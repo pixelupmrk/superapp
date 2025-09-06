@@ -90,10 +90,9 @@
 
 <script>
 /** ===== CONFIG =====
- * Troque abaixo para a URL pública do seu Replit (Baileys server)
- * ex.: https://pixelup-wa-server.seuusuario.repl.co
+ * URL pública do Replit (Baileys server) — já com a sua URL
  */
-const WA_API = "https://SEU-REPL-NAME.seuusuario.repl.co";
+const WA_API = "https://pixelup-wa-server.pixelupmrkt.repl.co";
 /** Chat API do Vercel */
 const CHAT_API = "/api/chat";
 
@@ -309,7 +308,7 @@ function CRM(){
         await showQR();
         if(!qrTimer) qrTimer = setInterval(showQR, 15000); // atualiza o QR a cada 15s
       }
-    }catch(e){ waStatus.textContent = "Erro ao iniciar sessão"; }
+    }catch(e){ waStatus.textContent = "Erro ao iniciar sessão"; console.error("startWA error:", e); }
   }
 
   $("#waStart").onclick = startWA;
@@ -570,55 +569,4 @@ function Chat(){
 router();
 </script>
 </body>
-</html><!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PixelUp SuperApp — Home, CRM, Mentoria e ChatBot</title>
-<style>
-/* ... todo o CSS que já te mandei antes ... */
-</style>
-</head>
-<body>
-<div class="top">
-  <div class="nav">
-    <div class="brand">
-      <div class="logo"></div>
-      <strong>PixelUp SuperApp</strong>
-      <span class="muted">Home • CRM • Mentoria • Chat</span>
-    </div>
-    <div class="tabs" id="tabs">
-      <button class="btn ghost" data-route="#/home">Home</button>
-      <button class="btn ghost" data-route="#/crm">CRM</button>
-      <button class="btn ghost" data-route="#/mentoria">Mentoria</button>
-      <button class="btn ghost" data-route="#/chat">ChatBot</button>
-    </div>
-  </div>
-</div>
-
-<div class="container">
-  <div class="bar">
-    <div class="back">
-      <button class="btn" id="btnBack">← Voltar</button>
-      <span id="crumb" class="muted"></span>
-    </div>
-    <div class="muted mono">Chat API: <span id="apiUrl"></span></div>
-  </div>
-  <div id="view"></div>
-</div>
-
-<script>
-/** ===== CONFIG =====
- * URL pública do Replit (Baileys server)
- */
-const WA_API = "https://pixelup-wa-server.pixelupmrkt.repl.co";
-/** Chat API do Vercel */
-const CHAT_API = "/api/chat";
-
-/* ===== Store, Utils, Router, Views etc ===== */
-/* ... aqui entra todo o código JS do index que já te mandei na última versão ... */
-</script>
-</body>
 </html>
-
