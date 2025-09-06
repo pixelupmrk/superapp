@@ -31,11 +31,6 @@
   th,td{border-bottom:1px solid var(--bd);padding:10px;text-align:left;vertical-align:top}
   .muted{color:var(--muted)}
   .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
-  .chat{display:grid;grid-template-rows:1fr auto;gap:10px;height:60vh}
-  .msgbox{background:#0b121c;border:1px solid var(--bd);border-radius:var(--br);padding:10px;overflow:auto}
-  .msg{margin:8px 0}
-  .msg.me{color:#33ccff}
-  .msg.bot{color:#00ff99}
   .hero{position:relative;overflow:hidden;border-radius:16px;border:1px solid var(--bd);background:linear-gradient(135deg,#001424,#012a46 35%,#004f74)}
   .hero-inner{padding:36px 24px;display:grid;gap:12px;grid-template-columns:1fr 1fr;align-items:center}
   .hero-left h1{margin:0 0 8px 0;font-size:28px}
@@ -60,6 +55,9 @@
   .nowrap{white-space:nowrap}
   .whats a{color:#00ff99;text-decoration:none}
   .chip{display:inline-block;padding:4px 8px;border:1px solid var(--bd);border-radius:999px;font-size:12px}
+  .qrbox{display:flex;align-items:center;gap:16px}
+  .qrcard{background:#0b121c;border:1px solid var(--bd);border-radius:12px;padding:10px;max-width:260px}
+  .qrcard img{width:100%;border-radius:8px;border:6px solid #00ffcc44}
 </style>
 </head>
 <body>
@@ -91,15 +89,15 @@
 </div>
 
 <script>
-/** CONFIG —>>> Troque pela URL do servidor WA */
-const WA_API = "https://SEU-SERVIDOR-WA.onrender.com"; // <— coloque aqui a URL do seu servidor Node
-/** Fim CONFIG */
+/** ===== CONFIG =====
+ * Troque abaixo para a URL pública do seu Replit (Baileys server)
+ * ex.: https://pixelup-wa-server.seuusuario.repl.co
+ */
+const WA_API = "https://SEU-REPL-NAME.seuusuario.repl.co";
+/** Chat API do Vercel */
+const CHAT_API = "/api/chat";
 
-const CHAT_API = "/api/chat"; // já está no Vercel
-
-/* =========================
-   Estado (localStorage)
-========================= */
+/* ===== Store (localStorage) ===== */
 const Store = {
   _get(k, def){ try{ return JSON.parse(localStorage.getItem(k) || JSON.stringify(def)); }catch(_){ return def; } },
   _set(k, v){ localStorage.setItem(k, JSON.stringify(v)); },
@@ -128,7 +126,7 @@ const $ = s => document.querySelector(s);
 const view = $("#view");
 $("#apiUrl").textContent = location.origin + CHAT_API;
 
-/* Router */
+/* ===== Router ===== */
 const routes = { "#/home":Home, "#/crm":CRM, "#/mentoria":Mentoria, "#/chat":Chat };
 function highlight(hash){ document.querySelectorAll("[data-route]").forEach(b=> b.classList.toggle("active", b.getAttribute("data-route")===hash)); }
 function router(){ const h = location.hash || "#/home"; (routes[h] || NotFound)(); highlight(h); $("#crumb").textContent = h.replace("#/","").toUpperCase(); }
@@ -136,12 +134,13 @@ window.addEventListener("hashchange", router);
 $("#tabs").addEventListener("click", e=>{ const b=e.target.closest("[data-route]"); if(!b) return; location.hash=b.getAttribute("data-route"); });
 $("#btnBack").onclick = ()=>{ if(history.length>1) history.back(); else location.hash="#/home"; };
 
-/* Utils */
+/* ===== Utils ===== */
 function telToWaLink(telRaw){ const d=String(telRaw||"").replace(/\D/g,""); const withDDI = d.startsWith("55")? d : ("55"+d); return "https://wa.me/"+withDDI; }
 function mdToHtml(md){ return String(md||"").replace(/\n\n/g,"</p><p>").replace(/\n/g,"<br>").replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>").replace(/\*(.*?)\*/g,"<em>$1</em>"); }
 
-/* Views */
+/* ===== Views ===== */
 function NotFound(){ view.innerHTML = `<div class="panel"><h2>404</h2><p class="muted">Rota não encontrada.</p></div>`; }
+
 function Home(){
   view.innerHTML = `
     <div class="hero">
@@ -162,10 +161,10 @@ function Home(){
       <div class="panel">
         <h3>Resumo</h3>
         <div class="grid" style="grid-template-columns:repeat(4,1fr)">
-          <div class="card"><div class="muted">Contatos</div><div id="k-contacts" style="font-size:24px"></div></div>
-          <div class="card"><div class="muted">Módulos</div><div id="k-mods" style="font-size:24px"></div></div>
-          <div class="card"><div class="muted">Mensagens</div><div id="k-msgs" style="font-size:24px"></div></div>
-          <div class="card"><div class="muted">API</div><div class="mono" style="font-size:14px">/api/chat</div></div>
+          <div class="panel"><div class="muted">Contatos</div><div id="k-contacts" style="font-size:24px"></div></div>
+          <div class="panel"><div class="muted">Módulos</div><div id="k-mods" style="font-size:24px"></div></div>
+          <div class="panel"><div class="muted">Mensagens</div><div id="k-msgs" style="font-size:24px"></div></div>
+          <div class="panel"><div class="muted">API</div><div class="mono" style="font-size:14px">/api/chat</div></div>
         </div>
       </div>
       <div class="panel">
@@ -222,15 +221,17 @@ function CRM(){
         <h3>Conexão WhatsApp</h3>
         <span id="waStatus" class="chip">verificando…</span>
       </div>
-      <div class="row">
-        <button class="btn" id="waStart">Conectar / Mostrar QR</button>
-        <button class="btn" id="waRefresh">Atualizar status</button>
-      </div>
-      <div class="grid" style="grid-template-columns:260px 1fr;margin-top:10px">
-        <div class="panel" id="qrPanel" style="display:none"><img id="qrImg" style="width:100%" alt="QR WhatsApp"/></div>
+      <div class="qrbox">
+        <div class="row">
+          <button class="btn" id="waStart">Conectar / Mostrar QR</button>
+          <button class="btn" id="waRefresh">Atualizar status</button>
+        </div>
+        <div class="qrcard" id="qrPanel" style="display:none">
+          <img id="qrImg" alt="QR WhatsApp"/>
+        </div>
         <div class="muted">
-          <p>• Abra o WhatsApp no celular → <strong>Configurações</strong> → <strong>Aparelhos conectados</strong> → <strong>Conectar um aparelho</strong> e escaneie o QR.</p>
-          <p>• Deixe este servidor sempre ligado (Railway/Render/VPS).</p>
+          <p>• WhatsApp no celular → <strong>Aparelhos conectados</strong> → <strong>Conectar um aparelho</strong> → escaneie o QR.</p>
+          <p>• No Replit free ele pode “dormir”; ao acordar talvez precise reconectar.</p>
         </div>
       </div>
     </div>
@@ -261,6 +262,7 @@ function CRM(){
   const waStatus = $("#waStatus");
   const qrPanel = $("#qrPanel");
   const qrImg = $("#qrImg");
+  let qrTimer = null;
 
   async function checkWA(){
     try{
@@ -269,10 +271,31 @@ function CRM(){
       if(j.connected){
         waStatus.textContent = `Conectado: ${j.user || ""}`;
         qrPanel.style.display = "none";
+        if(qrTimer) { clearInterval(qrTimer); qrTimer = null; }
       } else {
         waStatus.textContent = "Desconectado";
       }
     }catch(e){ waStatus.textContent = "Erro ao verificar"; }
+  }
+
+  async function showQR(){
+    try{
+      const r = await fetch(WA_API + "/api/wa/qr");
+      const j = await r.json();
+      if(j.connected){
+        waStatus.textContent = `Conectado: ${j.user || ""}`;
+        qrPanel.style.display = "none";
+        if(qrTimer) { clearInterval(qrTimer); qrTimer = null; }
+      } else if(j.qr){
+        qrImg.src = j.qr;
+        qrPanel.style.display = "block";
+        waStatus.textContent = "Aguardando leitura do QR…";
+      } else {
+        qrPanel.style.display = "none";
+      }
+    }catch(e){
+      // ignore
+    }
   }
 
   async function startWA(){
@@ -282,12 +305,9 @@ function CRM(){
       if(j.connected){
         waStatus.textContent = `Conectado: ${j.user || ""}`;
         qrPanel.style.display = "none";
-      } else if(j.qr){
-        qrImg.src = j.qr;
-        qrPanel.style.display = "block";
-        waStatus.textContent = "Aguardando leitura do QR…";
       } else {
-        waStatus.textContent = "Aguardando QR…";
+        await showQR();
+        if(!qrTimer) qrTimer = setInterval(showQR, 15000); // atualiza o QR a cada 15s
       }
     }catch(e){ waStatus.textContent = "Erro ao iniciar sessão"; }
   }
@@ -425,8 +445,6 @@ function CRM(){
         `).join("")}
       </div>
     `;
-
-    // Drag & Drop
     box.querySelectorAll("[draggable='true']").forEach(card=>{
       card.addEventListener("dragstart", e=>{
         e.dataTransfer.setData("text/plain", card.getAttribute("data-id"));
@@ -525,8 +543,8 @@ function Mentoria(){
 /* ===== Chat ===== */
 function Chat(){
   view.innerHTML = `
-    <div class="panel chat">
-      <div class="msgbox" id="msgs"></div>
+    <div class="panel" style="display:grid;grid-template-rows:1fr auto;gap:10px;height:60vh">
+      <div class="panel" id="msgs" style="overflow:auto"></div>
       <div class="row">
         <input id="text" placeholder="Digite sua mensagem..."/>
         <button class="btn pri" id="send">Enviar</button>
@@ -535,7 +553,7 @@ function Chat(){
     </div>
   `;
   const msgs = $("#msgs");
-  function add(role, t){ const d = document.createElement("div"); d.className="msg "+role; d.textContent=(role==="me"?"USER: ":"BOT: ")+t; msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight; }
+  function add(role, t){ const d = document.createElement("div"); d.style.margin="8px 0"; d.style.color = role==="me"?"#33ccff":"#00ff99"; d.textContent=(role==="me"?"USER: ":"BOT: ")+t; msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight; }
   async function send(){
     const t = $("#text").value.trim(); if(!t) return;
     $("#text").value=""; add("me", t); Store.msgCount = (Store.msgCount||0)+1;
@@ -548,7 +566,7 @@ function Chat(){
   $("#text").addEventListener("keydown", e=>{ if(e.key==="Enter") send(); });
 }
 
-/* Boot */
+/* boot */
 router();
 </script>
 </body>
