@@ -570,4 +570,55 @@ function Chat(){
 router();
 </script>
 </body>
+</html><!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PixelUp SuperApp — Home, CRM, Mentoria e ChatBot</title>
+<style>
+/* ... todo o CSS que já te mandei antes ... */
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="nav">
+    <div class="brand">
+      <div class="logo"></div>
+      <strong>PixelUp SuperApp</strong>
+      <span class="muted">Home • CRM • Mentoria • Chat</span>
+    </div>
+    <div class="tabs" id="tabs">
+      <button class="btn ghost" data-route="#/home">Home</button>
+      <button class="btn ghost" data-route="#/crm">CRM</button>
+      <button class="btn ghost" data-route="#/mentoria">Mentoria</button>
+      <button class="btn ghost" data-route="#/chat">ChatBot</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="bar">
+    <div class="back">
+      <button class="btn" id="btnBack">← Voltar</button>
+      <span id="crumb" class="muted"></span>
+    </div>
+    <div class="muted mono">Chat API: <span id="apiUrl"></span></div>
+  </div>
+  <div id="view"></div>
+</div>
+
+<script>
+/** ===== CONFIG =====
+ * URL pública do Replit (Baileys server)
+ */
+const WA_API = "https://pixelup-wa-server.pixelupmrkt.repl.co";
+/** Chat API do Vercel */
+const CHAT_API = "/api/chat";
+
+/* ===== Store, Utils, Router, Views etc ===== */
+/* ... aqui entra todo o código JS do index que já te mandei na última versão ... */
+</script>
+</body>
 </html>
+
