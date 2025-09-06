@@ -1,59 +1,334 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PixelUp SuperApp</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background:#0e1013; color:white }
-    #msgs { border:1px solid #444; height:250px; overflow:auto; padding:10px; background:#1a1d24; }
-    input { width:70%; padding:8px; }
-    button { padding:8px 12px; margin-left:6px; }
-    .user { color:#33ccff; }
-    .bot { color:#00ff99; }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PixelUp SuperApp — CRM + Mentoria + ChatBot</title>
+<style>
+  :root{
+    --bg:#0e1013; --panel:#161a22; --muted:#8aa4c1; --txt:#eaf6ff;
+    --pri:#00bfff; --ok:#22c55e; --warn:#f59e0b; --err:#ef4444; --br:14px;
+    --bd:rgba(255,255,255,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif}
+  .container{max-width:1100px;margin:0 auto;padding:18px}
+  .top{position:sticky;top:0;z-index:10;background:#0f1320cc;backdrop-filter:blur(8px);border-bottom:1px solid var(--bd)}
+  .nav{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:12px 18px}
+  .brand{display:flex;gap:10px;align-items:center}
+  .logo{width:26px;height:26px;border-radius:8px;background:radial-gradient(circle at 25% 25%,var(--pri),#012233)}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{appearance:none;border:1px solid var(--bd);background:#0f1724;color:var(--txt);padding:8px 12px;border-radius:10px;cursor:pointer}
+  .btn:hover{border-color:rgba(255,255,255,.18)}
+  .btn.pri{background:linear-gradient(90deg,var(--pri),#33ccff);color:#00131d;border:none}
+  .btn.ghost{background:transparent}
+  .active{box-shadow:0 0 0 1px #33ccff inset}
+  .grid{display:grid;gap:16px}
+  .panel{background:var(--panel);border:1px solid var(--bd);border-radius:var(--br);padding:16px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  input,textarea,select{width:100%;background:#0b121c;border:1px solid var(--bd);border-radius:10px;padding:10px;color:var(--txt)}
+  table{width:100%;border-collapse:collapse}
+  th,td{border-bottom:1px solid var(--bd);padding:10px;text-align:left}
+  .muted{color:var(--muted)}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+  .kpi{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:12px}
+  .card{background:#0f1724;border:1px solid var(--bd);border-radius:14px;padding:12px}
+  .chat{display:grid;grid-template-rows:1fr auto;gap:10px;height:60vh}
+  .msgbox{background:#0b121c;border:1px solid var(--bd);border-radius:var(--br);padding:10px;overflow:auto}
+  .msg{margin:8px 0}
+  .msg.me{color:#33ccff}
+  .msg.bot{color:#00ff99}
+  a{color:var(--pri)}
+</style>
 </head>
 <body>
-  <h1>PixelUp SuperApp</h1>
-  <p>CRM + Mentoria + ChatBot (Gemini)</p>
-
-  <div>
-    <h3>ChatBot</h3>
-    <div id="msgs"></div>
-    <input id="chatInput" placeholder="Digite sua mensagem..." />
-    <button id="btnSend">Enviar</button>
+<div class="top">
+  <div class="nav">
+    <div class="brand">
+      <div class="logo"></div>
+      <strong>PixelUp SuperApp</strong>
+      <span class="muted">CRM + Mentoria + ChatBot</span>
+    </div>
+    <div class="tabs" id="tabs">
+      <button class="btn ghost" data-route="#/dashboard">Dashboard</button>
+      <button class="btn ghost" data-route="#/crm">CRM</button>
+      <button class="btn ghost" data-route="#/mentoria">Mentoria</button>
+      <button class="btn ghost" data-route="#/chat">ChatBot</button>
+      <button class="btn ghost" data-route="#/sobre">Sobre</button>
+    </div>
   </div>
+</div>
 
-  <script>
-    const API_URL = "/api/chat";
+<div class="container">
+  <div id="view"></div>
+</div>
 
-    function addMsg(role, text){
-      const box = document.getElementById("msgs");
-      const div = document.createElement("div");
-      div.className = role;
-      div.textContent = role.toUpperCase()+": "+text;
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
+<script>
+/* =========================
+   Estado simples (localStorage)
+========================= */
+const Store = {
+  _get(k, def){ try{ return JSON.parse(localStorage.getItem(k) || JSON.stringify(def)); }catch(_){ return def; } },
+  _set(k, v){ localStorage.setItem(k, JSON.stringify(v)); },
+  get contacts(){ return this._get("px_contacts", []); },
+  set contacts(v){ this._set("px_contacts", v); },
+  get modules(){ return this._get("px_modules", [
+    {id:"m1", title:"Módulo 1 — Persona", order:1, content:"Defina **persona**, dores e desejos.\n\nChecklist:\n- Nicho e subnicho\n- Mapa de dores\n- Linguagem"},
+    {id:"m2", title:"Módulo 2 — Conteúdo", order:2, content:"Roteiro de posts (reels, stories, feed)."},
+    {id:"m3", title:"Módulo 3 — Anúncios", order:3, content:"Públicos, pixel/conversões e criativos."}
+  ]); },
+  set modules(v){ this._set("px_modules", v); },
+  get msgCount(){ return this._get("px_msgCount", 0); },
+  set msgCount(v){ this._set("px_msgCount", v); }
+};
+
+const $ = s => document.querySelector(s);
+const view = $("#view");
+
+/* =========================
+   Router
+========================= */
+const routes = {
+  "#/dashboard": Dashboard,
+  "#/crm": CRM,
+  "#/mentoria": Mentoria,
+  "#/chat": Chat,
+  "#/sobre": Sobre
+};
+
+function router(){
+  const h = location.hash || "#/dashboard";
+  document.querySelectorAll("[data-route]").forEach(b => {
+    b.classList.toggle("active", b.getAttribute("data-route") === h);
+  });
+  (routes[h] || NotFound)();
+}
+window.addEventListener("hashchange", router);
+
+/* =========================
+   Views
+========================= */
+function NotFound(){ view.innerHTML = `<div class="panel"><h2>404</h2><p class="muted">Rota não encontrada.</p></div>`; }
+
+function Dashboard(){
+  const contacts = Store.contacts.length;
+  const mods = Store.modules.length;
+  const msgs = Store.msgCount || 0;
+
+  view.innerHTML = `
+    <div class="grid">
+      <div class="kpi">
+        <div class="card"><div class="muted">Contatos</div><div style="font-size:24px">${contacts}</div></div>
+        <div class="card"><div class="muted">Módulos</div><div style="font-size:24px">${mods}</div></div>
+        <div class="card"><div class="muted">Mensagens</div><div style="font-size:24px">${msgs}</div></div>
+        <div class="card"><div class="muted">API</div><div class="mono" style="font-size:14px">${location.origin}/api/chat</div></div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <div class="panel">
+          <h3>Atalhos</h3>
+          <div class="row">
+            <button class="btn pri" onclick="location.hash='#/crm'">Abrir CRM</button>
+            <button class="btn" onclick="location.hash='#/mentoria'">Abrir Mentoria</button>
+            <button class="btn" onclick="location.hash='#/chat'">Abrir ChatBot</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Como funciona</h3>
+          <p class="muted">• CRM e Mentoria ficam no <code>localStorage</code> (sem depender de servidor).<br/>
+          • O ChatBot chama <code>/api/chat</code> que você já publicou no Vercel.<br/>
+          • Você pode migrar CRM/Mentoria para Firestore depois, se quiser.</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function CRM(){
+  const list = Store.contacts.slice();
+  view.innerHTML = `
+    <div class="grid" style="grid-template-columns:1.1fr .9fr">
+      <div class="panel">
+        <h2>Contatos</h2>
+        <table>
+          <thead><tr><th>Nome</th><th>Whats</th><th>Status</th><th></th></tr></thead>
+          <tbody id="tb"></tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <h3>Novo contato</h3>
+        <div class="grid">
+          <div><label>Nome</label><input id="c_name" placeholder="Cliente"/></div>
+          <div><label>WhatsApp</label><input id="c_whats" placeholder="(47) 99999-0000"/></div>
+          <div><label>Status</label>
+            <select id="c_status">
+              <option>Novo</option><option>Em atendimento</option>
+              <option>Ganhou</option><option>Perdeu</option>
+            </select>
+          </div>
+          <button class="btn pri" id="save">Salvar</button>
+          <div id="msg" class="muted"></div>
+        </div>
+      </div>
+    </div>
+  `;
+  const tb = $("#tb");
+  function render(){
+    tb.innerHTML = "";
+    if(!Store.contacts.length){
+      tb.innerHTML = `<tr><td colspan="4" class="muted">Sem contatos ainda.</td></tr>`;
+      return;
     }
+    Store.contacts.forEach((c,i)=>{
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${c.name||""}</td>
+        <td>${c.whats||""}</td>
+        <td>${c.status||""}</td>
+        <td><button class="btn" data-del="${i}">Excluir</button></td>
+      `;
+      tb.appendChild(tr);
+    });
+  }
+  render();
 
-    document.getElementById("btnSend").onclick = async ()=>{
-      const input = document.getElementById("chatInput");
-      const text = input.value.trim();
-      if(!text) return;
-      addMsg("user", text);
-      input.value="";
-      try{
-        const r = await fetch(API_URL, {
-          method:"POST",
-          headers:{ "Content-Type": "application/json" },
-          body: JSON.stringify({ message:text })
-        });
-        const data = await r.json();
-        addMsg("bot", data.reply);
-      }catch(err){
-        addMsg("bot", "Erro: "+err.message);
-      }
-    }
-  </script>
+  $("#save").onclick = ()=>{
+    const name = $("#c_name").value.trim();
+    const whats = $("#c_whats").value.trim();
+    const status = $("#c_status").value;
+    if(!name){ $("#msg").textContent = "Informe o nome."; return; }
+    const updated = Store.contacts;
+    updated.unshift({name,whats,status,created:Date.now()});
+    Store.contacts = updated;
+    $("#c_name").value = ""; $("#c_whats").value = ""; $("#msg").textContent = "Salvo!";
+    render();
+  };
+  tb.addEventListener("click", e=>{
+    const b = e.target.closest("[data-del]");
+    if(!b) return;
+    const i = +b.getAttribute("data-del");
+    const updated = Store.contacts; updated.splice(i,1); Store.contacts = updated; render();
+  });
+}
+
+function Mentoria(){
+  view.innerHTML = `
+    <div class="grid" style="grid-template-columns:.9fr 1.1fr">
+      <div class="panel">
+        <h2>Módulos</h2>
+        <div id="mods" class="grid"></div>
+      </div>
+      <div class="panel">
+        <h3 id="title" class="muted">Selecione um módulo</h3>
+        <div id="body" class="muted"></div>
+        <div class="row" style="margin-top:10px">
+          <input id="q" placeholder="Buscar no conteúdo..."/>
+          <button class="btn" id="bq">Buscar</button>
+        </div>
+        <div id="found" class="muted"></div>
+        <hr style="border:0;border-top:1px solid var(--bd);margin:12px 0"/>
+        <h3>Adicionar/Editar</h3>
+        <div class="grid">
+          <input id="m_title" placeholder="Módulo X — Título"/>
+          <input id="m_order" type="number" value="1"/>
+          <textarea id="m_content" rows="5" placeholder="Conteúdo (Markdown simples)"></textarea>
+          <button class="btn" id="m_save">Salvar módulo</button>
+          <div id="m_msg" class="muted"></div>
+        </div>
+      </div>
+    </div>
+  `;
+  const box = $("#mods");
+  const list = Store.modules.slice().sort((a,b)=> (a.order||0)-(b.order||0));
+
+  function renderMods(){
+    box.innerHTML = "";
+    list.forEach((m,idx)=>{
+      const el = document.createElement("div");
+      el.className = "panel";
+      el.innerHTML = `
+        <div class="row" style="justify-content:space-between">
+          <div><strong>${m.title}</strong> <span class="muted">#${m.order||0}</span></div>
+          <div>
+            <button class="btn" data-open="${idx}">Abrir</button>
+            <button class="btn" data-rm="${idx}">Excluir</button>
+          </div>
+        </div>`;
+      box.appendChild(el);
+    });
+  }
+  renderMods();
+
+  function mdToHtml(md){
+    return String(md||"")
+      .replace(/\n\n/g,"</p><p>")
+      .replace(/\n/g,"<br>")
+      .replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>")
+      .replace(/\*(.*?)\*/g,"<em>$1</em>");
+  }
+  function open(m){ $("#title").textContent = m.title; $("#body").innerHTML = "<p>"+mdToHtml(m.content||"")+"</p>"; }
+
+  box.addEventListener("click", e=>{
+    const o = e.target.closest("[data-open]"); const r = e.target.closest("[data-rm]");
+    if(o){ open(list[+o.getAttribute("data-open")]); }
+    if(r){ const i=+r.getAttribute("data-rm"); list.splice(i,1); Store.modules = list; renderMods(); $("#title").textContent="Selecione um módulo"; $("#body").textContent=""; }
+  });
+
+  $("#bq").onclick = ()=>{
+    const q = ($("#q").value||"").toLowerCase();
+    const found = list.filter(m => (m.content||"").toLowerCase().includes(q)).map(m=>m.title);
+    $("#found").textContent = found.length? ("Encontrado em: "+found.join(", ")) : "Nada encontrado.";
+  };
+
+  $("#m_save").onclick = ()=>{
+    const title = $("#m_title").value.trim();
+    const order = parseInt($("#m_order").value||"1",10) || 1;
+    const content = $("#m_content").value.trim();
+    if(!title || !content){ $("#m_msg").textContent = "Preencha título e conteúdo."; return; }
+    const id = title.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
+    const existsIdx = list.findIndex(m => m.id===id);
+    const obj = {id,title,order,content};
+    if(existsIdx>=0) list[existsIdx] = obj; else list.push(obj);
+    Store.modules = list; $("#m_msg").textContent = "Módulo salvo!"; renderMods();
+  };
+}
+
+function Chat(){
+  view.innerHTML = `
+    <div class="panel chat">
+      <div class="msgbox" id="msgs"></div>
+      <div class="row">
+        <input id="text" placeholder="Digite sua mensagem..."/>
+        <button class="btn pri" id="send">Enviar</button>
+        <span class="muted mono">→ /api/chat</span>
+      </div>
+    </div>
+  `;
+  const msgs = $("#msgs");
+  function add(role, t){ const d = document.createElement("div"); d.className="msg "+role; d.textContent=(role==="me"?"USER: ":"BOT: ")+t; msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight; }
+  async function send(){
+    const t = $("#text").value.trim(); if(!t) return;
+    $("#text").value=""; add("me", t); Store.msgCount = (Store.msgCount||0)+1;
+    try{
+      const r = await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:t})});
+      const data = await r.json(); add("bot", data.reply || JSON.stringify(data));
+    }catch(e){ add("bot","Erro: "+e.message); }
+  }
+  $("#send").onclick = send;
+  $("#text").addEventListener("keydown", e=>{ if(e.key==="Enter") send(); });
+}
+
+function Sobre(){
+  view.innerHTML = `
+    <div class="panel">
+      <h2>Sobre</h2>
+      <p class="muted">Este SuperApp é um exemplo pronto para rodar no Vercel: CRM + Mentoria (localStorage) e ChatBot (função serverless em <code>/api/chat</code> usando o Gemini API).</p>
+      <p>Quer migrar CRM e Mentoria para Firebase/Firestore? Podemos plugar login e banco rapidinho, mantendo a mesma UI.</p>
+    </div>
+  `;
+}
+
+router(); // primeira render
+</script>
 </body>
 </html>
