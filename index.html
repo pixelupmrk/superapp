@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PixelUp SuperApp</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background:#0e1013; color:white }
+    #msgs { border:1px solid #444; height:250px; overflow:auto; padding:10px; background:#1a1d24; }
+    input { width:70%; padding:8px; }
+    button { padding:8px 12px; margin-left:6px; }
+    .user { color:#33ccff; }
+    .bot { color:#00ff99; }
+  </style>
+</head>
+<body>
+  <h1>PixelUp SuperApp</h1>
+  <p>CRM + Mentoria + ChatBot (Gemini)</p>
+
+  <div>
+    <h3>ChatBot</h3>
+    <div id="msgs"></div>
+    <input id="chatInput" placeholder="Digite sua mensagem..." />
+    <button id="btnSend">Enviar</button>
+  </div>
+
+  <script>
+    const API_URL = "/api/chat";
+
+    function addMsg(role, text){
+      const box = document.getElementById("msgs");
+      const div = document.createElement("div");
+      div.className = role;
+      div.textContent = role.toUpperCase()+": "+text;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    document.getElementById("btnSend").onclick = async ()=>{
+      const input = document.getElementById("chatInput");
+      const text = input.value.trim();
+      if(!text) return;
+      addMsg("user", text);
+      input.value="";
+      try{
+        const r = await fetch(API_URL, {
+          method:"POST",
+          headers:{ "Content-Type": "application/json" },
+          body: JSON.stringify({ message:text })
+        });
+        const data = await r.json();
+        addMsg("bot", data.reply);
+      }catch(err){
+        addMsg("bot", "Erro: "+err.message);
+      }
+    }
+  </script>
+</body>
+</html>
