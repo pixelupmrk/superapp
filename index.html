@@ -314,4 +314,11 @@
     refreshStatus();
   </script>
 </body>
-</html>
+</html><script>
+  // força modo Proxy por padrão e oculta "Replit direto"
+  const proxyRadio = document.querySelector('input[name="mode"][value="proxy"]');
+  const replitLabel = document.querySelector('input[name="mode"][value="replit"]')?.closest('label');
+  if (proxyRadio) proxyRadio.checked = true;
+  if (replitLabel) replitLabel.style.display = 'none';
+</script>
+
