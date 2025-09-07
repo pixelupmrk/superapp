@@ -1,324 +1,572 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PixelUp SuperApp — WhatsApp</title>
-  <meta name="color-scheme" content="dark light">
-  <style>
-    :root{
-      --bg:#0e1013; --panel:#111827; --muted:#9aa4b2; --brand:#00b3ff; --brand-2:#18a1ff;
-      --ok:#16a34a; --warn:#f59e0b; --danger:#ef4444; --card:#0b1520; --line:#102437;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      background:linear-gradient(rgba(8,12,18,.9), rgba(8,12,18,.9)), radial-gradient(1200px 600px at 80% -10%, rgba(0,179,255,.18), transparent 60%),
-                 radial-gradient(900px 500px at -10% 120%, rgba(0,179,255,.12), transparent 60%), var(--bg);
-      color:#eaf6ff; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-    }
-    .topbar{
-      position:sticky; top:0; z-index:10; display:flex; gap:12px; align-items:center; padding:14px 18px;
-      background:rgba(11,21,32,.75); border-bottom:1px solid var(--line); backdrop-filter:saturate(1.2) blur(6px);
-    }
-    .brand{display:flex; align-items:center; gap:10px; font-weight:700}
-    .dot{width:12px; height:12px; border-radius:50%; background:linear-gradient(180deg,var(--brand),#3ddcff)}
-    nav{margin-left:auto; display:flex; gap:8px; flex-wrap:wrap}
-    nav a{color:#cfeaff; text-decoration:none; padding:6px 10px; border:1px solid transparent; border-radius:10px}
-    nav a.active, nav a:hover{border-color:#174464; background:rgba(0,179,255,.08)}
-
-    .container{max-width:980px; margin:24px auto; padding:0 16px}
-    .card{
-      background:linear-gradient(180deg, rgba(11,21,32,.85), rgba(8,12,18,.85));
-      border:1px solid #0f2a40; border-radius:16px; padding:18px; box-shadow:0 10px 40px rgba(0,179,255,.05);
-    }
-    h1{font-size:24px; margin:4px 0 8px}
-    .muted{color:var(--muted)}
-    .row{display:flex; gap:14px; flex-wrap:wrap; align-items:center}
-    .btn{
-      appearance:none; border:none; cursor:pointer; padding:10px 14px; border-radius:12px; color:#06141f; font-weight:700;
-      background:linear-gradient(180deg,#79d2ff,#27b0ff); box-shadow:0 4px 18px rgba(0,179,255,.3);
-    }
-    .btn.secondary{color:#dbeafe; background:transparent; border:1px solid #1b4663}
-    .btn:disabled{opacity:.6; cursor:not-allowed}
-    .badge{
-      display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid #123249; background:#09151f; color:#cfeaff;
-      font-size:12px; font-weight:600;
-    }
-    .b-ok{border-color:#134e27; color:#b7ffd3; background:#0a1a12}
-    .b-warn{border-color:#614214; color:#ffe9bd; background:#1b1407}
-    .b-danger{border-color:#5b1b1b; color:#ffcccc; background:#1b0a0a}
-
-    .grid{display:grid; grid-template-columns:1.2fr .8fr; gap:18px}
-    @media (max-width:900px){ .grid{grid-template-columns:1fr} }
-
-    .panel{border:1px solid #13304a; border-radius:14px; padding:14px; background:#0a1621}
-    label{font-size:12px; color:#9bb3c9}
-    input[type="text"]{
-      width:100%; padding:10px 12px; border-radius:10px; background:#0b1520; border:1px solid #183149; color:#dff1ff;
-      outline:none;
-    }
-    .switch{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-    .switch > *{display:flex; gap:8px; align-items:center}
-    .qrbox{
-      display:grid; place-items:center; min-height:280px; border:1px dashed #1f415c; border-radius:16px; background:#08121a; overflow:hidden;
-    }
-    .qrimg{max-width:100%; height:auto; image-rendering:pixelated}
-    .code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; font-size:12px; color:#bcd7f0}
-    .log{max-height:180px; overflow:auto; background:#08131b; border:1px solid #15324a; border-radius:10px; padding:8px; font-size:12px}
-    .hint{font-size:12px; color:#9fb8cc}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>PixelUp SuperApp — CRM • Mentoria • Chat • WhatsApp</title>
+<meta name="color-scheme" content="dark">
+<style>
+:root{
+  --bg:#0b1016;--panel:#0f1722;--muted:#9fb1c4;--text:#eaf6ff;
+  --brand:#00b3ff;--brand2:#2bc0ff;--line:#12334c;--ok:#16a34a;--warn:#f59e0b;--danger:#ef4444;
+}
+*{box-sizing:border-box} html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:
+linear-gradient(180deg,rgba(2,8,18,.9),rgba(2,8,18,.9)),
+radial-gradient(1000px 600px at 90% -10%, rgba(0,179,255,.18), transparent 60%),
+radial-gradient(800px 500px at -10% 120%, rgba(0,179,255,.12), transparent 60%), var(--bg); color:var(--text)}
+a{color:#cfeaff}
+.topbar{position:sticky;top:0;z-index:20;display:flex;gap:10px;align-items:center;padding:12px 16px;background:rgba(9,16,24,.8);backdrop-filter:saturate(1.3) blur(6px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800}
+.dot{width:12px;height:12px;border-radius:50%;background:linear-gradient(180deg,var(--brand),#39dbff)}
+nav{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+nav a{padding:8px 10px;border-radius:10px;text-decoration:none;color:#d7eeff;border:1px solid transparent}
+nav a.active,nav a:hover{border-color:#174464;background:rgba(0,179,255,.08)}
+.container{max-width:1100px;margin:20px auto;padding:0 14px}
+.page{display:none}
+.page.active{display:block}
+.card{background:linear-gradient(180deg,rgba(14,22,33,.9),rgba(9,15,24,.9));border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 10px 40px rgba(0,179,255,.06)}
+h1{font-size:22px;margin:6px 0 12px}
+h2{font-size:18px;margin:10px 0 8px}
+.muted{color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:1.1fr .9fr}
+@media (max-width:900px){.grid-2{grid-template-columns:1fr}}
+input,textarea,select{width:100%;padding:10px 12px;border-radius:10px;background:#0b1520;border:1px solid #183149;color:#dff1ff;outline:none}
+label{font-size:12px;color:#9bb3c9}
+.btn{appearance:none;border:none;cursor:pointer;padding:10px 14px;border-radius:12px;color:#05121b;font-weight:800;background:linear-gradient(180deg,#79d2ff,#27b0ff);box-shadow:0 4px 18px rgba(0,179,255,.3)}
+.btn.secondary{color:#dbeafe;background:transparent;border:1px solid #1b4663}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.badge{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid #123249;background:#09151f;color:#cfeaff;font-size:12px;font-weight:700}
+.b-ok{border-color:#134e27;color:#b7ffd3;background:#0a1a12}
+.b-warn{border-color:#614214;color:#ffe9bd;background:#1b1407}
+.b-danger{border-color:#5b1b1b;color:#ffcccc;background:#1b0a0a}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid #102437;padding:10px 8px;text-align:left}
+.kb{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kb-col{border:1px solid #13304a;border-radius:12px;padding:10px;background:#0b1622}
+.kb-card{border:1px solid #143149;border-radius:10px;padding:10px;background:#0a1824;margin-bottom:8px}
+.qrbox{display:grid;place-items:center;min-height:280px;border:1px dashed #1f415c;border-radius:16px;background:#08121a;overflow:hidden}
+.qrimg{max-width:100%;image-rendering:pixelated}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:#bcd7f0}
+.log{max-height:170px;overflow:auto;background:#08131b;border:1px solid #15324a;border-radius:10px;padding:8px;font-size:12px}
+.chatbox{height:360px;overflow:auto;border:1px solid #15324a;border-radius:12px;padding:10px;background:#08131b}
+.msg{margin:6px 0;display:flex;gap:8px}
+.msg .bubble{padding:10px 12px;border-radius:12px;max-width:78%}
+.msg.me{justify-content:flex-end}
+.msg.me .bubble{background:#11324b}
+.msg.ai .bubble{background:#0b1d2a}
+.small{font-size:12px}
+</style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand"><span class="dot"></span> PixelUp SuperApp</div>
-    <nav>
-      <a href="#" class="active">WhatsApp</a>
-      <a href="#crm">CRM</a>
-      <a href="#mentoria">Mentoria</a>
-      <a href="#chat">ChatBot</a>
-    </nav>
-  </header>
+<header class="topbar">
+  <div class="brand"><span class="dot"></span> PixelUp SuperApp</div>
+  <nav id="nav">
+    <a href="#home" class="active">Home</a>
+    <a href="#crm">CRM</a>
+    <a href="#mentoria">Mentoria</a>
+    <a href="#chat">ChatBot</a>
+    <a href="#whatsapp">WhatsApp</a>
+  </nav>
+</header>
 
-  <main class="container">
+<main class="container">
+
+  <!-- HOME -->
+  <section id="home" class="page active">
+    <div class="card">
+      <h1>Bem-vindo ao SuperApp da PixelUp</h1>
+      <p class="muted">CRM • Mentoria • Chat • Conexão WhatsApp. Tudo em um único lugar 💙</p>
+      <ul>
+        <li>Use o <b>CRM</b> para cadastrar contatos e acompanhar leads.</li>
+        <li>Consulte os <b>módulos da Mentoria</b> e junte tudo no fluxo de vendas.</li>
+        <li>Teste o <b>ChatBot</b> (via <span class="code">/api/chat/ask</span> no seu backend).</li>
+        <li>Faça a <b>Conexão WhatsApp</b> via proxy <span class="code">/api/wa</span>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CRM -->
+  <section id="crm" class="page">
+    <div class="card grid grid-2">
+      <div>
+        <h1>CRM — Contatos</h1>
+        <div class="row" id="authRow">
+          <span id="authBadge" class="badge b-warn">⏺ Deslogado</span>
+          <button id="btnLogout" class="btn secondary" style="display:none">Sair</button>
+        </div>
+        <div id="loginBox" style="margin-top:10px">
+          <div class="row">
+            <input id="email" type="email" placeholder="E-mail"/>
+            <input id="pass" type="password" placeholder="Senha"/>
+          </div>
+          <div class="row">
+            <button id="btnLogin" class="btn">Entrar</button>
+            <button id="btnSignup" class="btn secondary">Criar conta</button>
+          </div>
+          <p class="small muted">Autenticação Firebase. Se falhar, o CRM usa <b>localStorage</b> automaticamente.</p>
+        </div>
+
+        <div id="contactForm" style="display:none;margin-top:10px">
+          <h2>Novo contato</h2>
+          <div class="row">
+            <input id="c_name" placeholder="Nome"/>
+            <input id="c_phone" placeholder="Telefone (com DDD)"/>
+          </div>
+          <div class="row">
+            <input id="c_email" placeholder="E-mail"/>
+          </div>
+          <textarea id="c_notes" rows="3" placeholder="Observações"></textarea>
+          <div class="row" style="margin-top:8px">
+            <button id="btnSaveContact" class="btn">Salvar contato</button>
+            <span id="saveInfo" class="muted small"></span>
+          </div>
+
+          <h2 style="margin-top:18px">Lista</h2>
+          <table class="table" id="tblContacts">
+            <thead><tr><th>Nome</th><th>Telefone</th><th>E-mail</th><th>Obs.</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <h2>Kanban (simples)</h2>
+        <div class="kb" id="kanban">
+          <div class="kb-col" data-col="novo"><b>Novo</b><div class="kb-list"></div></div>
+          <div class="kb-col" data-col="progresso"><b>Em Progresso</b><div class="kb-list"></div></div>
+          <div class="kb-col" data-col="fechado"><b>Fechado</b><div class="kb-list"></div></div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <input id="leadTitle" placeholder="Título do lead"/>
+          <button id="btnAddLead" class="btn">Adicionar lead</button>
+        </div>
+        <p class="small muted">Arraste os cards entre colunas. O estado é salvo (Firestore se logado; senão localStorage).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENTORIA -->
+  <section id="mentoria" class="page">
+    <div class="card">
+      <h1>Mentoria PixelUp — Módulos</h1>
+      <div id="mentoriaList" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px"></div>
+    </div>
+  </section>
+
+  <!-- CHATBOT -->
+  <section id="chat" class="page">
+    <div class="card grid grid-2">
+      <div>
+        <h1>ChatBot (via /api/chat/ask)</h1>
+        <div class="chatbox" id="chatBox"></div>
+        <div class="row" style="margin-top:10px">
+          <input id="chatInput" placeholder="Digite sua pergunta..."/>
+          <button id="btnSendChat" class="btn">Enviar</button>
+        </div>
+        <p class="small muted">O backend deve expor <span class="code">POST /api/chat/ask</span> → <span class="code">{ reply }</span>.</p>
+      </div>
+      <div>
+        <h2>Dica</h2>
+        <p class="muted small">Se você preferir usar Gemini diretamente, deixe o backend proxiar a chave (não exponha no front).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHATSAPP -->
+  <section id="whatsapp" class="page">
     <div class="card">
       <div class="row" style="justify-content:space-between;">
         <div>
           <div class="muted">APIs: WA <span class="code">/status • /start • /qr • /health</span></div>
           <h1>Conexão WhatsApp</h1>
         </div>
-        <div id="statusBadge" class="badge b-warn">⏺ Desconectado</div>
+        <div id="waStatus" class="badge b-warn">⏺ Desconectado</div>
       </div>
 
-      <div class="grid" style="margin-top:10px">
+      <div class="grid grid-2" style="margin-top:10px">
         <section class="panel">
           <div class="row" style="margin-bottom:12px">
-            <button id="btnConnect" class="btn">Conectar / Mostrar QR</button>
-            <button id="btnStatus" class="btn secondary">Atualizar status</button>
-            <button id="btnLogout" class="btn secondary" title="Encerrar sessão">Logout</button>
+            <button id="waConnect" class="btn">Conectar / Mostrar QR</button>
+            <button id="waStatusBtn" class="btn secondary">Atualizar status</button>
+            <button id="waLogout" class="btn secondary" title="Encerrar sessão">Logout</button>
           </div>
-
           <div class="qrbox" id="qrBox">
             <div class="muted">Clique em <b>Conectar / Mostrar QR</b> e escaneie no WhatsApp → Aparelhos conectados.</div>
           </div>
-
-          <p class="hint" style="margin:10px 2px 0">
-            O QR é atualizado automaticamente até conectar. Depois de conectado, este painel mostra “Conectado”.
-          </p>
+          <p class="small muted" style="margin-top:8px">O QR atualiza até conectar. Depois, este painel mostra “Conectado”.</p>
         </section>
 
-        <aside class="panel">
-          <div class="switch" style="margin-bottom:10px">
-            <label><input type="radio" name="mode" value="replit" checked> Replit direto</label>
-            <label><input type="radio" name="mode" value="proxy"> Proxy /api/wa (Vercel)</label>
+        <aside class="panel" style="border:1px solid #13304a;border-radius:14px;padding:14px;background:#0a1621">
+          <div class="row" style="margin-bottom:8px">
+            <label style="display:flex;align-items:center;gap:6px"><input type="radio" name="waMode" value="proxy" checked> Proxy /api/wa (Vercel)</label>
+            <label style="display:flex;align-items:center;gap:6px"><input type="radio" name="waMode" value="replit"> Replit direto</label>
+          </div>
+          <label for="replitBase">Base Replit (se usar direto)</label>
+          <input id="replitBase" value="https://pixelup-wa-server.pixelupmrkt.repl.co"/>
+          <label style="margin-top:8px" for="waSession">Session ID</label>
+          <input id="waSession" value="pixelup"/>
+
+          <div class="code" style="margin-top:10px">Exemplos:
+            <div>GET <span id="exStatus">/api/wa/status?session=pixelup</span></div>
+            <div>POST <span id="exStart">/api/wa/start?session=pixelup</span></div>
+            <div>GET <span id="exQr">/api/wa/qr?session=pixelup</span></div>
           </div>
 
-          <label for="replitBase">Base do servidor (Replit)</label>
-          <input id="replitBase" type="text" value="https://pixelup-wa-server.pixelupmrkt.repl.co" spellcheck="false"/>
-
-          <div style="height:10px"></div>
-          <label for="sessionId">Session ID</label>
-          <input id="sessionId" type="text" value="pixelup" />
-
-          <div style="height:14px"></div>
-          <div class="code">Exemplos:
-            <div>GET <span id="exStatus">…/status?session=pixelup</span></div>
-            <div>POST <span id="exStart">…/start?session=pixelup</span></div>
-            <div>GET <span id="exQr">…/qr?session=pixelup</span></div>
-          </div>
-
-          <div style="height:14px"></div>
-          <div class="log" id="log"></div>
+          <div class="log" id="waLog" style="margin-top:10px"></div>
         </aside>
       </div>
     </div>
-  </main>
+  </section>
 
-  <script>
-    // --------- CONFIG ---------
-    const CONFIG = {
-      // Modo "proxy" usa o mesmo domínio do app: /api/wa
-      PROXY_BASE: "/api/wa",
-      // Modo "replit" vem da caixa de texto (pré-preenchida com o seu projeto)
-    };
+</main>
 
-    // --------- HELPERS UI ---------
-    const $ = sel => document.querySelector(sel);
-    const logEl = $("#log");
-    function log(msg, type="info"){
-      const t = new Date().toLocaleTimeString();
-      const line = document.createElement("div");
-      line.textContent = `[${t}] ${msg}`;
-      if(type==="err") line.style.color = "#ffb0b0";
-      if(type==="ok")  line.style.color = "#b9ffd5";
-      logEl.prepend(line);
-    }
-    function badge(state){
-      const el = $("#statusBadge");
-      el.className = "badge";
-      if(state==="connected"){ el.classList.add("b-ok"); el.textContent = "✅ Conectado"; }
-      else if(state==="connecting"){ el.classList.add("b-warn"); el.textContent = "⏳ Conectando…"; }
-      else if(state==="error"){ el.classList.add("b-danger"); el.textContent = "⚠️ Erro"; }
-      else { el.classList.add("b-warn"); el.textContent = "⏺ Desconectado"; }
-    }
-    function setQR(imgBlobOrDataUrl){
-      const box = $("#qrBox");
-      box.innerHTML = "";
-      const img = document.createElement("img");
-      img.className = "qrimg";
-      if(typeof imgBlobOrDataUrl === "string") img.src = imgBlobOrDataUrl;
-      else img.src = URL.createObjectURL(imgBlobOrDataUrl);
-      box.appendChild(img);
-    }
-    function setQRPlaceholder(){
-      $("#qrBox").innerHTML = '<div class="muted">Aguardando QR…</div>';
-    }
+<!-- Firebase compat (para simplificar o CRM) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
-    // --------- BUILD BASE URL ---------
-    function getMode(){ return document.querySelector('input[name="mode"]:checked').value; }
-    function getBase(){
-      const session = $("#sessionId").value.trim() || "pixelup";
-      let base = "";
-      if(getMode()==="proxy"){ base = CONFIG.PROXY_BASE; }
-      else {
-        base = ($("#replitBase").value || "").trim().replace(/\/+$/,"");
-        if(!/^https?:\/\//i.test(base)) base = "https://" + base;
-      }
-      // Preenche exemplos
-      $("#exStatus").textContent = `${base}/status?session=${session}`;
-      $("#exStart").textContent  = `${base}/start?session=${session}`;
-      $("#exQr").textContent     = `${base}/qr?session=${session}`;
-      return { base, session };
-    }
-
-    // --------- HTTP WRAPPER ---------
-    async function apiGet(path){
-      const {base} = getBase();
-      const url = `${base}${path}`;
-      const res = await fetch(url, {method:"GET"});
-      return {res, url};
-    }
-    async function apiPost(path, body){
-      const {base} = getBase();
-      const url = `${base}${path}`;
-      const res = await fetch(url, {method:"POST", headers:{'Content-Type':'application/json'}, body: body? JSON.stringify(body): null});
-      return {res, url};
-    }
-
-    // --------- ACTIONS ---------
-    let qrTimer = null, statusTimer = null;
-
-    async function refreshStatus(){
-      try{
-        const {session} = getBase();
-        const {res, url} = await apiGet(`/status?session=${encodeURIComponent(session)}`);
-        const ct = res.headers.get("content-type") || "";
-        let data = null;
-        if(ct.includes("application/json")) data = await res.json();
-        log(`GET ${url} → ${res.status}`);
-        if(!res.ok){ badge("error"); return; }
-        const connected = data && (data.connected || data.status==="CONNECTED" || data.state==="CONNECTED");
-        badge(connected? "connected":"");
-        return connected;
-      }catch(e){
-        log("Status falhou: "+e.message, "err");
-        badge("error");
-        return false;
-      }
-    }
-
-    async function startSessionAndShowQR(){
-      const {session} = getBase();
-      badge("connecting");
-      $("#btnConnect").disabled = true;
-      try{
-        // 1) start
-        const {res, url} = await apiPost(`/start?session=${encodeURIComponent(session)}`);
-        log(`POST ${url} → ${res.status}`);
-      }catch(e){
-        log("Start falhou: "+e.message, "err");
-      }
-
-      // 2) puxar QR em loop até conectar
-      setQRPlaceholder();
-      clearInterval(qrTimer); clearInterval(statusTimer);
-
-      qrTimer = setInterval(fetchQROnce, 3500);
-      statusTimer = setInterval(async ()=>{
-        const ok = await refreshStatus();
-        if(ok){
-          clearInterval(qrTimer);
-          clearInterval(statusTimer);
-          $("#btnConnect").disabled = false;
-          $("#qrBox").innerHTML = '<div class="muted">✅ Dispositivo conectado.</div>';
-        }
-      }, 3500);
-
-      // dispara primeiro fetch sem esperar o intervalo
-      fetchQROnce().finally(()=>{ $("#btnConnect").disabled = false; });
-    }
-
-    async function fetchQROnce(){
-      try{
-        const {session} = getBase();
-        const {res, url} = await apiGet(`/qr?session=${encodeURIComponent(session)}`);
-        log(`GET ${url} → ${res.status}`);
-        if(!res.ok){
-          // Alguns servidores retornam 204 quando já está conectado
-          if(res.status===204){ $("#qrBox").innerHTML = '<div class="muted">Sem QR (possivelmente já conectado).</div>'; return; }
-          throw new Error("QR não disponível");
-        }
-        const ct = res.headers.get("content-type") || "";
-        if(ct.includes("application/json")){
-          const j = await res.json();
-          if(j.qr){ setQR(j.qr.startsWith("data:")? j.qr : `data:image/png;base64,${j.qr}`); }
-          else if(j.image){ setQR(j.image); }
-          else { $("#qrBox").innerHTML = '<div class="muted">QR recebido (JSON), mas sem imagem.</div>'; }
-        }else{
-          const blob = await res.blob();
-          setQR(blob);
-        }
-      }catch(e){
-        $("#qrBox").innerHTML = `<div class="muted">Não foi possível obter o QR agora. Tente novamente.</div>`;
-        log("QR erro: "+e.message, "err");
-      }
-    }
-
-    async function doLogout(){
-      try{
-        const {session} = getBase();
-        const {res, url} = await apiPost(`/logout?session=${encodeURIComponent(session)}`);
-        log(`POST ${url} → ${res.status}`);
-        badge("");
-        $("#qrBox").innerHTML = '<div class="muted">Sessão finalizada. Clique em Conectar para gerar novo QR.</div>';
-      }catch(e){
-        log("Logout falhou: "+e.message, "err");
-      }
-    }
-
-    // --------- EVENTS ---------
-    $("#btnConnect").addEventListener("click", startSessionAndShowQR);
-    $("#btnStatus").addEventListener("click", refreshStatus);
-    $("#btnLogout").addEventListener("click", doLogout);
-    document.querySelectorAll('input[name="mode"]').forEach(r=>{
-      r.addEventListener("change", ()=>{ getBase(); });
+<script>
+/* =========================
+   Router simples (hash)
+========================= */
+const pages = ["home","crm","mentoria","chat","whatsapp"];
+function setPage(p){
+  pages.forEach(id=>{
+    document.getElementById(id).classList.toggle("active", id===p);
+    [...document.querySelectorAll("nav a")].forEach(a=>{
+      const hash = a.getAttribute("href").replace("#","");
+      if(hash===p) a.classList.add("active"); else a.classList.remove("active");
     });
-    $("#replitBase").addEventListener("change", ()=> getBase());
-    $("#sessionId").addEventListener("change", ()=> getBase());
+  });
+}
+window.addEventListener("hashchange", ()=> setPage(location.hash.replace("#","")||"home"));
+setPage(location.hash.replace("#","")||"home");
 
-    // Inicializa exemplos de rotas
-    getBase();
+/* =========================
+   Firebase (CRM)
+========================= */
+// Config do seu projeto (pode trocar aqui se tiver outro):
+const firebaseConfig = {
+  apiKey: "AIzaSyCjuQZP80sd4FtX83Zp5YgDmySpn7s6GZw",
+  authDomain: "pixelup-crm.firebaseapp.com",
+  projectId: "pixelup-crm",
+  storageBucket: "pixelup-crm.firebasestorage.app",
+  messagingSenderId: "286127901698",
+  appId: "1:286127901698:web:f4dd954937fad94757ab1b",
+  measurementId: "G-MBV63RYPN0"
+};
 
-    // Primeira checagem de status ao abrir
-    refreshStatus();
-  </script>
-</body>
-</html><script>
-  // força modo Proxy por padrão e oculta "Replit direto"
-  const proxyRadio = document.querySelector('input[name="mode"][value="proxy"]');
-  const replitLabel = document.querySelector('input[name="mode"][value="replit"]')?.closest('label');
-  if (proxyRadio) proxyRadio.checked = true;
-  if (replitLabel) replitLabel.style.display = 'none';
+// Init com fallback
+let fb = { ok:false }, auth=null, db=null;
+try{
+  const app = firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth(); db = firebase.firestore(); fb.ok = true;
+}catch(e){ console.warn("Firebase não inicializado, usando localStorage.", e); }
+
+// UI auth
+const authBadge = document.getElementById("authBadge");
+const loginBox = document.getElementById("loginBox");
+const btnLogout = document.getElementById("btnLogout");
+const contactForm = document.getElementById("contactForm");
+function setAuthUI(user){
+  if(user){
+    authBadge.className="badge b-ok"; authBadge.textContent="✅ "+(user.email||"Logado");
+    loginBox.style.display="none"; btnLogout.style.display="";
+    contactForm.style.display="";
+    loadContacts(); loadKanban();
+  }else{
+    authBadge.className="badge b-warn"; authBadge.textContent="⏺ Deslogado";
+    loginBox.style.display=""; btnLogout.style.display="none";
+    contactForm.style.display="none";
+  }
+}
+if(fb.ok){
+  auth.onAuthStateChanged(setAuthUI);
+}else{
+  // modo local sem login
+  setAuthUI({email:"modo local"});
+}
+
+document.getElementById("btnLogin").onclick = async ()=>{
+  const email = document.getElementById("email").value.trim();
+  const pass = document.getElementById("pass").value;
+  if(!email||!pass) return alert("Preencha e-mail e senha");
+  if(!fb.ok){ alert("Sem Firebase. Use modo local (contatos serão salvos no navegador)."); return; }
+  await auth.signInWithEmailAndPassword(email, pass);
+};
+document.getElementById("btnSignup").onclick = async ()=>{
+  const email = document.getElementById("email").value.trim();
+  const pass = document.getElementById("pass").value;
+  if(!email||!pass) return alert("Preencha e-mail e senha");
+  if(!fb.ok){ alert("Sem Firebase. Use modo local."); return; }
+  await auth.createUserWithEmailAndPassword(email, pass);
+};
+btnLogout.onclick = ()=> fb.ok ? auth.signOut() : location.reload();
+
+// Contatos
+const tblBody = document.querySelector("#tblContacts tbody");
+function row(c){
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td>${c.name||""}</td><td>${c.phone||""}</td><td>${c.email||""}</td><td>${c.notes||""}</td>`;
+  return tr;
+}
+function getUID(){ return fb.ok && auth.currentUser ? auth.currentUser.uid : "local"; }
+
+async function saveContact(){
+  const c = {
+    name: document.getElementById("c_name").value.trim(),
+    phone: document.getElementById("c_phone").value.trim(),
+    email: document.getElementById("c_email").value.trim(),
+    notes: document.getElementById("c_notes").value.trim(),
+    ts: Date.now()
+  };
+  if(!c.name) return alert("Digite um nome.");
+
+  const info = document.getElementById("saveInfo");
+  try{
+    if(fb.ok){
+      await db.collection("users").doc(getUID()).collection("contacts").add(c);
+    }else{
+      const key = "px_contacts_"+getUID();
+      const arr = JSON.parse(localStorage.getItem(key) || "[]"); arr.push(c);
+      localStorage.setItem(key, JSON.stringify(arr));
+    }
+    info.textContent = "Salvo!";
+    document.getElementById("c_name").value="";
+    document.getElementById("c_phone").value="";
+    document.getElementById("c_email").value="";
+    document.getElementById("c_notes").value="";
+  }catch(e){
+    info.textContent = "Erro ao salvar";
+  }
+}
+document.getElementById("btnSaveContact").onclick = saveContact;
+
+function renderContacts(list){
+  tblBody.innerHTML = "";
+  list.sort((a,b)=>b.ts-a.ts).forEach(c=> tblBody.appendChild(row(c)));
+}
+function loadContacts(){
+  const uid = getUID();
+  if(fb.ok){
+    db.collection("users").doc(uid).collection("contacts").orderBy("ts","desc")
+    .onSnapshot(snap=>{
+      const arr = []; snap.forEach(d=>arr.push(d.data())); renderContacts(arr);
+    });
+  }else{
+    const key = "px_contacts_"+uid;
+    const arr = JSON.parse(localStorage.getItem(key)||"[]"); renderContacts(arr);
+  }
+}
+
+// Kanban (muito simples)
+const kb = document.getElementById("kanban");
+const btnAddLead = document.getElementById("btnAddLead");
+btnAddLead.onclick = ()=>{
+  const t = document.getElementById("leadTitle").value.trim();
+  if(!t) return;
+  addCard({title:t,col:"novo",ts:Date.now()}); document.getElementById("leadTitle").value="";
+  saveKanban();
+};
+kb.addEventListener("dragstart", e=>{
+  if(e.target.classList.contains("kb-card")) e.dataTransfer.setData("id", e.target.dataset.id);
+});
+kb.querySelectorAll(".kb-col").forEach(col=>{
+  col.addEventListener("dragover", e=>e.preventDefault());
+  col.addEventListener("drop", e=>{
+    e.preventDefault();
+    const id = e.dataTransfer.getData("id");
+    const card = kb.querySelector(`.kb-card[data-id="${id}"]`);
+    col.querySelector(".kb-list").appendChild(card);
+    card.dataset.col = col.dataset.col;
+    saveKanban();
+  });
+});
+function addCard(c){
+  const el = document.createElement("div");
+  el.className="kb-card"; el.draggable=true;
+  el.dataset.id = String(c.ts); el.dataset.col=c.col;
+  el.innerHTML = `<div>${c.title}</div>`;
+  kb.querySelector(`.kb-col[data-col="${c.col}"] .kb-list`).appendChild(el);
+}
+function saveKanban(){
+  const cards = [...kb.querySelectorAll(".kb-card")].map(el=>({
+    title: el.textContent.trim(), col: el.dataset.col, ts: Number(el.dataset.id)
+  }));
+  const uid = getUID();
+  if(fb.ok){
+    db.collection("users").doc(uid).collection("kv").doc("kanban").set({cards});
+  }else{
+    localStorage.setItem("px_kanban_"+uid, JSON.stringify(cards));
+  }
+}
+function loadKanban(){
+  // limpa
+  kb.querySelectorAll(".kb-list").forEach(l=> l.innerHTML="");
+  const uid = getUID();
+  if(fb.ok){
+    db.collection("users").doc(uid).collection("kv").doc("kanban").onSnapshot(doc=>{
+      const cards = (doc.data() && doc.data().cards) || [];
+      kb.querySelectorAll(".kb-list").forEach(l=> l.innerHTML="");
+      cards.forEach(addCard);
+    });
+  }else{
+    const cards = JSON.parse(localStorage.getItem("px_kanban_"+uid)||"[]");
+    cards.forEach(addCard);
+  }
+}
+
+/* =========================
+   Mentoria (mock)
+========================= */
+const MENTORIA = [
+  {id:"m1",title:"Módulo 1 — Fundamentos do Negócio",desc:"Proposta de valor, persona, posicionamento, oferta."},
+  {id:"m2",title:"Módulo 2 — Algoritmo do Meta",desc:"Engajamento, sinais, distribuição, criativos."},
+  {id:"m3",title:"Módulo 3 — Cronograma de Postagens",desc:"Calendário, formatos, recorrência, templates."},
+  {id:"m4",title:"Módulo 4 — Conteúdo Visual",desc:"Vídeo curto, hook, CTA, design que vende."},
+  {id:"m5",title:"Módulo 5 — Copy com IA",desc:"Frameworks, prompts, headlines, ofertas irresistíveis."},
+  {id:"m6",title:"Módulo 6 — CRM & Follow-up",desc:"Funil, etapas, automações simples, scripts."},
+  {id:"m7",title:"Módulo 7 — Técnicas de Vendas",desc:"Rapport, objeções, fechamento, next step."},
+  {id:"m8",title:"Módulo 8 — Humanização da Marca",desc:"Tom de voz, bastidores, autoridade e prova."}
+];
+const mentList = document.getElementById("mentoriaList");
+MENTORIA.forEach(m=>{
+  const c = document.createElement("div");
+  c.className="card"; c.innerHTML = `<h3>${m.title}</h3><p class="muted">${m.desc}</p><button class="btn secondary" onclick="alert('Abra sua página de aula para ${m.id}')">Abrir</button>`;
+  mentList.appendChild(c);
+});
+
+/* =========================
+   ChatBot (proxy /api/chat/ask)
+========================= */
+const chatBox = document.getElementById("chatBox");
+function pushMsg(who, text){
+  const row = document.createElement("div"); row.className = "msg "+(who==="me"?"me":"ai");
+  row.innerHTML = `<div class="bubble">${text}</div>`; chatBox.appendChild(row); chatBox.scrollTop = chatBox.scrollHeight;
+}
+async function askChat(message){
+  try{
+    const session = getUID() || "anon";
+    const res = await fetch("/api/chat/ask",{
+      method:"POST",headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message, session })
+    });
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const data = await res.json();
+    return data.reply || JSON.stringify(data);
+  }catch(e){
+    return "Erro no chat. Verifique seu backend em /api/chat/ask.";
+  }
+}
+document.getElementById("btnSendChat").onclick = async ()=>{
+  const inp = document.getElementById("chatInput");
+  const q = inp.value.trim(); if(!q) return;
+  pushMsg("me", q); inp.value="";
+  const r = await askChat(q);
+  pushMsg("ai", r);
+};
+
+/* =========================
+   WhatsApp Connect
+========================= */
+const waLog = document.getElementById("waLog");
+const waStatus = document.getElementById("waStatus");
+function walog(s,t=""){ const ts=new Date().toLocaleTimeString(); const d=document.createElement("div"); d.textContent=`[${ts}] ${s}`; if(t==="err") d.style.color="#ffb0b0"; waLog.prepend(d); }
+function setWABadge(state){
+  if(state==="connected"){ waStatus.className="badge b-ok"; waStatus.textContent="✅ Conectado"; }
+  else if(state==="error"){ waStatus.className="badge b-danger"; waStatus.textContent="⚠️ Erro"; }
+  else if(state==="connecting"){ waStatus.className="badge b-warn"; waStatus.textContent="⏳ Conectando…"; }
+  else { waStatus.className="badge b-warn"; waStatus.textContent="⏺ Desconectado"; }
+}
+function waBase(){
+  const mode = document.querySelector('input[name="waMode"]:checked').value;
+  const session = document.getElementById("waSession").value.trim() || "pixelup";
+  let base = "/api/wa"; // proxy por padrão
+  if(mode==="replit"){
+    base = (document.getElementById("replitBase").value.trim() || "").replace(/\/+$/,"");
+    if(!/^https?:\/\//i.test(base)) base="https://"+base;
+  }
+  // exemplos
+  document.getElementById("exStatus").textContent = `${base}/status?session=${session}`;
+  document.getElementById("exStart").textContent  = `${base}/start?session=${session}`;
+  document.getElementById("exQr").textContent     = `${base}/qr?session=${session}`;
+  return {base, session};
+}
+async function waGET(path){
+  const {base}=waBase(); const url = `${base}${path}`;
+  const r = await fetch(url); return {r,url};
+}
+async function waPOST(path, body){
+  const {base}=waBase(); const url = `${base}${path}`;
+  const r = await fetch(url,{method:"POST",headers:{'Content-Type':'application/json'},body: body?JSON.stringify(body):null});
+  return {r,url};
+}
+let qrTimer=null, stTimer=null;
+async function refreshWAStatus(){
+  try{
+    const {session} = waBase();
+    const {r,url} = await waGET(`/status?session=${encodeURIComponent(session)}`);
+    walog(`GET ${url} → ${r.status}`);
+    if(!r.ok){ setWABadge("error"); return false; }
+    const ct = r.headers.get("content-type")||"";
+    let data=null; if(ct.includes("json")) data = await r.json();
+    const connected = data && (data.connected || data.state==="CONNECTED" || data.status==="CONNECTED");
+    setWABadge(connected?"connected":""); return connected;
+  }catch(e){ walog("Status falhou: "+e.message,"err"); setWABadge("error"); return false; }
+}
+async function showQRLoop(){
+  const {session} = waBase();
+  setWABadge("connecting");
+  try{
+    const {r,url} = await waPOST(`/start?session=${encodeURIComponent(session)}`);
+    walog(`POST ${url} → ${r.status}`);
+  }catch(e){ walog("Start falhou: "+e.message,"err"); }
+
+  const box = document.getElementById("qrBox");
+  const paintQR = async ()=>{
+    try{
+      const {r,url} = await waGET(`/qr?session=${encodeURIComponent(session)}`);
+      walog(`GET ${url} → ${r.status}`);
+      if(r.status===204){ box.innerHTML='<div class="muted">Sem QR (possível sessão já conectada).</div>'; return; }
+      if(!r.ok){ box.innerHTML='<div class="muted">Não foi possível obter o QR agora.</div>'; return; }
+      const ct = r.headers.get("content-type")||"";
+      if(ct.includes("json")){
+        const j = await r.json();
+        if(j.qr) box.innerHTML = `<img class="qrimg" src="${j.qr.startsWith('data:')? j.qr : 'data:image/png;base64,'+j.qr}">`;
+        else if(j.image) box.innerHTML = `<img class="qrimg" src="${j.image}">`;
+        else box.innerHTML = '<div class="muted">QR recebido (JSON), mas sem imagem.</div>';
+      }else{
+        const blob = await r.blob(); const urlObj = URL.createObjectURL(blob);
+        box.innerHTML = `<img class="qrimg" src="${urlObj}">`;
+      }
+    }catch(e){ box.innerHTML='<div class="muted">Falha ao obter QR.</div>'; walog("QR erro: "+e.message,"err"); }
+  };
+  clearInterval(qrTimer); clearInterval(stTimer);
+  await paintQR();
+  qrTimer = setInterval(paintQR, 3500);
+  stTimer = setInterval(async ()=>{
+    if(await refreshWAStatus()){ clearInterval(qrTimer); clearInterval(stTimer); box.innerHTML='<div class="muted">✅ Dispositivo conectado.</div>'; }
+  }, 3500);
+}
+async function waLogout(){
+  try{
+    const {session} = waBase();
+    const {r,url} = await waPOST(`/logout?session=${encodeURIComponent(session)}`);
+    walog(`POST ${url} → ${r.status}`); setWABadge("");
+    document.getElementById("qrBox").innerHTML='<div class="muted">Sessão finalizada. Clique em Conectar para gerar novo QR.</div>';
+  }catch(e){ walog("Logout falhou: "+e.message,"err"); }
+}
+document.getElementById("waConnect").onclick = showQRLoop;
+document.getElementById("waStatusBtn").onclick = refreshWAStatus;
+document.getElementById("waLogout").onclick = waLogout;
+document.querySelectorAll('input[name="waMode"]').forEach(r=> r.addEventListener("change", waBase));
+document.getElementById("replitBase").addEventListener("change", waBase);
+document.getElementById("waSession").addEventListener("change", waBase);
+waBase(); refreshWAStatus();
 </script>
 
+</body>
+</html>
