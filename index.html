@@ -18,6 +18,7 @@
   .brand{display:flex;gap:10px;align-items:center}
   .logo{display:none}
   .brand-img{width:28px;height:28px;border-radius:8px;border:1px solid var(--bd);object-fit:cover;box-shadow:0 0 12px rgba(0,191,255,.35)}
+    
   .tabs{display:flex;gap:8px;flex-wrap:wrap}
   .btn{appearance:none;border:1px solid var(--bd);background:#0f1724;color:var(--txt);padding:8px 12px;border-radius:10px;cursor:pointer}
   .btn:hover{border-color:rgba(255,255,255,.2)}
@@ -59,8 +60,6 @@
   .qrbox{display:flex;align-items:center;gap:16px}
   .qrcard{background:#0b121c;border:1px solid var(--bd);border-radius:12px;padding:10px;max-width:260px}
   .qrcard img{width:100%;border-radius:8px;border:6px solid #00ffcc44}
-
-  /* ===== Atendimento Overlay ===== */
   .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:50}
   .drawer{width:min(920px,96vw);max-height:86vh;overflow:auto;background:var(--panel);border:1px solid var(--bd);border-radius:16px;padding:14px}
   .bubble{max-width:80%;padding:10px 12px;border-radius:12px;margin:6px 0}
@@ -68,6 +67,7 @@
   .out{background:#07222d;border:1px solid #094b65;align-self:flex-end}
   .msglist{display:flex;flex-direction:column;gap:2px}
   .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
 </style>
 </head>
 <body>
@@ -100,7 +100,7 @@
 
 <script>
 /** ===== CONFIG =====
- * URL pública do Replit (Baileys server)
+ * URL pública do Replit (Baileys server) — já com a sua URL
  */
 const WA_API = "https://pixelup-wa-server.pixelupmrkt.repl.co";
 /** Chat API do Vercel */
@@ -120,7 +120,8 @@ const Store = {
   get msgCount(){ return this._get("px_msgCount", 0); },
   set msgCount(v){ this._set("px_msgCount", v); },
 
-  get modulesSeed(){
+  \
+get modulesSeed(){
     return [
       {id:"m1",  order:1,  title:"Fundamentos — Persona",
         content:"Defina **persona**, dores, desejos e objeções.\n\nChecklist:\n- Nicho e subnicho\n- Mapa de dores\n- Benefícios\n- Linguagem\n- Proposta de Valor"},
@@ -141,10 +142,10 @@ const Store = {
     ];
   },
   get modulesUser(){ return this._get("px_modules_user", []); },
-  set modulesUser(v){ this._set("px_modules_user", v); },
 
   get threads(){ return this._get("px_threads", {}); },
-  set threads(v){ this._set("px_threads", v); }
+  set threads(v){ this._set("px_threads", v); },
+  set modulesUser(v){ this._set("px_modules_user", v); }
 };
 
 const $ = s => document.querySelector(s);
@@ -345,7 +346,7 @@ function CRM(){
   renderTable();
   renderKanban();
 
-  // ===== Atendimento overlay (chat por contato) =====
+  // Atendimento overlay
   const overlay = document.createElement("div");
   overlay.className = "overlay";
   overlay.innerHTML = `
@@ -436,6 +437,7 @@ function CRM(){
   $("#attRecv").onclick = ()=>{
     const t = prompt("Mensagem recebida do cliente:", ""); if(!t) return;
     const thread = getThread().arr; thread.push({role:"in", text:t}); setThread(thread); renderThread();
+    // Se Auto estiver ligado, gerar com IA e enviar
     if($("#attAuto").checked){
       aiSuggest(t).then(async s=>{
         const thread2 = getThread().arr; thread2.push({role:"out", text:s}); setThread(thread2); renderThread();
@@ -443,6 +445,7 @@ function CRM(){
       });
     }
   };
+
 
   function renderOrigins(){
     const d = $("#origins"); d.innerHTML = "";
@@ -490,7 +493,6 @@ function CRM(){
       </table>`;
     const tb = $("#tb");
     if(!list.length){ tb.innerHTML = `<tr><td colspan="8" class="muted">Sem contatos ainda.</td></tr>`; return; }
-    tb.innerHTML = "";
     list.forEach((c,i)=>{
       const tr = document.createElement("tr");
       tr.innerHTML = `
@@ -513,11 +515,10 @@ function CRM(){
       tb.appendChild(tr);
     });
     tb.addEventListener("click", async e=>{
-      const attend = e.target.closest("[data-attend]");
-      if(attend){ const i = +attend.getAttribute("data-attend"); openAttend(i); return; }
-
       const send = e.target.closest("[data-send]");
       const del  = e.target.closest("[data-del]");
+      const attend = e.target.closest('[data-attend]');
+      if(attend){ const i = +attend.getAttribute('data-attend'); openAttend(i); return; }
       if(send){
         const i = +send.getAttribute("data-send");
         const c = Store.contacts[i];
