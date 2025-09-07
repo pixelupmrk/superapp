@@ -16,7 +16,9 @@
   .top{position:sticky;top:0;z-index:10;background:#0f1320cc;backdrop-filter:blur(8px);border-bottom:1px solid var(--bd)}
   .nav{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:12px 18px}
   .brand{display:flex;gap:10px;align-items:center}
-  .logo{width:28px;height:28px;border-radius:8px;background:radial-gradient(circle at 25% 25%,var(--pri),#012233)}
+  .logo{display:none}
+  .brand-img{width:28px;height:28px;border-radius:8px;border:1px solid var(--bd);object-fit:cover;box-shadow:0 0 12px rgba(0,191,255,.35)}
+    
   .tabs{display:flex;gap:8px;flex-wrap:wrap}
   .btn{appearance:none;border:1px solid var(--bd);background:#0f1724;color:var(--txt);padding:8px 12px;border-radius:10px;cursor:pointer}
   .btn:hover{border-color:rgba(255,255,255,.2)}
@@ -58,13 +60,21 @@
   .qrbox{display:flex;align-items:center;gap:16px}
   .qrcard{background:#0b121c;border:1px solid var(--bd);border-radius:12px;padding:10px;max-width:260px}
   .qrcard img{width:100%;border-radius:8px;border:6px solid #00ffcc44}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:50}
+  .drawer{width:min(920px,96vw);max-height:86vh;overflow:auto;background:var(--panel);border:1px solid var(--bd);border-radius:16px;padding:14px}
+  .bubble{max-width:80%;padding:10px 12px;border-radius:12px;margin:6px 0}
+  .in{background:#0b121c;border:1px solid var(--bd);align-self:flex-start}
+  .out{background:#07222d;border:1px solid #094b65;align-self:flex-end}
+  .msglist{display:flex;flex-direction:column;gap:2px}
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
 </style>
 </head>
 <body>
 <div class="top">
   <div class="nav">
     <div class="brand">
-      <div class="logo"></div>
+      <img class="brand-img" src="pixelup-logo.png" alt="PixelUp" />
       <strong>PixelUp SuperApp</strong>
       <span class="muted">Home • CRM • Mentoria • Chat</span>
     </div>
@@ -110,14 +120,31 @@ const Store = {
   get msgCount(){ return this._get("px_msgCount", 0); },
   set msgCount(v){ this._set("px_msgCount", v); },
 
-  get modulesSeed(){
+  \
+get modulesSeed(){
     return [
-      {id:"m1", title:"Fundamentos — Persona", order:1, content:"Defina **persona**, dores, desejos e objeções.\n\nChecklist:\n- Nicho e subnicho\n- Mapa de dores\n- Benefícios\n- Linguagem"},
-      {id:"m2", title:"Conteúdo e Calendário", order:2, content:"Roteiro de posts (reels, stories, feed).\n\nSugestões:\n- 3x Reels/semana\n- 5x Stories/dia\n- 3x Feed/semana"},
-      {id:"m3", title:"Anúncios — Meta", order:3, content:"Públicos, pixel/conversões, criativos, orçamento."}
+      {id:"m1",  order:1,  title:"Fundamentos — Persona",
+        content:"Defina **persona**, dores, desejos e objeções.\n\nChecklist:\n- Nicho e subnicho\n- Mapa de dores\n- Benefícios\n- Linguagem\n- Proposta de Valor"},
+      {id:"m2",  order:2,  title:"Algoritmo da Meta (FB/IG)",
+        content:"Como o algoritmo distribui alcance, sinais de engajamento e qualidade do conteúdo.\n\nPrático:\n- Sinais de interesse (saves, shares)\n- Retenção nos Reels\n- Primeiros 60 minutos\n- Conteúdo frescor vs. consistência"},
+      {id:"m3",  order:3,  title:"Cronograma de Postagens",
+        content:"Crie um calendário semanal:\n- 3x Reels/semana\n- 5–10 Stories/dia\n- 3x Feed/semana\n- 1 Live/quinzena\n\nUse temas fixos (Seg: prova social, Qua: bastidores, Sex: oferta)."},
+      {id:"m4",  order:4,  title:"Conteúdo Visual que Vende",
+        content:"Diretrizes visuais e roteiros rápidos:\n- Aberturas fortes (3s)\n- Hooks e CTAs\n- Enquadramento e luz\n- Branding PixelUp (azul/neon)\n- Bancada de templates para posts"},
+      {id:"m5",  order:5,  title:"Copy com IA (ChatGPT)",
+        content:"Estruturas: AIDA, PAS, 4Ps.\n\nPrompt base:\n- Persona + Dor + Oferta + Prova + CTA\n\nTarefas:\n- 10 ganchos para Reels\n- 3 legendas curtas com CTA\n- Variações de anúncios (Topo/Meio/Fundo)"},
+      {id:"m6",  order:6,  title:"CRM e Processo Comercial",
+        content:"Pipeline: Novo → Em atendimento → Proposta → Vendido → Perdido.\n\nBoas práticas:\n- SLA de resposta\n- Notas por contato\n- Scripts de qualificação\n- Follow-up com lembretes"},
+      {id:"m7",  order:7,  title:"Técnicas de Vendas (rapport)",
+        content:"Rapport, espelhamento, resumo empático, perguntas SPIN.\n\nRoteiro:\n1) Quebra-gelo\n2) Descoberta\n3) Proposta de valor\n4) Tratamento de objeções\n5) Fechamento"},
+      {id:"m8",  order:8,  title:"Humanização da Marca",
+        content:"Tom de voz, narrativa, bastidores, prova social, UGC e atendimento humanizado.\n\nKPIs:\n- Respostas D+1\n- Taxa de áudio x texto\n- Mensagens salvas/compartilhadas"}
     ];
   },
   get modulesUser(){ return this._get("px_modules_user", []); },
+
+  get threads(){ return this._get("px_threads", {}); },
+  set threads(v){ this._set("px_threads", v); },
   set modulesUser(v){ this._set("px_modules_user", v); }
 };
 
@@ -153,7 +180,7 @@ function Home(){
             <button class="btn" onclick="location.hash='#/chat'">Abrir ChatBot</button>
           </div>
         </div>
-        <div class="hero-right"><div class="hero-logo"></div></div>
+        <div class="hero-right"><img src="pixelup-logo.png" alt="PixelUp" style="width:220px;height:220px;border-radius:16px;object-fit:cover;border:1px solid var(--bd);box-shadow:0 0 40px rgba(0,191,255,.35)"/></div>
       </div>
     </div>
     <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:16px">
@@ -319,6 +346,107 @@ function CRM(){
   renderTable();
   renderKanban();
 
+  // Atendimento overlay
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+  overlay.innerHTML = `
+    <div class="drawer">
+      <div class="row" style="justify-content:space-between">
+        <strong>Atendimento</strong>
+        <button class="btn" id="attClose">Fechar</button>
+      </div>
+      <div class="muted" id="attInfo" style="margin:6px 0 10px"></div>
+      <div class="panel" style="display:grid;grid-template-rows:1fr auto;gap:8px;height:50vh">
+        <div id="attMsgs" class="msglist panel" style="overflow:auto"></div>
+        <div class="toolbar">
+          <input id="attInput" placeholder="Digite a mensagem..."/>
+          <button class="btn" id="attSend">Enviar via Whats</button>
+          <button class="btn" id="attAI">Sugerir resposta com IA</button>
+          <label class="muted" style="display:flex;align-items:center;gap:6px">
+            <input type="checkbox" id="attAuto"/> Auto (IA → enviar)
+          </label>
+          <button class="btn" id="attRecv">Add recebida</button>
+        </div>
+      </div>
+      <div class="muted" style="font-size:12px;margin-top:8px">
+        Dica: você pode configurar um *webhook* no seu servidor Baileys para POST em <code>/api/inbox</code> (Vercel) e as mensagens aparecerem automaticamente aqui.
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  let currentContact = null;
+
+  function openAttend(idx){
+    currentContact = Store.contacts[idx];
+    overlay.style.display = "flex";
+    $("#attInfo").textContent = `${currentContact.name} • ${currentContact.whats}`;
+    renderThread();
+  }
+  function closeAttend(){ overlay.style.display = "none"; currentContact = null; }
+
+  function getThread(){
+    const t = Store.threads || {};
+    const key = (currentContact?.whats || "").replace(/\D/g,"");
+    return { key, arr: t[key] || [] };
+  }
+  function setThread(arr){
+    const t = Store.threads || {};
+    t[getThread().key] = arr;
+    Store.threads = t;
+  }
+  function renderThread(){
+    const list = getThread().arr;
+    const box = $("#attMsgs"); box.innerHTML = "";
+    list.forEach(m=>{
+      const b = document.createElement("div");
+      b.className = "bubble " + (m.role === "out" ? "out" : "in");
+      b.textContent = m.text;
+      box.appendChild(b);
+    });
+    box.scrollTop = box.scrollHeight;
+  }
+  async function sendWA(text){
+    const r = await fetch(WA_API + "/api/wa/send", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ to: currentContact.whats, text })
+    });
+    const j = await r.json();
+    if(!j?.ok) alert("Falha ao enviar: " + (j?.error || "desconhecido"));
+    return j?.ok;
+  }
+  async function aiSuggest(text){
+    const context = `Você é um assistente de atendimento da PixelUp (agência de marketing). Responda de forma breve, educada e orientada a conversão. Dados do contato: nome=${currentContact?.name||""}, origem=${currentContact?.source||""}, estágio=${currentContact?.stage||""}. Mensagem do cliente: "${text}"`;
+    const r = await fetch(CHAT_API, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ message: context })});
+    const j = await r.json();
+    return j?.reply || "Sem sugestão.";
+  }
+
+  $("#attClose").onclick = closeAttend;
+  $("#attSend").onclick = async ()=>{
+    const t = $("#attInput").value.trim(); if(!t) return;
+    $("#attInput").value = "";
+    const thread = getThread().arr; thread.push({role:"out", text:t}); setThread(thread); renderThread();
+    await sendWA(t);
+  };
+  $("#attAI").onclick = async ()=>{
+    const lastIn = prompt("Cole a última mensagem recebida do cliente (até automatizarmos via webhook):", "");
+    if(!lastIn) return;
+    const suggestion = await aiSuggest(lastIn);
+    $("#attInput").value = suggestion;
+  };
+  $("#attRecv").onclick = ()=>{
+    const t = prompt("Mensagem recebida do cliente:", ""); if(!t) return;
+    const thread = getThread().arr; thread.push({role:"in", text:t}); setThread(thread); renderThread();
+    // Se Auto estiver ligado, gerar com IA e enviar
+    if($("#attAuto").checked){
+      aiSuggest(t).then(async s=>{
+        const thread2 = getThread().arr; thread2.push({role:"out", text:s}); setThread(thread2); renderThread();
+        await sendWA(s);
+      });
+    }
+  };
+
+
   function renderOrigins(){
     const d = $("#origins"); d.innerHTML = "";
     Store.origins.forEach(o=>{
@@ -379,6 +507,7 @@ function CRM(){
         <td>${c.owner||""}</td>
         <td>${c.date||""}</td>
         <td class="nowrap">
+          <button class="btn" data-attend="${i}">Atender</button>
           <button class="btn" data-send="${i}">Enviar Whats</button>
           <button class="btn" data-del="${i}">Excluir</button>
         </td>
@@ -388,6 +517,8 @@ function CRM(){
     tb.addEventListener("click", async e=>{
       const send = e.target.closest("[data-send]");
       const del  = e.target.closest("[data-del]");
+      const attend = e.target.closest('[data-attend]');
+      if(attend){ const i = +attend.getAttribute('data-attend'); openAttend(i); return; }
       if(send){
         const i = +send.getAttribute("data-send");
         const c = Store.contacts[i];
