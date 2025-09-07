@@ -3,63 +3,63 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CRM PixelUp — Versão Inicial</title>
+<title>CRM PixelUp + WhatsApp</title>
 <meta name="color-scheme" content="dark">
 <style>
-:root{
-  --bg:#0b1016;--panel:#0f1722;--muted:#9fb1c4;--text:#eaf6ff;
-  --brand:#00b3ff;--line:#12334c;--ok:#16a34a;--warn:#f59e0b;
-}
+:root{--bg:#0b1016;--panel:#0f1722;--muted:#9fb1c4;--text:#eaf6ff;--brand:#00b3ff;--line:#12334c;--ok:#16a34a;--warn:#f59e0b}
 *{box-sizing:border-box} html,body{height:100%}
-body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  background:linear-gradient(180deg,rgba(2,8,18,.92),rgba(2,8,18,.92)),
-  radial-gradient(900px 520px at 90% -10%, rgba(0,179,255,.18), transparent 60%),
-  radial-gradient(800px 500px at -10% 120%, rgba(0,179,255,.12), transparent 60%), #0e1013;
-  color:var(--text)}
-a{color:#cfeaff}
-.topbar{position:sticky;top:0;z-index:10;display:flex;gap:12px;align-items:center;padding:12px 16px;
-  background:rgba(9,16,24,.8);backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid var(--line)}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:
+linear-gradient(180deg,rgba(2,8,18,.92),rgba(2,8,18,.92)),
+radial-gradient(900px 520px at 90% -10%, rgba(0,179,255,.18), transparent 60%),
+radial-gradient(800px 500px at -10% 120%, rgba(0,179,255,.12), transparent 60%), #0e1013;color:var(--text)}
+.topbar{position:sticky;top:0;z-index:10;display:flex;gap:12px;align-items:center;padding:12px 16px;background:rgba(9,16,24,.8);backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800}
 .dot{width:12px;height:12px;border-radius:50%;background:linear-gradient(180deg,var(--brand),#39dbff)}
+nav{margin-left:auto;display:flex;gap:6px}
+nav a{padding:8px 10px;border-radius:10px;text-decoration:none;color:#d7eeff;border:1px solid transparent}
+nav a.active,nav a:hover{border-color:#174464;background:rgba(0,179,255,.08)}
 .container{max-width:1100px;margin:22px auto;padding:0 14px}
-.card{background:linear-gradient(180deg,rgba(14,22,33,.9),rgba(9,15,24,.9));border:1px solid var(--line);
-  border-radius:16px;padding:16px;box-shadow:0 10px 40px rgba(0,179,255,.06)}
-h1{font-size:22px;margin:6px 0 12px}
-h2{font-size:18px;margin:12px 0 8px}
+.page{display:none}.page.active{display:block}
+.card{background:linear-gradient(180deg,rgba(14,22,33,.9),rgba(9,15,24,.9));border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 10px 40px rgba(0,179,255,.06)}
+h1{font-size:22px;margin:6px 0 12px} h2{font-size:18px;margin:12px 0 8px}
 .muted{color:var(--muted)} .small{font-size:12px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.grid{display:grid;gap:16px}
-.grid-2{grid-template-columns:1.1fr .9fr}
-@media (max-width:900px){.grid-2{grid-template-columns:1fr}}
+.grid{display:grid;gap:16px}.grid-2{grid-template-columns:1.1fr .9fr}@media (max-width:900px){.grid-2{grid-template-columns:1fr}}
 input,textarea{width:100%;padding:10px 12px;border-radius:10px;background:#0b1520;border:1px solid #183149;color:#dff1ff;outline:none}
-.btn{appearance:none;border:none;cursor:pointer;padding:10px 14px;border-radius:12px;color:#05121b;font-weight:800;
-  background:linear-gradient(180deg,#79d2ff,#27b0ff);box-shadow:0 4px 18px rgba(0,179,255,.3)}
+.btn{appearance:none;border:none;cursor:pointer;padding:10px 14px;border-radius:12px;color:#05121b;font-weight:800;background:linear-gradient(180deg,#79d2ff,#27b0ff);box-shadow:0 4px 18px rgba(0,179,255,.3)}
 .btn.secondary{color:#dbeafe;background:transparent;border:1px solid #1b4663}
 .badge{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid #123249;background:#09151f;color:#cfeaff;font-size:12px;font-weight:700}
 .b-ok{border-color:#134e27;color:#b7ffd3;background:#0a1a12}
 .b-warn{border-color:#614214;color:#ffe9bd;background:#1b1407}
-.table{width:100%;border-collapse:collapse}
-.table th,.table td{border-bottom:1px solid #102437;padding:10px 8px;text-align:left}
+.table{width:100%;border-collapse:collapse}.table th,.table td{border-bottom:1px solid #102437;padding:10px 8px;text-align:left}
 .kb{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .kb-col{border:1px solid #13304a;border-radius:12px;padding:10px;background:#0b1622}
 .kb-card{border:1px solid #143149;border-radius:10px;padding:10px;background:#0a1824;margin-bottom:8px}
+.qrbox{display:grid;place-items:center;min-height:280px;border:1px dashed #1f415c;border-radius:16px;background:#08121a;overflow:hidden}
+.qrimg{max-width:100%;image-rendering:pixelated}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:#bcd7f0}
+.log{max-height:170px;overflow:auto;background:#08131b;border:1px solid #15324a;border-radius:10px;padding:8px;font-size:12px}
 </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand"><span class="dot"></span> CRM PixelUp</div>
-  </header>
+<header class="topbar">
+  <div class="brand"><span class="dot"></span> PixelUp CRM</div>
+  <nav>
+    <a href="#crm" class="active">CRM</a>
+    <a href="#whatsapp">WhatsApp</a>
+  </nav>
+</header>
 
-  <main class="container">
+<main class="container">
+  <!-- CRM (igual ao início) -->
+  <section id="crm" class="page active">
     <div class="card grid grid-2">
-      <!-- Coluna esquerda: Auth + Contatos -->
       <section>
         <h1>Contatos</h1>
         <div class="row" id="authRow">
           <span id="authBadge" class="badge b-warn">⏺ Deslogado</span>
           <button id="btnLogout" class="btn secondary" style="display:none">Sair</button>
         </div>
-
         <div id="loginBox" style="margin-top:10px">
           <div class="row">
             <input id="email" type="email" placeholder="E-mail"/>
@@ -69,7 +69,7 @@ input,textarea{width:100%;padding:10px 12px;border-radius:10px;background:#0b152
             <button id="btnLogin" class="btn">Entrar</button>
             <button id="btnSignup" class="btn secondary">Criar conta</button>
           </div>
-          <p class="small muted">Autenticação via Firebase. Se não estiver disponível, o CRM usa <b>localStorage</b>.</p>
+          <p class="small muted">Autenticação Firebase. Sem Firebase, usa <b>localStorage</b>.</p>
         </div>
 
         <div id="contactForm" style="display:none;margin-top:10px">
@@ -95,7 +95,6 @@ input,textarea{width:100%;padding:10px 12px;border-radius:10px;background:#0b152
         </div>
       </section>
 
-      <!-- Coluna direita: Kanban simples -->
       <aside>
         <h2>Kanban</h2>
         <div class="kb" id="kanban">
@@ -107,190 +106,182 @@ input,textarea{width:100%;padding:10px 12px;border-radius:10px;background:#0b152
           <input id="leadTitle" placeholder="Título do lead"/>
           <button id="btnAddLead" class="btn">Adicionar lead</button>
         </div>
-        <p class="small muted">Arraste os cards entre colunas. O estado é salvo no Firestore (logado) ou localStorage.</p>
+        <p class="small muted">Arraste os cards. Estado salvo no Firestore (logado) ou localStorage.</p>
       </aside>
     </div>
-  </main>
+  </section>
 
-  <!-- Firebase compat para manter tudo simples -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <!-- WhatsApp (conectar e mostrar QR) -->
+  <section id="whatsapp" class="page">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <div class="muted">APIs: <span class="code">/api/wa/status • /start • /qr</span></div>
+          <h1>Conexão WhatsApp</h1>
+        </div>
+        <div id="waStatus" class="badge b-warn">⏺ Desconectado</div>
+      </div>
+      <div class="row" style="margin:10px 0">
+        <button id="waConnect" class="btn">Conectar / Mostrar QR</button>
+        <button id="waStatusBtn" class="btn secondary">Atualizar status</button>
+      </div>
+      <div class="qrbox" id="qrBox">
+        <div class="muted">Clique em <b>Conectar / Mostrar QR</b> e escaneie no WhatsApp → Aparelhos conectados.</div>
+      </div>
+      <p class="small muted" style="margin-top:8px">O bot responde automaticamente (saudação/menu). Contatos podem ser gravados no CRM via Firestore Admin no Replit.</p>
+      <div class="log" id="waLog" style="margin-top:10px"></div>
+    </div>
+  </section>
+</main>
 
-  <script>
-  // ============ Firebase (mesma config do início) ============
-  const firebaseConfig = {
-    apiKey: "AIzaSyCjuQZP80sd4FtX83Zp5YgDmySpn7s6GZw",
-    authDomain: "pixelup-crm.firebaseapp.com",
-    projectId: "pixelup-crm",
-    storageBucket: "pixelup-crm.firebasestorage.app",
-    messagingSenderId: "286127901698",
-    appId: "1:286127901698:web:f4dd954937fad94757ab1b",
-    measurementId: "G-MBV63RYPN0"
-  };
+<!-- Firebase compat -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
-  let fb = { ok:false }, auth=null, db=null;
-  try{
-    const app = firebase.initializeApp(firebaseConfig);
-    auth = firebase.auth();
-    db = firebase.firestore();
-    fb.ok = true;
-  }catch(e){
-    console.warn("Firebase não inicializado; CRM usará localStorage.", e);
-  }
+<script>
+// Router simples
+const pages=["crm","whatsapp"];
+function setPage(p){ pages.forEach(id=>{document.getElementById(id).classList.toggle("active", id===p)}); [...document.querySelectorAll("nav a")].forEach(a=>{a.classList.toggle("active", a.getAttribute("href")==="#"+p)}); }
+window.addEventListener("hashchange", ()=> setPage((location.hash||"#crm").slice(1)));
+setPage((location.hash||"#crm").slice(1));
 
-  // ======== UI de autenticação ========
-  const authBadge = document.getElementById("authBadge");
-  const loginBox  = document.getElementById("loginBox");
-  const btnLogout = document.getElementById("btnLogout");
-  const contactForm = document.getElementById("contactForm");
+// Firebase (igual ao início)
+const firebaseConfig = {
+  apiKey:"AIzaSyCjuQZP80sd4FtX83Zp5YgDmySpn7s6GZw",
+  authDomain:"pixelup-crm.firebaseapp.com",
+  projectId:"pixelup-crm",
+  storageBucket:"pixelup-crm.firebasestorage.app",
+  messagingSenderId:"286127901698",
+  appId:"1:286127901698:web:f4dd954937fad94757ab1b",
+  measurementId:"G-MBV63RYPN0"
+};
+let fb={ok:false}, auth=null, db=null;
+try{ const app=firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); fb.ok=true; }catch(e){ console.warn("Sem Firebase; usando localStorage."); }
 
-  function setAuthUI(user){
-    if(user){
-      authBadge.className="badge b-ok";
-      authBadge.textContent="✅ "+(user.email||"Logado");
-      loginBox.style.display="none";
-      btnLogout.style.display="";
-      contactForm.style.display="";
-      loadContacts(); loadKanban();
-    }else{
-      authBadge.className="badge b-warn";
-      authBadge.textContent="⏺ Deslogado";
-      loginBox.style.display="";
-      btnLogout.style.display="none";
-      contactForm.style.display="none";
-    }
-  }
+const authBadge=document.getElementById("authBadge");
+const loginBox=document.getElementById("loginBox");
+const btnLogout=document.getElementById("btnLogout");
+const contactForm=document.getElementById("contactForm");
+function setAuthUI(user){
+  if(user){ authBadge.className="badge b-ok"; authBadge.textContent="✅ "+(user.email||"Logado"); loginBox.style.display="none"; btnLogout.style.display=""; contactForm.style.display=""; loadContacts(); loadKanban(); }
+  else{ authBadge.className="badge b-warn"; authBadge.textContent="⏺ Deslogado"; loginBox.style.display=""; btnLogout.style.display="none"; contactForm.style.display="none"; }
+}
+if(fb.ok){ auth.onAuthStateChanged(setAuthUI); } else { setAuthUI({email:"modo local"}); }
+document.getElementById("btnLogin").onclick = async ()=>{
+  const email=document.getElementById("email").value.trim(); const pass=document.getElementById("pass").value;
+  if(!email||!pass) return alert("Preencha e-mail e senha");
+  if(!fb.ok) return alert("Sem Firebase. Use modo local.");
+  await auth.signInWithEmailAndPassword(email, pass);
+};
+document.getElementById("btnSignup").onclick = async ()=>{
+  const email=document.getElementById("email").value.trim(); const pass=document.getElementById("pass").value;
+  if(!email||!pass) return alert("Preencha e-mail e senha");
+  if(!fb.ok) return alert("Sem Firebase. Use modo local.");
+  await auth.createUserWithEmailAndPassword(email, pass);
+};
+btnLogout.onclick = ()=> fb.ok ? auth.signOut() : location.reload();
 
-  if(fb.ok){ auth.onAuthStateChanged(setAuthUI); } else { setAuthUI({email:"modo local"}); }
+function getUID(){ return fb.ok && auth.currentUser ? auth.currentUser.uid : "local"; }
 
-  document.getElementById("btnLogin").onclick = async ()=>{
-    const email = document.getElementById("email").value.trim();
-    const pass  = document.getElementById("pass").value;
-    if(!email||!pass) return alert("Preencha e-mail e senha");
-    if(!fb.ok){ alert("Sem Firebase. Usando modo local."); return; }
-    await auth.signInWithEmailAndPassword(email, pass);
-  };
-  document.getElementById("btnSignup").onclick = async ()=>{
-    const email = document.getElementById("email").value.trim();
-    const pass  = document.getElementById("pass").value;
-    if(!email||!pass) return alert("Preencha e-mail e senha");
-    if(!fb.ok){ alert("Sem Firebase. Usando modo local."); return; }
-    await auth.createUserWithEmailAndPassword(email, pass);
-  };
-  btnLogout.onclick = ()=> fb.ok ? auth.signOut() : location.reload();
-
-  function getUID(){ return fb.ok && auth.currentUser ? auth.currentUser.uid : "local"; }
-
-  // ======== Contatos ========
-  const tblBody = document.querySelector("#tblContacts tbody");
-  function row(c){
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${c.name||""}</td><td>${c.phone||""}</td><td>${c.email||""}</td><td>${c.notes||""}</td>`;
-    return tr;
-  }
-  function renderContacts(list){
-    tblBody.innerHTML=""; list.sort((a,b)=>b.ts-a.ts).forEach(c=>tblBody.appendChild(row(c)));
-  }
-
-  async function loadContacts(){
-    const uid = getUID();
-    if(fb.ok){
-      db.collection("users").doc(uid).collection("contacts").orderBy("ts","desc")
-        .onSnapshot(snap=>{ const arr=[]; snap.forEach(d=>arr.push(d.data())); renderContacts(arr); });
-    }else{
-      const arr = JSON.parse(localStorage.getItem("px_contacts_"+uid)||"[]");
-      renderContacts(arr);
-    }
-  }
-
-  async function saveContact(){
-    const c = {
-      name: document.getElementById("c_name").value.trim(),
-      phone: document.getElementById("c_phone").value.trim(),
-      email: document.getElementById("c_email").value.trim(),
-      notes: document.getElementById("c_notes").value.trim(),
-      ts: Date.now()
-    };
-    if(!c.name) return alert("Digite um nome");
-    const info = document.getElementById("saveInfo");
-    try{
-      if(fb.ok){
-        await db.collection("users").doc(getUID()).collection("contacts").add(c);
-      }else{
-        const key="px_contacts_"+getUID();
-        const arr=JSON.parse(localStorage.getItem(key)||"[]"); arr.push(c);
-        localStorage.setItem(key, JSON.stringify(arr));
-      }
-      info.textContent="Salvo!";
-      document.getElementById("c_name").value="";
-      document.getElementById("c_phone").value="";
-      document.getElementById("c_email").value="";
-      document.getElementById("c_notes").value="";
-    }catch(e){ info.textContent="Erro ao salvar"; }
-  }
-  document.getElementById("btnSaveContact").onclick = saveContact;
-
-  // ======== Kanban simples ========
-  const kb = document.getElementById("kanban");
-  const btnAddLead = document.getElementById("btnAddLead");
-  btnAddLead.onclick = ()=>{
-    const t = document.getElementById("leadTitle").value.trim();
-    if(!t) return;
-    addCard({title:t,col:"novo",ts:Date.now()});
-    document.getElementById("leadTitle").value="";
-    saveKanban();
-  };
-
-  kb.addEventListener("dragstart", e=>{
-    if(e.target.classList.contains("kb-card")) e.dataTransfer.setData("id", e.target.dataset.id);
-  });
-  kb.querySelectorAll(".kb-col").forEach(col=>{
-    col.addEventListener("dragover", e=>e.preventDefault());
-    col.addEventListener("drop", e=>{
-      e.preventDefault();
-      const id = e.dataTransfer.getData("id");
-      const card = kb.querySelector(`.kb-card[data-id="${id}"]`);
-      col.querySelector(".kb-list").appendChild(card);
-      card.dataset.col = col.dataset.col;
-      saveKanban();
+// Contatos
+const tblBody=document.querySelector("#tblContacts tbody");
+function row(c){ const tr=document.createElement("tr"); tr.innerHTML = `<td>${c.name||""}</td><td>${c.phone||""}</td><td>${c.email||""}</td><td>${c.notes||""}</td>`; return tr; }
+function renderContacts(list){ tblBody.innerHTML=""; list.sort((a,b)=>b.ts-a.ts).forEach(c=> tblBody.appendChild(row(c))); }
+async function loadContacts(){
+  const uid=getUID();
+  if(fb.ok){
+    db.collection("users").doc(uid).collection("contacts").orderBy("ts","desc").onSnapshot(snap=>{
+      const arr=[]; snap.forEach(d=>arr.push(d.data())); renderContacts(arr);
     });
+  }else{
+    const arr=JSON.parse(localStorage.getItem("px_contacts_"+uid)||"[]"); renderContacts(arr);
+  }
+}
+async function saveContact(){
+  const c={ name: c_name.value.trim(), phone:c_phone.value.trim(), email:c_email.value.trim(), notes:c_notes.value.trim(), ts:Date.now() };
+  if(!c.name) return alert("Digite um nome");
+  const info=document.getElementById("saveInfo");
+  try{
+    if(fb.ok){
+      await db.collection("users").doc(getUID()).collection("contacts").add(c);
+    }else{
+      const key="px_contacts_"+getUID(); const arr=JSON.parse(localStorage.getItem(key)||"[]"); arr.push(c); localStorage.setItem(key, JSON.stringify(arr));
+    }
+    info.textContent="Salvo!"; c_name.value=c_phone.value=c_email.value=c_notes.value="";
+  }catch(e){ info.textContent="Erro"; }
+}
+document.getElementById("btnSaveContact").onclick = saveContact;
+
+// Kanban simples
+const kb=document.getElementById("kanban");
+btnAddLead.onclick = ()=>{ const t=leadTitle.value.trim(); if(!t) return; addCard({title:t,col:"novo",ts:Date.now()}); leadTitle.value=""; saveKanban(); };
+kb.addEventListener("dragstart", e=>{ if(e.target.classList.contains("kb-card")) e.dataTransfer.setData("id", e.target.dataset.id); });
+kb.querySelectorAll(".kb-col").forEach(col=>{
+  col.addEventListener("dragover", e=>e.preventDefault());
+  col.addEventListener("drop", e=>{
+    e.preventDefault();
+    const id=e.dataTransfer.getData("id");
+    const card=kb.querySelector(`.kb-card[data-id="${id}"]`);
+    col.querySelector(".kb-list").appendChild(card);
+    card.dataset.col=col.dataset.col; saveKanban();
   });
-
-  function addCard(c){
-    const el = document.createElement("div");
-    el.className="kb-card"; el.draggable=true;
-    el.dataset.id = String(c.ts); el.dataset.col=c.col;
-    el.innerHTML = `<div>${c.title}</div>`;
-    kb.querySelector(`.kb-col[data-col="${c.col}"] .kb-list`).appendChild(el);
+});
+function addCard(c){ const el=document.createElement("div"); el.className="kb-card"; el.draggable=true; el.dataset.id=String(c.ts); el.dataset.col=c.col; el.innerHTML=`<div>${c.title}</div>`; kb.querySelector(`.kb-col[data-col="${c.col}"] .kb-list`).appendChild(el); }
+function saveKanban(){
+  const cards=[...kb.querySelectorAll(".kb-card")].map(el=>({title:el.textContent.trim(), col:el.dataset.col, ts:Number(el.dataset.id)}));
+  const uid=getUID();
+  if(fb.ok){ db.collection("users").doc(uid).collection("kv").doc("kanban").set({cards}); }
+  else{ localStorage.setItem("px_kanban_"+uid, JSON.stringify(cards)); }
+}
+function loadKanban(){
+  kb.querySelectorAll(".kb-list").forEach(l=> l.innerHTML="");
+  const uid=getUID();
+  if(fb.ok){
+    db.collection("users").doc(uid).collection("kv").doc("kanban").onSnapshot(doc=>{
+      const cards=(doc.data()&&doc.data().cards)||[]; kb.querySelectorAll(".kb-list").forEach(l=> l.innerHTML=""); cards.forEach(addCard);
+    });
+  }else{
+    const cards=JSON.parse(localStorage.getItem("px_kanban_"+uid)||"[]"); cards.forEach(addCard);
   }
+}
 
-  function saveKanban(){
-    const cards = [...kb.querySelectorAll(".kb-card")].map(el=>({
-      title: el.textContent.trim(), col: el.dataset.col, ts: Number(el.dataset.id)
-    }));
-    const uid = getUID();
-    if(fb.ok){
-      db.collection("users").doc(uid).collection("kv").doc("kanban").set({cards});
-    }else{
-      localStorage.setItem("px_kanban_"+uid, JSON.stringify(cards));
-    }
-  }
-
-  function loadKanban(){
-    kb.querySelectorAll(".kb-list").forEach(l=> l.innerHTML="");
-    const uid = getUID();
-    if(fb.ok){
-      db.collection("users").doc(uid).collection("kv").doc("kanban").onSnapshot(doc=>{
-        const cards = (doc.data() && doc.data().cards) || [];
-        kb.querySelectorAll(".kb-list").forEach(l=> l.innerHTML="");
-        cards.forEach(addCard);
-      });
-    }else{
-      const cards = JSON.parse(localStorage.getItem("px_kanban_"+uid)||"[]");
-      cards.forEach(addCard);
-    }
-  }
-  </script>
+// WhatsApp (via proxy /api/wa para Vercel -> Replit)
+const waLog=document.getElementById("waLog");
+const waStatus=document.getElementById("waStatus");
+function walog(s){ const d=document.createElement("div"); d.textContent=s; waLog.prepend(d); }
+function setWABadge(state){
+  if(state==="connected"){ waStatus.className="badge b-ok"; waStatus.textContent="✅ Conectado"; }
+  else if(state==="error"){ waStatus.className="badge b-warn"; waStatus.textContent="⚠️ Erro"; }
+  else { waStatus.className="badge b-warn"; waStatus.textContent="⏺ Desconectado"; }
+}
+async function waGET(p){ const r=await fetch("/api/wa"+p); return r; }
+async function waPOST(p,body){ const r=await fetch("/api/wa"+p,{method:"POST",headers:{'Content-Type':'application/json'},body: body?JSON.stringify(body):null}); return r; }
+async function refreshWA(){
+  const r=await waGET(`/status?session=pixelup`); walog(`GET /api/wa/status → ${r.status}`);
+  if(!r.ok){ setWABadge("error"); return false; }
+  const j=await r.json(); setWABadge(j.connected? "connected": ""); return j.connected;
+}
+async function connectShowQR(){
+  setWABadge("connecting");
+  const s=await waPOST(`/start?session=pixelup`); walog(`POST /api/wa/start → ${s.status}`);
+  const box=document.getElementById("qrBox");
+  const tick=async ()=>{
+    const r=await waGET(`/qr?session=pixelup`); walog(`GET /api/wa/qr → ${r.status}`);
+    if(r.status===204){ box.innerHTML='<div class="muted">✅ Já conectado.</div>'; return true; }
+    if(!r.ok){ box.innerHTML='<div class="muted">QR não disponível agora. Tente de novo.</div>'; return false; }
+    const j=await r.json(); if(j.qr){ box.innerHTML=`<img class="qrimg" src="${j.qr}">`; }
+    return false;
+  };
+  let tries=0;
+  const t=setInterval(async ()=>{
+    tries++; const done=await tick(); const ok=await refreshWA();
+    if(done || ok || tries>20){ clearInterval(t); if(ok) box.innerHTML='<div class="muted">✅ Dispositivo conectado.</div>'; }
+  }, 3000);
+}
+document.getElementById("waConnect").onclick = connectShowQR;
+document.getElementById("waStatusBtn").onclick = refreshWA;
+refreshWA();
+</script>
 </body>
 </html>
