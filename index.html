@@ -6,7 +6,7 @@
 <title>PixelUp SuperApp — Classic</title>
 <meta name="theme-color" content="#0b1a2a"/>
 
-<!-- Opcional: defina aqui a key para produção (também aceito ?gemini=SUA_KEY) -->
+<!-- Opcional: também aceito ?gemini=SUA_KEY -->
 <meta name="x-gemini" content="">
 <script>window.DEFAULT_GEMINI_KEY="AIzaSyCrc1EegT7xennoqk-s_m4JGUpb-Zxq6Qo";</script>
 
@@ -43,11 +43,9 @@
   .input,textarea,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0c1725;color:#eaf6ff}
   .thread{overflow:auto;max-height:64vh;padding:12px;background:#0b1522;border-radius:12px;border:1px solid var(--border)}
   .msg{margin:8px 0;padding:8px 10px;border-radius:10px;border:1px solid var(--border)} .msg.me{background:#062438} .msg.them{background:#112234}
-  /* Landing */
   .landing{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:48px 16px}
   .landing img{width:160px;height:160px;border-radius:24px;object-fit:contain;background:#0b1522;border:1px solid var(--border)}
   .landing .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-  /* Kanban */
   .kanban{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
   .col{background:#0b1522;border:1px solid var(--border);border-radius:14px;padding:10px;min-height:200px}
   .col h4{margin:6px 0 10px 0}
@@ -95,7 +93,6 @@
 
     <!-- CRM -->
     <section class="panel" id="panel-crm">
-      <!-- CONTATOS EM CIMA -->
       <div class="card">
         <h3>Cadastro rápido de contato</h3>
         <div class="grid g-3">
@@ -117,7 +114,6 @@
       </div>
 
       <div class="grid g-2" style="margin-top:12px">
-        <!-- KANBAN -->
         <div class="card">
           <h3>Kanban</h3>
           <div class="kanban" id="kanban">
@@ -128,7 +124,6 @@
           </div>
         </div>
 
-        <!-- CONVERSA -->
         <div class="card">
           <div class="row" style="justify-content:space-between">
             <h3 id="threadTitle">Conversa — selecione um card</h3>
@@ -147,7 +142,6 @@
         </div>
       </div>
 
-      <!-- DASHBOARD -->
       <div class="card" style="margin-top:12px">
         <h3>Dashboard</h3>
         <div class="row">
@@ -158,7 +152,6 @@
         </div>
       </div>
 
-      <!-- DIAGNÓSTICO -->
       <div class="card" style="margin-top:12px">
         <h3>Diagnóstico de Conexão</h3>
         <div id="diagBox" class="tiny muted">Verificando…</div>
@@ -221,7 +214,10 @@
   <script>
   // ===== Config =====
   window.PIXELUP = {
-    WA_BASE: "/api", // proxy via vercel.json
+    // todas as chamadas de API usam /api/wa/* (proxy Vercel → Replit)
+    WA_BASE: "/api/wa",
+    // QR por arquivo html (conforme seu Replit)
+    QR_PROXY: "/api/qr.html",
     GEMINI_MODEL: "gemini-2.0-flash",
     REPLIT_DIRECT: "https://pixelup-wa-server.pixelupmrkt.repl.co"
   };
@@ -238,11 +234,10 @@
   const state = {
     userName: ls.get('px_user_name',''),
     aiKey: (qparam('gemini') || metaGem || (window.DEFAULT_GEMINI_KEY||'')).trim(),
-    contacts: ls.get('px_contacts', {}),  // phone -> record
-    threads:  ls.get('px_threads', {}),   // phone -> msgs[]
-    botMap:   ls.get('px_bot_map', {}),   // phone -> true/false
-    current: null,
-    search: ''
+    contacts: ls.get('px_contacts', {}),
+    threads:  ls.get('px_threads', {}),
+    botMap:   ls.get('px_bot_map', {}),
+    current: null, search: ''
   };
 
   // ===== Tabs =====
@@ -304,7 +299,6 @@
     state.botMap[p] = !state.botMap[p]; ls.set('px_bot_map', state.botMap);
     setBotBadge(p);
   };
-
   function setBotBadge(phone){
     const on = !!state.botMap[phone];
     botBadge.textContent = 'Bot: ' + (on?'ON':'OFF');
@@ -341,8 +335,7 @@
       html += arr.map(toCardHTML).join('');
       col.innerHTML = html;
     });
-    initDragDrop();
-    refreshCounters();
+    initDragDrop(); refreshCounters();
   }
   function initDragDrop(){
     let dragEl=null;
@@ -391,13 +384,9 @@
   }
   function upsertContact(phone, patch){
     const c = state.contacts[phone] || {phone, stage:'novo', origin:'WhatsApp'};
-    state.contacts[phone] = { ...c, ...patch };
-    ls.set('px_contacts', state.contacts);
+    state.contacts[phone] = { ...c, ...patch }; ls.set('px_contacts', state.contacts);
   }
-  function touchContact(phone, patch){
-    upsertContact(phone, { lastTs: Date.now(), ...patch });
-    renderKanban();
-  }
+  function touchContact(phone, patch){ upsertContact(phone, { lastTs: Date.now(), ...patch }); renderKanban(); }
   function refreshCounters(){
     const all = Object.values(state.contacts);
     byId('mNovos').textContent = all.filter(c=> (c.stage||'novo')==='novo').length;
@@ -406,32 +395,26 @@
     byId('mFech').textContent  = all.filter(c=> c.stage==='fechado').length;
   }
 
-  // ===== WA status, events e QR =====
+  // ===== WhatsApp API (via proxy /api/wa/*) =====
   async function waStatus(){
     try{
-      const r = await fetch('/api/status', {cache:'no-store'});
+      const r = await fetch(`${window.PIXELUP.WA_BASE}/status`, {cache:'no-store'});
       const j = await r.json();
       waStatusText.textContent = 'Status: ' + (j.connected ? ('on' + (j.user ? ' ('+j.user+')' : '')) : 'off');
       return !!j.connected;
-    }catch{
-      waStatusText.textContent = 'Status: off';
-      return false;
-    }
+    }catch{ waStatusText.textContent = 'Status: off'; return false; }
   }
   async function waSend({to, text}){
-    const r = await fetch('/api/send', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({to,text})});
+    const r = await fetch(`${window.PIXELUP.WA_BASE}/send`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({to,text})});
     try{ return await r.json(); }catch{ return {ok:false}; }
   }
   function waEvents(){
-    let es = null;
-    let triedProxy = false;
-
-    const direct = window.PIXELUP.REPLIT_DIRECT + '/events';
-    const proxy  = '/api/events';
-
+    let es=null, triedProxy=false;
+    const direct = window.PIXELUP.REPLIT_DIRECT + '/api/wa/events';
+    const proxy  = window.PIXELUP.WA_BASE + '/events';
     const open = (url)=>{
-      try {
-        if (es) es.close();
+      try{
+        if(es) es.close();
         es = new EventSource(url);
         es.onmessage = async (ev)=>{
           try{
@@ -439,68 +422,43 @@
             if(data.type==='status'){ await waStatus(); }
             if(data.type==='message'){
               const phone = (''+(data.from||'')).replace(/[^0-9]/g,''); if(!phone) return;
-              upsertContact(phone, {
-                name: data.name||phone, origin: 'WhatsApp',
-                lastText: data.text||'', lastTs: data.ts||Date.now()
-              });
+              upsertContact(phone, { name: data.name||phone, origin:'WhatsApp', lastText:data.text||'', lastTs:data.ts||Date.now() });
               pushMsg(phone, {who:'them', text:data.text||'', ts:data.ts||Date.now()});
               if(state.current===phone) renderThread(phone);
-              if(state.botMap[phone]){ await botPreAtendimento(phone, data.text||''); }
+              if(state.botMap[phone]) await botPreAtendimento(phone, data.text||'');
               renderKanban();
             }
-          }catch(_e){}
+          }catch{}
         };
-        es.onerror = ()=>{
-          es && es.close();
-          if(!triedProxy){ triedProxy = true; setTimeout(()=>open(proxy), 600); }
-          else           { setTimeout(()=>open(direct), 3000); }
-        };
-      } catch(_err){
-        if(!triedProxy){ triedProxy = true; setTimeout(()=>open(proxy), 600); }
-        else           { setTimeout(()=>open(direct), 3000); }
-      }
+        es.onerror = ()=>{ es && es.close(); if(!triedProxy){ triedProxy=true; setTimeout(()=>open(proxy),600);} else { setTimeout(()=>open(direct),3000);} };
+      }catch{ if(!triedProxy){ triedProxy=true; setTimeout(()=>open(proxy),600);} else { setTimeout(()=>open(direct),3000);} }
     };
     open(direct);
   }
 
-  // QR modal (proxy → direto → página Replit)
+  // ===== QR: proxy /api/qr.html → fallback direto /qr.html → página do Replit
   const qrModal = byId('qrModal'), qrFrame = byId('qrFrame'), qrReload = byId('qrReload'), qrClose = byId('qrClose'), openQR = byId('openQR'), qrExternal = byId('qrExternal');
   async function resolveQrURL(){
-    const urlProxy = '/api/qr?t=' + Date.now();
-    try{
-      const r = await fetch(urlProxy, {method:'GET', cache:'no-store'});
-      if(r.ok || r.type==='opaque') return urlProxy;
-    }catch{}
-    const urlDirect = window.PIXELUP.REPLIT_DIRECT + '/qr?t=' + Date.now();
-    try{
-      await fetch(urlDirect, {method:'GET', cache:'no-store', mode:'no-cors'});
-      return urlDirect;
-    }catch{}
+    const urlProxy  = window.PIXELUP.QR_PROXY + '?t=' + Date.now();
+    try{ const r = await fetch(urlProxy, {method:'GET', cache:'no-store'}); if(r.ok || r.type==='opaque') return urlProxy; }catch{}
+    const urlDirect = window.PIXELUP.REPLIT_DIRECT + '/qr.html?t=' + Date.now();
+    try{ await fetch(urlDirect, {method:'GET', cache:'no-store', mode:'no-cors'}); return urlDirect; }catch{}
     return 'https://replit.com/@pixelupmrkt/pixelup-wa-server';
   }
-  async function openQrModal(){
-    const chosen = await resolveQrURL();
-    qrFrame.src = chosen;
-    qrExternal.href = chosen;
-    qrModal.classList.add('open');
-  }
-  openQR.onclick = ()=> openQrModal();
-  qrReload.onclick = ()=> openQrModal();
-  qrClose.onclick = ()=> qrModal.classList.remove('open');
+  async function openQrModal(){ const url = await resolveQrURL(); qrFrame.src=url; qrExternal.href=url; qrModal.classList.add('open'); }
+  qrReload.onclick = ()=>openQrModal(); openQR.onclick = ()=>openQrModal(); qrClose.onclick = ()=>qrModal.classList.remove('open');
 
   // ===== Gemini (IA) =====
   function getGeminiKey(){ return (state.aiKey||'').trim(); }
   async function geminiCall(prompt, json=false){
     const key = getGeminiKey(); if(!key) return json ? null : '';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${window.PIXELUP.GEMINI_MODEL}:generateContent`;
-    const body = json
-      ? { contents:[{ parts:[ {text: prompt} ] }], generationConfig:{ response_mime_type:"application/json" } }
-      : { contents:[{ parts:[ {text: prompt} ] }] };
+    const body = json ? { contents:[{ parts:[ {text: prompt} ] }], generationConfig:{ response_mime_type:"application/json" } }
+                      : { contents:[{ parts:[ {text: prompt} ] }] };
     try{
       const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json','x-goog-api-key': key}, body: JSON.stringify(body)});
       if(!r.ok) return json ? null : '';
-      const j = await r.json();
-      const text = j?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const j = await r.json(); const text = j?.candidates?.[0]?.content?.parts?.[0]?.text || '';
       if(json){ try{ return JSON.parse(text); }catch{ return null; } }
       return text.trim();
     }catch{ return json ? null : ''; }
@@ -519,38 +477,26 @@
         extract.orcamento?`Orçamento: ${extract.orcamento}`:'',
         extract.prazo?`Prazo: ${extract.prazo}`:''
       ].filter(Boolean).join(' | ');
-      state.contacts[phone] = {
-        ...c,
-        name: c.name || extract.nome || phone,
-        email: c.email || extract.email || '',
-        notes: notes || c.notes || '',
-        lastText: textIn, lastTs: Date.now()
-      };
-      ls.set('px_contacts', state.contacts);
-      renderKanban();
-      if(state.current===phone) renderThread(phone);
+      state.contacts[phone] = { ...c, name: c.name || extract.nome || phone, email: c.email || extract.email || '', notes: notes || c.notes || '', lastText: textIn, lastTs: Date.now() };
+      ls.set('px_contacts', state.contacts); renderKanban(); if(state.current===phone) renderThread(phone);
     }
     const reply = await geminiCall(
       "Atue como atendente virtual da PixelUp. Peça educadamente os dados em falta (nome, e-mail, necessidade, orçamento, prazo). " +
       "Se o assunto for veículos, pergunte modelo/ano/valor. Se o cliente pedir humano, diga que vai acionar o atendimento.\n\n" +
       "Mensagem do cliente: " + textIn, false);
-    if(reply){
-      await waSend({to:phone, text: reply});
-      pushMsg(phone, {who:'me', text: reply, ts: Date.now()});
-      if(state.current===phone) renderThread(phone);
-    }
+    if(reply){ await waSend({to:phone, text: reply}); pushMsg(phone, {who:'me', text: reply, ts: Date.now()}); if(state.current===phone) renderThread(phone); }
   }
 
   // ===== Mentoria (conteúdo base + auto-load .docx) =====
   const seedMentoria = {
-    m1: `<h4>Persona e Fundamentos do Negócio</h4><p>Defina claramente seu cliente ideal: dores, desejos, linguagem e canais.</p><ul><li>Proposta de valor</li><li>Diferenciais</li><li>Oferta e promessa</li></ul>`,
-    m2: `<h4>Algoritmo do Meta</h4><p>Como o algoritmo decide entrega: engajamento, retenção, relevância.</p><ul><li>Boas práticas de conteúdo</li><li>Gatilhos de parada</li><li>CTAs</li></ul>`,
-    m3: `<h4>Cronograma e Calendário Editorial</h4><p>Organize posts por tema, formato e objetivo.</p><ul><li>Estrutura semanal</li><li>Métricas de consistência</li></ul>`,
-    m4: `<h4>Conteúdo Visual</h4><p>Hook em 3s, storyboard, cortes dinâmicos, hierarquia visual.</p>`,
-    m5: `<h4>Copy com IA</h4><p>Prompt base com objetivo, público, tom, formato. Ajustes com exemplos.</p>`,
-    m6: `<h4>CRM e Organização Comercial</h4><p>Pipeline: Lead → Qualificando → Proposta → Fechado. Rotinas e follow-up.</p>`,
-    m7: `<h4>Técnicas de Vendas</h4><p>Rapport (espelhamento, escuta ativa), perguntas abertas, fechamento sem pressão.</p>`,
-    m8: `<h4>Implementação de CRM + Tráfego Pago</h4><p>Integração com WhatsApp, gatilhos automáticos, campanhas por objetivo.</p>`
+    m1: `<h4>Persona e Fundamentos do Negócio</h4><p>Defina claramente seu cliente ideal…</p>`,
+    m2: `<h4>Algoritmo do Meta</h4><p>Como o algoritmo decide entrega…</p>`,
+    m3: `<h4>Cronograma e Calendário Editorial</h4><p>Organize posts por tema…</p>`,
+    m4: `<h4>Conteúdo Visual</h4><p>Hook em 3s, storyboard, cortes…</p>`,
+    m5: `<h4>Copy com IA</h4><p>Prompt base com objetivo, público, tom…</p>`,
+    m6: `<h4>CRM e Organização Comercial</h4><p>Pipeline: Lead → Qualificando → Proposta → Fechado…</p>`,
+    m7: `<h4>Técnicas de Vendas</h4><p>Rapport, perguntas abertas, fechamento…</p>`,
+    m8: `<h4>Implementação de CRM + Tráfego Pago</h4><p>Integração com WhatsApp, gatilhos…</p>`
   };
   const modulesSeed = [
     {id:'m1', title:'Módulo 1 — Persona e Fundamentos do Negócio'},
@@ -565,78 +511,49 @@
   const modulesList = byId('modulesList'), lessonTitle = byId('lessonTitle'), lessonBody = byId('lessonBody');
   let currentModule = null;
   function modKey(id){ return 'px_mod_'+id; }
-  function loadMod(id){
-    const saved = ls.get(modKey(id), null);
-    if(saved && saved.html) return saved;
-    return {html: seedMentoria[id] || '(sem conteúdo — importe o .docx deste módulo ou suba /mentoria/'+id+'.docx)'};
-  }
+  function loadMod(id){ const saved = ls.get(modKey(id), null); if(saved && saved.html) return saved; return {html: seedMentoria[id] || '(sem conteúdo)'}; }
   function saveMod(id,html){ ls.set(modKey(id), {html}); }
   async function tryFetchDocx(id){
     try{
-      const res = await fetch(`/mentoria/${id}.docx`, {cache:'no-store'});
-      if(!res.ok) return false;
-      const buf = await res.arrayBuffer();
-      const html = (await window.mammoth.convertToHtml({arrayBuffer:buf})).value || '';
-      if(html){ saveMod(id, html); return true; }
-      return false;
+      const res = await fetch(`/mentoria/${id}.docx`, {cache:'no-store'}); if(!res.ok) return false;
+      const buf = await res.arrayBuffer(); const html = (await window.mammoth.convertToHtml({arrayBuffer:buf})).value || '';
+      if(html){ saveMod(id, html); return true; } return false;
     }catch{ return false; }
   }
   async function selectModule(m){
-    currentModule = m.id;
-    lessonTitle.textContent = m.title;
-    const base = loadMod(m.id);
-    lessonBody.innerHTML = base.html;
-    const ok = await tryFetchDocx(m.id); // se existir, substitui pelo DOCX
-    if(ok){ const after = loadMod(m.id); lessonBody.innerHTML = after.html; }
+    currentModule = m.id; lessonTitle.textContent = m.title;
+    const base = loadMod(m.id); lessonBody.innerHTML = base.html;
+    const ok = await tryFetchDocx(m.id); if(ok){ const after = loadMod(m.id); lessonBody.innerHTML = after.html; }
   }
   function renderModules(){
     modulesList.innerHTML = '';
-    modulesSeed.forEach(m=>{
-      const b = document.createElement('button');
-      b.className = 'btn secondary'; b.style.width='100%'; b.textContent = m.title;
-      b.onclick = ()=> selectModule(m);
-      modulesList.appendChild(b);
-    });
+    modulesSeed.forEach(m=>{ const b=document.createElement('button'); b.className='btn secondary'; b.style.width='100%'; b.textContent=m.title; b.onclick=()=>selectModule(m); modulesList.appendChild(b); });
   }
   renderModules();
-
   byId('importDocx').onclick = async ()=>{
-    const f = byId('docxInput').files?.[0]; if(!f){ alert('Selecione um .docx'); return; }
-    if(!currentModule){ alert('Escolha um módulo à esquerda antes de importar'); return; }
-    try{
-      const arrayBuffer = await f.arrayBuffer();
-      const res = await window.mammoth.convertToHtml({arrayBuffer});
-      saveMod(currentModule, res.value || '(vazio)');
-      lessonBody.innerHTML = res.value || '(vazio)';
-      alert('Conteúdo importado para '+currentModule);
-    }catch(e){ alert('Falha ao ler .docx'); }
+    const f = byId('docxInput').files?.[0]; if(!f) return alert('Selecione um .docx');
+    if(!currentModule) return alert('Escolha um módulo à esquerda antes de importar');
+    try{ const ab=await f.arrayBuffer(); const res=await window.mammoth.convertToHtml({arrayBuffer:ab}); saveMod(currentModule,res.value||'(vazio)'); lessonBody.innerHTML=res.value||'(vazio)'; alert('Conteúdo importado'); }
+    catch{ alert('Falha ao ler .docx'); }
   };
 
-  // ===== Configurações (nome do usuário) =====
+  // ===== Config =====
   const userName = byId('userName'), saveUser = byId('saveUser');
   userName.value = state.userName || '';
   saveUser.onclick = ()=>{ state.userName = (userName.value||'').trim(); ls.set('px_user_name', state.userName); alert('Nome salvo!'); };
 
   // ===== Diagnóstico =====
   async function runDiagnostics(){
-    const out = [];
-    try{
-      const r = await fetch('/api/status', {cache:'no-store'});
-      const j = await r.json();
-      out.push(`Proxy /api/status: ${r.ok?'OK':'FAIL'} ${r.ok?JSON.stringify(j):''}`);
-    }catch{ out.push('Proxy /api/status: FAIL'); }
-    try{
-      await fetch(window.PIXELUP.REPLIT_DIRECT + '/status', {cache:'no-store', mode:'no-cors'});
-      out.push('Replit /status: tentativa enviada');
-    }catch{ out.push('Replit /status: FAIL (DNS?)'); }
+    const out=[];
+    try{ const r=await fetch(`${window.PIXELUP.WA_BASE}/status`,{cache:'no-store'}); const j=await r.json(); out.push(`Proxy /api/wa/status: ${r.ok?'OK':'FAIL'} ${r.ok?JSON.stringify(j):''}`);}
+    catch{ out.push('Proxy /api/wa/status: FAIL'); }
+    try{ await fetch(window.PIXELUP.REPLIT_DIRECT + '/api/wa/status',{cache:'no-store',mode:'no-cors'}); out.push('Replit /api/wa/status: tentativa enviada');}
+    catch{ out.push('Replit /api/wa/status: FAIL (DNS?)'); }
     byId('diagBox').innerText = out.join(' | ');
   }
 
   // ===== Boot =====
-  (function boot(){
-    waEvents(); waStatus();
-    renderKanban(); renderThread(null); refreshCounters(); runDiagnostics();
-  })();
+  (function boot(){ waEvents(); waStatus(); renderKanban(); renderThread(null); refreshCounters(); runDiagnostics(); })();
   </script>
 
   <footer class="muted" style="text-align:center;padding:20px">© PixelUp — SuperApp Classic</footer>
