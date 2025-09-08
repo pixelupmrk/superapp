@@ -1,81 +1,84 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>PixelUp SuperApp — Classic</title>
-  <meta name="description" content="Home, CRM + WhatsApp, Mentoria (8 módulos), Bootcamp (IA) — Layout original PixelUp"/>
-  <meta name="theme-color" content="#0b1a2a"/>
-  <link rel="preconnect" href="https://generativelanguage.googleapis.com" crossorigin>
-  <style>
-    :root{ --bg:#0b1118; --panel:#0f1b2a; --muted:#9bb3c7; --primary:#12b0ff; --primary2:#66d1ff; --accent:#00ffd5;
-           --danger:#ff5d5d; --ok:#27c93f; --card:#0e1825; --border:#122235; --radius:16px; --shadow:0 8px 28px rgba(0,0,0,.35); }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      background:radial-gradient(1000px 600px at 10% -10%, rgba(18,176,255,.14), transparent 60%),
-                 radial-gradient(800px 500px at 110% 10%, rgba(0,255,213,.10), transparent 60%), var(--bg);
-      color:#eaf6ff;}
-    a{color:var(--primary)} .muted{color:#9bb3c7} .tiny{font-size:12px}
-    header.topbar{position:sticky;top:0;z-index:20;display:flex;gap:16px;align-items:center;justify-content:space-between;
-      padding:12px 16px;background:rgba(11,20,32,.8);border-bottom:1px solid var(--border);backdrop-filter:blur(8px)}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:700}
-    .brand img{height:36px;display:block}
-    .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));
-      box-shadow:0 0 12px rgba(18,176,255,.7),0 0 24px rgba(0,255,213,.5)}
-    nav.tabs{display:flex;gap:8px;flex-wrap:wrap}
-    nav.tabs button{background:#0b1522;color:#cfeaff;border:1px solid var(--border);padding:8px 12px;border-radius:999px;cursor:pointer}
-    nav.tabs button.active{border-color:var(--primary);color:#fff;box-shadow:0 0 0 1px rgba(18,176,255,.25) inset}
-    main{max-width:1200px;margin:24px auto;padding:0 16px}
-    section.panel{display:none;background:rgba(15,27,42,.6);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:18px}
-    section.panel.active{display:block}
-    .grid{display:grid;gap:16px} .g-3{grid-template-columns:repeat(3,minmax(0,1fr))} .g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
-    .btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--primary),var(--primary2));
-      color:#001726;border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600;box-shadow:0 10px 22px rgba(0,0,0,.35),0 2px 0 rgba(0,0,0,.2) inset}
-    .btn.secondary{background:#0b1522;color:#dff2ff;border:1px solid var(--border);box-shadow:none}
-    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .input,textarea,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0c1725;color:#eaf6ff}
-    .ws-dot{width:10px;height:10px;border-radius:50%;background:#666}.ws-dot.on{background:var(--ok)}.ws-dot.off{background:var(--danger)}
-    .pill{padding:4px 8px;border-radius:999px;border:1px solid var(--border)}
-    .list{overflow:auto;max-height:60vh}
-    .thread{overflow:auto;max-height:60vh;padding:12px;background:#0b1522;border-radius:12px;border:1px solid var(--border)}
-    .msg{margin:8px 0;padding:8px 10px;border-radius:10px;border:1px solid var(--border)} .msg.me{background:#062438} .msg.them{background:#112234}
-    footer{color:#7fa6c2;text-align:center;padding:24px 12px}
-    @media (max-width:900px){ .g-3,.g-2{grid-template-columns:1fr} }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PixelUp SuperApp — Classic</title>
+<meta name="theme-color" content="#0b1a2a"/>
+<link rel="preconnect" href="https://generativelanguage.googleapis.com" crossorigin>
+<!-- Mammoth para importar .docx na Mentoria -->
+<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+<style>
+  :root{
+    --bg:#0b1118; --panel:#0f1b2a; --muted:#9bb3c7; --primary:#12b0ff; --primary2:#66d1ff; --accent:#00ffd5;
+    --danger:#ff5d5d; --ok:#27c93f; --card:#0e1825; --border:#122235; --radius:16px; --shadow:0 8px 28px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box} html,body{height:100%} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1000px 600px at 10% -10%, rgba(18,176,255,.14), transparent 60%),
+               radial-gradient(800px 500px at 110% 10%, rgba(0,255,213,.10), transparent 60%), var(--bg); color:#eaf6ff;}
+  a{color:var(--primary)} .muted{color:#9bb3c7} .tiny{font-size:12px} .pill{padding:4px 8px;border-radius:999px;border:1px solid var(--border)}
+  header.topbar{position:sticky;top:0;z-index:20;display:flex;gap:16px;align-items:center;justify-content:space-between;
+    padding:12px 16px;background:rgba(11,20,32,.8);border-bottom:1px solid var(--border);backdrop-filter:blur(8px)}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+  .brand img{height:36px;display:block}
+  .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));
+    box-shadow:0 0 12px rgba(18,176,255,.7),0 0 24px rgba(0,255,213,.5)}
+  nav.tabs{display:flex;gap:8px;flex-wrap:wrap}
+  nav.tabs button{background:#0b1522;color:#cfeaff;border:1px solid var(--border);padding:8px 12px;border-radius:999px;cursor:pointer}
+  nav.tabs button.active{border-color:var(--primary);color:#fff;box-shadow:0 0 0 1px rgba(18,176,255,.25) inset}
+  main{max-width:1250px;margin:24px auto;padding:0 16px}
+  section.panel{display:none;background:rgba(15,27,42,.6);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:18px}
+  section.panel.active{display:block}
+  .grid{display:grid;gap:16px} .g-3{grid-template-columns:repeat(3,minmax(0,1fr))} .g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--primary),var(--primary2));
+    color:#001726;border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600;box-shadow:0 10px 22px rgba(0,0,0,.35),0 2px 0 rgba(0,0,0,.2) inset}
+  .btn.secondary{background:#0b1522;color:#dff2ff;border:1px solid var(--border);box-shadow:none}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .input,textarea,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0c1725;color:#eaf6ff}
+  .ws-dot{width:10px;height:10px;border-radius:50%;background:#666}.ws-dot.on{background:var(--ok)}.ws-dot.off{background:var(--danger)}
+  .thread{overflow:auto;max-height:64vh;padding:12px;background:#0b1522;border-radius:12px;border:1px solid var(--border)}
+  .msg{margin:8px 0;padding:8px 10px;border-radius:10px;border:1px solid var(--border)} .msg.me{background:#062438} .msg.them{background:#112234}
+  /* Kanban */
+  .kanban{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .col{background:#0b1522;border:1px solid var(--border);border-radius:14px;padding:10px;min-height:200px}
+  .col h4{margin:6px 0 10px 0}
+  .card-k{background:#0e1624;border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px;cursor:grab}
+  .card-k.drag{opacity:.6}
+  .empty{color:#89a; font-style:italic}
+  @media (max-width:1100px){ .kanban{grid-template-columns:1fr} .thread{max-height:unset}}
+</style>
 </head>
 <body>
   <header class="topbar">
     <div class="brand">
-      <img src="./logo.jpg" alt="PixelUp logo" onerror="this.style.display='none'"/>
+      <img src="./logo.jpg" alt="PixelUp" onerror="this.style.display='none'"/>
       <span><span class="dot"></span> PixelUp SuperApp</span>
     </div>
     <nav class="tabs" id="tabs">
       <button data-tab="home" class="active">Home</button>
-      <button data-tab="crm">CRM + Chat</button>
-      <button data-tab="mentoria">Mentoria (8 módulos)</button>
-      <button data-tab="bootcamp">Chat do Bootcamp</button>
+      <button data-tab="crm">CRM</button>
+      <button data-tab="mentoria">Mentoria</button>
     </nav>
     <div class="row">
       <span class="ws-dot off" id="waDot"></span><span id="waLabel" class="muted">WA: off</span>
       <span class="pill" id="sseBadge">SSE: —</span>
-      <span class="pill" id="botBadge">Bot: OFF</span>
-      <button class="btn secondary" id="toggleBot">Ligar Bot</button>
     </div>
   </header>
 
   <main>
-    <!-- HOME -->
+    <!-- HOME (Dashboard leve) -->
     <section class="panel active" id="panel-home">
       <div class="grid g-3">
         <div class="card">
-          <h2>Hub — Padrão PixelUp (Original)</h2>
-          <p class="muted">WhatsApp conectado, CRM automático e IA (Gemini). Quando o <b>Bot</b> está ligado, ele responde; desligue para atendimento humano.</p>
+          <h2>Dashboard</h2>
           <div class="row">
-            <button class="btn" data-goto="crm">Abrir CRM</button>
-            <button class="btn secondary" data-goto="mentoria">Mentoria</button>
-            <button class="btn secondary" data-goto="bootcamp">Bootcamp</button>
+            <div class="pill">Novos: <b id="mNovos">0</b></div>
+            <div class="pill">Qualificando: <b id="mQuali">0</b></div>
+            <div class="pill">Proposta: <b id="mProp">0</b></div>
+            <div class="pill">Fechado: <b id="mFech">0</b></div>
           </div>
+          <p class="muted tiny" style="margin-top:8px">Contadores refletem o pipeline do Kanban (CRM).</p>
         </div>
         <div class="card">
           <h3>Configurações</h3>
@@ -86,13 +89,13 @@
           <small class="muted">Evita o bot responder seu próprio número.</small>
           <div style="margin-top:12px">
             <label class="muted" for="aiKey">Gemini API Key</label>
-            <input class="input" id="aiKey" placeholder="Cole sua chave do Gemini ou use ?gemini=SUA_KEY na URL">
+            <input class="input" id="aiKey" placeholder="Cole a chave ou use ?gemini=SUA_KEY">
             <button class="btn secondary" id="saveKey" style="margin-top:8px">Salvar Key</button>
             <div class="tiny muted" id="keyStatus">Key: —</div>
           </div>
         </div>
         <div class="card">
-          <h3>Status do WhatsApp</h3>
+          <h3>WhatsApp</h3>
           <div class="row">
             <span class="pill" id="waStatusText">off</span>
             <button class="btn secondary" id="btnCheckWA">Verificar</button>
@@ -103,29 +106,65 @@
       </div>
     </section>
 
-    <!-- CRM + CHAT -->
+    <!-- CRM: Cadastro em cima + Kanban à esquerda + Conversa à direita -->
     <section class="panel" id="panel-crm">
-      <div class="grid g-2">
+      <!-- CONTATOS EM CIMA -->
+      <div class="card">
+        <h3>Cadastro rápido de contato</h3>
+        <div class="grid g-3">
+          <input class="input" id="cName" placeholder="Nome">
+          <input class="input" id="cEmail" placeholder="E-mail">
+          <input class="input" id="cPhone" placeholder="Telefone (WhatsApp)">
+        </div>
+        <div class="row" style="margin-top:8px">
+          <select class="input" id="cOrigin">
+            <option value="WhatsApp">Origem: WhatsApp</option>
+            <option>Facebook</option><option>Instagram</option>
+            <option>Site</option><option>Indicação</option><option>Outro</option>
+          </select>
+          <input class="input" id="cNotes" placeholder="Notas (opcional)">
+          <button class="btn" id="btnAdd">Salvar contato</button>
+          <input class="input" id="search" placeholder="Buscar (nome/telefone/e-mail/origem)" />
+          <button class="btn secondary" id="clearSearch">Limpar</button>
+        </div>
+      </div>
+
+      <div class="grid g-2" style="margin-top:12px">
+        <!-- KANBAN -->
         <div class="card">
-          <h3>Contatos</h3>
-          <div class="row">
-            <input class="input" id="search" placeholder="Buscar por nome/telefone">
-            <button class="btn secondary" id="clearSearch">Limpar</button>
-          </div>
-          <div class="list" id="contactsList"></div>
-          <div class="card" style="margin-top:12px">
-            <h4>Novo contato</h4>
-            <input class="input" id="cName" placeholder="Nome (opcional)">
-            <input class="input" id="cPhone" placeholder="Telefone (WhatsApp)">
-            <textarea class="input" id="cNotes" placeholder="Notas"></textarea>
-            <button class="btn" id="btnAdd">Adicionar</button>
+          <h3>Kanban</h3>
+          <div class="kanban" id="kanban">
+            <div class="col" data-stage="novo">
+              <h4>Novos</h4>
+              <div class="empty tiny">— sem cards —</div>
+            </div>
+            <div class="col" data-stage="qualificando">
+              <h4>Qualificando</h4>
+              <div class="empty tiny">— sem cards —</div>
+            </div>
+            <div class="col" data-stage="proposta">
+              <h4>Proposta</h4>
+              <div class="empty tiny">— sem cards —</div>
+            </div>
+            <div class="col" data-stage="fechado">
+              <h4>Fechado</h4>
+              <div class="empty tiny">— sem cards —</div>
+            </div>
           </div>
         </div>
+
+        <!-- CONVERSA -->
         <div class="card">
-          <h3 id="threadTitle">Conversa</h3>
+          <div class="row" style="justify-content:space-between">
+            <h3 id="threadTitle">Conversa — selecione um card</h3>
+            <div class="row">
+              <span class="pill" id="botBadge">Bot: OFF</span>
+              <button class="btn secondary" id="toggleBot">Ligar IA</button>
+            </div>
+          </div>
           <div class="thread" id="thread"></div>
           <div class="row" style="margin-top:8px">
-            <input class="input" id="msgText" placeholder="Escreva uma mensagem">
+            <input class="input" id="msgText" placeholder="Mensagem para enviar no WhatsApp">
             <button class="btn" id="sendMsg">Enviar</button>
           </div>
         </div>
@@ -138,6 +177,10 @@
         <div class="card">
           <h3>Módulos</h3>
           <div id="modulesList"></div>
+          <hr style="border-color:#123">
+          <div class="tiny muted">Importar conteúdo do Word (.docx) para o módulo selecionado:</div>
+          <input type="file" id="docxInput" accept=".docx"/>
+          <button class="btn secondary" id="importDocx">Importar .docx</button>
         </div>
         <div class="card">
           <h3 id="lessonTitle">Selecione um módulo</h3>
@@ -145,230 +188,221 @@
         </div>
       </div>
     </section>
-
-    <!-- BOOTCAMP -->
-    <section class="panel" id="panel-bootcamp">
-      <div class="grid g-2">
-        <div class="card">
-          <h3>Chat do Bootcamp (IA)</h3>
-          <p class="muted">Tira-dúvidas com o Gemini (não envia ao WhatsApp).</p>
-          <textarea class="input" id="bootQ" rows="4" placeholder="Digite sua dúvida..."></textarea>
-          <div class="row" style="margin-top:8px">
-            <button class="btn" id="bootAsk">Perguntar</button>
-          </div>
-        </div>
-        <div class="card">
-          <h3>Resposta</h3>
-          <div id="bootA" class="thread"></div>
-        </div>
-      </div>
-    </section>
   </main>
-
-  <!-- Mentoria (8) inline -->
-  <script id="mentoria-data" type="application/json">{"modules":[
-    {"id":"m1","title":"Módulo 1 — Persona e Fundamentos do Negócio","lessons":[
-      {"id":"m1l1","title":"Definição de Persona","content":"# Persona\\nDescreva claramente seu cliente ideal.\\n- Dor principal\\n- Desejos e objeções\\n- Linguagem e canais preferidos"},
-      {"id":"m1l2","title":"Proposta de Valor","content":"**O que torna sua oferta única?** Liste benefícios tangíveis e intangíveis."}
-    ]},
-    {"id":"m2","title":"Módulo 2 — Algoritmo do Meta (Facebook/Instagram)","lessons":[
-      {"id":"m2l1","title":"Como o algoritmo decide a entrega","content":"Sinais: engajamento, retenção, tempo de sessão, relevância."},
-      {"id":"m2l2","title":"Boas práticas de conteúdo","content":"- Gatilhos de parada\\n- CTAs claros\\n- Testes A/B"}
-    ]},
-    {"id":"m3","title":"Módulo 3 — Cronograma e Calendário Editorial","lessons":[
-      {"id":"m3l1","title":"Estrutura de calendário","content":"Organize posts por tema, formato e objetivo."},
-      {"id":"m3l2","title":"Métricas de consistência","content":"Taxa de publicação, frequência mínima, cadência."}
-    ]},
-    {"id":"m4","title":"Conteúdo Visual (vídeo e imagem)","lessons":[
-      {"id":"m4l1","title":"Roteiro e captação","content":"Storyboard, **hook** em 3s, cortes dinâmicos."},
-      {"id":"m4l2","title":"Design que converte","content":"Contraste, tipografia, hierarquia e *branding*."}
-    ]},
-    {"id":"m5","title":"Copy com IA (ChatGPT)","lessons":[
-      {"id":"m5l1","title":"Prompt base","content":"Estrutura com objetivo, público, tom e formato."},
-      {"id":"m5l2","title":"Ajustes finos","content":"Refine com exemplos e *few-shot*."}
-    ]},
-    {"id":"m6","title":"CRM e Organização Comercial","lessons":[
-      {"id":"m6l1","title":"Pipeline simples","content":"Kanban: Lead → Qualificando → Proposta → Fechou."},
-      {"id":"m6l2","title":"Follow-up e rotinas","content":"Sequências e lembretes."}
-    ]},
-    {"id":"m7","title":"Técnicas de Vendas (rapport e conexão)","lessons":[
-      {"id":"m7l1","title":"Rapport prático","content":"*Espelhamento*, *escuta ativa*, perguntas abertas."},
-      {"id":"m7l2","title":"Fechamento","content":"Tratamento de objeções e *closing* sem pressão."}
-    ]},
-    {"id":"m8","title":"Implementação de CRM + Tráfego Pago","lessons":[
-      {"id":"m8l1","title":"Integração com WhatsApp","content":"Conectar bot, gatilhos automáticos, registrar interações."},
-      {"id":"m8l2","title":"Playbook de campanhas","content":"Estruturas por objetivo e orçamento inicial."}
-    ]}
-  ]}
-  </script>
 
   <script>
   // ===== Config =====
   window.PIXELUP = {
-    WA_BASE: "/api",                               // via proxy (vercel.json) → Replit
+    WA_BASE: "/api", // proxy via vercel.json
     GEMINI_MODEL: "gemini-2.0-flash",
     REPLIT_DIRECT: "https://pixelup-wa-server.pixelupmrkt.repl.co"
   };
-  // Opcional: deixar pré-carregada sua key aqui (ou cole na Home ou use ?gemini=SUA_KEY)
-  window.DEFAULT_GEMINI_KEY = "AIzaSyCrc1EegT7xennoqk-s_m4JGUpb-Zxq6Qo";
+  // carregue sua key na Home ou via ?gemini=SUA_KEY
+  window.DEFAULT_GEMINI_KEY = "";
 
-  // ===== Utils =====
-  const $ = sel => document.querySelector(sel);
-  const byId = id => document.getElementById(id);
+  // ===== Utils & State =====
+  const $ = s => document.querySelector(s); const byId = id => document.getElementById(id);
   const escapeHtml = s => (s||'').replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":"&#039;"}[m]));
   const norm = p => (''+(p||'')).replace(/[^0-9]/g,'');
   const ls = { get(k,d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d; }catch{ return d; } }, set(k,v){ localStorage.setItem(k, JSON.stringify(v)); } };
-  const qparam = key => new URLSearchParams(location.search).get(key);
+  const qparam = k => new URLSearchParams(location.search).get(k);
 
-  // ===== State =====
+  const stages = ["novo","qualificando","proposta","fechado"];
   const state = {
-    botOn: ls.get('px_bot_on', true),
-    myNumber: ls.get('px_my_number', ''),
+    myNumber: ls.get('px_my_number',''),
     aiKey: ls.get('px_ai_key', (qparam('gemini') || window.DEFAULT_GEMINI_KEY || '')),
-    contacts: ls.get('px_contacts', {}),
-    threads:  ls.get('px_threads', {}),
+    contacts: ls.get('px_contacts', {}),  // phone -> record
+    threads:  ls.get('px_threads', {}),   // phone -> msgs[]
+    botMap:   ls.get('px_bot_map', {}),   // phone -> true/false
     current: null,
     search: ''
   };
 
-  // ===== UI refs =====
-  const waDot = byId('waDot'), waLabel = byId('waLabel'), waStatusText = byId('waStatusText'), sseBadge = byId('sseBadge');
-  const botBadge = byId('botBadge'), toggleBot = byId('toggleBot');
-  const myNumber = byId('myNumber'), saveNumber = byId('saveNumber');
-  const aiKey = byId('aiKey'), saveKey = byId('saveKey');
-  const btnCheckWA = byId('btnCheckWA'), btnQR = byId('btnQR'), diag = byId('diag');
-  const contactsList = byId('contactsList');
-  const cName = byId('cName'), cPhone = byId('cPhone'), cNotes = byId('cNotes'), btnAdd = byId('btnAdd');
-  const thread = byId('thread'), threadTitle = byId('threadTitle');
-  const msgText = byId('msgText'), sendMsg = byId('sendMsg');
-  const search = byId('search'), clearSearch = byId('clearSearch');
-  const bootQ = byId('bootQ'), bootA = byId('bootA'), bootAsk = byId('bootAsk');
-
-  // ===== Init UI =====
-  (function init(){
-    botBadge.textContent = 'Bot: ' + (state.botOn? 'ON' : 'OFF');
-    toggleBot.textContent = state.botOn ? 'Desligar Bot' : 'Ligar Bot';
-    myNumber.value = state.myNumber || '';
-    aiKey.value = state.aiKey || '';
-    byId('keyStatus').textContent = state.aiKey ? 'Key: carregada' : 'Key: vazia (use ?gemini=...)';
-    btnQR.href = window.PIXELUP.REPLIT_DIRECT + '/qr';
-    renderContacts(); renderThread(null);
-    runDiagnostics(); waStatus(); waEvents();
-  })();
-
-  // ===== Tabs =====
+  // ===== Topbar & Tabs =====
   (function initTabs(){
     const tabs = byId('tabs');
-    const panels = { home: byId('panel-home'), crm: byId('panel-crm'), mentoria: byId('panel-mentoria'), bootcamp: byId('panel-bootcamp') };
+    const panels = {home: byId('panel-home'), crm: byId('panel-crm'), mentoria: byId('panel-mentoria')};
     tabs.addEventListener('click', (e)=>{
-      if(e.target.tagName==='BUTTON'){
-        const tab = e.target.dataset.tab;
-        tabs.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
-        Object.keys(panels).forEach(k => panels[k].classList.toggle('active', k===tab));
-      }
-    });
-    document.querySelectorAll('[data-goto]').forEach(btn => btn.addEventListener('click', ()=>{
-      const tab = btn.dataset.goto;
+      if(e.target.tagName!=='BUTTON') return;
+      const tab = e.target.dataset.tab;
       tabs.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
       Object.values(panels).forEach(p => p.classList.remove('active'));
       panels[tab].classList.add('active');
-    }));
+      if(tab==='crm'){ renderKanban(); renderThread(null); }
+    });
   })();
 
-  // ===== Buttons =====
-  toggleBot.addEventListener('click', ()=>{
-    state.botOn = !state.botOn; ls.set('px_bot_on', state.botOn);
-    botBadge.textContent = 'Bot: ' + (state.botOn? 'ON' : 'OFF');
-    toggleBot.textContent = state.botOn ? 'Desligar Bot' : 'Ligar Bot';
-  });
-  saveNumber.addEventListener('click', ()=>{ state.myNumber = myNumber.value.trim(); ls.set('px_my_number', state.myNumber); alert('Número salvo'); });
-  saveKey.addEventListener('click', ()=>{ state.aiKey = aiKey.value.trim(); ls.set('px_ai_key', state.aiKey); alert(state.aiKey ? 'Key salva' : 'Sem key definida'); byId('keyStatus').textContent = state.aiKey ? 'Key: carregada' : 'Key: vazia'; });
-  btnCheckWA.addEventListener('click', waStatus);
+  // ===== Home controls =====
+  const myNumber = byId('myNumber'), saveNumber = byId('saveNumber');
+  const aiKey = byId('aiKey'), saveKey = byId('saveKey'), keyStatus = byId('keyStatus');
+  const btnCheckWA = byId('btnCheckWA'), btnQR = byId('btnQR'), diag = byId('diag');
+  const waDot = byId('waDot'), waLabel = byId('waLabel'), waStatusText = byId('waStatusText'), sseBadge = byId('sseBadge');
 
-  // ===== CRM Rendering =====
-  function renderContacts(){
-    contactsList.innerHTML = '';
-    let arr = Object.values(state.contacts);
-    if(state.search){
-      const q = state.search.toLowerCase();
-      arr = arr.filter(c => (c.name||'').toLowerCase().includes(q) || (c.phone||'').includes(q));
-    }
-    arr.sort((a,b)=> (b.lastTs||0)-(a.lastTs||0));
-    if(arr.length===0){ contactsList.innerHTML = '<p class="muted">Sem contatos ainda.</p>'; return; }
-    arr.forEach(c => {
-      const div = document.createElement('div'); div.className='msg';
-      div.innerHTML = `<strong>${escapeHtml(c.name||c.phone)}</strong><br>
-        <small class="muted">${escapeHtml(c.phone)} — ${escapeHtml(c.lastText||'')}</small><br>
-        <small class="muted">Notas: ${escapeHtml(c.notes||'')}</small>`;
-      div.onclick = ()=>{ state.current = c.phone; renderThread(c.phone); };
-      contactsList.appendChild(div);
+  (function initHome(){
+    myNumber.value = state.myNumber; aiKey.value = state.aiKey;
+    keyStatus.textContent = state.aiKey ? 'Key: carregada' : 'Key: vazia';
+    btnQR.href = window.PIXELUP.REPLIT_DIRECT + '/qr';
+    runDiagnostics(); waStatus(); waEvents(); refreshCounters();
+  })();
+
+  saveNumber.onclick = ()=>{ state.myNumber = myNumber.value.trim(); ls.set('px_my_number', state.myNumber); alert('Número salvo'); };
+  saveKey.onclick    = ()=>{ state.aiKey = aiKey.value.trim(); ls.set('px_ai_key', state.aiKey); keyStatus.textContent = state.aiKey?'Key: carregada':'Key: vazia'; alert('Key salva'); };
+  btnCheckWA.onclick = waStatus;
+
+  // ===== CRM elements =====
+  const cName = byId('cName'), cEmail = byId('cEmail'), cPhone = byId('cPhone'), cOrigin = byId('cOrigin'), cNotes = byId('cNotes');
+  const btnAdd = byId('btnAdd'), search = byId('search'), clearSearch = byId('clearSearch');
+  const kanban = byId('kanban'), thread = byId('thread'), threadTitle = byId('threadTitle');
+  const msgText = byId('msgText'), sendMsg = byId('sendMsg');
+  const botBadge = byId('botBadge'), toggleBot = byId('toggleBot');
+
+  btnAdd.onclick = ()=>{
+    const phone = norm(cPhone.value.trim());
+    if(!phone){ alert('Telefone é obrigatório'); return; }
+    const rec = state.contacts[phone] || {};
+    state.contacts[phone] = {
+      phone,
+      name: (cName.value||'').trim() || phone,
+      email: (cEmail.value||'').trim(),
+      origin: (cOrigin.value||'WhatsApp'),
+      notes: (cNotes.value||'').trim(),
+      stage: rec.stage || 'novo',
+      lastText: rec.lastText || '', lastTs: rec.lastTs || Date.now()
+    };
+    ls.set('px_contacts', state.contacts);
+    cName.value=cEmail.value=cPhone.value=cNotes.value='';
+    renderKanban(); refreshCounters();
+  };
+
+  search.oninput = ()=>{ state.search = search.value.toLowerCase(); renderKanban(); };
+  clearSearch.onclick = ()=>{ search.value=''; state.search=''; renderKanban(); };
+
+  sendMsg.onclick = async ()=>{
+    const phone = state.current; const text = msgText.value.trim();
+    if(!phone || !text) return;
+    await waSend({to: phone, text});
+    pushMsg(phone, {who:'me', text, ts: Date.now()});
+    msgText.value=''; renderThread(phone);
+    touchContact(phone, {lastText: text});
+  };
+
+  toggleBot.onclick = ()=>{
+    const p = state.current; if(!p) return;
+    state.botMap[p] = !state.botMap[p]; ls.set('px_bot_map', state.botMap);
+    setBotBadge(p);
+  };
+
+  function setBotBadge(phone){
+    const on = !!state.botMap[phone];
+    botBadge.textContent = 'Bot: ' + (on?'ON':'OFF');
+    toggleBot.textContent = on ? 'Desligar IA' : 'Ligar IA';
+  }
+
+  // ===== Data helpers =====
+  function contactFilter(c){
+    if(!state.search) return true;
+    const q = state.search;
+    return [c.name,c.phone,c.email,c.origin,(c.notes||'')].join(' ').toLowerCase().includes(q);
+  }
+  function toCardHTML(c){
+    return `
+      <div class="card-k" draggable="true" data-phone="${c.phone}">
+        <b>${escapeHtml(c.name||c.phone)}</b><br>
+        <span class="tiny muted">${escapeHtml(c.origin||'')}</span>
+        ${c.email?`<div class="tiny muted">${escapeHtml(c.email)}</div>`:''}
+        <div class="tiny muted">${escapeHtml(c.lastText||'')}</div>
+      </div>`;
+  }
+  function renderKanban(){
+    // clear cols
+    kanban.querySelectorAll('.col').forEach(col=>{
+      const stage = col.dataset.stage;
+      let html = '';
+      const arr = Object.values(state.contacts).filter(c => (c.stage||'novo')===stage && contactFilter(c))
+        .sort((a,b)=>(b.lastTs||0)-(a.lastTs||0));
+      if(arr.length===0){ col.innerHTML = `<h4>${col.querySelector('h4').textContent}</h4><div class="empty tiny">— sem cards —</div>`; return; }
+      html += `<h4>${col.querySelector('h4').textContent}</h4>`;
+      html += arr.map(toCardHTML).join('');
+      col.innerHTML = html;
+    });
+    initDragDrop();
+    refreshCounters();
+  }
+  function initDragDrop(){
+    let dragEl=null;
+    kanban.querySelectorAll('.card-k').forEach(card=>{
+      card.addEventListener('dragstart',()=>{ dragEl=card; card.classList.add('drag'); });
+      card.addEventListener('dragend',()=>{ card.classList.remove('drag'); dragEl=null; });
+      card.onclick = ()=>{ const phone = card.dataset.phone; state.current = phone; renderThread(phone); setBotBadge(phone); };
+    });
+    kanban.querySelectorAll('.col').forEach(col=>{
+      col.addEventListener('dragover',e=>{ e.preventDefault(); });
+      col.addEventListener('drop',e=>{
+        e.preventDefault(); if(!dragEl) return;
+        const phone = dragEl.dataset.phone; const stage = col.dataset.stage;
+        const c = state.contacts[phone]; if(!c) return;
+        c.stage = stage; state.contacts[phone]=c; ls.set('px_contacts', state.contacts);
+        renderKanban();
+      });
     });
   }
   function renderThread(phone){
-    const el = thread; el.innerHTML = '';
-    if(!phone){ threadTitle.textContent = 'Conversa'; return; }
-    threadTitle.textContent = 'Conversa — ' + phone;
-    (state.threads[phone]||[]).forEach(m => {
-      const div = document.createElement('div'); div.className='msg '+(m.who==='me'?'me':'them');
+    thread.innerHTML = '';
+    if(!phone){ threadTitle.textContent = 'Conversa — selecione um card'; setBotBadge(null); return; }
+    const c = state.contacts[phone] || {phone};
+    threadTitle.textContent = `Conversa — ${c.name||phone} (${phone})`;
+    setBotBadge(phone);
+    (state.threads[phone]||[]).forEach(m=>{
+      const div=document.createElement('div'); div.className='msg '+(m.who==='me'?'me':'them');
       const date = new Date(m.ts||Date.now()).toLocaleString();
       div.innerHTML = `<small class="muted">${date}</small><br>${escapeHtml(m.text||'')}`;
-      el.appendChild(div);
+      thread.appendChild(div);
     });
-    el.scrollTop = el.scrollHeight;
-  }
-  function upsertContact(phone, data, lastText, ts){
-    const c = state.contacts[phone] || {phone};
-    state.contacts[phone] = { ...c, ...data, lastText, lastTs: ts };
-    ls.set('px_contacts', state.contacts);
-    renderContacts();
+    thread.scrollTop = thread.scrollHeight;
   }
   function pushMsg(phone, m){
-    const arr = state.threads[phone] || [];
-    arr.push(m);
-    state.threads[phone] = arr;
-    ls.set('px_threads', state.threads);
+    const arr = state.threads[phone] || []; arr.push(m); state.threads[phone]=arr; ls.set('px_threads', state.threads);
+  }
+  function upsertContact(phone, patch){
+    const c = state.contacts[phone] || {phone, stage:'novo', origin:'WhatsApp'};
+    state.contacts[phone] = { ...c, ...patch };
+    ls.set('px_contacts', state.contacts);
+  }
+  function touchContact(phone, patch){
+    upsertContact(phone, { lastTs: Date.now(), ...patch });
+    renderKanban();
+  }
+  function refreshCounters(){
+    const all = Object.values(state.contacts);
+    byId('mNovos').textContent = all.filter(c=> (c.stage||'novo')==='novo').length;
+    byId('mQuali').textContent = all.filter(c=> c.stage==='qualificando').length;
+    byId('mProp').textContent  = all.filter(c=> c.stage==='proposta').length;
+    byId('mFech').textContent  = all.filter(c=> c.stage==='fechado').length;
   }
 
-  // Inputs
-  btnAdd.addEventListener('click', ()=>{
-    const phone = norm(cPhone.value.trim()); if(!phone) return;
-    upsertContact(phone, {phone, name: cName.value.trim() || phone, notes: cNotes.value.trim()}, '', Date.now());
-    cName.value = cPhone.value = cNotes.value = '';
-  });
-  sendMsg.addEventListener('click', async ()=>{
-    const phone = state.current; const text = msgText.value.trim();
-    if(!phone || !text) return;
-    await waSend({to:phone, text});
-    pushMsg(phone, {who:'me', text, ts: Date.now()}); msgText.value=''; renderThread(phone);
-  });
-  search.addEventListener('input', ()=>{ state.search = search.value; renderContacts(); });
-  clearSearch.addEventListener('click', ()=>{ search.value=''; state.search=''; renderContacts(); });
-
-  // ===== WhatsApp backend (via /api proxy) =====
+  // ===== WhatsApp backend =====
   async function waStatus(){
     try{
       const r = await fetch(window.PIXELUP.WA_BASE + '/status');
       const j = await r.json();
       const ok = !!j.connected;
-      waDot.classList.toggle('on', ok);
-      waDot.classList.toggle('off', !ok);
+      waDot.classList.toggle('on', ok); waDot.classList.toggle('off', !ok);
       waLabel.textContent = ok ? ('WA: on' + (j.user ? ' ('+j.user+')' : '')) : 'WA: off';
       if(waStatusText) waStatusText.textContent = ok ? 'on' : 'off';
       return ok;
-    }catch(e){
-      waDot.classList.remove('on'); waDot.classList.add('off'); if(waStatusText) waStatusText.textContent='off'; return false;
-    }
+    }catch{ waDot.classList.remove('on'); waDot.classList.add('off'); if(waStatusText) waStatusText.textContent='off'; return false; }
   }
   async function waSend({to, text}){
-    const r = await fetch(window.PIXELUP.WA_BASE + '/send', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({to, text}) });
+    const r = await fetch(window.PIXELUP.WA_BASE + '/send', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({to,text})});
     try{ return await r.json(); }catch{ return {ok:false}; }
   }
   function waEvents(){
-    let es = null, timer = null;
+    let es=null, timer=null;
+    const url = (location.hostname.endsWith('vercel.app') ? window.PIXELUP.REPLIT_DIRECT : window.PIXELUP.WA_BASE) + '/events';
     const open = ()=>{
       try{
-        if(es){ es.close(); es=null; }
-        es = new EventSource(window.PIXELUP.WA_BASE + '/events');
+        if(es) es.close();
+        es = new EventSource(url);
         es.onopen = ()=>{ sseBadge.textContent='SSE: ON'; sseBadge.style.color='#b5ffd0'; };
         es.onmessage = async (ev)=>{
           try{
@@ -376,84 +410,140 @@
             if(data.type==='status'){ await waStatus(); }
             if(data.type==='message'){
               const phone = norm(data.from||''); if(!phone) return;
-              upsertContact(phone, {phone, name: data.name||phone, notes:''}, data.text||'', data.ts||Date.now());
-              pushMsg(phone, {who:'them', text: data.text||'', ts: data.ts||Date.now()});
+              upsertContact(phone, {
+                name: data.name||phone, origin: 'WhatsApp',
+                lastText: data.text||'', lastTs: data.ts||Date.now()
+              });
+              pushMsg(phone, {who:'them', text:data.text||'', ts:data.ts||Date.now()});
+              // se a conversa atual é essa, atualiza UI
               if(state.current===phone) renderThread(phone);
-              if(state.botOn && phone !== norm(state.myNumber)){
-                // Pré-atendimento: captura rápida + resposta
-                const info = await geminiCapture(`Mensagem: "${data.text||''}". Extraia curto JSON com: nome (se houver), necessidade, orçamento (se citar), prazo (se citar).`);
-                if(info){
-                  const notes = [info.nome?`Nome: ${info.nome}`:'', info.necessidade?`Necessidade: ${info.necessidade}`:'', info.orcamento?`Orçamento: ${info.orcamento}`:'', info.prazo?`Prazo: ${info.prazo}`:''].filter(Boolean).join(' | ');
-                  const c = state.contacts[phone] || {phone}; state.contacts[phone] = { ...c, notes, name: c.name || info.nome || phone, lastText: data.text||'', lastTs: Date.now() }; ls.set('px_contacts', state.contacts);
-                  if(state.current===phone) renderThread(phone);
-                }
-                const reply = await geminiReply("Você é um atendente virtual da PixelUp. Responda de forma educada, objetiva e peça dados essenciais (nome, necessidade, orçamento, prazo). Se o assunto for veículos, pergunte modelo/ano/valor. Se o contato pedir humano, responda que vai acionar o atendimento.\n\nPergunta do cliente: " + (data.text||''));
-                if(reply){
-                  await waSend({to: phone, text: reply});
-                  pushMsg(phone, {who:'me', text: reply, ts: Date.now()});
-                  if(state.current===phone) renderThread(phone);
-                }
+              // BOT por contato:
+              if(state.botMap[phone] && phone !== norm(state.myNumber)){
+                await botPreAtendimento(phone, data.text||'');
               }
+              renderKanban();
             }
           }catch{}
         };
-        es.onerror = ()=>{ sseBadge.textContent='SSE: OFF'; sseBadge.style.color='#ffd0d0'; timer && clearTimeout(timer); timer = setTimeout(open, 3000); };
-      }catch(e){ sseBadge.textContent='SSE: OFF'; sseBadge.style.color='#ffd0d0'; timer && clearTimeout(timer); timer = setTimeout(open, 3000); }
+        es.onerror = ()=>{ sseBadge.textContent='SSE: OFF'; sseBadge.style.color='#ffd0d0'; timer && clearTimeout(timer); timer=setTimeout(open,3000); };
+      }catch{ sseBadge.textContent='SSE: OFF'; sseBadge.style.color='#ffd0d0'; timer && clearTimeout(timer); timer=setTimeout(open,3000); }
     };
     open();
   }
 
   // ===== Gemini (IA) =====
-  function getGeminiKey(){ return (state.aiKey || '').trim(); }
-  async function geminiReply(prompt){
-    const key = getGeminiKey(); if(!key) return '';
-    const body = { contents:[{ parts:[ {text: prompt} ] }] };
+  function getGeminiKey(){ return (state.aiKey||'').trim(); }
+  async function geminiCall(prompt, json=false){
+    const key = getGeminiKey(); if(!key) return json ? null : '';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${window.PIXELUP.GEMINI_MODEL}:generateContent`;
+    const body = json
+      ? { contents:[{ parts:[ {text: prompt} ] }], generationConfig:{ response_mime_type:"application/json" } }
+      : { contents:[{ parts:[ {text: prompt} ] }] };
     try{
-      const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json','x-goog-api-key': key}, body: JSON.stringify(body) });
-      if(!r.ok) return '';
+      const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json','x-goog-api-key': key}, body: JSON.stringify(body)});
+      if(!r.ok) return json ? null : '';
       const j = await r.json();
-      return (j?.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
-    }catch(e){ return ''; }
+      const text = j?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      if(json){ try{ return JSON.parse(text); }catch{ return null; } }
+      return text.trim();
+    }catch{ return json ? null : ''; }
   }
-  async function geminiCapture(prompt){
-    const key = getGeminiKey(); if(!key) return null;
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${window.PIXELUP.GEMINI_MODEL}:generateContent`;
-    const body = { contents:[{ parts:[ {text: prompt} ] }], generationConfig:{ response_mime_type:"application/json" } };
-    try{
-      const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json','x-goog-api-key': key}, body: JSON.stringify(body) });
-      if(!r.ok) return null;
-      const j = await r.json();
-      try{ return JSON.parse(j?.candidates?.[0]?.content?.parts?.[0]?.text || ""); }catch{ return null; }
-    }catch(e){ return null; }
+  async function botPreAtendimento(phone, textIn){
+    // 1) capturar dados essenciais
+    const extract = await geminiCall(
+      `A partir da mensagem do cliente, extraia um JSON curto com campos (pode faltar):
+       nome, email, necessidade, orcamento, prazo.
+       Mensagem: "${textIn}"`, true);
+    if(extract){
+      const c = state.contacts[phone] || {phone};
+      const notes = [
+        extract.nome?`Nome: ${extract.nome}`:'',
+        extract.email?`Email: ${extract.email}`:'',
+        extract.necessidade?`Necessidade: ${extract.necessidade}`:'',
+        extract.orcamento?`Orçamento: ${extract.orcamento}`:'',
+        extract.prazo?`Prazo: ${extract.prazo}`:''
+      ].filter(Boolean).join(' | ');
+      state.contacts[phone] = {
+        ...c,
+        name: c.name || extract.nome || phone,
+        email: c.email || extract.email || '',
+        notes: notes || c.notes || '',
+        lastText: textIn, lastTs: Date.now()
+      };
+      ls.set('px_contacts', state.contacts);
+      renderKanban();
+      if(state.current===phone) renderThread(phone);
+    }
+    // 2) resposta do atendente virtual
+    const reply = await geminiCall(
+      "Atue como atendente virtual da PixelUp. Peça educadamente os dados em falta (nome, e-mail, necessidade, orçamento, prazo). " +
+      "Se o assunto for veículos, pergunte modelo/ano/valor. Se o cliente pedir humano, diga que vai acionar o atendimento.\n\n" +
+      "Mensagem do cliente: " + textIn, false);
+    if(reply){
+      await waSend({to:phone, text: reply});
+      pushMsg(phone, {who:'me', text: reply, ts: Date.now()});
+      if(state.current===phone) renderThread(phone);
+    }
   }
 
-  // Bootcamp Chat
-  function appendBoot(who, text){
-    const div = document.createElement('div');
-    div.className = 'msg ' + (who==='Você' ? 'me' : 'them');
-    const date = new Date().toLocaleString();
-    div.innerHTML = `<small class="muted">${date} — <b>${who}</b></small><br>${escapeHtml(text)}`;
-    bootA.appendChild(div); bootA.scrollTop = bootA.scrollHeight;
+  // ===== Mentoria (8 módulos + import .docx) =====
+  const modulesSeed = [
+    {id:'m1', title:'Módulo 1 — Persona e Fundamentos do Negócio'},
+    {id:'m2', title:'Módulo 2 — Algoritmo do Meta'},
+    {id:'m3', title:'Módulo 3 — Cronograma e Calendário Editorial'},
+    {id:'m4', title:'Módulo 4 — Conteúdo Visual'},
+    {id:'m5', title:'Módulo 5 — Copy com IA'},
+    {id:'m6', title:'Módulo 6 — CRM e Organização Comercial'},
+    {id:'m7', title:'Módulo 7 — Técnicas de Vendas'},
+    {id:'m8', title:'Módulo 8 — Implementação de CRM + Tráfego Pago'}
+  ];
+  const modulesList = byId('modulesList'), lessonTitle = byId('lessonTitle'), lessonBody = byId('lessonBody');
+  let currentModule = null;
+  function modKey(id){ return 'px_mod_'+id; }
+  function loadMod(id){ return ls.get(modKey(id), {html:'(sem conteúdo — importe o .docx deste módulo)'}) }
+  function saveMod(id,html){ ls.set(modKey(id), {html}); }
+  function renderModules(){
+    modulesList.innerHTML = '';
+    modulesSeed.forEach(m=>{
+      const b = document.createElement('button');
+      b.className = 'btn secondary'; b.style.margin='4px'; b.textContent = m.title;
+      b.onclick = ()=>{
+        currentModule = m.id;
+        const data = loadMod(m.id);
+        lessonTitle.textContent = m.title;
+        lessonBody.innerHTML = data.html;
+      };
+      modulesList.appendChild(b);
+    });
   }
-  bootAsk.addEventListener('click', async ()=>{
-    const q = bootQ.value.trim(); if(!q) return; appendBoot('Você', q); bootQ.value='';
-    const a = await geminiReply("Você é um tutor do Bootcamp PixelUp. Responda de forma clara e objetiva. Pergunta: " + q);
-    appendBoot('Tutor', a || '(sem resposta)');
-  });
+  renderModules();
+  byId('importDocx').onclick = async ()=>{
+    const f = byId('docxInput').files?.[0]; if(!f){ alert('Selecione um .docx'); return; }
+    if(!currentModule){ alert('Escolha um módulo à esquerda antes de importar'); return; }
+    try{
+      const arrayBuffer = await f.arrayBuffer();
+      const res = await window.mammoth.convertToHtml({arrayBuffer});
+      saveMod(currentModule, res.value || '(vazio)');
+      lessonBody.innerHTML = res.value || '(vazio)';
+      alert('Conteúdo importado para '+currentModule);
+    }catch(e){ alert('Falha ao ler .docx'); }
+  };
 
   // ===== Diagnostics =====
   async function runDiagnostics(){
     const lines = [];
     lines.push(`<div>Origin: <code>${location.origin}</code></div>`);
-    try{ const r = await fetch('/api/status'); const ok = r.ok; const j = ok? await r.json():{}; lines.push(`<div>/api/status: <b>${ok?'OK':'FAIL'}</b> ${ok?JSON.stringify(j):''}</div>`);}catch{ lines.push(`<div>/api/status: <b>FAIL</b></div>`); }
+    try{
+      const r = await fetch('/api/status'); const ok = r.ok; const j = ok? await r.json():{};
+      lines.push(`<div>/api/status: <b>${ok?'OK':'FAIL'}</b> ${ok?JSON.stringify(j):''}</div>`);
+    }catch{ lines.push(`<div>/api/status: <b>FAIL</b></div>`); }
     diag.innerHTML = lines.join('');
   }
 
-  // start events after functions definition
-  waEvents();
-  </script>
+  // ===== boot =====
+  renderKanban(); renderThread(null);
 
-  <footer>© PixelUp — SuperApp Classic</footer>
+  </script>
+  <footer class="muted" style="text-align:center;padding:20px">© PixelUp — SuperApp Classic</footer>
 </body>
 </html>
