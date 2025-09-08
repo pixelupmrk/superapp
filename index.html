@@ -5,15 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>PixelUp SuperApp — Classic</title>
 <meta name="theme-color" content="#0b1a2a"/>
+
+<!-- Se quiser fixar a key do Gemini via Vercel (build): preencha esta meta -->
+<meta name="x-gemini" content="">
+
 <link rel="preconnect" href="https://generativelanguage.googleapis.com" crossorigin>
-<!-- Mammoth para importar .docx na Mentoria -->
 <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
 <style>
   :root{
     --bg:#0b1118; --panel:#0f1b2a; --muted:#9bb3c7; --primary:#12b0ff; --primary2:#66d1ff; --accent:#00ffd5;
     --danger:#ff5d5d; --ok:#27c93f; --card:#0e1825; --border:#122235; --radius:16px; --shadow:0 8px 28px rgba(0,0,0,.35);
   }
-  *{box-sizing:border-box} html,body{height:100%} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
     background:radial-gradient(1000px 600px at 10% -10%, rgba(18,176,255,.14), transparent 60%),
                radial-gradient(800px 500px at 110% 10%, rgba(0,255,213,.10), transparent 60%), var(--bg); color:#eaf6ff;}
   a{color:var(--primary)} .muted{color:#9bb3c7} .tiny{font-size:12px} .pill{padding:4px 8px;border-radius:999px;border:1px solid var(--border)}
@@ -36,14 +40,19 @@
   .btn.secondary{background:#0b1522;color:#dff2ff;border:1px solid var(--border);box-shadow:none}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .input,textarea,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0c1725;color:#eaf6ff}
-  .ws-dot{width:10px;height:10px;border-radius:50%;background:#666}.ws-dot.on{background:var(--ok)}.ws-dot.off{background:var(--danger)}
   .thread{overflow:auto;max-height:64vh;padding:12px;background:#0b1522;border-radius:12px;border:1px solid var(--border)}
   .msg{margin:8px 0;padding:8px 10px;border-radius:10px;border:1px solid var(--border)} .msg.me{background:#062438} .msg.them{background:#112234}
+  /* Landing */
+  .landing{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:48px 16px}
+  .landing img{width:160px;height:160px;border-radius:24px;object-fit:contain;background:#0b1522;border:1px solid var(--border)}
+  .landing .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
   /* Kanban */
   .kanban{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
   .col{background:#0b1522;border:1px solid var(--border);border-radius:14px;padding:10px;min-height:200px}
   .col h4{margin:6px 0 10px 0}
-  .card-k{background:#0e1624;border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px;cursor:grab}
+  .card-k{background:#0e1624;border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px;cursor:grab;position:relative}
+  .card-k .icons{position:absolute;right:8px;top:8px;display:flex;gap:6px}
+  .card-k .icon{cursor:pointer}
   .card-k.drag{opacity:.6}
   .empty{color:#89a; font-style:italic}
   @media (max-width:1100px){ .kanban{grid-template-columns:1fr} .thread{max-height:unset}}
@@ -59,54 +68,24 @@
       <button data-tab="home" class="active">Home</button>
       <button data-tab="crm">CRM</button>
       <button data-tab="mentoria">Mentoria</button>
+      <button data-tab="config">Configurações</button>
     </nav>
-    <div class="row">
-      <span class="ws-dot off" id="waDot"></span><span id="waLabel" class="muted">WA: off</span>
-      <span class="pill" id="sseBadge">SSE: —</span>
-    </div>
   </header>
 
   <main>
-    <!-- HOME (Dashboard leve) -->
+    <!-- HOME (somente logo + botões grandes) -->
     <section class="panel active" id="panel-home">
-      <div class="grid g-3">
-        <div class="card">
-          <h2>Dashboard</h2>
-          <div class="row">
-            <div class="pill">Novos: <b id="mNovos">0</b></div>
-            <div class="pill">Qualificando: <b id="mQuali">0</b></div>
-            <div class="pill">Proposta: <b id="mProp">0</b></div>
-            <div class="pill">Fechado: <b id="mFech">0</b></div>
-          </div>
-          <p class="muted tiny" style="margin-top:8px">Contadores refletem o pipeline do Kanban (CRM).</p>
-        </div>
-        <div class="card">
-          <h3>Configurações</h3>
-          <div class="row">
-            <input class="input" id="myNumber" placeholder="Seu número WA (55DDDNUMERO)">
-            <button class="btn secondary" id="saveNumber">Salvar</button>
-          </div>
-          <small class="muted">Evita o bot responder seu próprio número.</small>
-          <div style="margin-top:12px">
-            <label class="muted" for="aiKey">Gemini API Key</label>
-            <input class="input" id="aiKey" placeholder="Cole a chave ou use ?gemini=SUA_KEY">
-            <button class="btn secondary" id="saveKey" style="margin-top:8px">Salvar Key</button>
-            <div class="tiny muted" id="keyStatus">Key: —</div>
-          </div>
-        </div>
-        <div class="card">
-          <h3>WhatsApp</h3>
-          <div class="row">
-            <span class="pill" id="waStatusText">off</span>
-            <button class="btn secondary" id="btnCheckWA">Verificar</button>
-            <a class="btn secondary" id="btnQR" target="_blank">Abrir QR</a>
-          </div>
-          <div id="diag" class="tiny" style="margin-top:8px"></div>
+      <div class="landing">
+        <img src="./logo.jpg" alt="PixelUp" onerror="this.style.display='none'"/>
+        <div class="actions">
+          <button class="btn" data-goto="crm">Abrir CRM</button>
+          <button class="btn secondary" data-goto="mentoria">Mentoria</button>
+          <button class="btn secondary" data-goto="config">Configurações</button>
         </div>
       </div>
     </section>
 
-    <!-- CRM: Cadastro em cima + Kanban à esquerda + Conversa à direita -->
+    <!-- CRM -->
     <section class="panel" id="panel-crm">
       <!-- CONTATOS EM CIMA -->
       <div class="card">
@@ -134,22 +113,10 @@
         <div class="card">
           <h3>Kanban</h3>
           <div class="kanban" id="kanban">
-            <div class="col" data-stage="novo">
-              <h4>Novos</h4>
-              <div class="empty tiny">— sem cards —</div>
-            </div>
-            <div class="col" data-stage="qualificando">
-              <h4>Qualificando</h4>
-              <div class="empty tiny">— sem cards —</div>
-            </div>
-            <div class="col" data-stage="proposta">
-              <h4>Proposta</h4>
-              <div class="empty tiny">— sem cards —</div>
-            </div>
-            <div class="col" data-stage="fechado">
-              <h4>Fechado</h4>
-              <div class="empty tiny">— sem cards —</div>
-            </div>
+            <div class="col" data-stage="novo"><h4>Novos</h4><div class="empty tiny">— sem cards —</div></div>
+            <div class="col" data-stage="qualificando"><h4>Qualificando</h4><div class="empty tiny">— sem cards —</div></div>
+            <div class="col" data-stage="proposta"><h4>Proposta</h4><div class="empty tiny">— sem cards —</div></div>
+            <div class="col" data-stage="fechado"><h4>Fechado</h4><div class="empty tiny">— sem cards —</div></div>
           </div>
         </div>
 
@@ -160,6 +127,8 @@
             <div class="row">
               <span class="pill" id="botBadge">Bot: OFF</span>
               <button class="btn secondary" id="toggleBot">Ligar IA</button>
+              <a class="btn secondary" id="btnQR" target="_blank">Gerar QR</a>
+              <span class="tiny muted" id="waStatusText">Status: —</span>
             </div>
           </div>
           <div class="thread" id="thread"></div>
@@ -167,6 +136,17 @@
             <input class="input" id="msgText" placeholder="Mensagem para enviar no WhatsApp">
             <button class="btn" id="sendMsg">Enviar</button>
           </div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD EMBAIXO -->
+      <div class="card" style="margin-top:12px">
+        <h3>Dashboard</h3>
+        <div class="row">
+          <div class="pill">Novos: <b id="mNovos">0</b></div>
+          <div class="pill">Qualificando: <b id="mQuali">0</b></div>
+          <div class="pill">Proposta: <b id="mProp">0</b></div>
+          <div class="pill">Fechado: <b id="mFech">0</b></div>
         </div>
       </div>
     </section>
@@ -181,11 +161,29 @@
           <div class="tiny muted">Importar conteúdo do Word (.docx) para o módulo selecionado:</div>
           <input type="file" id="docxInput" accept=".docx"/>
           <button class="btn secondary" id="importDocx">Importar .docx</button>
+          <div class="tiny muted" style="margin-top:6px">
+            Se você subir os arquivos <code>/mentoria/m1.docx</code> … <code>/mentoria/m8.docx</code> na Vercel,
+            o sistema tenta carregar automaticamente.
+          </div>
         </div>
         <div class="card">
           <h3 id="lessonTitle">Selecione um módulo</h3>
           <div id="lessonBody" class="muted">O conteúdo aparecerá aqui.</div>
         </div>
+      </div>
+    </section>
+
+    <!-- CONFIGURAÇÕES (apenas nome do usuário) -->
+    <section class="panel" id="panel-config">
+      <div class="card">
+        <h3>Configurações</h3>
+        <div class="grid g-3">
+          <input class="input" id="userName" placeholder="Seu nome (exibido no CRM)">
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn" id="saveUser">Salvar</button>
+        </div>
+        <small class="muted">As demais configurações (WhatsApp/API) ficam fora da UI e serão tratadas no backend/deploy.</small>
       </div>
     </section>
   </main>
@@ -197,8 +195,6 @@
     GEMINI_MODEL: "gemini-2.0-flash",
     REPLIT_DIRECT: "https://pixelup-wa-server.pixelupmrkt.repl.co"
   };
-  // carregue sua key na Home ou via ?gemini=SUA_KEY
-  window.DEFAULT_GEMINI_KEY = "";
 
   // ===== Utils & State =====
   const $ = s => document.querySelector(s); const byId = id => document.getElementById(id);
@@ -206,11 +202,12 @@
   const norm = p => (''+(p||'')).replace(/[^0-9]/g,'');
   const ls = { get(k,d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d; }catch{ return d; } }, set(k,v){ localStorage.setItem(k, JSON.stringify(v)); } };
   const qparam = k => new URLSearchParams(location.search).get(k);
+  const metaGem = (document.querySelector('meta[name="x-gemini"]')?.content||'').trim();
 
   const stages = ["novo","qualificando","proposta","fechado"];
   const state = {
-    myNumber: ls.get('px_my_number',''),
-    aiKey: ls.get('px_ai_key', (qparam('gemini') || window.DEFAULT_GEMINI_KEY || '')),
+    userName: ls.get('px_user_name',''),
+    aiKey: ls.get('px_ai_key', (qparam('gemini') || metaGem || '')),
     contacts: ls.get('px_contacts', {}),  // phone -> record
     threads:  ls.get('px_threads', {}),   // phone -> msgs[]
     botMap:   ls.get('px_bot_map', {}),   // phone -> true/false
@@ -218,43 +215,29 @@
     search: ''
   };
 
-  // ===== Topbar & Tabs =====
+  // ===== Tabs =====
   (function initTabs(){
     const tabs = byId('tabs');
-    const panels = {home: byId('panel-home'), crm: byId('panel-crm'), mentoria: byId('panel-mentoria')};
-    tabs.addEventListener('click', (e)=>{
-      if(e.target.tagName!=='BUTTON') return;
-      const tab = e.target.dataset.tab;
+    const panels = {home: byId('panel-home'), crm: byId('panel-crm'), mentoria: byId('panel-mentoria'), config: byId('panel-config')};
+    const activate = (tab) => {
       tabs.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
       Object.values(panels).forEach(p => p.classList.remove('active'));
       panels[tab].classList.add('active');
-      if(tab==='crm'){ renderKanban(); renderThread(null); }
+      if(tab==='crm'){ renderKanban(); renderThread(null); refreshCounters(); }
+    };
+    tabs.addEventListener('click', (e)=>{
+      if(e.target.tagName!=='BUTTON') return;
+      activate(e.target.dataset.tab);
     });
+    document.querySelectorAll('[data-goto]').forEach(b=> b.addEventListener('click', ()=> activate(b.dataset.goto)));
   })();
-
-  // ===== Home controls =====
-  const myNumber = byId('myNumber'), saveNumber = byId('saveNumber');
-  const aiKey = byId('aiKey'), saveKey = byId('saveKey'), keyStatus = byId('keyStatus');
-  const btnCheckWA = byId('btnCheckWA'), btnQR = byId('btnQR'), diag = byId('diag');
-  const waDot = byId('waDot'), waLabel = byId('waLabel'), waStatusText = byId('waStatusText'), sseBadge = byId('sseBadge');
-
-  (function initHome(){
-    myNumber.value = state.myNumber; aiKey.value = state.aiKey;
-    keyStatus.textContent = state.aiKey ? 'Key: carregada' : 'Key: vazia';
-    btnQR.href = window.PIXELUP.REPLIT_DIRECT + '/qr';
-    runDiagnostics(); waStatus(); waEvents(); refreshCounters();
-  })();
-
-  saveNumber.onclick = ()=>{ state.myNumber = myNumber.value.trim(); ls.set('px_my_number', state.myNumber); alert('Número salvo'); };
-  saveKey.onclick    = ()=>{ state.aiKey = aiKey.value.trim(); ls.set('px_ai_key', state.aiKey); keyStatus.textContent = state.aiKey?'Key: carregada':'Key: vazia'; alert('Key salva'); };
-  btnCheckWA.onclick = waStatus;
 
   // ===== CRM elements =====
   const cName = byId('cName'), cEmail = byId('cEmail'), cPhone = byId('cPhone'), cOrigin = byId('cOrigin'), cNotes = byId('cNotes');
   const btnAdd = byId('btnAdd'), search = byId('search'), clearSearch = byId('clearSearch');
   const kanban = byId('kanban'), thread = byId('thread'), threadTitle = byId('threadTitle');
   const msgText = byId('msgText'), sendMsg = byId('sendMsg');
-  const botBadge = byId('botBadge'), toggleBot = byId('toggleBot');
+  const botBadge = byId('botBadge'), toggleBot = byId('toggleBot'), btnQR = byId('btnQR'), waStatusText = byId('waStatusText');
 
   btnAdd.onclick = ()=>{
     const phone = norm(cPhone.value.trim());
@@ -292,6 +275,8 @@
     setBotBadge(p);
   };
 
+  btnQR.href = window.PIXELUP.REPLIT_DIRECT + '/qr';
+
   function setBotBadge(phone){
     const on = !!state.botMap[phone];
     botBadge.textContent = 'Bot: ' + (on?'ON':'OFF');
@@ -307,6 +292,10 @@
   function toCardHTML(c){
     return `
       <div class="card-k" draggable="true" data-phone="${c.phone}">
+        <div class="icons">
+          <span class="icon" title="Abrir conversa" data-action="open">💬</span>
+          <span class="icon" title="Atualizar card" data-action="refresh">↻</span>
+        </div>
         <b>${escapeHtml(c.name||c.phone)}</b><br>
         <span class="tiny muted">${escapeHtml(c.origin||'')}</span>
         ${c.email?`<div class="tiny muted">${escapeHtml(c.email)}</div>`:''}
@@ -314,7 +303,6 @@
       </div>`;
   }
   function renderKanban(){
-    // clear cols
     kanban.querySelectorAll('.col').forEach(col=>{
       const stage = col.dataset.stage;
       let html = '';
@@ -331,9 +319,20 @@
   function initDragDrop(){
     let dragEl=null;
     kanban.querySelectorAll('.card-k').forEach(card=>{
+      const phone = card.dataset.phone;
       card.addEventListener('dragstart',()=>{ dragEl=card; card.classList.add('drag'); });
       card.addEventListener('dragend',()=>{ card.classList.remove('drag'); dragEl=null; });
-      card.onclick = ()=>{ const phone = card.dataset.phone; state.current = phone; renderThread(phone); setBotBadge(phone); };
+      // clique no corpo abre conversa
+      card.addEventListener('click', (e)=>{ if(e.target.classList.contains('icon')) return; state.current = phone; renderThread(phone); setBotBadge(phone); });
+      // ícones
+      card.querySelectorAll('.icon').forEach(ic=>{
+        ic.addEventListener('click', (e)=>{
+          const action = ic.dataset.action;
+          if(action==='open'){ state.current = phone; renderThread(phone); setBotBadge(phone); }
+          if(action==='refresh'){ renderKanban(); }
+          e.stopPropagation();
+        });
+      });
     });
     kanban.querySelectorAll('.col').forEach(col=>{
       col.addEventListener('dragover',e=>{ e.preventDefault(); });
@@ -350,7 +349,8 @@
     thread.innerHTML = '';
     if(!phone){ threadTitle.textContent = 'Conversa — selecione um card'; setBotBadge(null); return; }
     const c = state.contacts[phone] || {phone};
-    threadTitle.textContent = `Conversa — ${c.name||phone} (${phone})`;
+    const uname = state.userName ? ` • Atendente: ${escapeHtml(state.userName)}` : '';
+    threadTitle.textContent = `Conversa — ${c.name||phone} (${phone})${uname}`;
     setBotBadge(phone);
     (state.threads[phone]||[]).forEach(m=>{
       const div=document.createElement('div'); div.className='msg '+(m.who==='me'?'me':'them');
@@ -380,17 +380,14 @@
     byId('mFech').textContent  = all.filter(c=> c.stage==='fechado').length;
   }
 
-  // ===== WhatsApp backend =====
+  // ===== WA backend =====
   async function waStatus(){
     try{
       const r = await fetch(window.PIXELUP.WA_BASE + '/status');
       const j = await r.json();
-      const ok = !!j.connected;
-      waDot.classList.toggle('on', ok); waDot.classList.toggle('off', !ok);
-      waLabel.textContent = ok ? ('WA: on' + (j.user ? ' ('+j.user+')' : '')) : 'WA: off';
-      if(waStatusText) waStatusText.textContent = ok ? 'on' : 'off';
-      return ok;
-    }catch{ waDot.classList.remove('on'); waDot.classList.add('off'); if(waStatusText) waStatusText.textContent='off'; return false; }
+      waStatusText.textContent = 'Status: ' + (j.connected ? ('on' + (j.user ? ' ('+j.user+')' : '')) : 'off');
+      return !!j.connected;
+    }catch{ waStatusText.textContent = 'Status: off'; return false; }
   }
   async function waSend({to, text}){
     const r = await fetch(window.PIXELUP.WA_BASE + '/send', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({to,text})});
@@ -403,7 +400,7 @@
       try{
         if(es) es.close();
         es = new EventSource(url);
-        es.onopen = ()=>{ sseBadge.textContent='SSE: ON'; sseBadge.style.color='#b5ffd0'; };
+        es.onopen = ()=>{ /* ok */ };
         es.onmessage = async (ev)=>{
           try{
             const data = JSON.parse(ev.data);
@@ -415,23 +412,19 @@
                 lastText: data.text||'', lastTs: data.ts||Date.now()
               });
               pushMsg(phone, {who:'them', text:data.text||'', ts:data.ts||Date.now()});
-              // se a conversa atual é essa, atualiza UI
               if(state.current===phone) renderThread(phone);
-              // BOT por contato:
-              if(state.botMap[phone] && phone !== norm(state.myNumber)){
-                await botPreAtendimento(phone, data.text||'');
-              }
+              if(state.botMap[phone]){ await botPreAtendimento(phone, data.text||''); }
               renderKanban();
             }
           }catch{}
         };
-        es.onerror = ()=>{ sseBadge.textContent='SSE: OFF'; sseBadge.style.color='#ffd0d0'; timer && clearTimeout(timer); timer=setTimeout(open,3000); };
-      }catch{ sseBadge.textContent='SSE: OFF'; sseBadge.style.color='#ffd0d0'; timer && clearTimeout(timer); timer=setTimeout(open,3000); }
+        es.onerror = ()=>{ timer && clearTimeout(timer); timer=setTimeout(open,3000); };
+      }catch{ timer && clearTimeout(timer); timer=setTimeout(open,3000); }
     };
     open();
   }
 
-  // ===== Gemini (IA) =====
+  // ===== Gemini =====
   function getGeminiKey(){ return (state.aiKey||'').trim(); }
   async function geminiCall(prompt, json=false){
     const key = getGeminiKey(); if(!key) return json ? null : '';
@@ -449,7 +442,6 @@
     }catch{ return json ? null : ''; }
   }
   async function botPreAtendimento(phone, textIn){
-    // 1) capturar dados essenciais
     const extract = await geminiCall(
       `A partir da mensagem do cliente, extraia um JSON curto com campos (pode faltar):
        nome, email, necessidade, orcamento, prazo.
@@ -474,7 +466,6 @@
       renderKanban();
       if(state.current===phone) renderThread(phone);
     }
-    // 2) resposta do atendente virtual
     const reply = await geminiCall(
       "Atue como atendente virtual da PixelUp. Peça educadamente os dados em falta (nome, e-mail, necessidade, orçamento, prazo). " +
       "Se o assunto for veículos, pergunte modelo/ano/valor. Se o cliente pedir humano, diga que vai acionar o atendimento.\n\n" +
@@ -486,7 +477,7 @@
     }
   }
 
-  // ===== Mentoria (8 módulos + import .docx) =====
+  // ===== Mentoria (ordem correta + auto-load .docx) =====
   const modulesSeed = [
     {id:'m1', title:'Módulo 1 — Persona e Fundamentos do Negócio'},
     {id:'m2', title:'Módulo 2 — Algoritmo do Meta'},
@@ -500,23 +491,42 @@
   const modulesList = byId('modulesList'), lessonTitle = byId('lessonTitle'), lessonBody = byId('lessonBody');
   let currentModule = null;
   function modKey(id){ return 'px_mod_'+id; }
-  function loadMod(id){ return ls.get(modKey(id), {html:'(sem conteúdo — importe o .docx deste módulo)'}) }
+  function loadMod(id){ return ls.get(modKey(id), {html:'(sem conteúdo — importe o .docx deste módulo ou suba /mentoria/'+id.replace('m','m')+'.docx)'}) }
   function saveMod(id,html){ ls.set(modKey(id), {html}); }
+  async function tryFetchDocx(id){
+    try{
+      const res = await fetch(`/mentoria/${id}.docx`, {cache:'no-store'});
+      if(!res.ok) return false;
+      const buf = await res.arrayBuffer();
+      const html = (await window.mammoth.convertToHtml({arrayBuffer:buf})).value || '';
+      if(html){ saveMod(id, html); return true; }
+      return false;
+    }catch{ return false; }
+  }
+  async function selectModule(m){
+    currentModule = m.id;
+    lessonTitle.textContent = m.title;
+    // tenta carregar automático uma vez se não tiver conteúdo salvo
+    const saved = loadMod(m.id);
+    if(saved && saved.html && !/sem conteúdo/.test(saved.html)){
+      lessonBody.innerHTML = saved.html;
+    }else{
+      const ok = await tryFetchDocx(m.id);
+      const after = loadMod(m.id);
+      lessonBody.innerHTML = ok ? after.html : saved.html;
+    }
+  }
   function renderModules(){
     modulesList.innerHTML = '';
     modulesSeed.forEach(m=>{
       const b = document.createElement('button');
       b.className = 'btn secondary'; b.style.margin='4px'; b.textContent = m.title;
-      b.onclick = ()=>{
-        currentModule = m.id;
-        const data = loadMod(m.id);
-        lessonTitle.textContent = m.title;
-        lessonBody.innerHTML = data.html;
-      };
+      b.onclick = ()=> selectModule(m);
       modulesList.appendChild(b);
     });
   }
   renderModules();
+
   byId('importDocx').onclick = async ()=>{
     const f = byId('docxInput').files?.[0]; if(!f){ alert('Selecione um .docx'); return; }
     if(!currentModule){ alert('Escolha um módulo à esquerda antes de importar'); return; }
@@ -529,21 +539,19 @@
     }catch(e){ alert('Falha ao ler .docx'); }
   };
 
-  // ===== Diagnostics =====
-  async function runDiagnostics(){
-    const lines = [];
-    lines.push(`<div>Origin: <code>${location.origin}</code></div>`);
-    try{
-      const r = await fetch('/api/status'); const ok = r.ok; const j = ok? await r.json():{};
-      lines.push(`<div>/api/status: <b>${ok?'OK':'FAIL'}</b> ${ok?JSON.stringify(j):''}</div>`);
-    }catch{ lines.push(`<div>/api/status: <b>FAIL</b></div>`); }
-    diag.innerHTML = lines.join('');
-  }
+  // ===== Configurações (nome do usuário) =====
+  const userName = byId('userName'), saveUser = byId('saveUser');
+  userName.value = state.userName || '';
+  saveUser.onclick = ()=>{ state.userName = (userName.value||'').trim(); ls.set('px_user_name', state.userName); alert('Nome salvo!'); };
 
-  // ===== boot =====
-  renderKanban(); renderThread(null);
-
+  // ===== Boot =====
+  (function boot(){
+    // iniciar SSE, status WA, e preparar conversa
+    waEvents(); waStatus();
+    renderKanban(); renderThread(null); refreshCounters();
+  })();
   </script>
+
   <footer class="muted" style="text-align:center;padding:20px">© PixelUp — SuperApp Classic</footer>
 </body>
 </html>
