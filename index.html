@@ -147,7 +147,7 @@
         </div>
       </div>
 
-      <!-- DASHBOARD EMBAIXO -->
+      <!-- DASHBOARD -->
       <div class="card" style="margin-top:12px">
         <h3>Dashboard</h3>
         <div class="row">
@@ -156,6 +156,12 @@
           <div class="pill">Proposta: <b id="mProp">0</b></div>
           <div class="pill">Fechado: <b id="mFech">0</b></div>
         </div>
+      </div>
+
+      <!-- DIAGNÓSTICO -->
+      <div class="card" style="margin-top:12px">
+        <h3>Diagnóstico de Conexão</h3>
+        <div id="diagBox" class="tiny muted">Verificando…</div>
       </div>
     </section>
 
@@ -247,7 +253,7 @@
       tabs.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
       Object.values(panels).forEach(p => p.classList.remove('active'));
       panels[tab].classList.add('active');
-      if(tab==='crm'){ renderKanban(); renderThread(null); refreshCounters(); }
+      if(tab==='crm'){ renderKanban(); renderThread(null); refreshCounters(); runDiagnostics(); }
     };
     tabs.addEventListener('click', (e)=>{
       if(e.target.tagName!=='BUTTON') return;
@@ -400,7 +406,7 @@
     byId('mFech').textContent  = all.filter(c=> c.stage==='fechado').length;
   }
 
-  // ===== WA status, events e QR (proxy primeiro, fallback direto) =====
+  // ===== WA status, events e QR =====
   async function waStatus(){
     try{
       const r = await fetch('/api/status', {cache:'no-store'});
@@ -446,27 +452,34 @@
         };
         es.onerror = ()=>{
           es && es.close();
-          if(!triedProxy){ triedProxy = true; setTimeout(()=>open(proxy), 500); }
+          if(!triedProxy){ triedProxy = true; setTimeout(()=>open(proxy), 600); }
           else           { setTimeout(()=>open(direct), 3000); }
         };
       } catch(_err){
-        if(!triedProxy){ triedProxy = true; setTimeout(()=>open(proxy), 500); }
+        if(!triedProxy){ triedProxy = true; setTimeout(()=>open(proxy), 600); }
         else           { setTimeout(()=>open(direct), 3000); }
       }
     };
     open(direct);
   }
 
-  // QR modal (proxy primeiro)
+  // QR modal (proxy → direto → página Replit)
   const qrModal = byId('qrModal'), qrFrame = byId('qrFrame'), qrReload = byId('qrReload'), qrClose = byId('qrClose'), openQR = byId('openQR'), qrExternal = byId('qrExternal');
-  async function openQrModal(){
-    const urlProxy = '/api/qr?t='+Date.now();
-    const urlDirect = window.PIXELUP.REPLIT_DIRECT + '/qr?t='+Date.now();
-    let chosen = urlProxy;
+  async function resolveQrURL(){
+    const urlProxy = '/api/qr?t=' + Date.now();
     try{
-      const r = await fetch(urlProxy, {method:'GET', cache:'no-store', mode:'no-cors'});
-      // mesmo com no-cors, a tentativa já força o wakeup da função
-    }catch{ chosen = urlDirect; }
+      const r = await fetch(urlProxy, {method:'GET', cache:'no-store'});
+      if(r.ok || r.type==='opaque') return urlProxy;
+    }catch{}
+    const urlDirect = window.PIXELUP.REPLIT_DIRECT + '/qr?t=' + Date.now();
+    try{
+      await fetch(urlDirect, {method:'GET', cache:'no-store', mode:'no-cors'});
+      return urlDirect;
+    }catch{}
+    return 'https://replit.com/@pixelupmrkt/pixelup-wa-server';
+  }
+  async function openQrModal(){
+    const chosen = await resolveQrURL();
     qrFrame.src = chosen;
     qrExternal.href = chosen;
     qrModal.classList.add('open');
@@ -604,10 +617,25 @@
   userName.value = state.userName || '';
   saveUser.onclick = ()=>{ state.userName = (userName.value||'').trim(); ls.set('px_user_name', state.userName); alert('Nome salvo!'); };
 
+  // ===== Diagnóstico =====
+  async function runDiagnostics(){
+    const out = [];
+    try{
+      const r = await fetch('/api/status', {cache:'no-store'});
+      const j = await r.json();
+      out.push(`Proxy /api/status: ${r.ok?'OK':'FAIL'} ${r.ok?JSON.stringify(j):''}`);
+    }catch{ out.push('Proxy /api/status: FAIL'); }
+    try{
+      await fetch(window.PIXELUP.REPLIT_DIRECT + '/status', {cache:'no-store', mode:'no-cors'});
+      out.push('Replit /status: tentativa enviada');
+    }catch{ out.push('Replit /status: FAIL (DNS?)'); }
+    byId('diagBox').innerText = out.join(' | ');
+  }
+
   // ===== Boot =====
   (function boot(){
     waEvents(); waStatus();
-    renderKanban(); renderThread(null); refreshCounters();
+    renderKanban(); renderThread(null); refreshCounters(); runDiagnostics();
   })();
   </script>
 
