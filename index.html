@@ -6,7 +6,7 @@
 <title>PixelUp SuperApp — Classic</title>
 <meta name="theme-color" content="#0b1a2a"/>
 
-<!-- Gemini (aceita também ?gemini=) -->
+<!-- Gemini (aceita também ?gemini=CHAVE) -->
 <meta name="x-gemini" content="">
 <script>window.DEFAULT_GEMINI_KEY="AIzaSyCrc1EegT7xennoqk-s_m4JGUpb-Zxq6Qo";</script>
 
@@ -23,7 +23,8 @@
   header.topbar{position:sticky;top:0;z-index:20;display:flex;gap:16px;align-items:center;justify-content:space-between;
     padding:12px 16px;background:rgba(11,20,32,.8);border-bottom:1px solid var(--border);backdrop-filter:blur(8px)}
   .brand{display:flex;align-items:center;gap:10px;font-weight:700}
-  .brand img{height:36px} .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));
+  .brand img{height:36px}
+  .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));
     box-shadow:0 0 12px rgba(18,176,255,.7),0 0 24px rgba(0,255,213,.5)}
   nav.tabs{display:flex;gap:8px;flex-wrap:wrap}
   nav.tabs button{background:#0b1522;color:#cfeaff;border:1px solid var(--border);padding:8px 12px;border-radius:999px;cursor:pointer}
@@ -45,7 +46,9 @@
   .kanban{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
   .col{background:#0b1522;border:1px solid var(--border);border-radius:14px;padding:10px;min-height:200px}
   .card-k{background:#0e1624;border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px;cursor:grab;position:relative}
-  .card-k .icons{position:absolute;right:8px;top:8px;display:flex;gap:6px}.card-k .icon{cursor:pointer}.card-k.drag{opacity:.6}
+  .card-k .icons{position:absolute;right:8px;top:8px;display:flex;gap:6px}
+  .card-k .icon{cursor:pointer}
+  .card-k.drag{opacity:.6}
   .empty{color:#89a;font-style:italic}
   @media (max-width:1100px){.kanban{grid-template-columns:1fr}.thread{max-height:unset}}
   /* Modal QR */
@@ -187,7 +190,7 @@
     </section>
   </main>
 
-  <!-- MODAL QR (com IMG, sem iframe) -->
+  <!-- MODAL QR (IMG, sem iframe) -->
   <div class="modal" id="qrModal">
     <div class="box">
       <header>
@@ -208,8 +211,8 @@
   <script>
   // ===== Config =====
   window.PIXELUP = {
-    WA_BASE: "/api/wa",                 // proxy Vercel → Replit
-    QR_PROXY_HTML: "/api/qr.html",      // abre em nova aba (quando precisar)
+    WA_BASE: "/api/wa",                      // proxy Vercel → Replit
+    QR_HTML_PROXY: "/api/qr.html",          // abre fora do iframe
     GEMINI_MODEL: "gemini-2.0-flash",
     REPLIT_DIRECT: "https://pixelup-wa-server.pixelupmrkt.repl.co"
   };
@@ -222,13 +225,13 @@
   const qparam = k => new URLSearchParams(location.search).get(k);
   const metaGem = (document.querySelector('meta[name="x-gemini"]')?.content||'').trim();
 
-  const stages = ["novo","qualificando","proposta","fechado"];
   const state = {
     userName: ls.get('px_user_name',''),
     aiKey: (qparam('gemini') || metaGem || (window.DEFAULT_GEMINI_KEY||'')).trim(),
     contacts: ls.get('px_contacts', {}), threads: ls.get('px_threads', {}),
     botMap: ls.get('px_bot_map', {}), current: null, search:''
   };
+  const stages = ["novo","qualificando","proposta","fechado"];
 
   // ===== Tabs =====
   (function initTabs(){
@@ -355,61 +358,42 @@
     open(direct);
   }
 
-  // ===== QR: busca a IMAGEM (sem iframe) =====
-  const qrModal=byId('qrModal'), qrImg=byId('qrImg'), qrMsg=byId('qrMsg'), qrReload=byId('qrReload'), qrClose=byId('qrClose'), openQR=byId('openQR'), qrExternal=byId('qrExternal');
+  // ===== QR: carrega IMAGEM (sem iframe) =====
+  const qrModal=byId('qrModal'), qrImg=byId('qrImg'), qrMsg=byId('qrMsg'),
+        qrReload=byId('qrReload'), qrClose=byId('qrClose'), openQR=byId('openQR'), qrExternal=byId('qrExternal');
   let qrPoll=null;
 
-  async function tryGetQR(){
-    // 1) JSON com dataURL
-    try{
-      const r=await fetch(`${window.PIXELUP.WA_BASE}/qr`,{cache:'no-store'});
-      if(r.ok){
-        const t=await r.text(); // pode vir JSON ou string
-        try{
-          const j=JSON.parse(t);
-          const dataURL=j.dataURL||j.dataUrl||j.image||j.qr||'';
-          if(dataURL && (dataURL.startsWith('data:image')||dataURL.startsWith('data:'))) return dataURL;
-        }catch{
-          // se vier SVG puro
-          if(t.trim().startsWith('<svg')) return 'data:image/svg+xml;base64,'+btoa(t);
-        }
-      }
-    }catch{}
-
-    // 2) PNG direto
-    try{
-      const r2=await fetch(`${window.PIXELUP.WA_BASE}/qr.png`,{cache:'no-store'});
-      if(r2.ok){ const blob=await r2.blob(); return URL.createObjectURL(blob); }
-    }catch{}
-
-    // 3) sem imagem via API – usar página externa (sem iframe)
+  async function findQrURL(){
+    const ts = 't=' + Date.now();
+    // preferir png → svg → endpoint genérico
+    const tries = [`${window.PIXELUP.WA_BASE}/qr.png?${ts}`, `${window.PIXELUP.WA_BASE}/qr.svg?${ts}`, `${window.PIXELUP.WA_BASE}/qr?format=png&${ts}`];
+    for (const u of tries){
+      try{ const r=await fetch(u,{method:'GET',cache:'no-store'}); if(r.ok){ const ct=r.headers.get('content-type')||''; if(ct.includes('image')||u.endsWith('.png')||u.endsWith('.svg')) return u; } }catch{}
+    }
     return null;
   }
 
   async function openQrModal(){
     qrImg.src=''; qrMsg.textContent='Carregando QR…';
-    const dataUrl = await tryGetQR();
-    if(dataUrl){
-      qrImg.src = dataUrl;
+    // link “nova aba” → qr.html via proxy; se falhar, abre direto no Replit
+    const prox = window.PIXELUP.QR_HTML_PROXY + '?t=' + Date.now();
+    const direct = window.PIXELUP.REPLIT_DIRECT + '/qr.html?t=' + Date.now();
+    qrExternal.href = prox;
+    qrExternal.onclick = async (e)=>{ try{ const r=await fetch(prox,{cache:'no-store'}); if(!r.ok) throw 0; }catch{ e.preventDefault(); window.open(direct,'_blank'); } };
+
+    const url = await findQrURL();
+    if(url){
+      qrImg.src = url;
       qrMsg.textContent = 'Aponte a câmera do WhatsApp para este QR.';
-      // repete a cada 15s porque o QR renova
       if(qrPoll) clearInterval(qrPoll);
       qrPoll = setInterval(async ()=>{
-        const d = await tryGetQR();
-        if(d) qrImg.src = d;
-        const ok = await waStatus(); if(ok){ clearInterval(qrPoll); qrPoll=null; qrMsg.textContent='Conectado!'; }
+        const ok = await waStatus();
+        if(ok){ clearInterval(qrPoll); qrPoll=null; qrMsg.textContent='Conectado!'; }
+        else { const u = await findQrURL(); if(u) qrImg.src = u; }
       }, 15000);
     }else{
       qrMsg.innerHTML = 'Não consegui carregar a imagem do QR pela API. Clique em <b>Abrir em nova aba</b>.';
     }
-    // link “nova aba” -> qr.html via proxy; fallback diretão do Replit
-    const prox = window.PIXELUP.QR_PROXY_HTML + '?t=' + Date.now();
-    const dir  = window.PIXELUP.REPLIT_DIRECT + '/qr.html?t=' + Date.now();
-    qrExternal.href = prox;
-    qrExternal.onclick = async (e)=>{
-      try{ const r=await fetch(prox,{method:'GET',cache:'no-store'}); if(!r.ok) throw 0; }
-      catch{ e.preventDefault(); window.open(dir,'_blank'); }
-    };
     qrModal.classList.add('open');
   }
   qrReload.onclick = ()=> openQrModal();
@@ -425,10 +409,8 @@
                     :{contents:[{parts:[{text:prompt}]}]};
     try{
       const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)});
-      if(!r.ok) return json?null:'';
-      const j=await r.json(); const text=j?.candidates?.[0]?.content?.parts?.[0]?.text||'';
-      if(json){ try{ return JSON.parse(text); }catch{ return null; } }
-      return text.trim();
+      if(!r.ok) return json?null:''; const j=await r.json(); const text=j?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+      if(json){ try{ return JSON.parse(text); }catch{ return null; } } return text.trim();
     }catch{ return json?null:''; }
   }
   async function botPreAtendimento(phone,textIn){
