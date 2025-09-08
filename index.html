@@ -6,8 +6,7 @@
 <title>PixelUp SuperApp — Classic</title>
 <meta name="theme-color" content="#0b1a2a"/>
 
-<!-- Se quiser esconder a key da UI mas usá-la no front, deixe aqui.
-     Também aceito ?gemini=SUA_KEY na URL. -->
+<!-- Opcional: defina aqui a key para produção (também aceito ?gemini=SUA_KEY) -->
 <meta name="x-gemini" content="">
 <script>window.DEFAULT_GEMINI_KEY="AIzaSyCrc1EegT7xennoqk-s_m4JGUpb-Zxq6Qo";</script>
 
@@ -82,7 +81,7 @@
   </header>
 
   <main>
-    <!-- HOME (logo + botões) -->
+    <!-- HOME -->
     <section class="panel active" id="panel-home">
       <div class="landing">
         <img src="./logo.jpg" alt="PixelUp" onerror="this.style.display='none'"/>
@@ -182,7 +181,7 @@
       </div>
     </section>
 
-    <!-- CONFIGURAÇÕES (apenas nome do usuário) -->
+    <!-- CONFIGURAÇÕES -->
     <section class="panel" id="panel-config">
       <div class="card">
         <h3>Configurações</h3>
@@ -192,7 +191,7 @@
         <div class="row" style="margin-top:8px">
           <button class="btn" id="saveUser">Salvar</button>
         </div>
-        <small class="muted">WhatsApp/API são tratados fora da UI (deploy/backend).</small>
+        <small class="muted">WhatsApp/API são tratados no deploy/backend.</small>
       </div>
     </section>
   </main>
@@ -401,32 +400,39 @@
     byId('mFech').textContent  = all.filter(c=> c.stage==='fechado').length;
   }
 
-  // ===== WA backend & QR =====
+  // ===== WA status, events e QR (proxy primeiro, fallback direto) =====
   async function waStatus(){
     try{
-      const r = await fetch(window.PIXELUP.WA_BASE + '/status');
+      const r = await fetch('/api/status', {cache:'no-store'});
       const j = await r.json();
       waStatusText.textContent = 'Status: ' + (j.connected ? ('on' + (j.user ? ' ('+j.user+')' : '')) : 'off');
       return !!j.connected;
-    }catch{ waStatusText.textContent = 'Status: off'; return false; }
+    }catch{
+      waStatusText.textContent = 'Status: off';
+      return false;
+    }
   }
   async function waSend({to, text}){
-    const r = await fetch(window.PIXELUP.WA_BASE + '/send', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({to,text})});
+    const r = await fetch('/api/send', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({to,text})});
     try{ return await r.json(); }catch{ return {ok:false}; }
   }
   function waEvents(){
-    let es=null, timer=null;
-    const url = (location.hostname.endsWith('vercel.app') ? window.PIXELUP.REPLIT_DIRECT : window.PIXELUP.WA_BASE) + '/events';
-    const open = ()=>{
-      try{
-        if(es) es.close();
+    let es = null;
+    let triedProxy = false;
+
+    const direct = window.PIXELUP.REPLIT_DIRECT + '/events';
+    const proxy  = '/api/events';
+
+    const open = (url)=>{
+      try {
+        if (es) es.close();
         es = new EventSource(url);
         es.onmessage = async (ev)=>{
           try{
             const data = JSON.parse(ev.data);
             if(data.type==='status'){ await waStatus(); }
             if(data.type==='message'){
-              const phone = norm(data.from||''); if(!phone) return;
+              const phone = (''+(data.from||'')).replace(/[^0-9]/g,''); if(!phone) return;
               upsertContact(phone, {
                 name: data.name||phone, origin: 'WhatsApp',
                 lastText: data.text||'', lastTs: data.ts||Date.now()
@@ -436,28 +442,40 @@
               if(state.botMap[phone]){ await botPreAtendimento(phone, data.text||''); }
               renderKanban();
             }
-          }catch{}
+          }catch(_e){}
         };
-        es.onerror = ()=>{ timer && clearTimeout(timer); timer=setTimeout(open,3000); };
-      }catch{ timer && clearTimeout(timer); timer=setTimeout(open,3000); }
+        es.onerror = ()=>{
+          es && es.close();
+          if(!triedProxy){ triedProxy = true; setTimeout(()=>open(proxy), 500); }
+          else           { setTimeout(()=>open(direct), 3000); }
+        };
+      } catch(_err){
+        if(!triedProxy){ triedProxy = true; setTimeout(()=>open(proxy), 500); }
+        else           { setTimeout(()=>open(direct), 3000); }
+      }
     };
-    open();
+    open(direct);
   }
 
-  // QR modal
+  // QR modal (proxy primeiro)
   const qrModal = byId('qrModal'), qrFrame = byId('qrFrame'), qrReload = byId('qrReload'), qrClose = byId('qrClose'), openQR = byId('openQR'), qrExternal = byId('qrExternal');
-  function openQrModal(){
-    const base = window.PIXELUP.REPLIT_DIRECT;
-    const url = base + '/qr' + '?t=' + Date.now();     // cache-buster
-    qrFrame.src = url;
-    qrExternal.href = url;
+  async function openQrModal(){
+    const urlProxy = '/api/qr?t='+Date.now();
+    const urlDirect = window.PIXELUP.REPLIT_DIRECT + '/qr?t='+Date.now();
+    let chosen = urlProxy;
+    try{
+      const r = await fetch(urlProxy, {method:'GET', cache:'no-store', mode:'no-cors'});
+      // mesmo com no-cors, a tentativa já força o wakeup da função
+    }catch{ chosen = urlDirect; }
+    qrFrame.src = chosen;
+    qrExternal.href = chosen;
     qrModal.classList.add('open');
   }
-  openQR.onclick = ()=>{ openQrModal(); };
-  qrReload.onclick = ()=>{ openQrModal(); };
-  qrClose.onclick = ()=>{ qrModal.classList.remove('open'); };
+  openQR.onclick = ()=> openQrModal();
+  qrReload.onclick = ()=> openQrModal();
+  qrClose.onclick = ()=> qrModal.classList.remove('open');
 
-  // ===== Gemini =====
+  // ===== Gemini (IA) =====
   function getGeminiKey(){ return (state.aiKey||'').trim(); }
   async function geminiCall(prompt, json=false){
     const key = getGeminiKey(); if(!key) return json ? null : '';
@@ -512,25 +530,14 @@
 
   // ===== Mentoria (conteúdo base + auto-load .docx) =====
   const seedMentoria = {
-    m1: `<h4>Persona e Fundamentos do Negócio</h4>
-         <p>Defina claramente seu cliente ideal: dores, desejos, linguagem e canais.</p>
-         <ul><li>Proposta de valor</li><li>Diferenciais</li><li>Oferta e promessa</li></ul>`,
-    m2: `<h4>Algoritmo do Meta</h4>
-         <p>Como o algoritmo decide entrega: engajamento, retenção, relevância.</p>
-         <ul><li>Boas práticas de conteúdo</li><li>Gatilhos de parada</li><li>CTAs</li></ul>`,
-    m3: `<h4>Cronograma e Calendário Editorial</h4>
-         <p>Organize posts por tema, formato e objetivo.</p>
-         <ul><li>Estrutura semanal</li><li>Métricas de consistência</li></ul>`,
-    m4: `<h4>Conteúdo Visual</h4>
-         <p>Hook em 3s, storyboard, cortes dinâmicos, hierarquia visual.</p>`,
-    m5: `<h4>Copy com IA</h4>
-         <p>Prompt base com objetivo, público, tom, formato. Ajustes com exemplos.</p>`,
-    m6: `<h4>CRM e Organização Comercial</h4>
-         <p>Pipeline: Lead → Qualificando → Proposta → Fechado. Rotinas e follow-up.</p>`,
-    m7: `<h4>Técnicas de Vendas</h4>
-         <p>Rapport (espelhamento, escuta ativa), perguntas abertas, fechamento sem pressão.</p>`,
-    m8: `<h4>Implementação de CRM + Tráfego Pago</h4>
-         <p>Integração com WhatsApp, gatilhos automáticos, campanhas por objetivo.</p>`
+    m1: `<h4>Persona e Fundamentos do Negócio</h4><p>Defina claramente seu cliente ideal: dores, desejos, linguagem e canais.</p><ul><li>Proposta de valor</li><li>Diferenciais</li><li>Oferta e promessa</li></ul>`,
+    m2: `<h4>Algoritmo do Meta</h4><p>Como o algoritmo decide entrega: engajamento, retenção, relevância.</p><ul><li>Boas práticas de conteúdo</li><li>Gatilhos de parada</li><li>CTAs</li></ul>`,
+    m3: `<h4>Cronograma e Calendário Editorial</h4><p>Organize posts por tema, formato e objetivo.</p><ul><li>Estrutura semanal</li><li>Métricas de consistência</li></ul>`,
+    m4: `<h4>Conteúdo Visual</h4><p>Hook em 3s, storyboard, cortes dinâmicos, hierarquia visual.</p>`,
+    m5: `<h4>Copy com IA</h4><p>Prompt base com objetivo, público, tom, formato. Ajustes com exemplos.</p>`,
+    m6: `<h4>CRM e Organização Comercial</h4><p>Pipeline: Lead → Qualificando → Proposta → Fechado. Rotinas e follow-up.</p>`,
+    m7: `<h4>Técnicas de Vendas</h4><p>Rapport (espelhamento, escuta ativa), perguntas abertas, fechamento sem pressão.</p>`,
+    m8: `<h4>Implementação de CRM + Tráfego Pago</h4><p>Integração com WhatsApp, gatilhos automáticos, campanhas por objetivo.</p>`
   };
   const modulesSeed = [
     {id:'m1', title:'Módulo 1 — Persona e Fundamentos do Negócio'},
@@ -566,8 +573,7 @@
     lessonTitle.textContent = m.title;
     const base = loadMod(m.id);
     lessonBody.innerHTML = base.html;
-    // tenta substituir pelo DOCX se existir
-    const ok = await tryFetchDocx(m.id);
+    const ok = await tryFetchDocx(m.id); // se existir, substitui pelo DOCX
     if(ok){ const after = loadMod(m.id); lessonBody.innerHTML = after.html; }
   }
   function renderModules(){
@@ -600,7 +606,6 @@
 
   // ===== Boot =====
   (function boot(){
-    // iniciar SSE, status WA, e preparar conversa
     waEvents(); waStatus();
     renderKanban(); renderThread(null); refreshCounters();
   })();
