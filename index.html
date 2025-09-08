@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>PixelUp SuperApp — Home | CRM | Mentoria | WhatsApp</title>
+  <meta name="theme-color" content="#0b1a2a"/>
+  <style>
+    :root{
+      --bg:#0b1118;
+      --panel:#0f1b2a;
+      --muted:#9bb3c7;
+      --primary:#12b0ff;
+      --primary-2:#66d1ff;
+      --accent:#00ffd5;
+      --danger:#ff5d5d;
+      --ok:#27c93f;
+      --card:#0e1825;
+      --border:#122235;
+      --shadow:0 8px 28px rgba(0,0,0,.35);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(1000px 600px at 10% -10%, rgba(18,176,255,.14), transparent 60%),
+        radial-gradient(800px 500px at 110% 10%, rgba(0,255,213,.10), transparent 60%),
+        var(--bg);
+      color:#eaf6ff;
+    }
+    a{color:var(--primary) ; text-decoration:none}
+    header.topbar{
+      position:sticky; top:0; z-index:20;
+      display:flex; gap:16px; align-items:center; justify-content:space-between;
+      padding:14px 18px;
+      background:rgba(11, 20, 32, .8);
+      border-bottom:1px solid var(--border);
+      backdrop-filter: blur(8px);
+    }
+    .brand{display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.3px}
+    .brand .dot{
+      width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow:0 0 12px rgba(18,176,255,.7), 0 0 24px rgba(0,255,213,.5);
+    }
+    nav.tabs{display:flex; gap:8px; flex-wrap:wrap}
+    nav.tabs button{
+      background:#0b1522; color:#cfeaff; border:1px solid var(--border);
+      padding:8px 12px; border-radius:999px; cursor:pointer;
+    }
+    nav.tabs button.active{ border-color:var(--primary); color:#fff; box-shadow:0 0 0 1px rgba(18,176,255,.25) inset }
+    main{max-width:1200px; margin:24px auto; padding:0 16px}
+    section.panel{
+      display:none; background:rgba(15,27,42,.6); border:1px solid var(--border);
+      border-radius:var(--radius); box-shadow:var(--shadow); padding:18px; margin-bottom:18px;
+    }
+    section.panel.active{display:block}
+    .grid{display:grid; gap:16px}
+    .g-3{grid-template-columns: repeat(3, minmax(0,1fr))}
+    .g-2{grid-template-columns: repeat(2, minmax(0,1fr))}
+    .card{
+      background:var(--card); border:1px solid var(--border);
+      border-radius: var(--radius); padding:16px; box-shadow:var(--shadow);
+    }
+    .muted{color:var(--muted)}
+    .pill{padding:4px 8px; border-radius:999px; border:1px solid var(--border);}
+    .ok{color:#b5ffd0}
+    .danger{color:#ffd0d0}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      background:linear-gradient(135deg, var(--primary), var(--primary-2));
+      color:#001726; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:600;
+      box-shadow: 0 10px 22px rgba(0,0,0,.35), 0 2px 0 rgba(0,0,0,.2) inset;
+    }
+    .btn.secondary{ background:#0b1522; color:#dff2ff; border:1px solid var(--border); box-shadow:none }
+    .stack{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+    .input, select, textarea{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border);
+      background:#0c1725; color:#eaf6ff;
+    }
+    .table{width:100%; border-collapse: collapse}
+    .table th,.table td{border-bottom:1px solid var(--border); padding:10px; text-align:left}
+    .ws-status{display:inline-flex; align-items:center; gap:8px}
+    .ws-dot{width:10px; height:10px; border-radius:50%; background:#666}
+    .ws-dot.on{background:var(--ok); box-shadow:0 0 10px rgba(39,201,63,.7)}
+    .ws-dot.off{background:var(--danger); box-shadow:0 0 8px rgba(255,93,93,.6)}
+    /* Chat bubble */
+    .chat-fab{
+      position:fixed; bottom:20px; right:20px; z-index:50;
+      width:56px; height:56px; border-radius:50%; border:1px solid var(--border);
+      background:linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow:0 18px 40px rgba(0,0,0,.4); cursor:pointer; font-size:26px; color:#001726;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .chat-drawer{
+      position:fixed; bottom:88px; right:20px; z-index:50; width:360px; max-height:70vh; display:none;
+      background:#0b1522; border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow);
+      overflow:hidden; display:flex; flex-direction:column;
+    }
+    .chat-drawer.open{display:flex}
+    .chat-header{padding:12px 14px; background:#0e1a2b; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center}
+    .chat-list{flex:1; overflow:auto; padding:12px}
+    .chat-msg{padding:8px 10px; background:#0d1f34; border:1px solid var(--border); border-radius:10px; margin:6px 0}
+    .chat-input{display:flex; gap:8px; padding:12px; border-top:1px solid var(--border)}
+    .chat-input input{flex:1}
+    .badge{font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid var(--border);}
+    .hidden{display:none}
+    footer{color:#7fa6c2; text-align:center; padding:28px 12px}
+    @media (max-width:900px){
+      .g-3{grid-template-columns: 1fr}
+      .g-2{grid-template-columns: 1fr}
+      .chat-drawer{width:92vw; right:4vw}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="dot"></span> PixelUp SuperApp</div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="home" class="active">Home</button>
+      <button data-tab="crm">CRM + ChatBot</button>
+      <button data-tab="mentoria">Mentoria (8 módulos)</button>
+    </nav>
+    <div class="ws-status">
+      <span class="ws-dot off" id="waDot"></span>
+      <span id="waLabel" class="muted">WhatsApp: desconectado</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section class="panel active" id="panel-home">
+      <div class="grid g-3">
+        <div class="card">
+          <h2>Bem-vindo ao Hub da PixelUp</h2>
+          <p class="muted">Tudo em um só lugar: <b>Home</b>, <b>CRM</b> com <b>ChatBot + WhatsApp</b> e acesso à <b>Mentoria</b>.</p>
+          <div class="stack">
+            <button class="btn" data-goto="crm">Abrir CRM</button>
+            <button class="btn secondary" data-goto="mentoria">Acessar Mentoria</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Status do WhatsApp</h3>
+          <p>Conexão do bot com o seu servidor (Baileys/Replit).</p>
+          <div class="stack">
+            <span class="badge" id="waStatusText">off</span>
+            <button class="btn secondary" id="btnCheckWA">Verificar</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Como funciona</h3>
+          <ol>
+            <li>Suba seu <b>backend WhatsApp</b> (Baileys) e copie a URL.</li>
+            <li>Em <code>index.html</code>, ajuste <code>window.PIXELUP_BOT_CONFIG.WA_BASE_URL</code>.</li>
+            <li>Faça deploy no Vercel (este projeto) e pronto.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- CRM + CHATBOT -->
+    <section class="panel" id="panel-crm">
+      <div class="grid g-2">
+        <div class="card">
+          <h3>Login (E-mail/Senha)</h3>
+          <p class="muted">Use uma conta própria para separar seus contatos.</p>
+          <form id="loginForm" class="stack" onsubmit="return false;">
+            <input class="input" type="email" id="email" placeholder="email@exemplo.com" required>
+            <input class="input" type="password" id="password" placeholder="Senha" required>
+            <div class="stack">
+              <button class="btn" id="btnLogin">Entrar</button>
+              <button class="btn secondary" id="btnSignup" type="button">Criar conta</button>
+              <button class="btn secondary" id="btnLogout" type="button" disabled>Sair</button>
+            </div>
+          </form>
+          <p id="authInfo" class="muted"></p>
+        </div>
+        <div class="card">
+          <h3>Enviar Mensagem (WhatsApp)</h3>
+          <form id="waForm" class="stack" onsubmit="return false;">
+            <input class="input" type="text" id="waTo" placeholder="Número com DDI/DDD. Ex: 55DDDNUMERO" required>
+            <input class="input" type="text" id="waText" placeholder="Digite sua mensagem" required>
+            <div class="stack">
+              <button class="btn" id="btnSendWA">Enviar</button>
+              <span class="muted" id="waSendHint">Envia usando seu backend Replit/Baileys</span>
+            </div>
+          </form>
+          <div id="waSendResult" class="muted"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Contatos</h3>
+        <form id="contactForm" class="stack" onsubmit="return false;">
+          <input class="input" id="cName" placeholder="Nome" required>
+          <input class="input" id="cPhone" placeholder="Telefone (WhatsApp)">
+          <input class="input" id="cPlate" placeholder="Placa (se aplicável)">
+          <textarea class="input" id="cNotes" placeholder="Notas"></textarea>
+          <div class="stack">
+            <button class="btn" id="btnSave">Salvar contato</button>
+            <button class="btn secondary" id="btnClear" type="button">Limpar</button>
+          </div>
+        </form>
+
+        <table class="table" id="contactsTable">
+          <thead>
+            <tr><th>Nome</th><th>Telefone</th><th>Placa</th><th>Notas</th><th>Ações</th></tr>
+          </thead>
+          <tbody id="contactsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- MENTORIA -->
+    <section class="panel" id="panel-mentoria">
+      <div class="grid g-2">
+        <div class="card">
+          <h3>Módulos</h3>
+          <div id="modulesList"></div>
+        </div>
+        <div class="card">
+          <h3 id="lessonTitle">Selecione um módulo</h3>
+          <div id="lessonBody" class="muted">O conteúdo aparecerá aqui.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Chat widget -->
+  <button class="chat-fab" id="chatFab" title="Abrir Chat">💬</button>
+  <div class="chat-drawer" id="chatDrawer">
+    <div class="chat-header">
+      <div class="stack"><strong>Atendimento</strong> <span class="badge" id="miniStatus">WA off</span></div>
+      <button class="btn secondary" id="chatClose" style="padding:6px 10px">Fechar</button>
+    </div>
+    <div class="chat-list" id="chatList"></div>
+    <div class="chat-input">
+      <input id="chatTo" class="input" placeholder="Para (55DDDNUMERO)">
+      <input id="chatText" class="input" placeholder="Mensagem">
+      <button class="btn" id="chatSend">Enviar</button>
+    </div>
+  </div>
+
+  <script>
+    // ====== CONFIGURAÇÕES (troque pela sua infra) ======
+    window.PIXELUP_BOT_CONFIG = {
+      // Coloque aqui a URL base do seu servidor Replit/Baileys (SEM barra no final)
+      // Ex: "https://pixelup-wa-server.<seu-usuario>.repl.co"
+      WA_BASE_URL: "https://SEU-REPLIT-URL.aqui",
+      API_TOKEN: "", // se o seu backend exigir, preencha
+      // Endpoints esperados:
+      //  GET  {WA_BASE_URL}/status         -> { connected: boolean, user?: string }
+      //  GET  {WA_BASE_URL}/events?token=  -> SSE com eventos {type:"message", from, to, text, ts}
+      //  POST {WA_BASE_URL}/send           -> body { to, text, token? }  -> { ok:true }
+    };
+    window.FIREBASE_CONFIG = {
+      apiKey: "COLOQUE_SUA_API_KEY",
+      authDomain: "COLOQUE_SEU_AUTH_DOMAIN",
+      projectId: "COLOQUE_SEU_PROJECT_ID",
+      storageBucket: "COLOQUE_SEU_STORAGE_BUCKET",
+      messagingSenderId: "COLOQUE_SEU_SENDER_ID",
+      appId: "COLOQUE_SEU_APP_ID",
+    };
+  </script>
+
+  <script src="wa-bot/wa-bot.js"></script>
+  <script type="module" src="js/crm.js"></script>
+  <script type="module" src="js/mentoria.js"></script>
+  <script src="js/app.js"></script>
+</body>
+<footer>© PixelUp — SuperApp unificado: Home • CRM + WhatsApp • Mentoria</footer>
+</html>
