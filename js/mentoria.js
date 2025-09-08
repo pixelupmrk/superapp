@@ -1,0 +1,59 @@
+// Carrega os módulos/ aulas do arquivo JSON e renderiza
+const modulesList = document.getElementById('modulesList');
+const lessonTitle = document.getElementById('lessonTitle');
+const lessonBody = document.getElementById('lessonBody');
+
+async function loadModules(){
+  try{
+    const r = await fetch('mentoria/modules.json');
+    const modules = await r.json();
+    renderModules(modules);
+  }catch(err){
+    modulesList.innerHTML = '<p class="muted">Não foi possível carregar os módulos.</p>';
+  }
+}
+
+function renderModules(mods){
+  modulesList.innerHTML = '';
+  mods.forEach((m, i)=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    const lessons = (m.lessons||[]).map(l => `<li><a href="#" data-mid="${m.id}" data-lid="${l.id}">${escapeHtml(l.title)}</a></li>`).join('');
+    wrap.innerHTML = `
+      <strong>${i+1}. ${escapeHtml(m.title)}</strong>
+      <ul>${lessons}</ul>
+    `;
+    modulesList.appendChild(wrap);
+  });
+
+  modulesList.addEventListener('click', (e)=>{
+    if(e.target.tagName==='A'){
+      e.preventDefault();
+      const mid = e.target.getAttribute('data-mid');
+      const lid = e.target.getAttribute('data-lid');
+      const m = mods.find(x=>x.id===mid);
+      const l = m?.lessons?.find(x=>x.id===lid);
+      if(l){
+        lessonTitle.textContent = l.title;
+        lessonBody.innerHTML = toHtml(l.content || '');
+      }
+    }
+  });
+}
+
+function toHtml(md){
+  let h = md
+    .replace(/^###\s(.+)$/gim, '<h3>$1</h3>')
+    .replace(/^##\s(.+)$/gim, '<h2>$1</h2>')
+    .replace(/^#\s(.+)$/gim, '<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/\*(.+?)\*/g, '<i>$1</i>')
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/^\-\s(.+)$/gim, '<li>$1</li>');
+  h = h.split(/\n\n+/).map(block => /<(h\d|ul|ol|li|p|blockquote)/.test(block.trim()) ? block : `<p>${block}</p>`).join('\n');
+  return h;
+}
+
+function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
+
+loadModules();
