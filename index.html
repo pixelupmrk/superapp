@@ -6,27 +6,24 @@
 <title>PixelUp SuperApp — Classic</title>
 <meta name="theme-color" content="#0b1a2a"/>
 
-<!-- Opcional: também aceito ?gemini=SUA_KEY -->
+<!-- Gemini (aceita também ?gemini=) -->
 <meta name="x-gemini" content="">
 <script>window.DEFAULT_GEMINI_KEY="AIzaSyCrc1EegT7xennoqk-s_m4JGUpb-Zxq6Qo";</script>
 
 <link rel="preconnect" href="https://generativelanguage.googleapis.com" crossorigin>
 <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
 <style>
-  :root{
-    --bg:#0b1118; --panel:#0f1b2a; --muted:#9bb3c7; --primary:#12b0ff; --primary2:#66d1ff; --accent:#00ffd5;
-    --danger:#ff5d5d; --ok:#27c93f; --card:#0e1825; --border:#122235; --radius:16px; --shadow:0 8px 28px rgba(0,0,0,.35);
-  }
+  :root{--bg:#0b1118;--panel:#0f1b2a;--muted:#9bb3c7;--primary:#12b0ff;--primary2:#66d1ff;--accent:#00ffd5;
+        --danger:#ff5d5d;--ok:#27c93f;--card:#0e1825;--border:#122235;--radius:16px;--shadow:0 8px 28px rgba(0,0,0,.35)}
   *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-    background:radial-gradient(1000px 600px at 10% -10%, rgba(18,176,255,.14), transparent 60%),
-               radial-gradient(800px 500px at 110% 10%, rgba(0,255,213,.10), transparent 60%), var(--bg); color:#eaf6ff;}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:
+       radial-gradient(1000px 600px at 10% -10%, rgba(18,176,255,.14), transparent 60%),
+       radial-gradient(800px 500px at 110% 10%, rgba(0,255,213,.10), transparent 60%), var(--bg); color:#eaf6ff}
   a{color:var(--primary)} .muted{color:#9bb3c7} .tiny{font-size:12px} .pill{padding:4px 8px;border-radius:999px;border:1px solid var(--border)}
   header.topbar{position:sticky;top:0;z-index:20;display:flex;gap:16px;align-items:center;justify-content:space-between;
     padding:12px 16px;background:rgba(11,20,32,.8);border-bottom:1px solid var(--border);backdrop-filter:blur(8px)}
   .brand{display:flex;align-items:center;gap:10px;font-weight:700}
-  .brand img{height:36px;display:block}
-  .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));
+  .brand img{height:36px} .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));
     box-shadow:0 0 12px rgba(18,176,255,.7),0 0 24px rgba(0,255,213,.5)}
   nav.tabs{display:flex;gap:8px;flex-wrap:wrap}
   nav.tabs button{background:#0b1522;color:#cfeaff;border:1px solid var(--border);padding:8px 12px;border-radius:999px;cursor:pointer}
@@ -34,7 +31,7 @@
   main{max-width:1250px;margin:24px auto;padding:0 16px}
   section.panel{display:none;background:rgba(15,27,42,.6);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:18px}
   section.panel.active{display:block}
-  .grid{display:grid;gap:16px} .g-3{grid-template-columns:repeat(3,minmax(0,1fr))} .g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid{display:grid;gap:16px}.g-3{grid-template-columns:repeat(3,minmax(0,1fr))}.g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
   .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
   .btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--primary),var(--primary2));
     color:#001726;border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600;box-shadow:0 10px 22px rgba(0,0,0,.35),0 2px 0 rgba(0,0,0,.2) inset}
@@ -45,23 +42,18 @@
   .msg{margin:8px 0;padding:8px 10px;border-radius:10px;border:1px solid var(--border)} .msg.me{background:#062438} .msg.them{background:#112234}
   .landing{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:48px 16px}
   .landing img{width:160px;height:160px;border-radius:24px;object-fit:contain;background:#0b1522;border:1px solid var(--border)}
-  .landing .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
   .kanban{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
   .col{background:#0b1522;border:1px solid var(--border);border-radius:14px;padding:10px;min-height:200px}
-  .col h4{margin:6px 0 10px 0}
   .card-k{background:#0e1624;border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px;cursor:grab;position:relative}
-  .card-k .icons{position:absolute;right:8px;top:8px;display:flex;gap:6px}
-  .card-k .icon{cursor:pointer}
-  .card-k.drag{opacity:.6}
-  .empty{color:#89a; font-style:italic}
-  @media (max-width:1100px){ .kanban{grid-template-columns:1fr} .thread{max-height:unset}}
-
+  .card-k .icons{position:absolute;right:8px;top:8px;display:flex;gap:6px}.card-k .icon{cursor:pointer}.card-k.drag{opacity:.6}
+  .empty{color:#89a;font-style:italic}
+  @media (max-width:1100px){.kanban{grid-template-columns:1fr}.thread{max-height:unset}}
   /* Modal QR */
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:60}
-  .modal .box{background:#0b1522;border:1px solid var(--border);border-radius:16px;max-width:620px;width:100%;padding:16px}
+  .modal .box{background:#0b1522;border:1px solid var(--border);border-radius:16px;max-width:520px;width:100%;padding:16px;text-align:center}
   .modal .box header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
   .modal.open{display:flex}
-  iframe.qrframe{width:100%;height:420px;border:1px solid var(--border);border-radius:12px;background:#0b1118}
+  .qr-img{width:320px;max-width:100%;height:auto;border:1px solid var(--border);border-radius:12px;background:#0b1118;margin:0 auto}
 </style>
 </head>
 <body>
@@ -108,12 +100,13 @@
           </select>
           <input class="input" id="cNotes" placeholder="Notas (opcional)">
           <button class="btn" id="btnAdd">Salvar contato</button>
-          <input class="input" id="search" placeholder="Buscar (nome/telefone/e-mail/origem)" />
+          <input class="input" id="search" placeholder="Buscar (nome/telefone/e-mail/origem)"/>
           <button class="btn secondary" id="clearSearch">Limpar</button>
         </div>
       </div>
 
       <div class="grid g-2" style="margin-top:12px">
+        <!-- KANBAN -->
         <div class="card">
           <h3>Kanban</h3>
           <div class="kanban" id="kanban">
@@ -124,6 +117,7 @@
           </div>
         </div>
 
+        <!-- CONVERSA -->
         <div class="card">
           <div class="row" style="justify-content:space-between">
             <h3 id="threadTitle">Conversa — selecione um card</h3>
@@ -187,15 +181,13 @@
         <div class="grid g-3">
           <input class="input" id="userName" placeholder="Seu nome (exibido no CRM)">
         </div>
-        <div class="row" style="margin-top:8px">
-          <button class="btn" id="saveUser">Salvar</button>
-        </div>
+        <div class="row" style="margin-top:8px"><button class="btn" id="saveUser">Salvar</button></div>
         <small class="muted">WhatsApp/API são tratados no deploy/backend.</small>
       </div>
     </section>
   </main>
 
-  <!-- MODAL QR -->
+  <!-- MODAL QR (com IMG, sem iframe) -->
   <div class="modal" id="qrModal">
     <div class="box">
       <header>
@@ -206,24 +198,24 @@
           <button class="btn" id="qrClose">Fechar</button>
         </div>
       </header>
-      <iframe class="qrframe" id="qrFrame" src="about:blank" loading="eager"></iframe>
-      <div class="tiny muted" style="margin-top:8px">Se não aparecer, clique em “Abrir em nova aba”.</div>
+      <div id="qrArea">
+        <img id="qrImg" class="qr-img" alt="QR Code" src="" />
+        <div id="qrMsg" class="tiny muted" style="margin-top:8px">Carregando QR…</div>
+      </div>
     </div>
   </div>
 
   <script>
   // ===== Config =====
   window.PIXELUP = {
-    // todas as chamadas de API usam /api/wa/* (proxy Vercel → Replit)
-    WA_BASE: "/api/wa",
-    // QR por arquivo html (conforme seu Replit)
-    QR_PROXY: "/api/qr.html",
+    WA_BASE: "/api/wa",                 // proxy Vercel → Replit
+    QR_PROXY_HTML: "/api/qr.html",      // abre em nova aba (quando precisar)
     GEMINI_MODEL: "gemini-2.0-flash",
     REPLIT_DIRECT: "https://pixelup-wa-server.pixelupmrkt.repl.co"
   };
 
   // ===== Utils & State =====
-  const $ = s => document.querySelector(s); const byId = id => document.getElementById(id);
+  const $ = s => document.querySelector(s), byId = id => document.getElementById(id);
   const escapeHtml = s => (s||'').replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":"&#039;"}[m]));
   const norm = p => (''+(p||'')).replace(/[^0-9]/g,'');
   const ls = { get(k,d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d; }catch{ return d; } }, set(k,v){ localStorage.setItem(k, JSON.stringify(v)); } };
@@ -234,10 +226,8 @@
   const state = {
     userName: ls.get('px_user_name',''),
     aiKey: (qparam('gemini') || metaGem || (window.DEFAULT_GEMINI_KEY||'')).trim(),
-    contacts: ls.get('px_contacts', {}),
-    threads:  ls.get('px_threads', {}),
-    botMap:   ls.get('px_bot_map', {}),
-    current: null, search: ''
+    contacts: ls.get('px_contacts', {}), threads: ls.get('px_threads', {}),
+    botMap: ls.get('px_bot_map', {}), current: null, search:''
   };
 
   // ===== Tabs =====
@@ -250,305 +240,245 @@
       panels[tab].classList.add('active');
       if(tab==='crm'){ renderKanban(); renderThread(null); refreshCounters(); runDiagnostics(); }
     };
-    tabs.addEventListener('click', (e)=>{
-      if(e.target.tagName!=='BUTTON') return;
-      activate(e.target.dataset.tab);
-    });
+    tabs.addEventListener('click', e=>{ if(e.target.tagName==='BUTTON') activate(e.target.dataset.tab); });
     document.querySelectorAll('[data-goto]').forEach(b=> b.addEventListener('click', ()=> activate(b.dataset.goto)));
   })();
 
   // ===== CRM elements =====
-  const cName = byId('cName'), cEmail = byId('cEmail'), cPhone = byId('cPhone'), cOrigin = byId('cOrigin'), cNotes = byId('cNotes');
-  const btnAdd = byId('btnAdd'), search = byId('search'), clearSearch = byId('clearSearch');
-  const kanban = byId('kanban'), thread = byId('thread'), threadTitle = byId('threadTitle');
-  const msgText = byId('msgText'), sendMsg = byId('sendMsg');
-  const botBadge = byId('botBadge'), toggleBot = byId('toggleBot'), waStatusText = byId('waStatusText');
+  const cName=byId('cName'), cEmail=byId('cEmail'), cPhone=byId('cPhone'), cOrigin=byId('cOrigin'), cNotes=byId('cNotes');
+  const btnAdd=byId('btnAdd'), search=byId('search'), clearSearch=byId('clearSearch');
+  const kanban=byId('kanban'), thread=byId('thread'), threadTitle=byId('threadTitle');
+  const msgText=byId('msgText'), sendMsg=byId('sendMsg');
+  const botBadge=byId('botBadge'), toggleBot=byId('toggleBot'), waStatusText=byId('waStatusText');
 
   btnAdd.onclick = ()=>{
-    const phone = norm(cPhone.value.trim());
-    if(!phone){ alert('Telefone é obrigatório'); return; }
+    const phone = norm(cPhone.value.trim()); if(!phone){ alert('Telefone é obrigatório'); return; }
     const rec = state.contacts[phone] || {};
-    state.contacts[phone] = {
-      phone,
-      name: (cName.value||'').trim() || phone,
-      email: (cEmail.value||'').trim(),
-      origin: (cOrigin.value||'WhatsApp'),
-      notes: (cNotes.value||'').trim(),
-      stage: rec.stage || 'novo',
-      lastText: rec.lastText || '', lastTs: rec.lastTs || Date.now()
-    };
+    state.contacts[phone] = { phone, name:(cName.value||'').trim()||phone, email:(cEmail.value||'').trim(),
+      origin:(cOrigin.value||'WhatsApp'), notes:(cNotes.value||'').trim(), stage: rec.stage||'novo',
+      lastText: rec.lastText||'', lastTs: rec.lastTs||Date.now() };
     ls.set('px_contacts', state.contacts);
-    cName.value=cEmail.value=cPhone.value=cNotes.value='';
-    renderKanban(); refreshCounters();
+    cName.value=cEmail.value=cPhone.value=cNotes.value=''; renderKanban(); refreshCounters();
   };
 
-  search.oninput = ()=>{ state.search = search.value.toLowerCase(); renderKanban(); };
+  search.oninput = ()=>{ state.search=search.value.toLowerCase(); renderKanban(); };
   clearSearch.onclick = ()=>{ search.value=''; state.search=''; renderKanban(); };
 
   sendMsg.onclick = async ()=>{
-    const phone = state.current; const text = msgText.value.trim();
-    if(!phone || !text) return;
-    await waSend({to: phone, text});
-    pushMsg(phone, {who:'me', text, ts: Date.now()});
-    msgText.value=''; renderThread(phone);
-    touchContact(phone, {lastText: text});
+    const phone = state.current, text = msgText.value.trim(); if(!phone||!text) return;
+    await waSend({to:phone, text}); pushMsg(phone,{who:'me',text,ts:Date.now()});
+    msgText.value=''; renderThread(phone); touchContact(phone,{lastText:text});
   };
 
-  toggleBot.onclick = ()=>{
-    const p = state.current; if(!p) return;
-    state.botMap[p] = !state.botMap[p]; ls.set('px_bot_map', state.botMap);
-    setBotBadge(p);
-  };
-  function setBotBadge(phone){
-    const on = !!state.botMap[phone];
-    botBadge.textContent = 'Bot: ' + (on?'ON':'OFF');
-    toggleBot.textContent = on ? 'Desligar IA' : 'Ligar IA';
-  }
+  toggleBot.onclick = ()=>{ const p=state.current; if(!p) return; state.botMap[p]=!state.botMap[p]; ls.set('px_bot_map',state.botMap); setBotBadge(p); };
+  function setBotBadge(phone){ const on=!!state.botMap[phone]; botBadge.textContent='Bot: '+(on?'ON':'OFF'); toggleBot.textContent = on?'Desligar IA':'Ligar IA'; }
 
   // ===== Kanban & Thread =====
-  function contactFilter(c){
-    if(!state.search) return true;
-    const q = state.search;
-    return [c.name,c.phone,c.email,c.origin,(c.notes||'')].join(' ').toLowerCase().includes(q);
-  }
+  function contactFilter(c){ if(!state.search) return true; const q=state.search; return [c.name,c.phone,c.email,c.origin,(c.notes||'')].join(' ').toLowerCase().includes(q); }
   function toCardHTML(c){
-    return `
-      <div class="card-k" draggable="true" data-phone="${c.phone}">
-        <div class="icons">
-          <span class="icon" title="Abrir conversa" data-action="open">💬</span>
-          <span class="icon" title="Atualizar card" data-action="refresh">↻</span>
-        </div>
-        <b>${escapeHtml(c.name||c.phone)}</b><br>
-        <span class="tiny muted">${escapeHtml(c.origin||'')}</span>
-        ${c.email?`<div class="tiny muted">${escapeHtml(c.email)}</div>`:''}
-        <div class="tiny muted">${escapeHtml(c.lastText||'')}</div>
-      </div>`;
+    return `<div class="card-k" draggable="true" data-phone="${c.phone}">
+      <div class="icons"><span class="icon" data-action="open">💬</span><span class="icon" data-action="refresh">↻</span></div>
+      <b>${escapeHtml(c.name||c.phone)}</b><br><span class="tiny muted">${escapeHtml(c.origin||'')}</span>
+      ${c.email?`<div class="tiny muted">${escapeHtml(c.email)}</div>`:''}
+      <div class="tiny muted">${escapeHtml(c.lastText||'')}</div></div>`;
   }
   function renderKanban(){
     kanban.querySelectorAll('.col').forEach(col=>{
-      const stage = col.dataset.stage;
-      let html = '';
-      const arr = Object.values(state.contacts).filter(c => (c.stage||'novo')===stage && contactFilter(c))
+      const stage=col.dataset.stage; const arr=Object.values(state.contacts).filter(c=>(c.stage||'novo')===stage && contactFilter(c))
         .sort((a,b)=>(b.lastTs||0)-(a.lastTs||0));
-      if(arr.length===0){ col.innerHTML = `<h4>${col.querySelector('h4').textContent}</h4><div class="empty tiny">— sem cards —</div>`; return; }
-      html += `<h4>${col.querySelector('h4').textContent}</h4>`;
-      html += arr.map(toCardHTML).join('');
-      col.innerHTML = html;
+      col.innerHTML=`<h4>${col.querySelector('h4').textContent}</h4>`+(arr.length?arr.map(toCardHTML).join(''):`<div class="empty tiny">— sem cards —</div>`);
     });
     initDragDrop(); refreshCounters();
   }
   function initDragDrop(){
     let dragEl=null;
     kanban.querySelectorAll('.card-k').forEach(card=>{
-      const phone = card.dataset.phone;
-      card.addEventListener('dragstart',()=>{ dragEl=card; card.classList.add('drag'); });
-      card.addEventListener('dragend',()=>{ card.classList.remove('drag'); dragEl=null; });
-      card.addEventListener('click', (e)=>{ if(e.target.classList.contains('icon')) return; state.current = phone; renderThread(phone); setBotBadge(phone); });
+      const phone=card.dataset.phone;
+      card.addEventListener('dragstart',()=>{dragEl=card;card.classList.add('drag')});
+      card.addEventListener('dragend',()=>{card.classList.remove('drag');dragEl=null});
+      card.addEventListener('click',e=>{ if(e.target.classList.contains('icon')) return; state.current=phone; renderThread(phone); setBotBadge(phone); });
       card.querySelectorAll('.icon').forEach(ic=>{
-        ic.addEventListener('click', (e)=>{
-          const action = ic.dataset.action;
-          if(action==='open'){ state.current = phone; renderThread(phone); setBotBadge(phone); }
-          if(action==='refresh'){ renderKanban(); }
-          e.stopPropagation();
-        });
+        ic.addEventListener('click',e=>{ const a=ic.dataset.action; if(a==='open'){state.current=phone;renderThread(phone);setBotBadge(phone);} if(a==='refresh'){renderKanban();} e.stopPropagation(); });
       });
     });
     kanban.querySelectorAll('.col').forEach(col=>{
-      col.addEventListener('dragover',e=>{ e.preventDefault(); });
-      col.addEventListener('drop',e=>{
-        e.preventDefault(); if(!dragEl) return;
-        const phone = dragEl.dataset.phone; const stage = col.dataset.stage;
-        const c = state.contacts[phone]; if(!c) return;
-        c.stage = stage; state.contacts[phone]=c; ls.set('px_contacts', state.contacts);
-        renderKanban();
-      });
+      col.addEventListener('dragover',e=>e.preventDefault());
+      col.addEventListener('drop',e=>{ e.preventDefault(); if(!dragEl) return; const phone=dragEl.dataset.phone, stage=col.dataset.stage;
+        const c=state.contacts[phone]; if(!c) return; c.stage=stage; state.contacts[phone]=c; ls.set('px_contacts',state.contacts); renderKanban();});
     });
   }
   function renderThread(phone){
-    thread.innerHTML = '';
-    if(!phone){ threadTitle.textContent = 'Conversa — selecione um card'; setBotBadge(null); return; }
-    const c = state.contacts[phone] || {phone};
-    const uname = state.userName ? ` • Atendente: ${escapeHtml(state.userName)}` : '';
-    threadTitle.textContent = `Conversa — ${c.name||phone} (${phone})${uname}`;
-    setBotBadge(phone);
-    (state.threads[phone]||[]).forEach(m=>{
-      const div=document.createElement('div'); div.className='msg '+(m.who==='me'?'me':'them');
-      const date = new Date(m.ts||Date.now()).toLocaleString();
-      div.innerHTML = `<small class="muted">${date}</small><br>${escapeHtml(m.text||'')}`;
-      thread.appendChild(div);
-    });
-    thread.scrollTop = thread.scrollHeight;
+    thread.innerHTML=''; if(!phone){ threadTitle.textContent='Conversa — selecione um card'; setBotBadge(null); return; }
+    const c=state.contacts[phone]||{phone}; const uname=state.userName?` • Atendente: ${escapeHtml(state.userName)}`:'';
+    threadTitle.textContent=`Conversa — ${c.name||phone} (${phone})${uname}`; setBotBadge(phone);
+    (state.threads[phone]||[]).forEach(m=>{ const div=document.createElement('div'); div.className='msg '+(m.who==='me'?'me':'them');
+      const date=new Date(m.ts||Date.now()).toLocaleString(); div.innerHTML=`<small class="muted">${date}</small><br>${escapeHtml(m.text||'')}`; thread.appendChild(div); });
+    thread.scrollTop=thread.scrollHeight;
   }
-  function pushMsg(phone, m){
-    const arr = state.threads[phone] || []; arr.push(m); state.threads[phone]=arr; ls.set('px_threads', state.threads);
-  }
-  function upsertContact(phone, patch){
-    const c = state.contacts[phone] || {phone, stage:'novo', origin:'WhatsApp'};
-    state.contacts[phone] = { ...c, ...patch }; ls.set('px_contacts', state.contacts);
-  }
-  function touchContact(phone, patch){ upsertContact(phone, { lastTs: Date.now(), ...patch }); renderKanban(); }
-  function refreshCounters(){
-    const all = Object.values(state.contacts);
-    byId('mNovos').textContent = all.filter(c=> (c.stage||'novo')==='novo').length;
-    byId('mQuali').textContent = all.filter(c=> c.stage==='qualificando').length;
-    byId('mProp').textContent  = all.filter(c=> c.stage==='proposta').length;
-    byId('mFech').textContent  = all.filter(c=> c.stage==='fechado').length;
-  }
+  function pushMsg(phone,m){ const arr=state.threads[phone]||[]; arr.push(m); state.threads[phone]=arr; ls.set('px_threads',state.threads); }
+  function upsertContact(phone,patch){ const c=state.contacts[phone]||{phone,stage:'novo',origin:'WhatsApp'}; state.contacts[phone]={...c,...patch}; ls.set('px_contacts',state.contacts); }
+  function touchContact(phone,patch){ upsertContact(phone,{lastTs:Date.now(),...patch}); renderKanban(); }
+  function refreshCounters(){ const all=Object.values(state.contacts);
+    byId('mNovos').textContent=all.filter(c=>(c.stage||'novo')==='novo').length;
+    byId('mQuali').textContent=all.filter(c=>c.stage==='qualificando').length;
+    byId('mProp').textContent=all.filter(c=>c.stage==='proposta').length;
+    byId('mFech').textContent=all.filter(c=>c.stage==='fechado').length; }
 
-  // ===== WhatsApp API (via proxy /api/wa/*) =====
+  // ===== WhatsApp API =====
   async function waStatus(){
-    try{
-      const r = await fetch(`${window.PIXELUP.WA_BASE}/status`, {cache:'no-store'});
-      const j = await r.json();
-      waStatusText.textContent = 'Status: ' + (j.connected ? ('on' + (j.user ? ' ('+j.user+')' : '')) : 'off');
-      return !!j.connected;
-    }catch{ waStatusText.textContent = 'Status: off'; return false; }
+    try{ const r=await fetch(`${window.PIXELUP.WA_BASE}/status`,{cache:'no-store'}); const j=await r.json();
+      waStatusText.textContent='Status: '+(j.connected?('on'+(j.user?' ('+j.user+')':'')):'off'); return !!j.connected;
+    }catch{ waStatusText.textContent='Status: off'; return false; }
   }
-  async function waSend({to, text}){
-    const r = await fetch(`${window.PIXELUP.WA_BASE}/send`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({to,text})});
-    try{ return await r.json(); }catch{ return {ok:false}; }
-  }
+  async function waSend({to,text}){ const r=await fetch(`${window.PIXELUP.WA_BASE}/send`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,text})}); try{return await r.json()}catch{return{ok:false}} }
   function waEvents(){
     let es=null, triedProxy=false;
-    const direct = window.PIXELUP.REPLIT_DIRECT + '/api/wa/events';
-    const proxy  = window.PIXELUP.WA_BASE + '/events';
-    const open = (url)=>{
+    const direct=window.PIXELUP.REPLIT_DIRECT+'/api/wa/events', proxy=window.PIXELUP.WA_BASE+'/events';
+    const open=(url)=>{
       try{
-        if(es) es.close();
-        es = new EventSource(url);
-        es.onmessage = async (ev)=>{
-          try{
-            const data = JSON.parse(ev.data);
+        if(es) es.close(); es=new EventSource(url);
+        es.onmessage=async(ev)=>{ try{
+            const data=JSON.parse(ev.data);
             if(data.type==='status'){ await waStatus(); }
             if(data.type==='message'){
-              const phone = (''+(data.from||'')).replace(/[^0-9]/g,''); if(!phone) return;
-              upsertContact(phone, { name: data.name||phone, origin:'WhatsApp', lastText:data.text||'', lastTs:data.ts||Date.now() });
-              pushMsg(phone, {who:'them', text:data.text||'', ts:data.ts||Date.now()});
+              const phone=(''+(data.from||'')).replace(/[^0-9]/g,''); if(!phone) return;
+              upsertContact(phone,{name:data.name||phone,origin:'WhatsApp',lastText:data.text||'',lastTs:data.ts||Date.now()});
+              pushMsg(phone,{who:'them',text:data.text||'',ts:data.ts||Date.now()});
               if(state.current===phone) renderThread(phone);
-              if(state.botMap[phone]) await botPreAtendimento(phone, data.text||'');
+              if(state.botMap[phone]) await botPreAtendimento(phone,data.text||'');
               renderKanban();
             }
-          }catch{}
-        };
-        es.onerror = ()=>{ es && es.close(); if(!triedProxy){ triedProxy=true; setTimeout(()=>open(proxy),600);} else { setTimeout(()=>open(direct),3000);} };
+        }catch{} };
+        es.onerror=()=>{ es&&es.close(); if(!triedProxy){ triedProxy=true; setTimeout(()=>open(proxy),600);} else { setTimeout(()=>open(direct),3000);} };
       }catch{ if(!triedProxy){ triedProxy=true; setTimeout(()=>open(proxy),600);} else { setTimeout(()=>open(direct),3000);} }
     };
     open(direct);
   }
 
-  // ===== QR: proxy /api/qr.html → fallback direto /qr.html → página do Replit
-  const qrModal = byId('qrModal'), qrFrame = byId('qrFrame'), qrReload = byId('qrReload'), qrClose = byId('qrClose'), openQR = byId('openQR'), qrExternal = byId('qrExternal');
-  async function resolveQrURL(){
-    const urlProxy  = window.PIXELUP.QR_PROXY + '?t=' + Date.now();
-    try{ const r = await fetch(urlProxy, {method:'GET', cache:'no-store'}); if(r.ok || r.type==='opaque') return urlProxy; }catch{}
-    const urlDirect = window.PIXELUP.REPLIT_DIRECT + '/qr.html?t=' + Date.now();
-    try{ await fetch(urlDirect, {method:'GET', cache:'no-store', mode:'no-cors'}); return urlDirect; }catch{}
-    return 'https://replit.com/@pixelupmrkt/pixelup-wa-server';
-  }
-  async function openQrModal(){ const url = await resolveQrURL(); qrFrame.src=url; qrExternal.href=url; qrModal.classList.add('open'); }
-  qrReload.onclick = ()=>openQrModal(); openQR.onclick = ()=>openQrModal(); qrClose.onclick = ()=>qrModal.classList.remove('open');
+  // ===== QR: busca a IMAGEM (sem iframe) =====
+  const qrModal=byId('qrModal'), qrImg=byId('qrImg'), qrMsg=byId('qrMsg'), qrReload=byId('qrReload'), qrClose=byId('qrClose'), openQR=byId('openQR'), qrExternal=byId('qrExternal');
+  let qrPoll=null;
 
-  // ===== Gemini (IA) =====
-  function getGeminiKey(){ return (state.aiKey||'').trim(); }
-  async function geminiCall(prompt, json=false){
-    const key = getGeminiKey(); if(!key) return json ? null : '';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${window.PIXELUP.GEMINI_MODEL}:generateContent`;
-    const body = json ? { contents:[{ parts:[ {text: prompt} ] }], generationConfig:{ response_mime_type:"application/json" } }
-                      : { contents:[{ parts:[ {text: prompt} ] }] };
+  async function tryGetQR(){
+    // 1) JSON com dataURL
     try{
-      const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json','x-goog-api-key': key}, body: JSON.stringify(body)});
-      if(!r.ok) return json ? null : '';
-      const j = await r.json(); const text = j?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const r=await fetch(`${window.PIXELUP.WA_BASE}/qr`,{cache:'no-store'});
+      if(r.ok){
+        const t=await r.text(); // pode vir JSON ou string
+        try{
+          const j=JSON.parse(t);
+          const dataURL=j.dataURL||j.dataUrl||j.image||j.qr||'';
+          if(dataURL && (dataURL.startsWith('data:image')||dataURL.startsWith('data:'))) return dataURL;
+        }catch{
+          // se vier SVG puro
+          if(t.trim().startsWith('<svg')) return 'data:image/svg+xml;base64,'+btoa(t);
+        }
+      }
+    }catch{}
+
+    // 2) PNG direto
+    try{
+      const r2=await fetch(`${window.PIXELUP.WA_BASE}/qr.png`,{cache:'no-store'});
+      if(r2.ok){ const blob=await r2.blob(); return URL.createObjectURL(blob); }
+    }catch{}
+
+    // 3) sem imagem via API – usar página externa (sem iframe)
+    return null;
+  }
+
+  async function openQrModal(){
+    qrImg.src=''; qrMsg.textContent='Carregando QR…';
+    const dataUrl = await tryGetQR();
+    if(dataUrl){
+      qrImg.src = dataUrl;
+      qrMsg.textContent = 'Aponte a câmera do WhatsApp para este QR.';
+      // repete a cada 15s porque o QR renova
+      if(qrPoll) clearInterval(qrPoll);
+      qrPoll = setInterval(async ()=>{
+        const d = await tryGetQR();
+        if(d) qrImg.src = d;
+        const ok = await waStatus(); if(ok){ clearInterval(qrPoll); qrPoll=null; qrMsg.textContent='Conectado!'; }
+      }, 15000);
+    }else{
+      qrMsg.innerHTML = 'Não consegui carregar a imagem do QR pela API. Clique em <b>Abrir em nova aba</b>.';
+    }
+    // link “nova aba” -> qr.html via proxy; fallback diretão do Replit
+    const prox = window.PIXELUP.QR_PROXY_HTML + '?t=' + Date.now();
+    const dir  = window.PIXELUP.REPLIT_DIRECT + '/qr.html?t=' + Date.now();
+    qrExternal.href = prox;
+    qrExternal.onclick = async (e)=>{
+      try{ const r=await fetch(prox,{method:'GET',cache:'no-store'}); if(!r.ok) throw 0; }
+      catch{ e.preventDefault(); window.open(dir,'_blank'); }
+    };
+    qrModal.classList.add('open');
+  }
+  qrReload.onclick = ()=> openQrModal();
+  qrClose.onclick  = ()=>{ qrModal.classList.remove('open'); if(qrPoll) clearInterval(qrPoll); };
+  openQR.onclick   = ()=> openQrModal();
+
+  // ===== Gemini =====
+  function getGeminiKey(){ return (state.aiKey||'').trim(); }
+  async function geminiCall(prompt,json=false){
+    const key=getGeminiKey(); if(!key) return json?null:'';
+    const url=`https://generativelanguage.googleapis.com/v1beta/models/${window.PIXELUP.GEMINI_MODEL}:generateContent`;
+    const body=json?{contents:[{parts:[{text:prompt}]}],generationConfig:{response_mime_type:"application/json"}}
+                    :{contents:[{parts:[{text:prompt}]}]};
+    try{
+      const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)});
+      if(!r.ok) return json?null:'';
+      const j=await r.json(); const text=j?.candidates?.[0]?.content?.parts?.[0]?.text||'';
       if(json){ try{ return JSON.parse(text); }catch{ return null; } }
       return text.trim();
-    }catch{ return json ? null : ''; }
+    }catch{ return json?null:''; }
   }
-  async function botPreAtendimento(phone, textIn){
-    const extract = await geminiCall(
-      `A partir da mensagem do cliente, extraia um JSON curto com campos (pode faltar):
-       nome, email, necessidade, orcamento, prazo.
-       Mensagem: "${textIn}"`, true);
+  async function botPreAtendimento(phone,textIn){
+    const extract=await geminiCall(`A partir da mensagem do cliente, extraia um JSON curto (pode faltar): nome, email, necessidade, orcamento, prazo. Mensagem: "${textIn}"`,true);
     if(extract){
-      const c = state.contacts[phone] || {phone};
-      const notes = [
-        extract.nome?`Nome: ${extract.nome}`:'',
-        extract.email?`Email: ${extract.email}`:'',
-        extract.necessidade?`Necessidade: ${extract.necessidade}`:'',
-        extract.orcamento?`Orçamento: ${extract.orcamento}`:'',
-        extract.prazo?`Prazo: ${extract.prazo}`:''
-      ].filter(Boolean).join(' | ');
-      state.contacts[phone] = { ...c, name: c.name || extract.nome || phone, email: c.email || extract.email || '', notes: notes || c.notes || '', lastText: textIn, lastTs: Date.now() };
-      ls.set('px_contacts', state.contacts); renderKanban(); if(state.current===phone) renderThread(phone);
+      const c=state.contacts[phone]||{phone};
+      const notes=[extract.nome?`Nome: ${extract.nome}`:'',extract.email?`Email: ${extract.email}`:'',extract.necessidade?`Necessidade: ${extract.necessidade}`:'',extract.orcamento?`Orçamento: ${extract.orcamento}`:'',extract.prazo?`Prazo: ${extract.prazo}`:''].filter(Boolean).join(' | ');
+      state.contacts[phone]={...c,name:c.name||extract.nome||phone,email:c.email||extract.email||'',notes:notes||c.notes||'',lastText:textIn,lastTs:Date.now()};
+      ls.set('px_contacts',state.contacts); renderKanban(); if(state.current===phone) renderThread(phone);
     }
-    const reply = await geminiCall(
-      "Atue como atendente virtual da PixelUp. Peça educadamente os dados em falta (nome, e-mail, necessidade, orçamento, prazo). " +
-      "Se o assunto for veículos, pergunte modelo/ano/valor. Se o cliente pedir humano, diga que vai acionar o atendimento.\n\n" +
-      "Mensagem do cliente: " + textIn, false);
-    if(reply){ await waSend({to:phone, text: reply}); pushMsg(phone, {who:'me', text: reply, ts: Date.now()}); if(state.current===phone) renderThread(phone); }
+    const reply=await geminiCall("Atue como atendente virtual da PixelUp. Peça educadamente os dados em falta (nome, e-mail, necessidade, orçamento, prazo). Se o cliente pedir humano, diga que vai acionar o atendimento.\n\nMensagem do cliente: "+textIn,false);
+    if(reply){ await waSend({to:phone,text:reply}); pushMsg(phone,{who:'me',text:reply,ts:Date.now()}); if(state.current===phone) renderThread(phone); }
   }
 
-  // ===== Mentoria (conteúdo base + auto-load .docx) =====
-  const seedMentoria = {
-    m1: `<h4>Persona e Fundamentos do Negócio</h4><p>Defina claramente seu cliente ideal…</p>`,
-    m2: `<h4>Algoritmo do Meta</h4><p>Como o algoritmo decide entrega…</p>`,
-    m3: `<h4>Cronograma e Calendário Editorial</h4><p>Organize posts por tema…</p>`,
-    m4: `<h4>Conteúdo Visual</h4><p>Hook em 3s, storyboard, cortes…</p>`,
-    m5: `<h4>Copy com IA</h4><p>Prompt base com objetivo, público, tom…</p>`,
-    m6: `<h4>CRM e Organização Comercial</h4><p>Pipeline: Lead → Qualificando → Proposta → Fechado…</p>`,
-    m7: `<h4>Técnicas de Vendas</h4><p>Rapport, perguntas abertas, fechamento…</p>`,
-    m8: `<h4>Implementação de CRM + Tráfego Pago</h4><p>Integração com WhatsApp, gatilhos…</p>`
-  };
-  const modulesSeed = [
-    {id:'m1', title:'Módulo 1 — Persona e Fundamentos do Negócio'},
-    {id:'m2', title:'Módulo 2 — Algoritmo do Meta'},
-    {id:'m3', title:'Módulo 3 — Cronograma e Calendário Editorial'},
-    {id:'m4', title:'Módulo 4 — Conteúdo Visual'},
-    {id:'m5', title:'Módulo 5 — Copy com IA'},
-    {id:'m6', title:'Módulo 6 — CRM e Organização Comercial'},
-    {id:'m7', title:'Módulo 7 — Técnicas de Vendas'},
-    {id:'m8', title:'Módulo 8 — Implementação de CRM + Tráfego Pago'}
-  ];
-  const modulesList = byId('modulesList'), lessonTitle = byId('lessonTitle'), lessonBody = byId('lessonBody');
-  let currentModule = null;
+  // ===== Mentoria =====
+  const seedMentoria={m1:`<h4>Persona e Fundamentos do Negócio</h4><p>Defina claramente seu cliente ideal…</p>`,
+    m2:`<h4>Algoritmo do Meta</h4><p>Como o algoritmo decide entrega…</p>`,
+    m3:`<h4>Cronograma e Calendário Editorial</h4><p>Organize posts por tema…</p>`,
+    m4:`<h4>Conteúdo Visual</h4><p>Hook em 3s, storyboard, cortes…</p>`,
+    m5:`<h4>Copy com IA</h4><p>Prompt base com objetivo, público, tom…</p>`,
+    m6:`<h4>CRM e Organização Comercial</h4><p>Pipeline: Lead → Qualificando → Proposta → Fechado…</p>`,
+    m7:`<h4>Técnicas de Vendas</h4><p>Rapport, perguntas abertas, fechamento…</p>`,
+    m8:`<h4>Implementação de CRM + Tráfego Pago</h4><p>Integração com WhatsApp, gatilhos…</p>`};
+  const modulesSeed=[{id:'m1',title:'Módulo 1 — Persona e Fundamentos do Negócio'},{id:'m2',title:'Módulo 2 — Algoritmo do Meta'},
+    {id:'m3',title:'Módulo 3 — Cronograma e Calendário Editorial'},{id:'m4',title:'Módulo 4 — Conteúdo Visual'},
+    {id:'m5',title:'Módulo 5 — Copy com IA'},{id:'m6',title:'Módulo 6 — CRM e Organização Comercial'},
+    {id:'m7',title:'Módulo 7 — Técnicas de Vendas'},{id:'m8',title:'Módulo 8 — Implementação de CRM + Tráfego Pago'}];
+  const modulesList=byId('modulesList'), lessonTitle=byId('lessonTitle'), lessonBody=byId('lessonBody'); let currentModule=null;
   function modKey(id){ return 'px_mod_'+id; }
-  function loadMod(id){ const saved = ls.get(modKey(id), null); if(saved && saved.html) return saved; return {html: seedMentoria[id] || '(sem conteúdo)'}; }
-  function saveMod(id,html){ ls.set(modKey(id), {html}); }
+  function loadMod(id){ const saved=ls.get(modKey(id),null); if(saved&&saved.html) return saved; return {html:seedMentoria[id]||'(sem conteúdo)'}; }
+  function saveMod(id,html){ ls.set(modKey(id),{html}); }
   async function tryFetchDocx(id){
-    try{
-      const res = await fetch(`/mentoria/${id}.docx`, {cache:'no-store'}); if(!res.ok) return false;
-      const buf = await res.arrayBuffer(); const html = (await window.mammoth.convertToHtml({arrayBuffer:buf})).value || '';
-      if(html){ saveMod(id, html); return true; } return false;
-    }catch{ return false; }
+    try{ const res=await fetch(`/mentoria/${id}.docx`,{cache:'no-store'}); if(!res.ok) return false;
+      const buf=await res.arrayBuffer(); const html=(await window.mammoth.convertToHtml({arrayBuffer:buf})).value||'';
+      if(html){ saveMod(id,html); return true; } return false;}catch{ return false; }
   }
-  async function selectModule(m){
-    currentModule = m.id; lessonTitle.textContent = m.title;
-    const base = loadMod(m.id); lessonBody.innerHTML = base.html;
-    const ok = await tryFetchDocx(m.id); if(ok){ const after = loadMod(m.id); lessonBody.innerHTML = after.html; }
-  }
-  function renderModules(){
-    modulesList.innerHTML = '';
-    modulesSeed.forEach(m=>{ const b=document.createElement('button'); b.className='btn secondary'; b.style.width='100%'; b.textContent=m.title; b.onclick=()=>selectModule(m); modulesList.appendChild(b); });
-  }
+  async function selectModule(m){ currentModule=m.id; lessonTitle.textContent=m.title; const base=loadMod(m.id); lessonBody.innerHTML=base.html;
+    const ok=await tryFetchDocx(m.id); if(ok){ const after=loadMod(m.id); lessonBody.innerHTML=after.html; } }
+  function renderModules(){ modulesList.innerHTML=''; modulesSeed.forEach(m=>{ const b=document.createElement('button'); b.className='btn secondary'; b.style.width='100%'; b.textContent=m.title; b.onclick=()=>selectModule(m); modulesList.appendChild(b); }); }
   renderModules();
-  byId('importDocx').onclick = async ()=>{
-    const f = byId('docxInput').files?.[0]; if(!f) return alert('Selecione um .docx');
-    if(!currentModule) return alert('Escolha um módulo à esquerda antes de importar');
-    try{ const ab=await f.arrayBuffer(); const res=await window.mammoth.convertToHtml({arrayBuffer:ab}); saveMod(currentModule,res.value||'(vazio)'); lessonBody.innerHTML=res.value||'(vazio)'; alert('Conteúdo importado'); }
-    catch{ alert('Falha ao ler .docx'); }
-  };
+  byId('importDocx').onclick=async()=>{ const f=byId('docxInput').files?.[0]; if(!f) return alert('Selecione um .docx'); if(!currentModule) return alert('Escolha um módulo à esquerda');
+    try{ const ab=await f.arrayBuffer(); const res=await window.mammoth.convertToHtml({arrayBuffer:ab}); saveMod(currentModule,res.value||'(vazio)'); lessonBody.innerHTML=res.value||'(vazio)'); alert('Conteúdo importado'); }catch{ alert('Falha ao ler .docx'); } };
 
   // ===== Config =====
-  const userName = byId('userName'), saveUser = byId('saveUser');
-  userName.value = state.userName || '';
-  saveUser.onclick = ()=>{ state.userName = (userName.value||'').trim(); ls.set('px_user_name', state.userName); alert('Nome salvo!'); };
+  const userName=byId('userName'), saveUser=byId('saveUser'); userName.value=state.userName||''; saveUser.onclick=()=>{ state.userName=(userName.value||'').trim(); ls.set('px_user_name',state.userName); alert('Nome salvo!'); };
 
   // ===== Diagnóstico =====
   async function runDiagnostics(){
-    const out=[];
-    try{ const r=await fetch(`${window.PIXELUP.WA_BASE}/status`,{cache:'no-store'}); const j=await r.json(); out.push(`Proxy /api/wa/status: ${r.ok?'OK':'FAIL'} ${r.ok?JSON.stringify(j):''}`);}
-    catch{ out.push('Proxy /api/wa/status: FAIL'); }
-    try{ await fetch(window.PIXELUP.REPLIT_DIRECT + '/api/wa/status',{cache:'no-store',mode:'no-cors'}); out.push('Replit /api/wa/status: tentativa enviada');}
-    catch{ out.push('Replit /api/wa/status: FAIL (DNS?)'); }
+    const out=[]; try{ const r=await fetch(`${window.PIXELUP.WA_BASE}/status`,{cache:'no-store'}); const j=await r.json(); out.push(`Proxy /api/wa/status: ${r.ok?'OK':'FAIL'} ${r.ok?JSON.stringify(j):''}`);}catch{ out.push('Proxy /api/wa/status: FAIL'); }
+    try{ await fetch(window.PIXELUP.REPLIT_DIRECT+'/api/wa/status',{cache:'no-store',mode:'no-cors'}); out.push('Replit /api/wa/status: tentativa enviada'); }catch{ out.push('Replit /api/wa/status: FAIL (DNS?)'); }
     byId('diagBox').innerText = out.join(' | ');
   }
 
