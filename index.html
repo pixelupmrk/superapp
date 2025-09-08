@@ -6,8 +6,10 @@
 <title>PixelUp SuperApp — Classic</title>
 <meta name="theme-color" content="#0b1a2a"/>
 
-<!-- Se quiser fixar a key do Gemini via Vercel (build): preencha esta meta -->
+<!-- Se quiser esconder a key da UI mas usá-la no front, deixe aqui.
+     Também aceito ?gemini=SUA_KEY na URL. -->
 <meta name="x-gemini" content="">
+<script>window.DEFAULT_GEMINI_KEY="AIzaSyCrc1EegT7xennoqk-s_m4JGUpb-Zxq6Qo";</script>
 
 <link rel="preconnect" href="https://generativelanguage.googleapis.com" crossorigin>
 <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
@@ -56,6 +58,13 @@
   .card-k.drag{opacity:.6}
   .empty{color:#89a; font-style:italic}
   @media (max-width:1100px){ .kanban{grid-template-columns:1fr} .thread{max-height:unset}}
+
+  /* Modal QR */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:60}
+  .modal .box{background:#0b1522;border:1px solid var(--border);border-radius:16px;max-width:620px;width:100%;padding:16px}
+  .modal .box header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .modal.open{display:flex}
+  iframe.qrframe{width:100%;height:420px;border:1px solid var(--border);border-radius:12px;background:#0b1118}
 </style>
 </head>
 <body>
@@ -73,7 +82,7 @@
   </header>
 
   <main>
-    <!-- HOME (somente logo + botões grandes) -->
+    <!-- HOME (logo + botões) -->
     <section class="panel active" id="panel-home">
       <div class="landing">
         <img src="./logo.jpg" alt="PixelUp" onerror="this.style.display='none'"/>
@@ -127,7 +136,7 @@
             <div class="row">
               <span class="pill" id="botBadge">Bot: OFF</span>
               <button class="btn secondary" id="toggleBot">Ligar IA</button>
-              <a class="btn secondary" id="btnQR" target="_blank">Gerar QR</a>
+              <button class="btn secondary" id="openQR">Gerar QR</button>
               <span class="tiny muted" id="waStatusText">Status: —</span>
             </div>
           </div>
@@ -156,9 +165,9 @@
       <div class="grid g-2">
         <div class="card">
           <h3>Módulos</h3>
-          <div id="modulesList"></div>
+          <div id="modulesList" style="display:flex;flex-direction:column;gap:8px"></div>
           <hr style="border-color:#123">
-          <div class="tiny muted">Importar conteúdo do Word (.docx) para o módulo selecionado:</div>
+          <div class="tiny muted">Importar conteúdo do Word (.docx) para o módulo selecionado (opcional):</div>
           <input type="file" id="docxInput" accept=".docx"/>
           <button class="btn secondary" id="importDocx">Importar .docx</button>
           <div class="tiny muted" style="margin-top:6px">
@@ -183,10 +192,26 @@
         <div class="row" style="margin-top:8px">
           <button class="btn" id="saveUser">Salvar</button>
         </div>
-        <small class="muted">As demais configurações (WhatsApp/API) ficam fora da UI e serão tratadas no backend/deploy.</small>
+        <small class="muted">WhatsApp/API são tratados fora da UI (deploy/backend).</small>
       </div>
     </section>
   </main>
+
+  <!-- MODAL QR -->
+  <div class="modal" id="qrModal">
+    <div class="box">
+      <header>
+        <strong>Conectar WhatsApp — QR</strong>
+        <div class="row">
+          <a id="qrExternal" class="btn secondary" target="_blank">Abrir em nova aba</a>
+          <button class="btn secondary" id="qrReload">Recarregar</button>
+          <button class="btn" id="qrClose">Fechar</button>
+        </div>
+      </header>
+      <iframe class="qrframe" id="qrFrame" src="about:blank" loading="eager"></iframe>
+      <div class="tiny muted" style="margin-top:8px">Se não aparecer, clique em “Abrir em nova aba”.</div>
+    </div>
+  </div>
 
   <script>
   // ===== Config =====
@@ -207,7 +232,7 @@
   const stages = ["novo","qualificando","proposta","fechado"];
   const state = {
     userName: ls.get('px_user_name',''),
-    aiKey: ls.get('px_ai_key', (qparam('gemini') || metaGem || '')),
+    aiKey: (qparam('gemini') || metaGem || (window.DEFAULT_GEMINI_KEY||'')).trim(),
     contacts: ls.get('px_contacts', {}),  // phone -> record
     threads:  ls.get('px_threads', {}),   // phone -> msgs[]
     botMap:   ls.get('px_bot_map', {}),   // phone -> true/false
@@ -237,7 +262,7 @@
   const btnAdd = byId('btnAdd'), search = byId('search'), clearSearch = byId('clearSearch');
   const kanban = byId('kanban'), thread = byId('thread'), threadTitle = byId('threadTitle');
   const msgText = byId('msgText'), sendMsg = byId('sendMsg');
-  const botBadge = byId('botBadge'), toggleBot = byId('toggleBot'), btnQR = byId('btnQR'), waStatusText = byId('waStatusText');
+  const botBadge = byId('botBadge'), toggleBot = byId('toggleBot'), waStatusText = byId('waStatusText');
 
   btnAdd.onclick = ()=>{
     const phone = norm(cPhone.value.trim());
@@ -275,15 +300,13 @@
     setBotBadge(p);
   };
 
-  btnQR.href = window.PIXELUP.REPLIT_DIRECT + '/qr';
-
   function setBotBadge(phone){
     const on = !!state.botMap[phone];
     botBadge.textContent = 'Bot: ' + (on?'ON':'OFF');
     toggleBot.textContent = on ? 'Desligar IA' : 'Ligar IA';
   }
 
-  // ===== Data helpers =====
+  // ===== Kanban & Thread =====
   function contactFilter(c){
     if(!state.search) return true;
     const q = state.search;
@@ -322,9 +345,7 @@
       const phone = card.dataset.phone;
       card.addEventListener('dragstart',()=>{ dragEl=card; card.classList.add('drag'); });
       card.addEventListener('dragend',()=>{ card.classList.remove('drag'); dragEl=null; });
-      // clique no corpo abre conversa
       card.addEventListener('click', (e)=>{ if(e.target.classList.contains('icon')) return; state.current = phone; renderThread(phone); setBotBadge(phone); });
-      // ícones
       card.querySelectorAll('.icon').forEach(ic=>{
         ic.addEventListener('click', (e)=>{
           const action = ic.dataset.action;
@@ -380,7 +401,7 @@
     byId('mFech').textContent  = all.filter(c=> c.stage==='fechado').length;
   }
 
-  // ===== WA backend =====
+  // ===== WA backend & QR =====
   async function waStatus(){
     try{
       const r = await fetch(window.PIXELUP.WA_BASE + '/status');
@@ -400,7 +421,6 @@
       try{
         if(es) es.close();
         es = new EventSource(url);
-        es.onopen = ()=>{ /* ok */ };
         es.onmessage = async (ev)=>{
           try{
             const data = JSON.parse(ev.data);
@@ -423,6 +443,19 @@
     };
     open();
   }
+
+  // QR modal
+  const qrModal = byId('qrModal'), qrFrame = byId('qrFrame'), qrReload = byId('qrReload'), qrClose = byId('qrClose'), openQR = byId('openQR'), qrExternal = byId('qrExternal');
+  function openQrModal(){
+    const base = window.PIXELUP.REPLIT_DIRECT;
+    const url = base + '/qr' + '?t=' + Date.now();     // cache-buster
+    qrFrame.src = url;
+    qrExternal.href = url;
+    qrModal.classList.add('open');
+  }
+  openQR.onclick = ()=>{ openQrModal(); };
+  qrReload.onclick = ()=>{ openQrModal(); };
+  qrClose.onclick = ()=>{ qrModal.classList.remove('open'); };
 
   // ===== Gemini =====
   function getGeminiKey(){ return (state.aiKey||'').trim(); }
@@ -477,7 +510,28 @@
     }
   }
 
-  // ===== Mentoria (ordem correta + auto-load .docx) =====
+  // ===== Mentoria (conteúdo base + auto-load .docx) =====
+  const seedMentoria = {
+    m1: `<h4>Persona e Fundamentos do Negócio</h4>
+         <p>Defina claramente seu cliente ideal: dores, desejos, linguagem e canais.</p>
+         <ul><li>Proposta de valor</li><li>Diferenciais</li><li>Oferta e promessa</li></ul>`,
+    m2: `<h4>Algoritmo do Meta</h4>
+         <p>Como o algoritmo decide entrega: engajamento, retenção, relevância.</p>
+         <ul><li>Boas práticas de conteúdo</li><li>Gatilhos de parada</li><li>CTAs</li></ul>`,
+    m3: `<h4>Cronograma e Calendário Editorial</h4>
+         <p>Organize posts por tema, formato e objetivo.</p>
+         <ul><li>Estrutura semanal</li><li>Métricas de consistência</li></ul>`,
+    m4: `<h4>Conteúdo Visual</h4>
+         <p>Hook em 3s, storyboard, cortes dinâmicos, hierarquia visual.</p>`,
+    m5: `<h4>Copy com IA</h4>
+         <p>Prompt base com objetivo, público, tom, formato. Ajustes com exemplos.</p>`,
+    m6: `<h4>CRM e Organização Comercial</h4>
+         <p>Pipeline: Lead → Qualificando → Proposta → Fechado. Rotinas e follow-up.</p>`,
+    m7: `<h4>Técnicas de Vendas</h4>
+         <p>Rapport (espelhamento, escuta ativa), perguntas abertas, fechamento sem pressão.</p>`,
+    m8: `<h4>Implementação de CRM + Tráfego Pago</h4>
+         <p>Integração com WhatsApp, gatilhos automáticos, campanhas por objetivo.</p>`
+  };
   const modulesSeed = [
     {id:'m1', title:'Módulo 1 — Persona e Fundamentos do Negócio'},
     {id:'m2', title:'Módulo 2 — Algoritmo do Meta'},
@@ -491,7 +545,11 @@
   const modulesList = byId('modulesList'), lessonTitle = byId('lessonTitle'), lessonBody = byId('lessonBody');
   let currentModule = null;
   function modKey(id){ return 'px_mod_'+id; }
-  function loadMod(id){ return ls.get(modKey(id), {html:'(sem conteúdo — importe o .docx deste módulo ou suba /mentoria/'+id.replace('m','m')+'.docx)'}) }
+  function loadMod(id){
+    const saved = ls.get(modKey(id), null);
+    if(saved && saved.html) return saved;
+    return {html: seedMentoria[id] || '(sem conteúdo — importe o .docx deste módulo ou suba /mentoria/'+id+'.docx)'};
+  }
   function saveMod(id,html){ ls.set(modKey(id), {html}); }
   async function tryFetchDocx(id){
     try{
@@ -506,21 +564,17 @@
   async function selectModule(m){
     currentModule = m.id;
     lessonTitle.textContent = m.title;
-    // tenta carregar automático uma vez se não tiver conteúdo salvo
-    const saved = loadMod(m.id);
-    if(saved && saved.html && !/sem conteúdo/.test(saved.html)){
-      lessonBody.innerHTML = saved.html;
-    }else{
-      const ok = await tryFetchDocx(m.id);
-      const after = loadMod(m.id);
-      lessonBody.innerHTML = ok ? after.html : saved.html;
-    }
+    const base = loadMod(m.id);
+    lessonBody.innerHTML = base.html;
+    // tenta substituir pelo DOCX se existir
+    const ok = await tryFetchDocx(m.id);
+    if(ok){ const after = loadMod(m.id); lessonBody.innerHTML = after.html; }
   }
   function renderModules(){
     modulesList.innerHTML = '';
     modulesSeed.forEach(m=>{
       const b = document.createElement('button');
-      b.className = 'btn secondary'; b.style.margin='4px'; b.textContent = m.title;
+      b.className = 'btn secondary'; b.style.width='100%'; b.textContent = m.title;
       b.onclick = ()=> selectModule(m);
       modulesList.appendChild(b);
     });
