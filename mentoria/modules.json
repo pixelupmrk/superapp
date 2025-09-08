@@ -1,0 +1,130 @@
+[
+  {
+    "id": "m1",
+    "title": "Módulo 1 — Persona e Fundamentos do Negócio",
+    "lessons": [
+      {
+        "id": "m1l1",
+        "title": "Definição de Persona",
+        "content": "# Persona\\n\\nDescreva claramente seu cliente ideal.\\n- Dor principal\\n- Desejos e objeções\\n- Linguagem e canais preferidos"
+      },
+      {
+        "id": "m1l2",
+        "title": "Proposta de Valor",
+        "content": "**O que torna sua oferta única?** Liste benefícios tangíveis e intangíveis."
+      }
+    ]
+  },
+  {
+    "id": "m2",
+    "title": "Módulo 2 — Algoritmo do Meta (Facebook/Instagram)",
+    "lessons": [
+      {
+        "id": "m2l1",
+        "title": "Como o algoritmo decide a entrega",
+        "content": "Sinais: engajamento, retenção, tempo de sessão, relevância."
+      },
+      {
+        "id": "m2l2",
+        "title": "Boas práticas de conteúdo",
+        "content": "- Gatilhos de parada\\n- CTAs claros\\n- Testes A/B"
+      }
+    ]
+  },
+  {
+    "id": "m3",
+    "title": "Módulo 3 — Cronograma e Calendário Editorial",
+    "lessons": [
+      {
+        "id": "m3l1",
+        "title": "Estrutura de calendário",
+        "content": "Organize posts por tema, formato e objetivo."
+      },
+      {
+        "id": "m3l2",
+        "title": "Métricas de consistência",
+        "content": "Taxa de publicação, frequência mínima, cadência."
+      }
+    ]
+  },
+  {
+    "id": "m4",
+    "title": "Módulo 4 — Conteúdo Visual (vídeo e imagem)",
+    "lessons": [
+      {
+        "id": "m4l1",
+        "title": "Roteiro e captação",
+        "content": "Storyboard, **hook** em 3s, cortes dinâmicos."
+      },
+      {
+        "id": "m4l2",
+        "title": "Design que converte",
+        "content": "Contraste, tipografia, hierarquia e *branding*."
+      }
+    ]
+  },
+  {
+    "id": "m5",
+    "title": "Módulo 5 — Copy com IA (ChatGPT)",
+    "lessons": [
+      {
+        "id": "m5l1",
+        "title": "Prompt base",
+        "content": "Estrutura com objetivo, público, tom e formato."
+      },
+      {
+        "id": "m5l2",
+        "title": "Ajustes finos",
+        "content": "Refine com exemplos e *few-shot*."
+      }
+    ]
+  },
+  {
+    "id": "m6",
+    "title": "Módulo 6 — CRM e Organização Comercial",
+    "lessons": [
+      {
+        "id": "m6l1",
+        "title": "Pipeline simples",
+        "content": "Kanban: Lead → Qualificando → Proposta → Fechou."
+      },
+      {
+        "id": "m6l2",
+        "title": "Follow-up e rotinas",
+        "content": "Sequências e lembretes."
+      }
+    ]
+  },
+  {
+    "id": "m7",
+    "title": "Módulo 7 — Técnicas de Vendas (rapport e conexão)",
+    "lessons": [
+      {
+        "id": "m7l1",
+        "title": "Rapport prático",
+        "content": "*Espelhamento*, *escuta ativa*, perguntas abertas."
+      },
+      {
+        "id": "m7l2",
+        "title": "Fechamento",
+        "content": "Tratamento de objeções e *closing* sem pressão."
+      }
+    ]
+  },
+  {
+    "id": "m8",
+    "title": "Módulo 8 — Implementação de CRM + Tráfego Pago",
+    "lessons": [
+      {
+        "id": "m8l1",
+        "title": "Integração com WhatsApp",
+        "content": "Conectar bot, gatilhos automáticos, registrar interações."
+      },
+      {
+        "id": "m8l2",
+        "title": "Playbook de campanhas",
+        "content": "Estruturas por objetivo e orçamento inicial."
+      }
+    ]
+  }
+]
