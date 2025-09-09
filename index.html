@@ -5,17 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>PixelUp SuperApp — Classic</title>
 <meta name="theme-color" content="#0b1a2a"/>
-
-<!-- GEMINI (também aceita ?gemini=CHAVE) -->
 <script>window.DEFAULT_GEMINI_KEY="AIzaSyCrc1EegT7xennoqk-s_m4JGUpb-Zxq6Qo";</script>
-
 <link rel="preconnect" href="https://generativelanguage.googleapis.com" crossorigin>
 <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
-
 <style>
   :root{--bg:#0b1118;--panel:#0f1b2a;--muted:#9bb3c7;--primary:#12b0ff;--primary2:#66d1ff;--accent:#00ffd5;--danger:#ff5d5d;--ok:#27c93f;--card:#0e1825;--border:#122235;--radius:16px;--shadow:0 8px 28px rgba(0,0,0,.35)}
-  *{box-sizing:border-box}
-  html,body{height:100%}
+  *{box-sizing:border-box} html,body{height:100%}
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:
        radial-gradient(1000px 600px at 10% -10%, rgba(18,176,255,.14), transparent 60%),
        radial-gradient(800px 500px at 110% 10%, rgba(0,255,213,.10), transparent 60%), var(--bg); color:#eaf6ff}
@@ -29,9 +24,7 @@
   main{max-width:1250px;margin:24px auto;padding:0 16px}
   section.panel{display:none;background:rgba(15,27,42,.6);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:18px}
   section.panel.active{display:block}
-  .grid{display:grid;gap:16px}
-  .g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid{display:grid;gap:16px}.g-3{grid-template-columns:repeat(3,minmax(0,1fr))}.g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
   .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
   .btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#001726;border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600;box-shadow:0 10px 22px rgba(0,0,0,.35),0 2px 0 rgba(0,0,0,.2) inset}
   .btn.secondary{background:#0b1522;color:#dff2ff;border:1px solid var(--border);box-shadow:none}
@@ -51,7 +44,7 @@
   .empty{color:#89a;font-style:italic}
   @media (max-width:1100px){.kanban{grid-template-columns:1fr}.thread{max-height:unset}}
 
-  /* Modal QR (imagem, sem iframe) */
+  /* Modal QR */
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:60}
   .modal .box{background:#0b1522;border:1px solid var(--border);border-radius:16px;max-width:520px;width:100%;padding:16px;text-align:center}
   .modal .box header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -63,10 +56,10 @@
   <header class="topbar">
     <div class="brand"><span class="dot"></span> PixelUp SuperApp</div>
     <nav class="tabs" id="tabs">
-      <button data-tab="home" class="active">Home</button>
-      <button data-tab="crm">CRM</button>
-      <button data-tab="mentoria">Mentoria</button>
-      <button data-tab="config">Configurações</button>
+      <button class="active" onclick="window.activateTab('home')">Home</button>
+      <button onclick="window.activateTab('crm')">CRM</button>
+      <button onclick="window.activateTab('mentoria')">Mentoria</button>
+      <button onclick="window.activateTab('config')">Configurações</button>
     </nav>
   </header>
 
@@ -76,9 +69,9 @@
       <div class="landing">
         <img src="./logo.jpg" alt="PixelUp" onerror="this.style.display='none'"/>
         <div class="actions">
-          <button class="btn" data-goto="crm">Abrir CRM</button>
-          <button class="btn secondary" data-goto="mentoria">Mentoria</button>
-          <button class="btn secondary" data-goto="config">Configurações</button>
+          <button class="btn" onclick="window.activateTab('crm')">Abrir CRM</button>
+          <button class="btn secondary" onclick="window.activateTab('mentoria')">Mentoria</button>
+          <button class="btn secondary" onclick="window.activateTab('config')">Configurações</button>
         </div>
       </div>
     </section>
@@ -201,40 +194,31 @@
 <script>
 /* ===== CONFIG ===== */
 window.PIXELUP = {
-  WA_BASE: "/api/wa",                                    // proxy (Vercel → Replit)
+  WA_BASE: "/api/wa",
   REPLIT_DIRECT: "https://pixelup-wa-server.pixelupmrkt.repl.co",
   GEMINI_MODEL: "gemini-2.0-flash"
 };
 
-/* ===== Helpers/State ===== */
-const $ = s => document.querySelector(s), byId=id=>document.getElementById(id);
-const esc = s => (s||'').replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));
-const norm = p => (''+(p||'')).replace(/[^0-9]/g,'');
-const ls = { get(k,d){ try{return JSON.parse(localStorage.getItem(k)) ?? d;}catch{ return d; }}, set(k,v){ localStorage.setItem(k, JSON.stringify(v)); } };
-const qparam = k => new URLSearchParams(location.search).get(k);
-
-const state = {
-  userName: ls.get('px_user_name',''),
-  aiKey: (qparam('gemini') || (window.DEFAULT_GEMINI_KEY||'')).trim(),
-  contacts: ls.get('px_contacts', {}),
-  threads:  ls.get('px_threads', {}),
-  botMap:   ls.get('px_bot_map', {}),
-  current: null,
-  search: ''
-};
-
-/* ===== Tabs ===== */
+/* ===== Navegação robusta ===== */
 function activateTab(tab){
-  document.querySelectorAll('nav#tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
-  document.querySelectorAll('section.panel').forEach(p => p.classList.remove('active'));
-  const el = byId('panel-'+tab); if(el) el.classList.add('active');
-  if(tab==='crm'){ renderKanban(); renderThread(null); refreshCounters(); runDiagnostics(); }
+  document.querySelectorAll('nav#tabs button').forEach(b=>b.classList.toggle('active', b.textContent.toLowerCase().includes(tab)));
+  document.querySelectorAll('section.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+tab));
+  if(tab==='crm'){ try{ renderKanban(); renderThread(null); refreshCounters(); runDiagnostics(); }catch(e){} }
 }
-document.addEventListener('click', (e)=>{
-  const t = e.target;
-  if(t.matches('nav#tabs button[data-tab]')) activateTab(t.dataset.tab);
-  if(t.matches('[data-goto]')) activateTab(t.dataset.goto);
-});
+window.activateTab = activateTab; // <-- disponível no HTML
+document.addEventListener('DOMContentLoaded', ()=>activateTab('home'));
+
+/* ===== Helpers/State ===== */
+const $=s=>document.querySelector(s), byId=id=>document.getElementById(id);
+const esc=s=>(s||'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const norm=p=>(''+(p||'')).replace(/[^0-9]/g,'');
+const ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d;}catch{return d;}},set(k,v){localStorage.setItem(k,JSON.stringify(v));}};
+const qparam=k=>new URLSearchParams(location.search).get(k);
+
+const state={userName:ls.get('px_user_name',''),
+  aiKey:(qparam('gemini')||(window.DEFAULT_GEMINI_KEY||'')).trim(),
+  contacts:ls.get('px_contacts',{}), threads:ls.get('px_threads',{}), botMap:ls.get('px_bot_map',{}),
+  current:null, search:''};
 
 /* ===== CRM ===== */
 const cName=byId('cName'), cEmail=byId('cEmail'), cPhone=byId('cPhone'), cOrigin=byId('cOrigin'), cNotes=byId('cNotes');
@@ -243,43 +227,40 @@ const kanban=byId('kanban'), thread=byId('thread'), threadTitle=byId('threadTitl
 const msgText=byId('msgText'), sendMsg=byId('sendMsg');
 const botBadge=byId('botBadge'), toggleBot=byId('toggleBot'), waStatusText=byId('waStatusText');
 
-btnAdd.onclick = ()=>{
-  const phone = norm(cPhone.value.trim()); if(!phone){ alert('Telefone é obrigatório'); return; }
-  const rec = state.contacts[phone] || {};
-  state.contacts[phone] = { phone, name:(cName.value||'').trim()||phone, email:(cEmail.value||'').trim(),
-    origin:(cOrigin.value||'WhatsApp'), notes:(cNotes.value||'').trim(), stage: rec.stage||'novo',
-    lastText: rec.lastText||'', lastTs: rec.lastTs||Date.now() };
-  ls.set('px_contacts', state.contacts);
+btnAdd.onclick=()=>{
+  const phone=norm(cPhone.value.trim()); if(!phone){alert('Telefone é obrigatório');return;}
+  const rec=state.contacts[phone]||{};
+  state.contacts[phone]={phone,name:(cName.value||'').trim()||phone,email:(cEmail.value||'').trim(),
+    origin:(cOrigin.value||'WhatsApp'),notes:(cNotes.value||'').trim(),stage:rec.stage||'novo',
+    lastText:rec.lastText||'',lastTs:rec.lastTs||Date.now()};
+  ls.set('px_contacts',state.contacts);
   cName.value=cEmail.value=cPhone.value=cNotes.value='';
   renderKanban(); refreshCounters();
 };
-search.oninput = ()=>{ state.search=search.value.toLowerCase(); renderKanban(); };
-clearSearch.onclick = ()=>{ search.value=''; state.search=''; renderKanban(); };
+search.oninput=()=>{state.search=search.value.toLowerCase();renderKanban();};
+clearSearch.onclick=()=>{search.value='';state.search='';renderKanban();};
 
-sendMsg.onclick = async ()=>{
-  const phone = state.current, text = msgText.value.trim(); if(!phone||!text) return;
-  await waSend({to:phone, text});
-  pushMsg(phone,{who:'me',text,ts:Date.now()});
-  msgText.value=''; renderThread(phone);
-  touchContact(phone,{lastText:text});
+sendMsg.onclick=async()=>{
+  const phone=state.current, text=msgText.value.trim(); if(!phone||!text) return;
+  await waSend({to:phone,text}); pushMsg(phone,{who:'me',text,ts:Date.now()});
+  msgText.value=''; renderThread(phone); touchContact(phone,{lastText:text});
 };
-toggleBot.onclick = ()=>{ const p=state.current; if(!p) return; state.botMap[p]=!state.botMap[p]; ls.set('px_bot_map',state.botMap); setBotBadge(p); };
-function setBotBadge(p){ const on=!!state.botMap[p]; botBadge.textContent='Bot: '+(on?'ON':'OFF'); toggleBot.textContent=on?'Desligar IA':'Ligar IA'; }
+toggleBot.onclick=()=>{const p=state.current;if(!p)return;state.botMap[p]=!state.botMap[p];ls.set('px_bot_map',state.botMap);setBotBadge(p);};
+function setBotBadge(p){const on=!!state.botMap[p];botBadge.textContent='Bot: '+(on?'ON':'OFF');toggleBot.textContent=on?'Desligar IA':'Ligar IA';}
 
-/* Kanban & Thread */
-function match(c){ if(!state.search) return true; const q=state.search; return [c.name,c.phone,c.email,c.origin,(c.notes||'')].join(' ').toLowerCase().includes(q); }
-function cardHTML(c){ return `<div class="card-k" draggable="true" data-phone="${c.phone}">
+function match(c){if(!state.search)return true;const q=state.search;return [c.name,c.phone,c.email,c.origin,(c.notes||'')].join(' ').toLowerCase().includes(q);}
+function cardHTML(c){return `<div class="card-k" draggable="true" data-phone="${c.phone}">
   <div class="icons"><span class="icon" data-action="open">💬</span><span class="icon" data-action="refresh">↻</span></div>
   <b>${esc(c.name||c.phone)}</b><br><span class="tiny muted">${esc(c.origin||'')}</span>
   ${c.email?`<div class="tiny muted">${esc(c.email)}</div>`:''}
-  <div class="tiny muted">${esc(c.lastText||'')}</div></div>`; }
+  <div class="tiny muted">${esc(c.lastText||'')}</div></div>`;}
 function renderKanban(){
-  const cols = ['novo','qualificando','proposta','fechado'];
+  const cols=['novo','qualificando','proposta','fechado'];
   kanban.querySelectorAll('.col').forEach((col,i)=>{
-    const st = cols[i]; const arr = Object.values(state.contacts).filter(c => (c.stage||'novo')===st && match(c))
-                 .sort((a,b)=>(b.lastTs||0)-(a.lastTs||0));
-    const head = `<h4>${col.querySelector('h4').textContent}</h4>`;
-    col.innerHTML = head + (arr.length?arr.map(cardHTML).join(''):`<div class="empty tiny">— sem cards —</div>`);
+    const st=cols[i];const arr=Object.values(state.contacts).filter(c=>(c.stage||'novo')===st&&match(c))
+      .sort((a,b)=>(b.lastTs||0)-(a.lastTs||0));
+    const head=`<h4>${col.querySelector('h4').textContent}</h4>`;
+    col.innerHTML=head+(arr.length?arr.map(cardHTML).join(''):`<div class="empty tiny">— sem cards —</div>`);
   });
   initDnD(); refreshCounters();
 }
@@ -289,194 +270,112 @@ function initDnD(){
     const p=card.dataset.phone;
     card.addEventListener('dragstart',()=>{dragEl=card;card.classList.add('drag')});
     card.addEventListener('dragend',()=>{card.classList.remove('drag');dragEl=null});
-    card.addEventListener('click',e=>{ if(e.target.classList.contains('icon')) return; state.current=p; renderThread(p); setBotBadge(p); });
+    card.addEventListener('click',e=>{if(e.target.classList.contains('icon'))return;state.current=p;renderThread(p);setBotBadge(p);});
     card.querySelectorAll('.icon').forEach(ic=>ic.addEventListener('click',e=>{
-      const a=ic.dataset.action; if(a==='open'){ state.current=p; renderThread(p); setBotBadge(p); }
-      if(a==='refresh'){ renderKanban(); } e.stopPropagation();
+      const a=ic.dataset.action; if(a==='open'){state.current=p;renderThread(p);setBotBadge(p);} if(a==='refresh'){renderKanban();} e.stopPropagation();
     }));
   });
   kanban.querySelectorAll('.col').forEach(col=>{
     col.addEventListener('dragover',e=>e.preventDefault());
-    col.addEventListener('drop',e=>{
-      e.preventDefault(); if(!dragEl) return;
-      const p=dragEl.dataset.phone, st=col.dataset.stage, c=state.contacts[p]; if(!c) return;
-      c.stage=st; state.contacts[p]=c; ls.set('px_contacts',state.contacts); renderKanban();
-    });
+    col.addEventListener('drop',e=>{e.preventDefault();if(!dragEl)return;const p=dragEl.dataset.phone,st=col.dataset.stage,c=state.contacts[p];if(!c)return;c.stage=st;state.contacts[p]=c;ls.set('px_contacts',state.contacts);renderKanban();});
   });
 }
 function renderThread(p){
-  thread.innerHTML='';
-  if(!p){ threadTitle.textContent='Conversa — selecione um card'; setBotBadge(null); return; }
-  const c=state.contacts[p]||{phone:p}; const agent=state.userName?` • Atendente: ${esc(state.userName)}`:'';
+  thread.innerHTML=''; if(!p){threadTitle.textContent='Conversa — selecione um card'; setBotBadge(null); return;}
+  const c=state.contacts[p]||{phone:p};const agent=state.userName?` • Atendente: ${esc(state.userName)}`:'';
   threadTitle.textContent=`Conversa — ${c.name||p} (${p})${agent}`; setBotBadge(p);
-  (state.threads[p]||[]).forEach(m=>{
-    const div=document.createElement('div'); div.className='msg '+(m.who==='me'?'me':'them');
-    const dt=new Date(m.ts||Date.now()).toLocaleString(); div.innerHTML=`<small class="muted">${dt}</small><br>${esc(m.text||'')}`;
-    thread.appendChild(div);
-  });
-  thread.scrollTop = thread.scrollHeight;
+  (state.threads[p]||[]).forEach(m=>{const d=document.createElement('div');d.className='msg '+(m.who==='me'?'me':'them');const dt=new Date(m.ts||Date.now()).toLocaleString();d.innerHTML=`<small class="muted">${dt}</small><br>${esc(m.text||'')}`;thread.appendChild(d);});
+  thread.scrollTop=thread.scrollHeight;
 }
-function pushMsg(p,m){ const a=state.threads[p]||[]; a.push(m); state.threads[p]=a; ls.set('px_threads',state.threads); }
-function upsert(p,patch){ const c=state.contacts[p]||{phone:p,stage:'novo',origin:'WhatsApp'}; state.contacts[p]={...c,...patch}; ls.set('px_contacts',state.contacts); }
-function touchContact(p,patch){ upsert(p,{lastTs:Date.now(),...patch}); renderKanban(); }
-function refreshCounters(){
-  const all = Object.values(state.contacts);
-  byId('mNovos').textContent = all.filter(c=>(c.stage||'novo')==='novo').length;
-  byId('mQuali').textContent = all.filter(c=>c.stage==='qualificando').length;
-  byId('mProp').textContent  = all.filter(c=>c.stage==='proposta').length;
-  byId('mFech').textContent  = all.filter(c=>c.stage==='fechado').length;
-}
+function pushMsg(p,m){const a=state.threads[p]||[];a.push(m);state.threads[p]=a;ls.set('px_threads',state.threads);}
+function upsert(p,patch){const c=state.contacts[p]||{phone:p,stage:'novo',origin:'WhatsApp'};state.contacts[p]={...c,...patch};ls.set('px_contacts',state.contacts);}
+function touchContact(p,patch){upsert(p,{lastTs:Date.now(),...patch});renderKanban();}
+function refreshCounters(){const all=Object.values(state.contacts);
+  byId('mNovos').textContent=all.filter(c=>(c.stage||'novo')==='novo').length;
+  byId('mQuali').textContent=all.filter(c=>c.stage==='qualificando').length;
+  byId('mProp').textContent=all.filter(c=>c.stage==='proposta').length;
+  byId('mFech').textContent=all.filter(c=>c.stage==='fechado').length;}
 
 /* ===== WhatsApp API ===== */
-async function waStatus(){
-  try{
-    const r = await fetch(`${window.PIXELUP.WA_BASE}/status`,{cache:'no-store'});
-    const j = await r.json();
-    waStatusText.textContent = 'Status: ' + (j.connected ? ('on' + (j.user?' ('+j.user+')':'')) : 'off');
-    return !!j.connected;
-  }catch{ waStatusText.textContent = 'Status: off'; return false; }
-}
-async function waSend({to,text}){
-  const r = await fetch(`${window.PIXELUP.WA_BASE}/send`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,text})});
-  try{ return await r.json(); }catch{ return {ok:false}; }
-}
+async function waStatus(){try{const r=await fetch(`${window.PIXELUP.WA_BASE}/status`,{cache:'no-store'});const j=await r.json();waStatusText.textContent='Status: '+(j.connected?('on'+(j.user?' ('+j.user+')':'')):'off');return !!j.connected;}catch{waStatusText.textContent='Status: off';return false;}}
+async function waSend({to,text}){const r=await fetch(`${window.PIXELUP.WA_BASE}/send`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,text})});try{return await r.json();}catch{return{ok:false};}}
 function waEvents(){
-  let es=null,tried=false;
-  const direct = window.PIXELUP.REPLIT_DIRECT + '/api/wa/events';
-  const proxy  = window.PIXELUP.WA_BASE + '/events';
-  const open = (url)=>{
-    try{
-      if(es) es.close();
-      es = new EventSource(url);
-      es.onmessage = async ev=>{
-        try{
-          const data = JSON.parse(ev.data);
-          if(data.type==='status'){ await waStatus(); }
-          if(data.type==='message'){
-            const p = (''+(data.from||'')).replace(/[^0-9]/g,''); if(!p) return;
-            upsert(p,{name:data.name||p,origin:'WhatsApp',lastText:data.text||'',lastTs:data.ts||Date.now()});
-            pushMsg(p,{who:'them',text:data.text||'',ts:data.ts||Date.now()});
-            if(state.current===p) renderThread(p);
-            if(state.botMap[p]) await botIA(p, data.text||'');
-            renderKanban();
-          }
-        }catch{}
-      };
-      es.onerror = ()=>{ es&&es.close(); if(!tried){tried=true; setTimeout(()=>open(proxy),600);} else { setTimeout(()=>open(direct),3000);} };
-    }catch{ if(!tried){tried=true; setTimeout(()=>open(proxy),600);} else { setTimeout(()=>open(direct),3000);} }
-  };
+  let es=null,tried=false;const direct=window.PIXELUP.REPLIT_DIRECT+'/api/wa/events', proxy=window.PIXELUP.WA_BASE+'/events';
+  const open=url=>{try{es&&es.close();es=new EventSource(url);es.onmessage=async ev=>{try{const d=JSON.parse(ev.data);
+        if(d.type==='status'){await waStatus();}
+        if(d.type==='message'){const p=(''+(d.from||'')).replace(/[^0-9]/g,''); if(!p)return;
+          upsert(p,{name:d.name||p,origin:'WhatsApp',lastText:d.text||'',lastTs:d.ts||Date.now()});
+          pushMsg(p,{who:'them',text:d.text||'',ts:d.ts||Date.now()});
+          if(state.current===p) renderThread(p);
+          if(state.botMap[p]) await botIA(p,d.text||'');
+          renderKanban();}}catch{}};
+      es.onerror=()=>{es&&es.close(); if(!tried){tried=true;setTimeout(()=>open(proxy),600);} else {setTimeout(()=>open(direct),3000);}};}
+    catch{if(!tried){tried=true;setTimeout(()=>open(proxy),600);} else {setTimeout(()=>open(direct),3000);}}};
   open(direct);
 }
 
 /* ===== QR (imagem) ===== */
 const qrModal=byId('qrModal'), qrImg=byId('qrImg'), qrMsg=byId('qrMsg'), qrReload=byId('qrReload'), qrClose=byId('qrClose'), openQR=byId('openQR'), qrExternal=byId('qrExternal');
 let qrPoll=null;
-async function findQrURL(){
-  const ts='t='+Date.now();
-  const tries=[`${window.PIXELUP.WA_BASE}/qr.png?${ts}`,`${window.PIXELUP.WA_BASE}/qr.svg?${ts}`,`${window.PIXELUP.WA_BASE}/qr?format=png&${ts}`];
-  for(const u of tries){
-    try{ const r=await fetch(u,{cache:'no-store'}); if(r.ok){ const ct=r.headers.get('content-type')||''; if(ct.includes('image')||u.endsWith('.png')||u.endsWith('.svg')) return u; } }catch{}
-  }
-  return null;
-}
+async function findQrURL(){const ts='t='+Date.now();const tries=[`${window.PIXELUP.WA_BASE}/qr.png?${ts}`,`${window.PIXELUP.WA_BASE}/qr.svg?${ts}`,`${window.PIXELUP.WA_BASE}/qr?format=png&${ts}`];
+  for(const u of tries){try{const r=await fetch(u,{cache:'no-store'});if(r.ok){const ct=r.headers.get('content-type')||'';if(ct.includes('image')||u.endsWith('.png')||u.endsWith('.svg')) return u;}}catch{}}
+  return null;}
 async function openQrModal(){
-  qrImg.src=''; qrMsg.textContent='Carregando QR…';
-  const prox = window.PIXELUP.REPLIT_DIRECT + '/qr.html?t='+Date.now(); // abre fora, se precisar
-  qrExternal.href = prox;
-
-  const url = await findQrURL();
-  if(url){
-    qrImg.src = url; qrMsg.textContent='Aponte a câmera do WhatsApp para este QR.';
+  qrImg.src=''; qrMsg.textContent='Carregando QR…'; qrExternal.href=window.PIXELUP.REPLIT_DIRECT+'/qr.html?t='+Date.now();
+  const url=await findQrURL();
+  if(url){ qrImg.src=url; qrMsg.textContent='Aponte a câmera do WhatsApp para este QR.';
     if(qrPoll) clearInterval(qrPoll);
-    qrPoll = setInterval(async ()=>{
-      const ok = await waStatus();
-      if(ok){ clearInterval(qrPoll); qrPoll=null; qrMsg.textContent='Conectado!'; }
-      else { const u=await findQrURL(); if(u) qrImg.src=u; }
-    }, 15000);
-  }else{
-    qrMsg.innerHTML='Não consegui carregar a imagem do QR pela API. Clique em <b>Abrir QR em nova aba</b>.';
-  }
+    qrPoll=setInterval(async()=>{const ok=await waStatus(); if(ok){clearInterval(qrPoll);qrPoll=null;qrMsg.textContent='Conectado!';} else {const u=await findQrURL(); if(u) qrImg.src=u;}},15000);
+  }else{ qrMsg.innerHTML='Não consegui carregar a imagem do QR pela API. Clique em <b>Abrir QR em nova aba</b>.'; }
   qrModal.classList.add('open');
 }
-qrReload.onclick = ()=> openQrModal();
-qrClose.onclick  = ()=>{ qrModal.classList.remove('open'); if(qrPoll) clearInterval(qrPoll); };
-openQR.onclick   = ()=> openQrModal();
+qrReload.onclick=()=>openQrModal();
+qrClose.onclick =()=>{qrModal.classList.remove('open'); if(qrPoll) clearInterval(qrPoll);};
+openQR.onclick  =()=>openQrModal();
 
 /* ===== Gemini (bot) ===== */
-function gemKey(){ return (state.aiKey||'').trim(); }
-async function gemCall(prompt,json){
-  const key=gemKey(); if(!key) return json?null:'';
-  const url=`https://generativelanguage.googleapis.com/v1beta/models/${window.PIXELUP.GEMINI_MODEL}:generateContent`;
+function gemKey(){return(state.aiKey||'').trim();}
+async function gemCall(prompt,json){const key=gemKey(); if(!key) return json?null:''; const url=`https://generativelanguage.googleapis.com/v1beta/models/${window.PIXELUP.GEMINI_MODEL}:generateContent`;
   const body=json?{contents:[{parts:[{text:prompt}]}],generationConfig:{response_mime_type:"application/json"}}:{contents:[{parts:[{text:prompt}]}]};
-  try{
-    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)});
-    if(!r.ok) return json?null:''; const j=await r.json(); const t=j?.candidates?.[0]?.content?.parts?.[0]?.text||'';
-    if(json){ try{return JSON.parse(t);}catch{return null;} } return t.trim();
-  }catch{ return json?null:''; }
-}
-async function botIA(p, textIn){
-  const ext=await gemCall(`Extraia JSON curto: nome, email, necessidade, orcamento, prazo (pode faltar). Msg: "${textIn}"`, true);
-  if(ext){
-    const notes=[ext.nome?`Nome: ${ext.nome}`:'',ext.email?`Email: ${ext.email}`:'',ext.necessidade?`Necessidade: ${ext.necessidade}`:'',ext.orcamento?`Orçamento: ${ext.orcamento}`:'',ext.prazo?`Prazo: ${ext.prazo}`:''].filter(Boolean).join(' | ');
-    const c=state.contacts[p]||{phone:p};
-    state.contacts[p]={...c,name:c.name||ext.nome||p,email:c.email||ext.email||'',notes:notes||c.notes||'',lastText:textIn,lastTs:Date.now()};
-    ls.set('px_contacts',state.contacts); renderKanban(); if(state.current===p) renderThread(p);
-  }
+  try{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)}); if(!r.ok) return json?null:''; const j=await r.json(); const t=j?.candidates?.[0]?.content?.parts?.[0]?.text||''; if(json){try{return JSON.parse(t);}catch{return null;}} return t.trim();}catch{return json?null:'';}}
+async function botIA(p,textIn){
+  const ext=await gemCall(`Extraia JSON curto: nome, email, necessidade, orcamento, prazo (pode faltar). Msg: "${textIn}"`,true);
+  if(ext){const notes=[ext.nome?`Nome: ${ext.nome}`:'',ext.email?`Email: ${ext.email}`:'',ext.necessidade?`Necessidade: ${ext.necessidade}`:'',ext.orcamento?`Orçamento: ${ext.orcamento}`:'',ext.prazo?`Prazo: ${ext.prazo}`:''].filter(Boolean).join(' | ');
+    const c=state.contacts[p]||{phone:p}; state.contacts[p]={...c,name:c.name||ext.nome||p,email:c.email||ext.email||'',notes:notes||c.notes||'',lastText:textIn,lastTs:Date.now()};
+    ls.set('px_contacts',state.contacts); renderKanban(); if(state.current===p) renderThread(p);}
   const reply=await gemCall("Atue como atendente virtual da PixelUp. Peça educadamente os dados que faltam (nome, e-mail, necessidade, orçamento, prazo). Se pedirem humano, diga que vai acionar o atendimento.\n\nMensagem: "+textIn,false);
-  if(reply){ await waSend({to:p,text:reply}); pushMsg(p,{who:'me',text:reply,ts:Date.now()}); if(state.current===p) renderThread(p); }
+  if(reply){await waSend({to:p,text:reply}); pushMsg(p,{who:'me',text:reply,ts:Date.now()}); if(state.current===p) renderThread(p);}
 }
 
 /* ===== Mentoria ===== */
-const seedMods=[
-  {id:'m1',t:'Módulo 1 — Persona e Fundamentos do Negócio',h:'<h4>Persona</h4><p>Defina seu cliente ideal…</p>'},
-  {id:'m2',t:'Módulo 2 — Algoritmo do Meta',h:'<h4>Algoritmo</h4><p>Entenda sinais de entrega…</p>'},
-  {id:'m3',t:'Módulo 3 — Calendário Editorial',h:'<h4>Calendário</h4><p>Temas, formatos, metas…</p>'},
-  {id:'m4',t:'Módulo 4 — Conteúdo Visual',h:'<h4>Visual</h4><p>Hook, cortes, ritmo…</p>'},
-  {id:'m5',t:'Módulo 5 — Copy com IA',h:'<h4>Copy</h4><p>Estrutura de prompts…</p>'},
-  {id:'m6',t:'Módulo 6 — CRM e Rotina Comercial',h:'<h4>CRM</h4><p>Pipeline e follow-up…</p>'},
-  {id:'m7',t:'Módulo 7 — Técnicas de Vendas',h:'<h4>Vendas</h4><p>Rapport, objeções…</p>'},
-  {id:'m8',t:'Módulo 8 — Implementação + Tráfego',h:'<h4>Implementação</h4><p>Integração WhatsApp + Ads…</p>'}
-];
+const seedMods=[{id:'m1',t:'Módulo 1 — Persona e Fundamentos do Negócio',h:'<h4>Persona</h4><p>Defina seu cliente ideal…</p>'},
+{id:'m2',t:'Módulo 2 — Algoritmo do Meta',h:'<h4>Algoritmo</h4><p>Entenda sinais de entrega…</p>'},
+{id:'m3',t:'Módulo 3 — Calendário Editorial',h:'<h4>Calendário</h4><p>Temas, formatos, metas…</p>'},
+{id:'m4',t:'Módulo 4 — Conteúdo Visual',h:'<h4>Visual</h4><p>Hook, cortes, ritmo…</p>'},
+{id:'m5',t:'Módulo 5 — Copy com IA',h:'<h4>Copy</h4><p>Estrutura de prompts…</p>'},
+{id:'m6',t:'Módulo 6 — CRM e Rotina Comercial',h:'<h4>CRM</h4><p>Pipeline e follow-up…</p>'},
+{id:'m7',t:'Módulo 7 — Técnicas de Vendas',h:'<h4>Vendas</h4><p>Rapport, objeções…</p>'},
+{id:'m8',t:'Módulo 8 — Implementação + Tráfego',h:'<h4>Implementação</h4><p>Integração WhatsApp + Ads…</p>'}];
 const modulesList=byId('modulesList'), lessonTitle=byId('lessonTitle'), lessonBody=byId('lessonBody'); let currentModule=null;
-function mkey(id){ return 'px_mod_'+id; }
-function loadMod(id){ const s=ls.get(mkey(id),null); return s && s.html ? s.html : (seedMods.find(x=>x.id===id)?.h || '(sem conteúdo)'); }
-function saveMod(id,html){ ls.set(mkey(id),{html}); }
-function renderModules(){ modulesList.innerHTML=''; seedMods.forEach(m=>{ const b=document.createElement('button'); b.className='btn secondary'; b.style.width='100%'; b.textContent=m.t; b.onclick=()=>selectModule(m); modulesList.appendChild(b); }); }
-async function selectModule(m){
-  currentModule=m.id; lessonTitle.textContent=m.t; lessonBody.innerHTML=loadMod(m.id);
-  try{
-    const res=await fetch(`/mentoria/${m.id}.docx`,{cache:'no-store'});
-    if(res.ok){ const ab=await res.arrayBuffer(); const html=(await window.mammoth.convertToHtml({arrayBuffer:ab})).value||''; if(html){ saveMod(m.id,html); lessonBody.innerHTML=html; } }
-  }catch{}
-}
-byId('importDocx').onclick=async()=>{
-  const f=byId('docxInput').files?.[0]; if(!f) return alert('Selecione um .docx');
-  if(!currentModule) return alert('Escolha um módulo à esquerda');
-  try{ const ab=await f.arrayBuffer(); const html=(await window.mammoth.convertToHtml({arrayBuffer:ab})).value||'(vazio)'; saveMod(currentModule,html); lessonBody.innerHTML=html; alert('Conteúdo importado!'); }catch{ alert('Falha ao ler .docx'); }
-};
+function mkey(id){return'px_mod_'+id;} function loadMod(id){const s=ls.get(mkey(id),null); return s&&s.html?s.html:(seedMods.find(x=>x.id===id)?.h||'(sem conteúdo)');}
+function saveMod(id,html){ls.set(mkey(id),{html});}
+function renderModules(){modulesList.innerHTML='';seedMods.forEach(m=>{const b=document.createElement('button');b.className='btn secondary';b.style.width='100%';b.textContent=m.t;b.onclick=()=>selectModule(m);modulesList.appendChild(b);});}
+async function selectModule(m){currentModule=m.id;lessonTitle.textContent=m.t;lessonBody.innerHTML=loadMod(m.id);
+  try{const res=await fetch(`/mentoria/${m.id}.docx`,{cache:'no-store'}); if(res.ok){const ab=await res.arrayBuffer(); const html=(await window.mammoth.convertToHtml({arrayBuffer:ab})).value||''; if(html){saveMod(m.id,html);lessonBody.innerHTML=html;}}}catch{}}
+byId('importDocx').onclick=async()=>{const f=byId('docxInput').files?.[0]; if(!f) return alert('Selecione um .docx'); if(!currentModule) return alert('Escolha um módulo à esquerda');
+  try{const ab=await f.arrayBuffer(); const html=(await window.mammoth.convertToHtml({arrayBuffer:ab})).value||'(vazio)'; saveMod(currentModule,html); lessonBody.innerHTML=html; alert('Conteúdo importado!');}catch{alert('Falha ao ler .docx');}};
 renderModules();
 
 /* ===== Config ===== */
-const userName=byId('userName'), saveUser=byId('saveUser');
-userName.value = state.userName || '';
-saveUser.onclick = ()=>{ state.userName=(userName.value||'').trim(); ls.set('px_user_name',state.userName); alert('Nome salvo!'); };
+const userName=byId('userName'), saveUser=byId('saveUser'); userName.value=state.userName||''; saveUser.onclick=()=>{state.userName=(userName.value||'').trim(); ls.set('px_user_name',state.userName); alert('Nome salvo!');};
 
 /* ===== Diagnóstico ===== */
-async function runDiagnostics(){
-  const lines=[];
-  try{ const r=await fetch(`${window.PIXELUP.WA_BASE}/status`,{cache:'no-store'}); const j=await r.json(); lines.push(`Proxy /api/wa/status: ${r.ok?'OK':'FAIL'} ${r.ok?JSON.stringify(j):''}`);}catch{ lines.push('Proxy /api/wa/status: FAIL'); }
-  try{ await fetch(window.PIXELUP.REPLIT_DIRECT+'/api/wa/status',{mode:'no-cors'}); lines.push('Replit /api/wa/status: tentativa enviada'); }catch{ lines.push('Replit /api/wa/status: FAIL'); }
-  byId('diagBox').innerText = lines.join(' | ');
-}
+async function runDiagnostics(){const out=[]; try{const r=await fetch(`${window.PIXELUP.WA_BASE}/status`,{cache:'no-store'});const j=await r.json(); out.push(`Proxy /api/wa/status: ${r.ok?'OK':'FAIL'} ${r.ok?JSON.stringify(j):''}`);}catch{out.push('Proxy /api/wa/status: FAIL');}
+  try{await fetch(window.PIXELUP.REPLIT_DIRECT+'/api/wa/status',{mode:'no-cors'}); out.push('Replit /api/wa/status: tentativa enviada');}catch{out.push('Replit /api/wa/status: FAIL');}
+  byId('diagBox').innerText=out.join(' | ');}
 
 /* ===== Boot ===== */
-function boot(){
-  try{
-    activateTab('home'); // garante que a Home aparece
-    waEvents(); waStatus(); renderKanban(); renderThread(null); refreshCounters(); runDiagnostics();
-  }catch(e){ console.error(e); alert('Erro ao iniciar a UI. Atualize a página.'); }
-}
-document.addEventListener('DOMContentLoaded', boot);
+try{waEvents(); waStatus(); renderKanban(); renderThread(null); refreshCounters(); runDiagnostics();}catch(e){console.error(e);}
 </script>
 
 <footer class="muted" style="text-align:center;padding:20px">© PixelUp — SuperApp Classic</footer>
