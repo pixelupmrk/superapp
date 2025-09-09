@@ -2,7 +2,6 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/api/wa/:path*", "destination": "https://pixelup-wa-server.pixelupmrkt.repl.co/api/wa/:path*" },
-    { "source": "/api/qr.html",   "destination": "https://pixelup-wa-server.pixelupmrkt.repl.co/qr.html" },
     { "source": "/api/:path*",    "destination": "https://pixelup-wa-server.pixelupmrkt.repl.co/:path*" }
   ]
 }
