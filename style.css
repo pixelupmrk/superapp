@@ -79,111 +79,6 @@ body {
 /* --- Conteúdo Principal --- */
 .main-content {
     flex-grow: 1;
-    margin-left: var(--sidebar-width); /* Espaço para a sidebar */
-    padding: 2rem;
-}
-
-.main-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.main-header h1 {
-    font-size: 2rem;
-}
-
-.user-profile {
-    font-weight: 600;
-}
-
-.content-area {
-    background-color: var(--primary-color);
-    padding: 2rem;
-    border-radius: 12px;
-    min-height: 80vh;
-}@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-
-:root {
-    --background-color: #0d1117;
-    --primary-color: #0a192f;
-    --secondary-color: #162b4d;
-    --accent-color: #00f7ff; /* Azul Neon Forte */
-    --text-color: #cdd6f4;
-    --text-color-muted: #8892b0;
-    --border-glow: rgba(0, 247, 255, 0.5);
-    --sidebar-width: 250px;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--background-color);
-    color: var(--text-color);
-}
-
-.app-container {
-    display: flex;
-}
-
-/* --- Sidebar --- */
-.sidebar {
-    width: var(--sidebar-width);
-    height: 100vh;
-    background-color: var(--primary-color);
-    border-right: 1px solid var(--secondary-color);
-    display: flex;
-    flex-direction: column;
-    padding: 1.5rem;
-    position: fixed;
-}
-
-.sidebar-header .logo {
-    max-width: 120px;
-    margin-bottom: 3rem;
-}
-
-.sidebar-nav {
-    flex-grow: 1;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    padding: 0.9rem 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    color: var(--text-color-muted);
-    transition: all 0.3s ease;
-}
-
-.nav-item:hover {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-}
-
-.nav-item.active {
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    font-weight: 600;
-    box-shadow: 0 0 15px var(--border-glow);
-}
-
-.nav-item i {
-    font-size: 1.5rem;
-    margin-right: 1rem;
-}
-
-/* --- Conteúdo Principal --- */
-.main-content {
-    flex-grow: 1;
     margin-left: var(--sidebar-width);
     padding: 2rem;
 }
@@ -245,13 +140,14 @@ body {
 }
 
 .kanban-card {
+    position: relative;
     background-color: var(--primary-color);
     padding: 1rem;
     border-radius: 8px;
     border: 1px solid var(--secondary-color);
     margin-bottom: 0.75rem;
     cursor: grab;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .kanban-card:active {
@@ -287,7 +183,14 @@ body {
     cursor: pointer;
     font-weight: 700;
     transition: all 0.2s ease;
-}/* Estilos para o novo formulário de Leads */
+}
+
+.new-lead-form button:hover {
+    opacity: 0.9;
+    box-shadow: 0 0 10px var(--border-glow);
+}
+
+/* Estilos para o novo formulário de Leads */
 
 .card {
     background-color: var(--secondary-color);
@@ -368,10 +271,6 @@ body {
     transform: translateY(-2px);
 }
 
-.new-lead-form button:hover {
-    opacity: 0.9;
-    box-shadow: 0 0 10px var(--border-glow);
-}
 /* Estilos para o Modal de Edição */
 .modal-overlay {
     position: fixed;
@@ -442,4 +341,24 @@ body {
 .btn-cancel:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
+}
+
+/* Estilos para o botão de exclusão */
+.delete-card-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    color: var(--text-color-muted);
+    cursor: pointer;
+    font-size: 1.2rem;
+    opacity: 0.7;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.delete-card-btn:hover {
+    color: #ff5f5f;
+    transform: scale(1.1);
+    opacity: 1;
 }
