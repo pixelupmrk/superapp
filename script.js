@@ -78,14 +78,19 @@ document.addEventListener('DOMContentLoaded', () => {
             nome: document.getElementById('lead-name').value,
             whatsapp: document.getElementById('lead-whatsapp').value,
             origem: document.getElementById('lead-origin').value,
-            qualificacao: document.getElementById('lead-qualification').value
+            qualificacao: document.getElementById('lead-qualification').value,
         };
 
         const newCard = document.createElement('div');
         newCard.classList.add('kanban-card');
         newCard.draggable = true;
         
-        // Criando o conteúdo do card com os dados do formulário
+        // Salvando os dados no próprio HTML do card (data attributes)
+        newCard.setAttribute('data-name', newLead.nome);
+        newCard.setAttribute('data-whatsapp', newLead.whatsapp);
+        newCard.setAttribute('data-origem', newLead.origem);
+        newCard.setAttribute('data-qualificacao', newLead.qualificacao);
+
         newCard.innerHTML = `
             <strong>${newLead.nome}</strong><br>
             <small>WhatsApp: ${newLead.whatsapp}</small><br>
@@ -95,5 +100,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
         kanbanCardsListNovo.appendChild(newCard);
         leadForm.reset();
+    });
+
+    // Lógica para o Modal de Edição
+    const editModal = document.getElementById('edit-lead-modal');
+    const editForm = document.getElementById('edit-lead-form');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    let currentCard = null;
+
+    kanbanBoard.addEventListener('click', (e) => {
+        const card = e.target.closest('.kanban-card');
+        if (card) {
+            currentCard = card;
+            // Preenche o formulário com os dados do card
+            document.getElementById('edit-lead-name').value = card.getAttribute('data-name');
+            document.getElementById('edit-lead-whatsapp').value = card.getAttribute('data-whatsapp');
+            document.getElementById('edit-lead-origem').value = card.getAttribute('data-origem');
+            document.getElementById('edit-lead-qualification').value = card.getAttribute('data-qualificacao');
+            
+            // Exibe o modal
+            editModal.style.display = 'flex';
+        }
+    });
+
+    cancelEditBtn.addEventListener('click', () => {
+        editModal.style.display = 'none';
+    });
+
+    editForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Atualiza os dados do card
+        currentCard.setAttribute('data-name', document.getElementById('edit-lead-name').value);
+        currentCard.setAttribute('data-whatsapp', document.getElementById('edit-lead-whatsapp').value);
+        currentCard.setAttribute('data-origem', document.getElementById('edit-lead-origem').value);
+        currentCard.setAttribute('data-qualificacao', document.getElementById('edit-lead-qualification').value);
+        
+        // Atualiza o HTML visível do card
+        currentCard.innerHTML = `
+            <strong>${document.getElementById('edit-lead-name').value}</strong><br>
+            <small>WhatsApp: ${document.getElementById('edit-lead-whatsapp').value}</small><br>
+            <small>Origem: ${document.getElementById('edit-lead-origem').value}</small><br>
+            <small>Qualificação: ${document.getElementById('edit-lead-qualification').value}</small>
+        `;
+
+        editModal.style.display = 'none';
     });
 });
