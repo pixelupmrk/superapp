@@ -1,190 +1,606 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>CRM PixelUp + WhatsApp + Planilhas</title>
-<meta name="color-scheme" content="dark">
-<style>
-/* (estilos iguais ao seu código anterior) */
-:root{--bg:#0b1016;--panel:#0f1722;--muted:#9fb1c4;--text:#eaf6ff;--brand:#00b3ff;--line:#12334c;--ok:#16a34a;--warn:#f59e0b}
-*{box-sizing:border-box} html,body{height:100%}
-body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:
-linear-gradient(180deg,rgba(2,8,18,.92),rgba(2,8,18,.92)),
-radial-gradient(900px 520px at 90% -10%, rgba(0,179,255,.18), transparent 60%),
-radial-gradient(800px 500px at -10% 120%, rgba(0,179,255,.12), transparent 60%), #0e1013;color:var(--text)}
-.topbar{position:sticky;top:0;z-index:10;display:flex;gap:12px;align-items:center;padding:12px 16px;background:rgba(9,16,24,.8);backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800}
-.dot{width:12px;height:12px;border-radius:50%;background:linear-gradient(180deg,var(--brand),#39dbff)}
-nav{margin-left:auto;display:flex;gap:6px}
-nav a{padding:8px 10px;border-radius:10px;text-decoration:none;color:#d7eeff;border:1px solid transparent}
-nav a.active,nav a:hover{border-color:#174464;background:rgba(0,179,255,.08)}
-.container{max-width:1100px;margin:22px auto;padding:0 14px}
-.page{display:none}.page.active{display:block}
-.card{background:linear-gradient(180deg,rgba(14,22,33,.9),rgba(9,15,24,.9));border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 10px 40px rgba(0,179,255,.06)}
-h1{font-size:22px;margin:6px 0 12px} h2{font-size:18px;margin:12px 0 8px}
-.muted{color:var(--muted)} .small{font-size:12px}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.grid{display:grid;gap:16px}.grid-2{grid-template-columns:1.1fr .9fr}@media (max-width:900px){.grid-2{grid-template-columns:1fr}}
-input,textarea{width:100%;padding:10px 12px;border-radius:10px;background:#0b1520;border:1px solid #183149;color:#dff1ff;outline:none}
-.btn{appearance:none;border:none;cursor:pointer;padding:10px 14px;border-radius:12px;color:#05121b;font-weight:800;background:linear-gradient(180deg,#79d2ff,#27b0ff);box-shadow:0 4px 18px rgba(0,179,255,.3)}
-.btn.secondary{color:#dbeafe;background:transparent;border:1px solid #1b4663}
-.badge{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid #123249;background:#09151f;color:#cfeaff;font-size:12px;font-weight:700}
-.b-ok{border-color:#134e27;color:#b7ffd3;background:#0a1a12}
-.b-warn{border-color:#614214;color:#ffe9bd;background:#1b1407}
-.table{width:100%;border-collapse:collapse}.table th,.table td{border-bottom:1px solid #102437;padding:10px 8px;text-align:left}
-.kb{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.kb-col{border:1px solid #13304a;border-radius:12px;padding:10px;background:#0b1622}
-.kb-card{border:1px solid #143149;border-radius:10px;padding:10px;background:#0a1824;margin-bottom:8px}
-.qrbox{display:grid;place-items:center;min-height:280px;border:1px dashed #1f415c;border-radius:16px;background:#08121a;overflow:hidden}
-.qrimg{max-width:100%;image-rendering:pixelated}
-.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:#bcd7f0}
-.log{max-height:170px;overflow:auto;background:#08131b;border:1px solid #15324a;border-radius:10px;padding:8px;font-size:12px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelUp Super App</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* Estilos customizados para o neon blue theme */
+        :root {
+            --neon-blue: #00BFFF; /* DeepSkyBlue */
+            --neon-blue-dark: #009ACD;
+            --dark-bg: #111827; /* gray-900 */
+            --dark-card: #1f2937; /* gray-800 */
+            --dark-border: #374151; /* gray-700 */
+        }
+        .bg-neon { background-color: var(--neon-blue); }
+        .text-neon { color: var(--neon-blue); }
+        .border-neon { border-color: var(--neon-blue); }
+        .hover\:bg-neon-dark:hover { background-color: var(--neon-blue-dark); }
+        .ring-neon:focus {
+            --tw-ring-color: var(--neon-blue);
+        }
+
+        /* Estilos para a scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--neon-blue);
+            border-radius: 20px;
+            border: 2px solid var(--dark-bg);
+        }
+        
+        /* Classe para item sendo arrastado */
+        .dragging {
+            opacity: 0.5;
+            transform: rotate(3deg);
+        }
+    </style>
 </head>
-<body>
-<header class="topbar">
-  <div class="brand"><span class="dot"></span> PixelUp CRM</div>
-  <nav>
-    <a href="#crm" class="active">CRM</a>
-    <a href="#whatsapp">WhatsApp</a>
-  </nav>
-</header>
+<body class="bg-dark-bg text-gray-200 font-sans">
 
-<main class="container">
-  <!-- CRM -->
-  <section id="crm" class="page active">
-    <div class="card grid grid-2">
-      <section>
-        <h1>Contatos</h1>
-        <div class="row" id="authRow">
-          <span id="authBadge" class="badge b-warn">⏺ Deslogado</span>
-          <button id="btnLogout" class="btn secondary" style="display:none">Sair</button>
+    <!-- Tela de Login -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-dark-card p-8 rounded-lg shadow-lg border border-dark-border">
+            <div class="text-center mb-8">
+                <!-- LOGO AQUI -->
+                <h1 class="text-4xl font-bold text-neon">PixelUp</h1>
+                <p class="text-gray-400">Bem-vindo ao seu Super App</p>
+            </div>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="email" class="block mb-2 text-sm font-medium">Email</label>
+                    <input type="email" id="login-email" class="w-full bg-gray-900 border border-dark-border rounded-lg p-3 focus:outline-none focus:ring-2 ring-neon" placeholder="seu@email.com" required>
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block mb-2 text-sm font-medium">Senha</label>
+                    <input type="password" id="login-password" class="w-full bg-gray-900 border border-dark-border rounded-lg p-3 focus:outline-none focus:ring-2 ring-neon" placeholder="********" required>
+                </div>
+                <button type="submit" class="w-full bg-neon text-gray-900 font-bold py-3 rounded-lg hover:bg-neon-dark transition-colors duration-300">Entrar</button>
+            </form>
+            <p id="login-error" class="text-red-500 text-center mt-4 text-sm"></p>
         </div>
-
-        <div id="loginBox" style="margin-top:10px">
-          <div class="row">
-            <input id="email" type="email" placeholder="E-mail"/>
-            <input id="pass" type="password" placeholder="Senha"/>
-          </div>
-          <div class="row">
-            <button id="btnLogin" class="btn">Entrar</button>
-            <button id="btnSignup" class="btn secondary">Criar conta</button>
-          </div>
-          <p class="small muted">Autenticação Firebase. Sem Firebase, usa <b>localStorage</b>.</p>
-        </div>
-
-        <div id="contactForm" style="display:none;margin-top:10px">
-          <h2>Novo contato</h2>
-          <div class="row">
-            <input id="c_name" placeholder="Nome"/>
-            <input id="c_phone" placeholder="Telefone (DDD)"/>
-          </div>
-          <div class="row"><input id="c_email" placeholder="E-mail"/></div>
-          <textarea id="c_notes" rows="3" placeholder="Observações"></textarea>
-          <div class="row" style="margin-top:8px">
-            <button id="btnSaveContact" class="btn">Salvar contato</button>
-            <span id="saveInfo" class="muted small"></span>
-          </div>
-
-          <!-- Importar/Exportar Planilha -->
-          <div class="row" style="margin-top:14px">
-            <input type="file" id="fileImport" accept=".csv" style="display:none"/>
-            <button id="btnImport" class="btn secondary">Importar CSV</button>
-            <button id="btnExport" class="btn secondary">Exportar CSV</button>
-          </div>
-
-          <h2 style="margin-top:18px">Lista</h2>
-          <table class="table" id="tblContacts">
-            <thead><tr><th>Nome</th><th>Telefone</th><th>E-mail</th><th>Obs.</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Kanban -->
-      <aside>
-        <h2>Kanban</h2>
-        <div class="kb" id="kanban">
-          <div class="kb-col" data-col="novo"><b>Novo</b><div class="kb-list"></div></div>
-          <div class="kb-col" data-col="progresso"><b>Em Progresso</b><div class="kb-list"></div></div>
-          <div class="kb-col" data-col="fechado"><b>Fechado</b><div class="kb-list"></div></div>
-        </div>
-        <div class="row" style="margin-top:10px">
-          <input id="leadTitle" placeholder="Título do lead"/>
-          <button id="btnAddLead" class="btn">Adicionar lead</button>
-        </div>
-      </aside>
     </div>
-  </section>
 
-  <!-- WhatsApp -->
-  <section id="whatsapp" class="page">
-    <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <div><h1>Conexão WhatsApp</h1></div>
-        <div id="waStatus" class="badge b-warn">⏺ Desconectado</div>
-      </div>
-      <div class="row" style="margin:10px 0">
-        <button id="waConnect" class="btn">Conectar / Mostrar QR</button>
-        <button id="waStatusBtn" class="btn secondary">Atualizar status</button>
-      </div>
-      <div class="qrbox" id="qrBox"><div class="muted">Clique em <b>Conectar</b> e escaneie no WhatsApp.</div></div>
-      <div class="log" id="waLog" style="margin-top:10px"></div>
+    <!-- Interface Principal do App (escondida por padrão) -->
+    <div id="app-screen" class="hidden">
+        <div class="flex h-screen">
+            <!-- Menu Lateral -->
+            <aside class="w-64 bg-dark-card border-r border-dark-border flex flex-col">
+                <div class="p-6 text-center border-b border-dark-border">
+                    <!-- LOGO AQUI TAMBÉM -->
+                    <h1 class="text-3xl font-bold text-neon">PixelUp</h1>
+                </div>
+                <nav class="flex-1 p-4 space-y-2">
+                    <a href="#crm" data-tab="crm" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors duration-200">
+                        <i data-lucide="users" class="w-5 h-5 mr-3"></i> CRM
+                    </a>
+                    <a href="#caixa" data-tab="caixa" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors duration-200">
+                        <i data-lucide="dollar-sign" class="w-5 h-5 mr-3"></i> Controle de Caixa
+                    </a>
+                    <a href="#precificacao" data-tab="precificacao" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors duration-200">
+                        <i data-lucide="archive" class="w-5 h-5 mr-3"></i> Precificação
+                    </a>
+                    <a href="#mentoria" data-tab="mentoria" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors duration-200">
+                        <i data-lucide="graduation-cap" class="w-5 h-5 mr-3"></i> Mentoria
+                    </a>
+                    <a href="#chatbot" data-tab="chatbot" class="nav-link flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors duration-200">
+                        <i data-lucide="bot" class="w-5 h-5 mr-3"></i> Chatbot IA
+                    </a>
+                </nav>
+                <div class="p-4 border-t border-dark-border">
+                    <button id="logout-button" class="w-full flex items-center justify-center p-3 rounded-lg text-gray-300 hover:bg-red-800 transition-colors duration-200">
+                        <i data-lucide="log-out" class="w-5 h-5 mr-3"></i> Sair
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Conteúdo Principal -->
+            <main class="flex-1 p-8 overflow-y-auto">
+                
+                <!-- ### SEÇÃO CRM ### -->
+                <div id="tab-crm" class="tab-content">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-4xl font-bold">CRM de Leads</h2>
+                        <div class="flex items-center gap-4">
+                           <div id="view-toggle" class="flex items-center bg-dark-card p-1 rounded-lg border border-dark-border">
+                                <button id="view-kanban-btn" class="p-2 rounded-md" title="Visão Kanban"><i data-lucide="layout-grid"></i></button>
+                                <button id="view-list-btn" class="p-2 rounded-md" title="Visão Lista"><i data-lucide="list"></i></button>
+                           </div>
+                           <button id="add-lead-btn" class="bg-neon text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-neon-dark transition-colors duration-300 flex items-center gap-2">
+                               <i data-lucide="plus"></i> Novo Lead
+                           </button>
+                        </div>
+                    </div>
+
+                    <!-- Visão Kanban -->
+                    <div id="kanban-view" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Colunas do Kanban serão geradas pelo JS -->
+                    </div>
+
+                    <!-- Visão Lista -->
+                    <div id="list-view" class="hidden bg-dark-card p-4 rounded-lg border border-dark-border">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b border-dark-border">
+                                    <th class="p-3">Nome</th>
+                                    <th class="p-3">WhatsApp</th>
+                                    <th class="p-3">Origem</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-view-body">
+                                <!-- Linhas da lista serão geradas pelo JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ### SEÇÃO CONTROLE DE CAIXA ### -->
+                <div id="tab-caixa" class="tab-content hidden">
+                     <h2 class="text-4xl font-bold mb-6">Controle de Caixa</h2>
+                     <div class="bg-dark-card p-6 rounded-lg border border-dark-border">
+                        <p>Funcionalidade de Controle de Caixa será implementada aqui, baseada na sua planilha.</p>
+                     </div>
+                </div>
+                
+                <!-- ### SEÇÃO PRECIFICACAO ### -->
+                <div id="tab-precificacao" class="tab-content hidden">
+                     <h2 class="text-4xl font-bold mb-6">Precificação e Lucro</h2>
+                     <div class="bg-dark-card p-6 rounded-lg border border-dark-border">
+                        <p>Funcionalidade de Precificação e Estoque será implementada aqui, baseada na sua planilha.</p>
+                     </div>
+                </div>
+
+                <!-- ### SEÇÃO MENTORIA ### -->
+                <div id="tab-mentoria" class="tab-content hidden">
+                     <h2 class="text-4xl font-bold mb-6">Sua Mentoria</h2>
+                     <div class="bg-dark-card p-6 rounded-lg border border-dark-border">
+                        <p>O conteúdo da sua mentoria e o acompanhamento de progresso aparecerão aqui.</p>
+                     </div>
+                </div>
+
+                <!-- ### SEÇÃO CHATBOT ### -->
+                <div id="tab-chatbot" class="tab-content hidden">
+                     <h2 class="text-4xl font-bold mb-6">Assistente Virtual PixelUp</h2>
+                     <div class="bg-dark-card p-6 rounded-lg border border-dark-border">
+                        <p>O Chatbot com IA Gemini será implementado nesta tela.</p>
+                     </div>
+                </div>
+            </main>
+        </div>
     </div>
-  </section>
-</main>
+    
+    <!-- Modal para Adicionar/Editar Lead -->
+    <div id="lead-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
+        <div class="bg-dark-card rounded-lg shadow-xl w-full max-w-lg border border-dark-border">
+            <div class="p-6 border-b border-dark-border flex justify-between items-center">
+                <h3 id="modal-title" class="text-2xl font-bold">Novo Lead</h3>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-white"><i data-lucide="x"></i></button>
+            </div>
+            <form id="lead-form" class="p-6">
+                <input type="hidden" id="lead-id">
+                <div class="mb-4">
+                    <label for="lead-name" class="block mb-2 text-sm font-medium">Nome</label>
+                    <input type="text" id="lead-name" class="w-full bg-gray-900 border border-dark-border rounded-lg p-3 focus:outline-none focus:ring-2 ring-neon" required>
+                </div>
+                <div class="mb-4">
+                    <label for="lead-whatsapp" class="block mb-2 text-sm font-medium">WhatsApp (com DDD, somente números)</label>
+                    <input type="tel" id="lead-whatsapp" class="w-full bg-gray-900 border border-dark-border rounded-lg p-3 focus:outline-none focus:ring-2 ring-neon" required>
+                </div>
+                <div class="mb-4">
+                    <label for="lead-source" class="block mb-2 text-sm font-medium">Origem do Lead</label>
+                    <input type="text" id="lead-source" class="w-full bg-gray-900 border border-dark-border rounded-lg p-3 focus:outline-none focus:ring-2 ring-neon" placeholder="Ex: Instagram, Indicação">
+                </div>
+                <div class="mb-4">
+                    <label for="lead-temp" class="block mb-2 text-sm font-medium">Temperatura</label>
+                    <select id="lead-temp" class="w-full bg-gray-900 border border-dark-border rounded-lg p-3 focus:outline-none focus:ring-2 ring-neon">
+                        <option value="frio">Frio</option>
+                        <option value="morno">Morno</option>
+                        <option value="quente">Quente</option>
+                    </select>
+                </div>
+                 <div class="mb-4">
+                    <label for="lead-status" class="block mb-2 text-sm font-medium">Status</label>
+                    <select id="lead-status" class="w-full bg-gray-900 border border-dark-border rounded-lg p-3 focus:outline-none focus:ring-2 ring-neon">
+                        <!-- Opções de status serão preenchidas pelo JS -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="lead-description" class="block mb-2 text-sm font-medium">Descrição</label>
+                    <textarea id="lead-description" rows="3" class="w-full bg-gray-900 border border-dark-border rounded-lg p-3 focus:outline-none focus:ring-2 ring-neon"></textarea>
+                </div>
+                <div class="flex justify-end gap-4 mt-6">
+                    <button type="button" id="delete-lead-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-300 hidden">Excluir</button>
+                    <button type="submit" class="bg-neon text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-neon-dark transition-colors duration-300">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
-<script>
-// -------------------- IMPORT/EXPORT CSV --------------------
-function exportCSV(data){
-  const header=["Nome","Telefone","Email","Observações"];
-  const rows=data.map(c=>[c.name,c.phone,c.email,c.notes]);
-  const csv=[header,...rows].map(r=>r.join(";")).join("\n");
-  const blob=new Blob([csv],{type:"text/csv"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="contatos_pixelup.csv";
-  a.click();
-}
-function parseCSV(text){
-  const lines=text.split(/\r?\n/).slice(1);
-  return lines.map(l=>{
-    const [name,phone,email,notes]=l.split(";");
-    return {name,phone,email,notes,ts:Date.now()};
-  }).filter(c=>c.name);
-}
-btnExport.onclick=async ()=>{
-  const uid=getUID();
-  if(fb.ok){
-    const snap=await db.collection("users").doc(uid).collection("contacts").get();
-    exportCSV(snap.docs.map(d=>d.data()));
-  }else{
-    const arr=JSON.parse(localStorage.getItem("px_contacts_"+uid)||"[]");
-    exportCSV(arr);
-  }
-};
-btnImport.onclick=()=> fileImport.click();
-fileImport.onchange=async e=>{
-  const file=e.target.files[0]; if(!file) return;
-  const text=await file.text();
-  const arr=parseCSV(text);
-  for(const c of arr){
-    if(fb.ok){ await db.collection("users").doc(getUID()).collection("contacts").add(c); }
-    else{
-      const key="px_contacts_"+getUID();
-      const old=JSON.parse(localStorage.getItem(key)||"[]"); old.push(c);
-      localStorage.setItem(key,JSON.stringify(old));
-    }
-  }
-  loadContacts();
-};
-// ------------------------------------------------------------
-</script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        
+        // ***************************************************************
+        // IMPORTANTE: Cole aqui a configuração do seu projeto Firebase
+        // ***************************************************************
+        const firebaseConfig = {
+          apiKey: "SUA_API_KEY",
+          authDomain: "SEU_AUTH_DOMAIN",
+          projectId: "SEU_PROJECT_ID",
+          storageBucket: "SEU_STORAGE_BUCKET",
+          messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+          appId: "SEU_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- Gerenciamento de Estado da UI ---
+        const loginScreen = document.getElementById('login-screen');
+        const appScreen = document.getElementById('app-screen');
+        
+        // Kanban Columns
+        const KANBAN_COLUMNS = {
+            'new': 'Novo Lead',
+            'contacted': 'Contactado',
+            'proposal': 'Proposta Enviada',
+            'won': 'Ganho',
+        };
+
+        // --- Autenticação ---
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            signInWithEmailAndPassword(auth, email, password)
+                .catch((error) => {
+                    console.error("Erro de login:", error.message);
+                    loginError.textContent = "Email ou senha inválidos.";
+                });
+        });
+
+        const logoutButton = document.getElementById('logout-button');
+        logoutButton.addEventListener('click', () => {
+            signOut(auth);
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Usuário está logado
+                loginScreen.classList.add('hidden');
+                appScreen.classList.remove('hidden');
+                initApp(user);
+            } else {
+                // Usuário está deslogado
+                loginScreen.classList.remove('hidden');
+                appScreen.classList.add('hidden');
+            }
+        });
+
+
+        // --- Inicialização do App ---
+        function initApp(user) {
+            console.log("App iniciado para o usuário:", user.uid);
+            lucide.createIcons(); // Ativar ícones
+            setupNavigation();
+            setupViewToggle();
+            setupModal();
+            loadLeads(user.uid);
+        }
+
+        // --- Navegação por Abas ---
+        function setupNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const tabs = document.querySelectorAll('.tab-content');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabId = link.dataset.tab;
+
+                    // Esconde todas as abas
+                    tabs.forEach(tab => tab.classList.add('hidden'));
+                    // Remove classe ativa de todos os links
+                    navLinks.forEach(l => l.classList.remove('bg-gray-700', 'text-white'));
+
+                    // Mostra a aba correta
+                    document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+                    // Ativa o link clicado
+                    link.classList.add('bg-gray-700', 'text-white');
+                });
+            });
+            // Ativa a primeira aba por padrão
+            navLinks[0].click();
+        }
+
+        // --- Lógica do CRM ---
+        const kanbanView = document.getElementById('kanban-view');
+        const listViewBody = document.getElementById('list-view-body');
+        let leadsCollectionRef;
+
+        function loadLeads(userId) {
+            leadsCollectionRef = collection(db, `users/${userId}/leads`);
+
+            onSnapshot(leadsCollectionRef, (snapshot) => {
+                const leads = [];
+                snapshot.forEach(doc => {
+                    leads.push({ id: doc.id, ...doc.data() });
+                });
+                renderKanban(leads);
+                renderList(leads);
+            });
+        }
+        
+        // Drag and Drop Logic
+        let draggedItem = null;
+
+        function setupDragAndDrop() {
+            const cards = document.querySelectorAll('.lead-card');
+            const columns = document.querySelectorAll('.kanban-column-body');
+
+            cards.forEach(card => {
+                card.addEventListener('dragstart', () => {
+                    draggedItem = card;
+                    setTimeout(() => card.classList.add('dragging'), 0);
+                });
+                card.addEventListener('dragend', () => {
+                    draggedItem.classList.remove('dragging');
+                    draggedItem = null;
+                });
+            });
+
+            columns.forEach(column => {
+                column.addEventListener('dragover', e => {
+                    e.preventDefault();
+                });
+                column.addEventListener('drop', async e => {
+                    e.preventDefault();
+                    if (draggedItem) {
+                        const newStatus = column.dataset.status;
+                        const leadId = draggedItem.dataset.id;
+                        column.appendChild(draggedItem);
+                        
+                        // Update in Firestore
+                        const leadDocRef = doc(db, leadsCollectionRef.path, leadId);
+                        await updateDoc(leadDocRef, { status: newStatus });
+                    }
+                });
+            });
+        }
+
+        // Renderizações do CRM
+        function renderKanban(leads) {
+            kanbanView.innerHTML = '';
+            for (const status in KANBAN_COLUMNS) {
+                const columnLeads = leads.filter(lead => lead.status === status);
+                const columnEl = document.createElement('div');
+                columnEl.className = 'bg-dark-card rounded-lg p-4 border border-dark-border';
+                columnEl.innerHTML = `
+                    <h3 class="font-bold text-lg mb-4 text-neon">${KANBAN_COLUMNS[status]} <span class="text-sm text-gray-400 font-normal">${columnLeads.length}</span></h3>
+                    <div class="kanban-column-body space-y-4 min-h-[200px]" data-status="${status}">
+                        ${columnLeads.map(lead => createLeadCard(lead)).join('')}
+                    </div>
+                `;
+                kanbanView.appendChild(columnEl);
+            }
+            setupDragAndDrop();
+        }
+
+        function createLeadCard(lead) {
+            const tempColors = {
+                frio: 'bg-blue-600',
+                morno: 'bg-yellow-600',
+                quente: 'bg-red-600'
+            };
+            return `
+                <div class="lead-card bg-gray-900 p-4 rounded-lg border border-dark-border cursor-pointer" draggable="true" data-id="${lead.id}">
+                    <h4 class="font-bold">${lead.name}</h4>
+                    <p class="text-sm text-gray-400">${lead.source || 'Sem origem'}</p>
+                    <div class="mt-3 flex justify-between items-center">
+                        <span class="text-xs font-semibold px-2 py-1 ${tempColors[lead.temp]} rounded-full">${lead.temp.charAt(0).toUpperCase() + lead.temp.slice(1)}</span>
+                         <button class="edit-lead-btn" data-id="${lead.id}"><i data-lucide="edit-2" class="w-4 h-4 text-gray-500 hover:text-neon"></i></button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Abre o modal ao clicar em "editar" no card
+        kanbanView.addEventListener('click', (e) => {
+            const editButton = e.target.closest('.edit-lead-btn');
+            if (editButton) {
+                const leadId = editButton.dataset.id;
+                openModalForEdit(leadId);
+            }
+        });
+
+        function renderList(leads) {
+            listViewBody.innerHTML = '';
+            if (leads.length === 0) {
+                listViewBody.innerHTML = '<tr><td colspan="5" class="text-center p-4">Nenhum lead encontrado.</td></tr>';
+                return;
+            }
+            leads.forEach(lead => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-dark-border hover:bg-gray-700/50';
+                row.innerHTML = `
+                    <td class="p-3">${lead.name}</td>
+                    <td class="p-3">
+                        <a href="https://wa.me/55${lead.whatsapp.replace(/\D/g, '')}" target="_blank" class="text-neon hover:underline flex items-center gap-2">
+                           <i data-lucide="message-circle" class="w-4 h-4"></i> ${lead.whatsapp}
+                        </a>
+                    </td>
+                    <td class="p-3">${lead.source || 'N/A'}</td>
+                    <td class="p-3">${KANBAN_COLUMNS[lead.status] || 'N/A'}</td>
+                    <td class="p-3">
+                        <button class="edit-lead-btn p-1 text-gray-400 hover:text-neon" data-id="${lead.id}">
+                            <i data-lucide="edit-2" class="w-5 h-5"></i>
+                        </button>
+                    </td>
+                `;
+                listViewBody.appendChild(row);
+            });
+            lucide.createIcons(); // Recriar ícones dinâmicos
+            
+            // Adicionar event listeners para os botões de edição da lista
+            document.querySelectorAll('#list-view-body .edit-lead-btn').forEach(btn => {
+                btn.addEventListener('click', () => openModalForEdit(btn.dataset.id));
+            });
+        }
+        
+        // Controle de Visão (Kanban/Lista)
+        function setupViewToggle() {
+            const kanbanBtn = document.getElementById('view-kanban-btn');
+            const listBtn = document.getElementById('view-list-btn');
+            const kanbanViewEl = document.getElementById('kanban-view');
+            const listViewEl = document.getElementById('list-view');
+
+            function setActiveView(view) {
+                if (view === 'kanban') {
+                    kanbanBtn.classList.add('bg-neon', 'text-gray-900');
+                    listBtn.classList.remove('bg-neon', 'text-gray-900');
+                    kanbanViewEl.classList.remove('hidden');
+                    listViewEl.classList.add('hidden');
+                } else {
+                    listBtn.classList.add('bg-neon', 'text-gray-900');
+                    kanbanBtn.classList.remove('bg-neon', 'text-gray-900');
+                    listViewEl.classList.remove('hidden');
+                    kanbanViewEl.classList.add('hidden');
+                }
+            }
+            
+            kanbanBtn.addEventListener('click', () => setActiveView('kanban'));
+            listBtn.addEventListener('click', () => setActiveView('list'));
+
+            setActiveView('kanban'); // View padrão
+        }
+
+        // Lógica do Modal de Leads
+        const leadModal = document.getElementById('lead-modal');
+        const addLeadBtn = document.getElementById('add-lead-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const leadForm = document.getElementById('lead-form');
+        const modalTitle = document.getElementById('modal-title');
+        const leadIdInput = document.getElementById('lead-id');
+        const deleteLeadBtn = document.getElementById('delete-lead-btn');
+        const leadStatusSelect = document.getElementById('lead-status');
+
+        function setupModal() {
+            // Preencher o select de status
+            leadStatusSelect.innerHTML = '';
+            for (const key in KANBAN_COLUMNS) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = KANBAN_COLUMNS[key];
+                leadStatusSelect.appendChild(option);
+            }
+            
+            addLeadBtn.addEventListener('click', openModalForNew);
+            closeModalBtn.addEventListener('click', closeModal);
+            leadModal.addEventListener('click', (e) => {
+                if (e.target === leadModal) closeModal();
+            });
+
+            leadForm.addEventListener('submit', handleFormSubmit);
+            deleteLeadBtn.addEventListener('click', handleDeleteLead);
+        }
+
+        function openModalForNew() {
+            modalTitle.textContent = "Novo Lead";
+            leadForm.reset();
+            leadIdInput.value = '';
+            deleteLeadBtn.classList.add('hidden');
+            leadModal.classList.remove('hidden');
+        }
+
+        async function openModalForEdit(id) {
+            const docRef = doc(db, leadsCollectionRef.path, id);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const lead = docSnap.data();
+                modalTitle.textContent = "Editar Lead";
+                leadIdInput.value = id;
+                document.getElementById('lead-name').value = lead.name;
+                document.getElementById('lead-whatsapp').value = lead.whatsapp;
+                document.getElementById('lead-source').value = lead.source || '';
+                document.getElementById('lead-temp').value = lead.temp;
+                document.getElementById('lead-status').value = lead.status;
+                document.getElementById('lead-description').value = lead.description || '';
+                deleteLeadBtn.classList.remove('hidden');
+                leadModal.classList.remove('hidden');
+            } else {
+                console.error("Lead não encontrado!");
+            }
+        }
+        
+        import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+        function closeModal() {
+            leadModal.classList.add('hidden');
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const id = leadIdInput.value;
+            const leadData = {
+                name: document.getElementById('lead-name').value,
+                whatsapp: document.getElementById('lead-whatsapp').value,
+                source: document.getElementById('lead-source').value,
+                temp: document.getElementById('lead-temp').value,
+                status: document.getElementById('lead-status').value,
+                description: document.getElementById('lead-description').value,
+            };
+
+            try {
+                if (id) { // Editando
+                    const docRef = doc(db, leadsCollectionRef.path, id);
+                    await updateDoc(docRef, leadData);
+                } else { // Criando
+                    await addDoc(leadsCollectionRef, leadData);
+                }
+                closeModal();
+            } catch (error) {
+                console.error("Erro ao salvar lead: ", error);
+            }
+        }
+        
+        async function handleDeleteLead() {
+            const id = leadIdInput.value;
+            if (id && confirm('Tem certeza que deseja excluir este lead? Esta ação não pode ser desfeita.')) {
+                try {
+                    const docRef = doc(db, leadsCollectionRef.path, id);
+                    await deleteDoc(docRef);
+                    closeModal();
+                } catch(error) {
+                    console.error("Erro ao excluir lead: ", error);
+                }
+            }
+        }
+
+    </script>
 </body>
 </html>
