@@ -127,11 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     kanbanBoard.addEventListener('click', (e) => {
         // Encontra o botão de edição ou exclusão clicado, se houver
-        const clickedButton = e.target.closest('button');
-        if (!clickedButton) return; // Se não for um botão, não faz nada
+        const editButton = e.target.closest('.edit-card-btn');
+        const deleteButton = e.target.closest('.delete-card-btn');
 
-        if (clickedButton.classList.contains('edit-card-btn')) {
-            currentCard = clickedButton.closest('.kanban-card');
+        if (editButton) {
+            currentCard = editButton.closest('.kanban-card');
             
             document.getElementById('edit-lead-name').value = currentCard.getAttribute('data-name') || '';
             document.getElementById('edit-lead-email').value = currentCard.getAttribute('data-email') || '';
@@ -146,8 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
             editModal.style.display = 'flex';
         }
 
-        if (clickedButton.classList.contains('delete-card-btn')) {
-            const cardToDelete = clickedButton.closest('.kanban-card');
+        if (deleteButton) {
+            const cardToDelete = deleteButton.closest('.kanban-card');
             if (confirm('Tem certeza que deseja excluir este lead?')) {
                  cardToDelete.remove();
             }
