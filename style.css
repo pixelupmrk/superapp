@@ -214,7 +214,10 @@ body {
 
 #lead-form input,
 #lead-form select,
-#lead-form textarea {
+#lead-form textarea,
+#edit-lead-form input,
+#edit-lead-form select,
+#edit-lead-form textarea {
     width: 100%;
     padding: 0.75rem 1rem;
     background-color: var(--primary-color);
@@ -227,7 +230,10 @@ body {
 
 #lead-form input:focus,
 #lead-form select:focus,
-#lead-form textarea:focus {
+#lead-form textarea:focus,
+#edit-lead-form input:focus,
+#edit-lead-form select:focus,
+#edit-lead-form textarea:focus {
     outline: none;
     border-color: var(--accent-color);
     box-shadow: 0 0 10px var(--border-glow);
@@ -247,7 +253,7 @@ body {
     color: var(--text-color-muted);
 }
 
-#lead-form textarea {
+#lead-form textarea, #edit-lead-form textarea {
     min-height: 100px;
     resize: vertical;
     margin-bottom: 1rem;
@@ -306,16 +312,6 @@ body {
     color: var(--text-color);
 }
 
-#edit-lead-form input,
-#edit-lead-form select,
-#edit-lead-form textarea {
-    background-color: var(--primary-color);
-    border: 1px solid var(--secondary-color);
-    color: var(--text-color);
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-}
-
 .modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -343,26 +339,6 @@ body {
     color: var(--text-color);
 }
 
-/* Estilos para o botão de edição no card */
-.edit-card-btn {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    background: none;
-    border: none;
-    color: var(--text-color-muted);
-    cursor: pointer;
-    font-size: 1.2rem;
-    opacity: 0.7;
-    transition: color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
-}
-
-.edit-card-btn:hover {
-    color: var(--accent-color);
-    transform: scale(1.1);
-    opacity: 1;
-}
-
 #delete-lead-btn {
     background-color: #d9534f;
     color: var(--text-color);
@@ -373,4 +349,55 @@ body {
 #delete-lead-btn:hover {
     background-color: #c9302c;
     box-shadow: 0 0 10px #d9534f;
+}
+
+/* Novos estilos para a tabela */
+.table-container {
+    overflow-x: auto;
+}
+
+#leads-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+}
+
+#leads-table thead th {
+    background-color: var(--primary-color);
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid var(--secondary-color);
+}
+
+#leads-table tbody tr {
+    border-bottom: 1px solid var(--secondary-color);
+    transition: background-color 0.2s ease;
+}
+
+#leads-table tbody tr:hover {
+    background-color: var(--primary-color);
+}
+
+#leads-table td {
+    padding: 1rem;
+}
+
+.btn-edit-table, .btn-delete-table {
+    background: none;
+    border: none;
+    color: var(--text-color-muted);
+    cursor: pointer;
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-edit-table:hover {
+    color: var(--accent-color);
+    transform: scale(1.1);
+}
+
+.btn-delete-table:hover {
+    color: #d9534f;
+    transform: scale(1.1);
 }
