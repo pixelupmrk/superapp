@@ -287,6 +287,85 @@ body {
     cursor: pointer;
     font-weight: 700;
     transition: all 0.2s ease;
+}/* Estilos para o novo formulário de Leads */
+
+.card {
+    background-color: var(--secondary-color);
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.new-lead-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+#lead-form input,
+#lead-form select,
+#lead-form textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--primary-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1rem;
+    appearance: none;
+}
+
+#lead-form input:focus,
+#lead-form select:focus,
+#lead-form textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px var(--border-glow);
+}
+
+.select-group {
+    position: relative;
+}
+
+.select-group::after {
+    content: '▼';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-color-muted);
+}
+
+#lead-form textarea {
+    min-height: 100px;
+    resize: vertical;
+    margin-bottom: 1rem;
+}
+
+.btn-save {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-save:hover {
+    box-shadow: 0 0 15px var(--border-glow);
+    transform: translateY(-2px);
 }
 
 .new-lead-form button:hover {
