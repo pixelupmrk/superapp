@@ -15,9 +15,13 @@
                 <img src="logo.png" alt="Logo PixelUp" class="logo">
             </div>
             <nav class="sidebar-nav">
-                <a href="#" id="nav-crm" class="nav-item active" data-target="crm-section">
+                <a href="#" id="nav-crm-kanban" class="nav-item active" data-target="crm-kanban-section">
                     <i class="ph-fill ph-trello-logo"></i>
                     <span>CRM / Kanban</span>
+                </a>
+                <a href="#" id="nav-crm-list" class="nav-item" data-target="crm-list-section">
+                    <i class="ph-fill ph-list-dashes"></i>
+                    <span>Lista de Leads</span>
                 </a>
                 <a href="#" id="nav-finance" class="nav-item" data-target="finance-section">
                     <i class="ph-fill ph-chart-bar"></i>
@@ -48,7 +52,7 @@
                 </div>
             </header>
             
-            <div class="content-area active" id="crm-section">
+            <div class="content-area active" id="crm-kanban-section">
                 <div class="card new-lead-card">
                     <h2>Novo Lead</h2>
                     <form id="lead-form">
@@ -56,19 +60,9 @@
                             <input type="text" id="lead-name" placeholder="Nome" required>
                             <input type="email" id="lead-email" placeholder="E-mail" required>
                             <input type="tel" id="lead-whatsapp" placeholder="WhatsApp" required>
-                            
-                            <div class="select-group">
-                                <select id="lead-status">
-                                    <option value="novo">Novo</option>
-                                    <option value="progresso">Em Progresso</option>
-                                    <option value="fechado">Fechado</option>
-                                </select>
-                            </div>
-                            
                             <input type="text" id="lead-attendant" placeholder="Atendente (quem atende)">
                             <input type="text" id="lead-origin" placeholder="Origem">
                             <input type="date" id="lead-date" placeholder="dd/mm/aaaa">
-                            
                             <div class="select-group">
                                 <select id="lead-qualification">
                                     <option value="">Qualificação</option>
@@ -95,6 +89,28 @@
                     <div class="kanban-column" data-status="fechado">
                         <h3>Fechado</h3>
                         <div class="kanban-cards-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area" id="crm-list-section" style="display: none;">
+                <h2>Lista de Leads</h2>
+                <div class="card">
+                    <div class="table-container">
+                        <table id="leads-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>WhatsApp</th>
+                                    <th>Origem</th>
+                                    <th>Qualificação</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -131,7 +147,7 @@
                         </select>
                     </div>
                     <input type="text" id="edit-lead-attendant" placeholder="Atendente (quem atende)">
-                    <input type="text" id="edit-lead-origin" placeholder="Origem">
+                    <input type="text" id="edit-lead-origem" placeholder="Origem">
                     <input type="date" id="edit-lead-date" placeholder="dd/mm/aaaa">
                     <div class="select-group">
                         <select id="edit-lead-qualification">
