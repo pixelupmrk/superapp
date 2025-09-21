@@ -123,9 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentCard = null;
 
     kanbanBoard.addEventListener('click', (e) => {
-        if (e.target.closest('.delete-card-btn')) {
+        const deleteButton = e.target.closest('.delete-card-btn');
+        if (deleteButton) {
             e.stopPropagation();
-            const cardToDelete = e.target.closest('.kanban-card');
+            const cardToDelete = deleteButton.closest('.kanban-card');
             cardToDelete.remove();
             return;
         }
@@ -134,15 +135,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (card) {
             currentCard = card;
             
-            document.getElementById('edit-lead-name').value = card.getAttribute('data-name');
-            document.getElementById('edit-lead-email').value = card.getAttribute('data-email');
-            document.getElementById('edit-lead-whatsapp').value = card.getAttribute('data-whatsapp');
+            document.getElementById('edit-lead-name').value = card.getAttribute('data-name') || '';
+            document.getElementById('edit-lead-email').value = card.getAttribute('data-email') || '';
+            document.getElementById('edit-lead-whatsapp').value = card.getAttribute('data-whatsapp') || '';
             document.getElementById('edit-lead-status').value = card.parentElement.closest('.kanban-column').getAttribute('data-status');
-            document.getElementById('edit-lead-attendant').value = card.getAttribute('data-atendente');
-            document.getElementById('edit-lead-origem').value = card.getAttribute('data-origem');
-            document.getElementById('edit-lead-date').value = card.getAttribute('data-data');
-            document.getElementById('edit-lead-qualification').value = card.getAttribute('data-qualificacao');
-            document.getElementById('edit-lead-notes').value = card.getAttribute('data-notas');
+            document.getElementById('edit-lead-attendant').value = card.getAttribute('data-atendente') || '';
+            document.getElementById('edit-lead-origem').value = card.getAttribute('data-origem') || '';
+            document.getElementById('edit-lead-date').value = card.getAttribute('data-data') || '';
+            document.getElementById('edit-lead-qualification').value = card.getAttribute('data-qualificacao') || '';
+            document.getElementById('edit-lead-notes').value = card.getAttribute('data-notas') || '';
             
             editModal.style.display = 'flex';
         }
@@ -155,21 +156,34 @@ document.addEventListener('DOMContentLoaded', () => {
     editForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        currentCard.setAttribute('data-name', document.getElementById('edit-lead-name').value);
-        currentCard.setAttribute('data-email', document.getElementById('edit-lead-email').value);
-        currentCard.setAttribute('data-whatsapp', document.getElementById('edit-lead-whatsapp').value);
-        currentCard.setAttribute('data-atendente', document.getElementById('edit-lead-attendant').value);
-        currentCard.setAttribute('data-origem', document.getElementById('edit-lead-origem').value);
-        currentCard.setAttribute('data-data', document.getElementById('edit-lead-date').value);
-        currentCard.setAttribute('data-qualificacao', document.getElementById('edit-lead-qualification').value);
-        currentCard.setAttribute('data-notas', document.getElementById('edit-lead-notes').value);
+        const updatedLead = {
+            nome: document.getElementById('edit-lead-name').value,
+            email: document.getElementById('edit-lead-email').value,
+            whatsapp: document.getElementById('edit-lead-whatsapp').value,
+            atendente: document.getElementById('edit-lead-attendant').value,
+            origem: document.getElementById('edit-lead-origem').value,
+            data: document.getElementById('edit-lead-date').value,
+            qualificacao: document.getElementById('edit-lead-qualification').value,
+            notas: document.getElementById('edit-lead-notes').value,
+        };
 
+        // Atualiza os atributos de dados do card
+        currentCard.setAttribute('data-name', updatedLead.nome);
+        currentCard.setAttribute('data-email', updatedLead.email);
+        currentCard.setAttribute('data-whatsapp', updatedLead.whatsapp);
+        currentCard.setAttribute('data-atendente', updatedLead.atendente);
+        currentCard.setAttribute('data-origem', updatedLead.origem);
+        currentCard.setAttribute('data-data', updatedLead.data);
+        currentCard.setAttribute('data-qualificacao', updatedLead.qualificacao);
+        currentCard.setAttribute('data-notas', updatedLead.notas);
+
+        // Atualiza o HTML visível do card
         currentCard.innerHTML = `
             <button class="delete-card-btn"><i class="ph-fill ph-x-circle"></i></button>
-            <strong>${document.getElementById('edit-lead-name').value}</strong><br>
-            <small>WhatsApp: ${document.getElementById('edit-lead-whatsapp').value}</small><br>
-            <small>Origem: ${document.getElementById('edit-lead-origem').value}</small><br>
-            <small>Qualificação: ${document.getElementById('edit-lead-qualification').value}</small>
+            <strong>${updatedLead.nome}</strong><br>
+            <small>WhatsApp: ${updatedLead.whatsapp}</small><br>
+            <small>Origem: ${updatedLead.origem}</small><br>
+            <small>Qualificação: ${updatedLead.qualificacao}</small>
         `;
 
         const newStatus = document.getElementById('edit-lead-status').value;
