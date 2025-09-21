@@ -1,120 +1,41 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM | Super App PixelUp</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-</head>
-<body>
-
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <img src="logo.png" alt="Logo PixelUp" class="logo">
-            </div>
-            <nav class="sidebar-nav">
-                <a href="#" id="nav-crm" class="nav-item active" data-target="crm-section">
-                    <i class="ph-fill ph-trello-logo"></i>
-                    <span>CRM / Kanban</span>
-                </a>
-                <a href="#" id="nav-finance" class="nav-item" data-target="finance-section">
-                    <i class="ph-fill ph-chart-bar"></i>
-                    <span>Financeiro</span>
-                </a>
-                <a href="#" id="nav-mentoring" class="nav-item" data-target="mentoring-section">
-                    <i class="ph-fill ph-graduation-cap"></i>
-                    <span>Mentoria</span>
-                </a>
-                <a href="#" id="nav-chatbot" class="nav-item" data-target="chatbot-section">
-                    <i class="ph-fill ph-robot"></i>
-                    <span>Chatbot AI</span>
-                </a>
-            </nav>
-            <div class="sidebar-footer">
-                <a href="#" class="nav-item">
-                    <i class="ph-fill ph-gear-six"></i>
-                    <span>Configurações</span>
-                </a>
-            </div>
-        </aside>
-
-        <main class="main-content">
-            <header class="main-header">
-                <h1>CRM / Kanban</h1>
-                <div class="user-profile">
-                    <span>Olá, [Nome do Usuário]</span>
+<div class="modal-overlay" id="edit-lead-modal">
+    <div class="modal-content">
+        <h2>Editar Lead</h2>
+        <form id="edit-lead-form">
+            <input type="hidden" id="edit-lead-id">
+            <div class="input-grid">
+                <input type="text" id="edit-lead-name" placeholder="Nome">
+                <input type="email" id="edit-lead-email" placeholder="E-mail">
+                <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
+                <div class="select-group">
+                    <select id="edit-lead-status">
+                        <option value="novo">Novo</option>
+                        <option value="progresso">Em Progresso</option>
+                        <option value="fechado">Fechado</option>
+                    </select>
                 </div>
-            </header>
-            
-            <div class="content-area active" id="crm-section">
-                <div class="card new-lead-card">
-                    <h2>Novo Lead</h2>
-                    <form id="lead-form">
-                        <div class="input-grid">
-                            <input type="text" id="lead-name" placeholder="Nome" required>
-                            <input type="email" id="lead-email" placeholder="E-mail" required>
-                            <input type="tel" id="lead-whatsapp" placeholder="WhatsApp" required>
-                            
-                            <div class="select-group">
-                                <select id="lead-status">
-                                    <option value="novo">Novo</option>
-                                    <option value="progresso">Em Progresso</option>
-                                    <option value="fechado">Fechado</option>
-                                </select>
-                            </div>
-                            
-                            <input type="text" id="lead-attendant" placeholder="Atendente (quem atende)">
-                            <input type="text" id="lead-origin" placeholder="Origem">
-                            <input type="date" id="lead-date" placeholder="dd/mm/aaaa">
-                            
-                            <div class="select-group">
-                                <select id="lead-qualification">
-                                    <option value="">Qualificação</option>
-                                    <option value="quente">Lead Quente</option>
-                                    <option value="morno">Lead Morno</option>
-                                    <option value="frio">Lead Frio</option>
-                                </select>
-                            </div>
-                        </div>
-                        <textarea id="lead-notes" placeholder="Notas"></textarea>
-                        <button type="submit" class="btn-save">Salvar</button>
-                    </form>
-                </div>
-
-                <div class="kanban-board" id="kanban-board">
-                    <div class="kanban-column" data-status="novo">
-                        <h3>Novo</h3>
-                        <div class="kanban-cards-list"></div>
-                    </div>
-                    <div class="kanban-column" data-status="progresso">
-                        <h3>Em Progresso</h3>
-                        <div class="kanban-cards-list"></div>
-                    </div>
-                    <div class="kanban-column" data-status="fechado">
-                        <h3>Fechado</h3>
-                        <div class="kanban-cards-list"></div>
-                    </div>
+                <input type="text" id="edit-lead-attendant" placeholder="Atendente (quem atende)">
+                <input type="text" id="edit-lead-origin" placeholder="Origem">
+                <input type="date" id="edit-lead-date" placeholder="dd/mm/aaaa">
+                <div class="select-group">
+                    <select id="edit-lead-qualification">
+                        <option value="">Qualificação</option>
+                        <option value="quente">Lead Quente</option>
+                        <option value="morno">Lead Morno</option>
+                        <option value="frio">Lead Frio</option>
+                    </select>
                 </div>
             </div>
-
-            <div class="content-area" id="finance-section" style="display: none;">
-                <h2>Financeiro</h2>
-                <p>Aqui entra o conteúdo financeiro.</p>
+            <textarea id="edit-lead-notes" placeholder="Notas"></textarea>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" id="cancel-edit-btn">Cancelar</button>
+                <button type="submit" class="btn-save">Salvar Alterações</button>
             </div>
-            <div class="content-area" id="mentoring-section" style="display: none;">
-                <h2>Mentoria</h2>
-                <p>Aqui entra o conteúdo da mentoria.</p>
-            </div>
-            <div class="content-area" id="chatbot-section" style="display: none;">
-                <h2>Chatbot AI</h2>
-                <p>Aqui entra o conteúdo do chatbot.</p>
-            </div>
-        </main>
+        </form>
     </div>
+</div>
 
-    <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
