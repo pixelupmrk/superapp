@@ -147,7 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (deleteButton) {
             const cardToDelete = deleteButton.closest('.kanban-card');
-            cardToDelete.remove();
+            if (confirm('Tem certeza que deseja excluir este lead?')) {
+                 cardToDelete.remove();
+            }
         }
     });
 
