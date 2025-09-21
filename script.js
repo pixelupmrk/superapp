@@ -73,20 +73,21 @@ document.addEventListener('DOMContentLoaded', () => {
         newCard.classList.add('kanban-card');
         newCard.draggable = true;
 
-        newCard.setAttribute('data-name', lead.nome);
-        newCard.setAttribute('data-whatsapp', lead.whatsapp);
-        newCard.setAttribute('data-origem', lead.origem);
-        newCard.setAttribute('data-qualificacao', lead.qualificacao);
-        newCard.setAttribute('data-email', lead.email);
-        newCard.setAttribute('data-atendente', lead.atendente);
-        newCard.setAttribute('data-data', lead.data);
-        newCard.setAttribute('data-notas', lead.notas);
+        // Garante que todos os atributos de dados existem, mesmo que vazios
+        newCard.setAttribute('data-name', lead.nome || '');
+        newCard.setAttribute('data-email', lead.email || '');
+        newCard.setAttribute('data-whatsapp', lead.whatsapp || '');
+        newCard.setAttribute('data-atendente', lead.atendente || '');
+        newCard.setAttribute('data-origem', lead.origem || '');
+        newCard.setAttribute('data-data', lead.data || '');
+        newCard.setAttribute('data-qualificacao', lead.qualificacao || '');
+        newCard.setAttribute('data-notas', lead.notas || '');
 
         newCard.innerHTML = `
-            <strong>${lead.nome}</strong><br>
-            <small>WhatsApp: ${lead.whatsapp}</small><br>
-            <small>Origem: ${lead.origem}</small><br>
-            <small>Qualificação: ${lead.qualificacao}</small>
+            <strong>${lead.nome || ''}</strong><br>
+            <small>WhatsApp: ${lead.whatsapp || ''}</small><br>
+            <small>Origem: ${lead.origem || ''}</small><br>
+            <small>Qualificação: ${lead.qualificacao || ''}</small>
             <button class="edit-card-btn"><i class="ph-fill ph-note-pencil"></i></button>
         `;
 
@@ -128,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (editButton) {
             currentCard = editButton.closest('.kanban-card');
             
-            // Preenche os campos do formulário de edição com os dados do card
             document.getElementById('edit-lead-name').value = currentCard.getAttribute('data-name') || '';
             document.getElementById('edit-lead-email').value = currentCard.getAttribute('data-email') || '';
             document.getElementById('edit-lead-whatsapp').value = currentCard.getAttribute('data-whatsapp') || '';
