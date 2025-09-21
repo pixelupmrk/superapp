@@ -1,195 +1,364 @@
-document.addEventListener('DOMContentLoaded', () => {
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
-    // Lógica para a navegação da sidebar
-    const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
-    const contentAreas = document.querySelectorAll('.main-content .content-area');
+:root {
+    --background-color: #0d1117;
+    --primary-color: #0a192f;
+    --secondary-color: #162b4d;
+    --accent-color: #00f7ff; /* Azul Neon Forte */
+    --text-color: #cdd6f4;
+    --text-color-muted: #8892b0;
+    --border-glow: rgba(0, 247, 255, 0.5);
+    --sidebar-width: 250px;
+}
 
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = e.currentTarget.getAttribute('data-target');
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-            navItems.forEach(nav => nav.classList.remove('active'));
-            e.currentTarget.classList.add('active');
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
 
-            contentAreas.forEach(area => {
-                area.style.display = 'none';
-            });
-            document.getElementById(targetId).style.display = 'block';
-        });
-    });
+.app-container {
+    display: flex;
+}
 
-    // Lógica para o Kanban (Drag and Drop)
-    const columns = document.querySelectorAll('.kanban-column');
-    const kanbanBoard = document.getElementById('kanban-board');
-    let draggedItem = null;
+/* --- Sidebar --- */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background-color: var(--primary-color);
+    border-right: 1px solid var(--secondary-color);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    position: fixed;
+}
 
-    document.addEventListener('dragstart', (e) => {
-        if (e.target.classList.contains('kanban-card')) {
-            draggedItem = e.target;
-            setTimeout(() => {
-                e.target.style.display = 'none';
-            }, 0);
-        }
-    });
+.sidebar-header .logo {
+    max-width: 120px;
+    margin-bottom: 3rem;
+}
 
-    document.addEventListener('dragend', (e) => {
-        if (e.target.classList.contains('kanban-card')) {
-            e.target.style.display = 'block';
-            draggedItem = null;
-        }
-    });
+.sidebar-nav {
+    flex-grow: 1;
+}
 
-    kanbanBoard.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        const afterElement = getDragAfterElement(e.target, e.clientY);
-        const column = e.target.closest('.kanban-column');
-        if (draggedItem && column) {
-            const list = column.querySelector('.kanban-cards-list');
-            if (afterElement == null) {
-                list.appendChild(draggedItem);
-            } else {
-                list.insertBefore(draggedItem, afterElement);
-            }
-        }
-    });
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-color-muted);
+    transition: all 0.3s ease;
+}
 
-    function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.kanban-card:not(.dragging)')];
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
+.nav-item:hover {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+}
 
-    // Função para criar um card
-    function createKanbanCard(lead) {
-        const newCard = document.createElement('div');
-        newCard.classList.add('kanban-card');
-        newCard.draggable = true;
+.nav-item.active {
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    font-weight: 600;
+    box-shadow: 0 0 15px var(--border-glow);
+}
 
-        newCard.setAttribute('data-name', lead.nome);
-        newCard.setAttribute('data-whatsapp', lead.whatsapp);
-        newCard.setAttribute('data-origem', lead.origem);
-        newCard.setAttribute('data-qualificacao', lead.qualificacao);
-        newCard.setAttribute('data-email', lead.email);
-        newCard.setAttribute('data-atendente', lead.atendente);
-        newCard.setAttribute('data-data', lead.data);
-        newCard.setAttribute('data-notas', lead.notas);
+.nav-item i {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+}
 
-        newCard.innerHTML = `
-            <button class="delete-card-btn"><i class="ph-fill ph-x-circle"></i></button>
-            <strong>${lead.nome}</strong><br>
-            <small>WhatsApp: ${lead.whatsapp}</small><br>
-            <small>Origem: ${lead.origem}</small><br>
-            <small>Qualificação: ${lead.qualificacao}</small>
-        `;
+/* --- Conteúdo Principal --- */
+.main-content {
+    flex-grow: 1;
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+}
 
-        return newCard;
-    }
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
 
-    // Lógica para o formulário de novo lead
-    const leadForm = document.getElementById('lead-form');
-    const kanbanCardsListNovo = document.querySelector('.kanban-column[data-status="novo"] .kanban-cards-list');
+.main-header h1 {
+    font-size: 2rem;
+}
 
-    leadForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+.user-profile {
+    font-weight: 600;
+}
 
-        const newLead = {
-            nome: document.getElementById('lead-name').value,
-            email: document.getElementById('lead-email').value,
-            whatsapp: document.getElementById('lead-whatsapp').value,
-            atendente: document.getElementById('lead-attendant').value,
-            origem: document.getElementById('lead-origin').value,
-            data: document.getElementById('lead-date').value,
-            qualificacao: document.getElementById('lead-qualification').value,
-            notas: document.getElementById('lead-notes').value,
-        };
+.content-area {
+    background-color: var(--primary-color);
+    padding: 2rem;
+    border-radius: 12px;
+    min-height: 80vh;
+}
 
-        const newCard = createKanbanCard(newLead);
-        kanbanCardsListNovo.appendChild(newCard);
-        leadForm.reset();
-    });
+.content-area:not(.active) {
+    display: none;
+}
 
-    // Lógica para o Modal de Edição
-    const editModal = document.getElementById('edit-lead-modal');
-    const editForm = document.getElementById('edit-lead-form');
-    const cancelEditBtn = document.getElementById('cancel-edit-btn');
-    let currentCard = null;
+/* --- Kanban Styles --- */
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    min-height: 400px;
+}
 
-    kanbanBoard.addEventListener('click', (e) => {
-        const deleteButton = e.target.closest('.delete-card-btn');
-        if (deleteButton) {
-            e.stopPropagation();
-            const cardToDelete = deleteButton.closest('.kanban-card');
-            cardToDelete.remove();
-            return;
-        }
+.kanban-column {
+    background-color: var(--secondary-color);
+    padding: 1rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+}
 
-        const card = e.target.closest('.kanban-card');
-        if (card) {
-            currentCard = card;
-            
-            document.getElementById('edit-lead-name').value = card.getAttribute('data-name') || '';
-            document.getElementById('edit-lead-email').value = card.getAttribute('data-email') || '';
-            document.getElementById('edit-lead-whatsapp').value = card.getAttribute('data-whatsapp') || '';
-            document.getElementById('edit-lead-status').value = card.parentElement.closest('.kanban-column').getAttribute('data-status');
-            document.getElementById('edit-lead-attendant').value = card.getAttribute('data-atendente') || '';
-            document.getElementById('edit-lead-origem').value = card.getAttribute('data-origem') || '';
-            document.getElementById('edit-lead-date').value = card.getAttribute('data-data') || '';
-            document.getElementById('edit-lead-qualification').value = card.getAttribute('data-qualificacao') || '';
-            document.getElementById('edit-lead-notes').value = card.getAttribute('data-notas') || '';
-            
-            editModal.style.display = 'flex';
-        }
-    });
+.kanban-column h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
 
-    cancelEditBtn.addEventListener('click', () => {
-        editModal.style.display = 'none';
-    });
+.kanban-cards-list {
+    flex-grow: 1;
+    min-height: 100px;
+    padding: 0.5rem;
+    border: 1px dashed var(--text-color-muted);
+    border-radius: 8px;
+}
 
-    editForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const updatedLead = {
-            nome: document.getElementById('edit-lead-name').value,
-            email: document.getElementById('edit-lead-email').value,
-            whatsapp: document.getElementById('edit-lead-whatsapp').value,
-            atendente: document.getElementById('edit-lead-attendant').value,
-            origem: document.getElementById('edit-lead-origem').value,
-            data: document.getElementById('edit-lead-date').value,
-            qualificacao: document.getElementById('edit-lead-qualification').value,
-            notas: document.getElementById('edit-lead-notes').value,
-        };
+.kanban-card {
+    position: relative;
+    background-color: var(--primary-color);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--secondary-color);
+    margin-bottom: 0.75rem;
+    cursor: grab;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
-        // Atualiza os atributos de dados do card
-        currentCard.setAttribute('data-name', updatedLead.nome);
-        currentCard.setAttribute('data-email', updatedLead.email);
-        currentCard.setAttribute('data-whatsapp', updatedLead.whatsapp);
-        currentCard.setAttribute('data-atendente', updatedLead.atendente);
-        currentCard.setAttribute('data-origem', updatedLead.origem);
-        currentCard.setAttribute('data-data', updatedLead.data);
-        currentCard.setAttribute('data-qualificacao', updatedLead.qualificacao);
-        currentCard.setAttribute('data-notas', updatedLead.notas);
+.kanban-card:active {
+    cursor: grabbing;
+}
 
-        // Atualiza o HTML visível do card
-        currentCard.innerHTML = `
-            <button class="delete-card-btn"><i class="ph-fill ph-x-circle"></i></button>
-            <strong>${updatedLead.nome}</strong><br>
-            <small>WhatsApp: ${updatedLead.whatsapp}</small><br>
-            <small>Origem: ${updatedLead.origem}</small><br>
-            <small>Qualificação: ${updatedLead.qualificacao}</small>
-        `;
+.kanban-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 247, 255, 0.2);
+}
 
-        const newStatus = document.getElementById('edit-lead-status').value;
-        const newColumn = document.querySelector(`.kanban-column[data-status="${newStatus}"] .kanban-cards-list`);
-        newColumn.appendChild(currentCard);
+.new-lead-form {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
 
-        editModal.style.display = 'none';
-    });
-});
+.new-lead-form input {
+    flex-grow: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+.new-lead-form button {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.new-lead-form button:hover {
+    opacity: 0.9;
+    box-shadow: 0 0 10px var(--border-glow);
+}
+
+/* Estilos para o novo formulário de Leads */
+
+.card {
+    background-color: var(--secondary-color);
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.new-lead-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+#lead-form input,
+#lead-form select,
+#lead-form textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--primary-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1rem;
+    appearance: none;
+}
+
+#lead-form input:focus,
+#lead-form select:focus,
+#lead-form textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px var(--border-glow);
+}
+
+.select-group {
+    position: relative;
+}
+
+.select-group::after {
+    content: '▼';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-color-muted);
+}
+
+#lead-form textarea {
+    min-height: 100px;
+    resize: vertical;
+    margin-bottom: 1rem;
+}
+
+.btn-save {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-save:hover {
+    box-shadow: 0 0 15px var(--border-glow);
+    transform: translateY(-2px);
+}
+
+/* Estilos para o Modal de Edição */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: none; /* Inicia oculto */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: var(--secondary-color);
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: 0 0 25px var(--border-glow);
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.modal-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+#edit-lead-form input,
+#edit-lead-form select,
+#edit-lead-form textarea {
+    background-color: var(--primary-color);
+    border: 1px solid var(--secondary-color);
+    color: var(--text-color);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.modal-actions .btn-save {
+    width: auto;
+    padding: 0.75rem 1.5rem;
+}
+
+.btn-cancel {
+    background-color: transparent;
+    border: 1px solid var(--text-color-muted);
+    color: var(--text-color-muted);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+}
+
+/* Estilos para o botão de exclusão */
+.delete-card-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    color: var(--text-color-muted);
+    cursor: pointer;
+    font-size: 1.2rem;
+    opacity: 0.7;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.delete-card-btn:hover {
+    color: #ff5f5f;
+    transform: scale(1.1);
+    opacity: 1;
+}
