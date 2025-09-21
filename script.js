@@ -83,11 +83,14 @@ document.addEventListener('DOMContentLoaded', () => {
         newCard.setAttribute('data-notas', lead.notas);
 
         newCard.innerHTML = `
-            <button class="delete-card-btn"><i class="ph-fill ph-x-circle"></i></button>
             <strong>${lead.nome}</strong><br>
             <small>WhatsApp: ${lead.whatsapp}</small><br>
             <small>Origem: ${lead.origem}</small><br>
             <small>Qualificação: ${lead.qualificacao}</small>
+            <div class="card-actions">
+                <button class="edit-card-btn"><i class="ph-fill ph-note-pencil"></i></button>
+                <button class="delete-card-btn"><i class="ph-fill ph-trash"></i></button>
+            </div>
         `;
 
         return newCard;
@@ -116,36 +119,35 @@ document.addEventListener('DOMContentLoaded', () => {
         leadForm.reset();
     });
 
-    // Lógica para o Modal de Edição
+    // Lógica para o Modal de Edição (agora com botões dedicados)
     const editModal = document.getElementById('edit-lead-modal');
     const editForm = document.getElementById('edit-lead-form');
     const cancelEditBtn = document.getElementById('cancel-edit-btn');
     let currentCard = null;
 
     kanbanBoard.addEventListener('click', (e) => {
+        const editButton = e.target.closest('.edit-card-btn');
         const deleteButton = e.target.closest('.delete-card-btn');
-        if (deleteButton) {
-            e.stopPropagation();
-            const cardToDelete = deleteButton.closest('.kanban-card');
-            cardToDelete.remove();
-            return;
-        }
-
-        const card = e.target.closest('.kanban-card');
-        if (card) {
-            currentCard = card;
+        
+        if (editButton) {
+            currentCard = editButton.closest('.kanban-card');
             
-            document.getElementById('edit-lead-name').value = card.getAttribute('data-name') || '';
-            document.getElementById('edit-lead-email').value = card.getAttribute('data-email') || '';
-            document.getElementById('edit-lead-whatsapp').value = card.getAttribute('data-whatsapp') || '';
-            document.getElementById('edit-lead-status').value = card.parentElement.closest('.kanban-column').getAttribute('data-status');
-            document.getElementById('edit-lead-attendant').value = card.getAttribute('data-atendente') || '';
-            document.getElementById('edit-lead-origem').value = card.getAttribute('data-origem') || '';
-            document.getElementById('edit-lead-date').value = card.getAttribute('data-data') || '';
-            document.getElementById('edit-lead-qualification').value = card.getAttribute('data-qualificacao') || '';
-            document.getElementById('edit-lead-notes').value = card.getAttribute('data-notas') || '';
+            document.getElementById('edit-lead-name').value = currentCard.getAttribute('data-name') || '';
+            document.getElementById('edit-lead-email').value = currentCard.getAttribute('data-email') || '';
+            document.getElementById('edit-lead-whatsapp').value = currentCard.getAttribute('data-whatsapp') || '';
+            document.getElementById('edit-lead-status').value = currentCard.parentElement.closest('.kanban-column').getAttribute('data-status');
+            document.getElementById('edit-lead-attendant').value = currentCard.getAttribute('data-atendente') || '';
+            document.getElementById('edit-lead-origem').value = currentCard.getAttribute('data-origem') || '';
+            document.getElementById('edit-lead-date').value = currentCard.getAttribute('data-data') || '';
+            document.getElementById('edit-lead-qualification').value = currentCard.getAttribute('data-qualificacao') || '';
+            document.getElementById('edit-lead-notes').value = currentCard.getAttribute('data-notas') || '';
             
             editModal.style.display = 'flex';
+        }
+
+        if (deleteButton) {
+            const cardToDelete = deleteButton.closest('.kanban-card');
+            cardToDelete.remove();
         }
     });
 
@@ -178,13 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
         currentCard.setAttribute('data-notas', updatedLead.notas);
 
         // Atualiza o HTML visível do card
-        currentCard.innerHTML = `
-            <button class="delete-card-btn"><i class="ph-fill ph-x-circle"></i></button>
-            <strong>${updatedLead.nome}</strong><br>
-            <small>WhatsApp: ${updatedLead.whatsapp}</small><br>
-            <small>Origem: ${updatedLead.origem}</small><br>
-            <small>Qualificação: ${updatedLead.qualificacao}</small>
-        `;
+        currentCard.querySelector('strong').textContent = updatedLead.nome;
+        const smallElements = currentCard.querySelectorAll('small');
+        smallElements[0].textContent = `WhatsApp: ${updatedLead.whatsapp}`;
+        smallElements[1].textContent = `Origem: ${updatedLead.origem}`;
+        smallElements[2].textContent = `Qualificação: ${updatedLead.qualificacao}`;
 
         const newStatus = document.getElementById('edit-lead-status').value;
         const newColumn = document.querySelector(`.kanban-column[data-status="${newStatus}"] .kanban-cards-list`);
