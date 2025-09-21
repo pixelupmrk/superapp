@@ -1,383 +1,245 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PixelUp SuperApp — Classic</title>
-<meta name="theme-color" content="#0b1a2a"/>
-<script>window.DEFAULT_GEMINI_KEY="AIzaSyCrc1EegT7xennoqk-s_m4JGUpb-Zxq6Qo";</script>
-<link rel="preconnect" href="https://generativelanguage.googleapis.com" crossorigin>
-<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
-<style>
-  :root{--bg:#0b1118;--panel:#0f1b2a;--muted:#9bb3c7;--primary:#12b0ff;--primary2:#66d1ff;--accent:#00ffd5;--danger:#ff5d5d;--ok:#27c93f;--card:#0e1825;--border:#122235;--radius:16px;--shadow:0 8px 28px rgba(0,0,0,.35)}
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:
-       radial-gradient(1000px 600px at 10% -10%, rgba(18,176,255,.14), transparent 60%),
-       radial-gradient(800px 500px at 110% 10%, rgba(0,255,213,.10), transparent 60%), var(--bg); color:#eaf6ff}
-  a{color:var(--primary)} .muted{color:#9bb3c7} .tiny{font-size:12px} .pill{padding:4px 8px;border-radius:999px;border:1px solid var(--border)}
-  header.topbar{position:sticky;top:0;z-index:20;display:flex;gap:16px;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(11,20,32,.85);border-bottom:1px solid var(--border);backdrop-filter:blur(8px)}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:700}
-  .brand .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));box-shadow:0 0 12px rgba(18,176,255,.7),0 0 24px rgba(0,255,213,.5)}
-  nav.tabs{display:flex;gap:8px;flex-wrap:wrap}
-  nav.tabs button{background:#0b1522;color:#cfeaff;border:1px solid var(--border);padding:8px 12px;border-radius:999px;cursor:pointer}
-  nav.tabs button.active{border-color:var(--primary);color:#fff;box-shadow:0 0 0 1px rgba(18,176,255,.25) inset}
-  main{max-width:1250px;margin:24px auto;padding:0 16px}
-  section.panel{display:none;background:rgba(15,27,42,.6);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:18px}
-  section.panel.active{display:block}
-  .grid{display:grid;gap:16px}.g-3{grid-template-columns:repeat(3,minmax(0,1fr))}.g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
-  .btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#001726;border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600;box-shadow:0 10px 22px rgba(0,0,0,.35),0 2px 0 rgba(0,0,0,.2) inset}
-  .btn.secondary{background:#0b1522;color:#dff2ff;border:1px solid var(--border);box-shadow:none}
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .input,textarea,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0c1725;color:#eaf6ff}
-  .thread{overflow:auto;max-height:64vh;padding:12px;background:#0b1522;border-radius:12px;border:1px solid var(--border)}
-  .msg{margin:8px 0;padding:8px 10px;border-radius:10px;border:1px solid var(--border)} .msg.me{background:#062438} .msg.them{background:#112234}
-  .landing{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:48px 16px}
-  .landing img{width:160px;height:160px;border-radius:24px;object-fit:contain;background:#0b1522;border:1px solid var(--border)}
-  .kanban{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-  .col{background:#0b1522;border:1px solid var(--border);border-radius:14px;padding:10px;min-height:200px}
-  .col h4{margin:6px 0 10px}
-  .card-k{background:#0e1624;border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px;cursor:grab;position:relative}
-  .card-k .icons{position:absolute;right:8px;top:8px;display:flex;gap:6px}
-  .card-k .icon{cursor:pointer}
-  .card-k.drag{opacity:.6}
-  .empty{color:#89a;font-style:italic}
-  @media (max-width:1100px){.kanban{grid-template-columns:1fr}.thread{max-height:unset}}
-
-  /* Modal QR */
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:60}
-  .modal .box{background:#0b1522;border:1px solid var(--border);border-radius:16px;max-width:520px;width:100%;padding:16px;text-align:center}
-  .modal .box header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-  .modal.open{display:flex}
-  .qr-img{width:320px;max-width:100%;height:auto;border:1px solid var(--border);border-radius:12px;background:#0b1118;margin:0 auto}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SuperApp PixelUp</title>
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+    }
+    header {
+      background: #0056d2;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+    }
+    nav {
+      width: 220px;
+      background: #fff;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      border-right: 1px solid #ddd;
+      padding-top: 20px;
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+    nav ul li {
+      padding: 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      transition: background 0.3s;
+    }
+    nav ul li:hover, nav ul li.active {
+      background: #0056d2;
+      color: #fff;
+    }
+    main {
+      margin-left: 240px;
+      padding: 20px;
+    }
+    section {
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+    .btn {
+      background: #0056d2;
+      color: #fff;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .btn:hover {
+      background: #0040a8;
+    }
+    table.dataTable thead th {
+      background: #0056d2;
+      color: #fff;
+    }
+  </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand"><span class="dot"></span> PixelUp SuperApp</div>
-    <nav class="tabs" id="tabs">
-      <button class="active" onclick="window.activateTab('home')">Home</button>
-      <button onclick="window.activateTab('crm')">CRM</button>
-      <button onclick="window.activateTab('mentoria')">Mentoria</button>
-      <button onclick="window.activateTab('config')">Configurações</button>
-    </nav>
+
+  <header>
+    <h1>SuperApp PixelUp</h1>
   </header>
 
+  <nav>
+    <ul>
+      <li data-tab="crm">CRM</li>
+      <li data-tab="mentoria">Mentoria</li>
+      <li data-tab="bot">Chatbot</li>
+      <li data-tab="veiculos">Administração de Veículos</li>
+      <li data-tab="caixa">Caixa Geral</li>
+    </ul>
+  </nav>
+
   <main>
-    <!-- HOME -->
-    <section class="panel active" id="panel-home">
-      <div class="landing">
-        <img src="./logo.jpg" alt="PixelUp" onerror="this.style.display='none'"/>
-        <div class="actions">
-          <button class="btn" onclick="window.activateTab('crm')">Abrir CRM</button>
-          <button class="btn secondary" onclick="window.activateTab('mentoria')">Mentoria</button>
-          <button class="btn secondary" onclick="window.activateTab('config')">Configurações</button>
-        </div>
-      </div>
-    </section>
-
     <!-- CRM -->
-    <section class="panel" id="panel-crm">
-      <div class="card">
-        <h3>Cadastro rápido de contato</h3>
-        <div class="grid g-3">
-          <input class="input" id="cName" placeholder="Nome">
-          <input class="input" id="cEmail" placeholder="E-mail">
-          <input class="input" id="cPhone" placeholder="Telefone (WhatsApp)">
-        </div>
-        <div class="row" style="margin-top:8px">
-          <select class="input" id="cOrigin">
-            <option value="WhatsApp">Origem: WhatsApp</option>
-            <option>Facebook</option><option>Instagram</option><option>Site</option><option>Indicação</option><option>Outro</option>
-          </select>
-          <input class="input" id="cNotes" placeholder="Notas (opcional)">
-          <button class="btn" id="btnAdd">Salvar contato</button>
-          <input class="input" id="search" placeholder="Buscar (nome/telefone/e-mail/origem)"/>
-          <button class="btn secondary" id="clearSearch">Limpar</button>
-        </div>
-      </div>
-
-      <div class="grid g-2" style="margin-top:12px">
-        <!-- KANBAN -->
-        <div class="card">
-          <h3>Kanban</h3>
-          <div class="kanban" id="kanban">
-            <div class="col" data-stage="novo"><h4>Novos</h4><div class="empty tiny">— sem cards —</div></div>
-            <div class="col" data-stage="qualificando"><h4>Qualificando</h4><div class="empty tiny">— sem cards —</div></div>
-            <div class="col" data-stage="proposta"><h4>Proposta</h4><div class="empty tiny">— sem cards —</div></div>
-            <div class="col" data-stage="fechado"><h4>Fechado</h4><div class="empty tiny">— sem cards —</div></div>
-          </div>
-        </div>
-
-        <!-- CONVERSA -->
-        <div class="card">
-          <div class="row" style="justify-content:space-between">
-            <h3 id="threadTitle">Conversa — selecione um card</h3>
-            <div class="row">
-              <span class="pill" id="botBadge">Bot: OFF</span>
-              <button class="btn secondary" id="toggleBot">Ligar IA</button>
-              <button class="btn secondary" id="openQR">Conectar WhatsApp</button>
-              <span class="tiny muted" id="waStatusText">Status: —</span>
-            </div>
-          </div>
-          <div class="thread" id="thread"></div>
-          <div class="row" style="margin-top:8px">
-            <input class="input" id="msgText" placeholder="Mensagem para enviar no WhatsApp">
-            <button class="btn" id="sendMsg">Enviar</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <h3>Dashboard</h3>
-        <div class="row">
-          <div class="pill">Novos: <b id="mNovos">0</b></div>
-          <div class="pill">Qualificando: <b id="mQuali">0</b></div>
-          <div class="pill">Proposta: <b id="mProp">0</b></div>
-          <div class="pill">Fechado: <b id="mFech">0</b></div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <h3>Diagnóstico de Conexão</h3>
-        <div id="diagBox" class="tiny muted">Verificando…</div>
-      </div>
+    <section id="crm">
+      <h2>CRM PixelUp</h2>
+      <p>Aqui fica o CRM já existente...</p>
     </section>
 
-    <!-- MENTORIA -->
-    <section class="panel" id="panel-mentoria">
-      <div class="grid g-2">
-        <div class="card">
-          <h3>Módulos</h3>
-          <div id="modulesList" style="display:flex;flex-direction:column;gap:8px"></div>
-          <hr style="border-color:#123">
-          <div class="tiny muted">Importe um .docx para preencher o módulo selecionado (opcional):</div>
-          <input type="file" id="docxInput" accept=".docx"/>
-          <button class="btn secondary" id="importDocx">Importar .docx</button>
-        </div>
-        <div class="card">
-          <h3 id="lessonTitle">Selecione um módulo</h3>
-          <div id="lessonBody" class="muted">O conteúdo aparecerá aqui.</div>
-        </div>
-      </div>
+    <!-- Mentoria -->
+    <section id="mentoria">
+      <h2>Mentoria</h2>
+      <p>Conteúdo da mentoria PixelUp...</p>
     </section>
 
-    <!-- CONFIGURAÇÕES -->
-    <section class="panel" id="panel-config">
-      <div class="card">
-        <h3>Configurações</h3>
-        <div class="grid g-3">
-          <input class="input" id="userName" placeholder="Seu nome (exibido no CRM)">
-        </div>
-        <div class="row" style="margin-top:8px"><button class="btn" id="saveUser">Salvar</button></div>
-        <small class="muted">WhatsApp/API são tratados no deploy/backend.</small>
-      </div>
+    <!-- Chatbot -->
+    <section id="bot">
+      <h2>Chatbot</h2>
+      <p>Integração do bot de pré-atendimento...</p>
+    </section>
+
+    <!-- Administração de Veículos -->
+    <section id="veiculos">
+      <h2>Administração de Veículos</h2>
+      <button class="btn" id="addVeiculo">Adicionar Veículo</button>
+      <table id="tabelaVeiculos" class="display" style="width:100%">
+        <thead>
+          <tr>
+            <th>Veículo</th>
+            <th>Placa</th>
+            <th>Valor FIPE</th>
+            <th>Valor Compra</th>
+            <th>Data Entrada</th>
+            <th>Custos</th>
+            <th>Valor Venda</th>
+            <th>Lucro</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Caixa Geral -->
+    <section id="caixa">
+      <h2>Caixa Geral</h2>
+      <button class="btn" id="addCaixa">Adicionar Lançamento</button>
+      <table id="tabelaCaixa" class="display" style="width:100%">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th>Entrada (R$)</th>
+            <th>Saída (R$)</th>
+            <th>Observações</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </section>
   </main>
 
-  <!-- MODAL QR -->
-  <div class="modal" id="qrModal">
-    <div class="box">
-      <header>
-        <strong>Conectar WhatsApp — QR</strong>
-        <div class="row">
-          <a id="qrExternal" class="btn secondary" target="_blank">Abrir QR em nova aba</a>
-          <button class="btn secondary" id="qrReload">Recarregar</button>
-          <button class="btn" id="qrClose">Fechar</button>
-        </div>
-      </header>
-      <img id="qrImg" class="qr-img" alt="QR" />
-      <div id="qrMsg" class="tiny muted" style="margin-top:8px">Carregando QR…</div>
-    </div>
-  </div>
+  <!-- jQuery e DataTables -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <script>
+    // Alternar abas
+    const tabs = document.querySelectorAll("nav ul li");
+    const sections = document.querySelectorAll("main section");
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        sections.forEach(sec => sec.classList.remove("active"));
+        document.getElementById(tab.dataset.tab).classList.add("active");
+      });
+    });
+    tabs[0].click(); // Abre a primeira aba por padrão
 
-<script>
-/* ===== CONFIG ===== */
-window.PIXELUP = {
-  WA_BASE: "/api/wa",
-  REPLIT_DIRECT: "https://pixelup-wa-server.pixelupmrkt.repl.co",
-  GEMINI_MODEL: "gemini-2.0-flash"
-};
+    let tabelaVeiculos;
+    let tabelaCaixa;
 
-/* ===== Navegação robusta ===== */
-function activateTab(tab){
-  document.querySelectorAll('nav#tabs button').forEach(b=>b.classList.toggle('active', b.textContent.toLowerCase().includes(tab)));
-  document.querySelectorAll('section.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+tab));
-  if(tab==='crm'){ try{ renderKanban(); renderThread(null); refreshCounters(); runDiagnostics(); }catch(e){} }
-}
-window.activateTab = activateTab; // <-- disponível no HTML
-document.addEventListener('DOMContentLoaded', ()=>activateTab('home'));
+    $(document).ready(function() {
+      // Inicializa DataTables
+      tabelaVeiculos = $('#tabelaVeiculos').DataTable();
+      tabelaCaixa = $('#tabelaCaixa').DataTable();
 
-/* ===== Helpers/State ===== */
-const $=s=>document.querySelector(s), byId=id=>document.getElementById(id);
-const esc=s=>(s||'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-const norm=p=>(''+(p||'')).replace(/[^0-9]/g,'');
-const ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d;}catch{return d;}},set(k,v){localStorage.setItem(k,JSON.stringify(v));}};
-const qparam=k=>new URLSearchParams(location.search).get(k);
+      // Adicionar veículo
+      $("#addVeiculo").on("click", function() {
+        const veiculo = prompt("Veículo:");
+        const placa = prompt("Placa:");
+        const fipe = prompt("Valor FIPE:");
+        const compra = prompt("Valor de compra:");
+        const dataEntrada = prompt("Data de entrada:");
+        const custos = prompt("Custos:");
+        const venda = prompt("Valor de venda:");
+        const lucro = prompt("Lucro:");
+        if(veiculo) {
+          tabelaVeiculos.row.add([
+            veiculo, placa, fipe, compra, dataEntrada, custos, venda, lucro,
+            "<button class='btn btn-editar'>Editar</button> <button class='btn btn-excluir'>Excluir</button>"
+          ]).draw();
+        }
+      });
 
-const state={userName:ls.get('px_user_name',''),
-  aiKey:(qparam('gemini')||(window.DEFAULT_GEMINI_KEY||'')).trim(),
-  contacts:ls.get('px_contacts',{}), threads:ls.get('px_threads',{}), botMap:ls.get('px_bot_map',{}),
-  current:null, search:''};
+      // Adicionar lançamento no caixa
+      $("#addCaixa").on("click", function() {
+        const data = prompt("Data:");
+        const descricao = prompt("Descrição:");
+        const entrada = prompt("Entrada (R$):");
+        const saida = prompt("Saída (R$):");
+        const obs = prompt("Observações:");
+        if(data) {
+          tabelaCaixa.row.add([
+            data, descricao, entrada, saida, obs,
+            "<button class='btn btn-editar'>Editar</button> <button class='btn btn-excluir'>Excluir</button>"
+          ]).draw();
+        }
+      });
 
-/* ===== CRM ===== */
-const cName=byId('cName'), cEmail=byId('cEmail'), cPhone=byId('cPhone'), cOrigin=byId('cOrigin'), cNotes=byId('cNotes');
-const btnAdd=byId('btnAdd'), search=byId('search'), clearSearch=byId('clearSearch');
-const kanban=byId('kanban'), thread=byId('thread'), threadTitle=byId('threadTitle');
-const msgText=byId('msgText'), sendMsg=byId('sendMsg');
-const botBadge=byId('botBadge'), toggleBot=byId('toggleBot'), waStatusText=byId('waStatusText');
+      // Editar / excluir veículo
+      $('#tabelaVeiculos tbody').on('click', 'button', function () {
+        const row = tabelaVeiculos.row($(this).parents('tr'));
+        if($(this).hasClass('btn-excluir')) {
+          row.remove().draw();
+        } else if($(this).hasClass('btn-editar')) {
+          const data = row.data();
+          data[0] = prompt("Veículo:", data[0]);
+          data[1] = prompt("Placa:", data[1]);
+          data[2] = prompt("Valor FIPE:", data[2]);
+          data[3] = prompt("Valor de compra:", data[3]);
+          data[4] = prompt("Data entrada:", data[4]);
+          data[5] = prompt("Custos:", data[5]);
+          data[6] = prompt("Valor venda:", data[6]);
+          data[7] = prompt("Lucro:", data[7]);
+          row.data(data).draw();
+        }
+      });
 
-btnAdd.onclick=()=>{
-  const phone=norm(cPhone.value.trim()); if(!phone){alert('Telefone é obrigatório');return;}
-  const rec=state.contacts[phone]||{};
-  state.contacts[phone]={phone,name:(cName.value||'').trim()||phone,email:(cEmail.value||'').trim(),
-    origin:(cOrigin.value||'WhatsApp'),notes:(cNotes.value||'').trim(),stage:rec.stage||'novo',
-    lastText:rec.lastText||'',lastTs:rec.lastTs||Date.now()};
-  ls.set('px_contacts',state.contacts);
-  cName.value=cEmail.value=cPhone.value=cNotes.value='';
-  renderKanban(); refreshCounters();
-};
-search.oninput=()=>{state.search=search.value.toLowerCase();renderKanban();};
-clearSearch.onclick=()=>{search.value='';state.search='';renderKanban();};
-
-sendMsg.onclick=async()=>{
-  const phone=state.current, text=msgText.value.trim(); if(!phone||!text) return;
-  await waSend({to:phone,text}); pushMsg(phone,{who:'me',text,ts:Date.now()});
-  msgText.value=''; renderThread(phone); touchContact(phone,{lastText:text});
-};
-toggleBot.onclick=()=>{const p=state.current;if(!p)return;state.botMap[p]=!state.botMap[p];ls.set('px_bot_map',state.botMap);setBotBadge(p);};
-function setBotBadge(p){const on=!!state.botMap[p];botBadge.textContent='Bot: '+(on?'ON':'OFF');toggleBot.textContent=on?'Desligar IA':'Ligar IA';}
-
-function match(c){if(!state.search)return true;const q=state.search;return [c.name,c.phone,c.email,c.origin,(c.notes||'')].join(' ').toLowerCase().includes(q);}
-function cardHTML(c){return `<div class="card-k" draggable="true" data-phone="${c.phone}">
-  <div class="icons"><span class="icon" data-action="open">💬</span><span class="icon" data-action="refresh">↻</span></div>
-  <b>${esc(c.name||c.phone)}</b><br><span class="tiny muted">${esc(c.origin||'')}</span>
-  ${c.email?`<div class="tiny muted">${esc(c.email)}</div>`:''}
-  <div class="tiny muted">${esc(c.lastText||'')}</div></div>`;}
-function renderKanban(){
-  const cols=['novo','qualificando','proposta','fechado'];
-  kanban.querySelectorAll('.col').forEach((col,i)=>{
-    const st=cols[i];const arr=Object.values(state.contacts).filter(c=>(c.stage||'novo')===st&&match(c))
-      .sort((a,b)=>(b.lastTs||0)-(a.lastTs||0));
-    const head=`<h4>${col.querySelector('h4').textContent}</h4>`;
-    col.innerHTML=head+(arr.length?arr.map(cardHTML).join(''):`<div class="empty tiny">— sem cards —</div>`);
-  });
-  initDnD(); refreshCounters();
-}
-function initDnD(){
-  let dragEl=null;
-  kanban.querySelectorAll('.card-k').forEach(card=>{
-    const p=card.dataset.phone;
-    card.addEventListener('dragstart',()=>{dragEl=card;card.classList.add('drag')});
-    card.addEventListener('dragend',()=>{card.classList.remove('drag');dragEl=null});
-    card.addEventListener('click',e=>{if(e.target.classList.contains('icon'))return;state.current=p;renderThread(p);setBotBadge(p);});
-    card.querySelectorAll('.icon').forEach(ic=>ic.addEventListener('click',e=>{
-      const a=ic.dataset.action; if(a==='open'){state.current=p;renderThread(p);setBotBadge(p);} if(a==='refresh'){renderKanban();} e.stopPropagation();
-    }));
-  });
-  kanban.querySelectorAll('.col').forEach(col=>{
-    col.addEventListener('dragover',e=>e.preventDefault());
-    col.addEventListener('drop',e=>{e.preventDefault();if(!dragEl)return;const p=dragEl.dataset.phone,st=col.dataset.stage,c=state.contacts[p];if(!c)return;c.stage=st;state.contacts[p]=c;ls.set('px_contacts',state.contacts);renderKanban();});
-  });
-}
-function renderThread(p){
-  thread.innerHTML=''; if(!p){threadTitle.textContent='Conversa — selecione um card'; setBotBadge(null); return;}
-  const c=state.contacts[p]||{phone:p};const agent=state.userName?` • Atendente: ${esc(state.userName)}`:'';
-  threadTitle.textContent=`Conversa — ${c.name||p} (${p})${agent}`; setBotBadge(p);
-  (state.threads[p]||[]).forEach(m=>{const d=document.createElement('div');d.className='msg '+(m.who==='me'?'me':'them');const dt=new Date(m.ts||Date.now()).toLocaleString();d.innerHTML=`<small class="muted">${dt}</small><br>${esc(m.text||'')}`;thread.appendChild(d);});
-  thread.scrollTop=thread.scrollHeight;
-}
-function pushMsg(p,m){const a=state.threads[p]||[];a.push(m);state.threads[p]=a;ls.set('px_threads',state.threads);}
-function upsert(p,patch){const c=state.contacts[p]||{phone:p,stage:'novo',origin:'WhatsApp'};state.contacts[p]={...c,...patch};ls.set('px_contacts',state.contacts);}
-function touchContact(p,patch){upsert(p,{lastTs:Date.now(),...patch});renderKanban();}
-function refreshCounters(){const all=Object.values(state.contacts);
-  byId('mNovos').textContent=all.filter(c=>(c.stage||'novo')==='novo').length;
-  byId('mQuali').textContent=all.filter(c=>c.stage==='qualificando').length;
-  byId('mProp').textContent=all.filter(c=>c.stage==='proposta').length;
-  byId('mFech').textContent=all.filter(c=>c.stage==='fechado').length;}
-
-/* ===== WhatsApp API ===== */
-async function waStatus(){try{const r=await fetch(`${window.PIXELUP.WA_BASE}/status`,{cache:'no-store'});const j=await r.json();waStatusText.textContent='Status: '+(j.connected?('on'+(j.user?' ('+j.user+')':'')):'off');return !!j.connected;}catch{waStatusText.textContent='Status: off';return false;}}
-async function waSend({to,text}){const r=await fetch(`${window.PIXELUP.WA_BASE}/send`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,text})});try{return await r.json();}catch{return{ok:false};}}
-function waEvents(){
-  let es=null,tried=false;const direct=window.PIXELUP.REPLIT_DIRECT+'/api/wa/events', proxy=window.PIXELUP.WA_BASE+'/events';
-  const open=url=>{try{es&&es.close();es=new EventSource(url);es.onmessage=async ev=>{try{const d=JSON.parse(ev.data);
-        if(d.type==='status'){await waStatus();}
-        if(d.type==='message'){const p=(''+(d.from||'')).replace(/[^0-9]/g,''); if(!p)return;
-          upsert(p,{name:d.name||p,origin:'WhatsApp',lastText:d.text||'',lastTs:d.ts||Date.now()});
-          pushMsg(p,{who:'them',text:d.text||'',ts:d.ts||Date.now()});
-          if(state.current===p) renderThread(p);
-          if(state.botMap[p]) await botIA(p,d.text||'');
-          renderKanban();}}catch{}};
-      es.onerror=()=>{es&&es.close(); if(!tried){tried=true;setTimeout(()=>open(proxy),600);} else {setTimeout(()=>open(direct),3000);}};}
-    catch{if(!tried){tried=true;setTimeout(()=>open(proxy),600);} else {setTimeout(()=>open(direct),3000);}}};
-  open(direct);
-}
-
-/* ===== QR (imagem) ===== */
-const qrModal=byId('qrModal'), qrImg=byId('qrImg'), qrMsg=byId('qrMsg'), qrReload=byId('qrReload'), qrClose=byId('qrClose'), openQR=byId('openQR'), qrExternal=byId('qrExternal');
-let qrPoll=null;
-async function findQrURL(){const ts='t='+Date.now();const tries=[`${window.PIXELUP.WA_BASE}/qr.png?${ts}`,`${window.PIXELUP.WA_BASE}/qr.svg?${ts}`,`${window.PIXELUP.WA_BASE}/qr?format=png&${ts}`];
-  for(const u of tries){try{const r=await fetch(u,{cache:'no-store'});if(r.ok){const ct=r.headers.get('content-type')||'';if(ct.includes('image')||u.endsWith('.png')||u.endsWith('.svg')) return u;}}catch{}}
-  return null;}
-async function openQrModal(){
-  qrImg.src=''; qrMsg.textContent='Carregando QR…'; qrExternal.href=window.PIXELUP.REPLIT_DIRECT+'/qr.html?t='+Date.now();
-  const url=await findQrURL();
-  if(url){ qrImg.src=url; qrMsg.textContent='Aponte a câmera do WhatsApp para este QR.';
-    if(qrPoll) clearInterval(qrPoll);
-    qrPoll=setInterval(async()=>{const ok=await waStatus(); if(ok){clearInterval(qrPoll);qrPoll=null;qrMsg.textContent='Conectado!';} else {const u=await findQrURL(); if(u) qrImg.src=u;}},15000);
-  }else{ qrMsg.innerHTML='Não consegui carregar a imagem do QR pela API. Clique em <b>Abrir QR em nova aba</b>.'; }
-  qrModal.classList.add('open');
-}
-qrReload.onclick=()=>openQrModal();
-qrClose.onclick =()=>{qrModal.classList.remove('open'); if(qrPoll) clearInterval(qrPoll);};
-openQR.onclick  =()=>openQrModal();
-
-/* ===== Gemini (bot) ===== */
-function gemKey(){return(state.aiKey||'').trim();}
-async function gemCall(prompt,json){const key=gemKey(); if(!key) return json?null:''; const url=`https://generativelanguage.googleapis.com/v1beta/models/${window.PIXELUP.GEMINI_MODEL}:generateContent`;
-  const body=json?{contents:[{parts:[{text:prompt}]}],generationConfig:{response_mime_type:"application/json"}}:{contents:[{parts:[{text:prompt}]}]};
-  try{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)}); if(!r.ok) return json?null:''; const j=await r.json(); const t=j?.candidates?.[0]?.content?.parts?.[0]?.text||''; if(json){try{return JSON.parse(t);}catch{return null;}} return t.trim();}catch{return json?null:'';}}
-async function botIA(p,textIn){
-  const ext=await gemCall(`Extraia JSON curto: nome, email, necessidade, orcamento, prazo (pode faltar). Msg: "${textIn}"`,true);
-  if(ext){const notes=[ext.nome?`Nome: ${ext.nome}`:'',ext.email?`Email: ${ext.email}`:'',ext.necessidade?`Necessidade: ${ext.necessidade}`:'',ext.orcamento?`Orçamento: ${ext.orcamento}`:'',ext.prazo?`Prazo: ${ext.prazo}`:''].filter(Boolean).join(' | ');
-    const c=state.contacts[p]||{phone:p}; state.contacts[p]={...c,name:c.name||ext.nome||p,email:c.email||ext.email||'',notes:notes||c.notes||'',lastText:textIn,lastTs:Date.now()};
-    ls.set('px_contacts',state.contacts); renderKanban(); if(state.current===p) renderThread(p);}
-  const reply=await gemCall("Atue como atendente virtual da PixelUp. Peça educadamente os dados que faltam (nome, e-mail, necessidade, orçamento, prazo). Se pedirem humano, diga que vai acionar o atendimento.\n\nMensagem: "+textIn,false);
-  if(reply){await waSend({to:p,text:reply}); pushMsg(p,{who:'me',text:reply,ts:Date.now()}); if(state.current===p) renderThread(p);}
-}
-
-/* ===== Mentoria ===== */
-const seedMods=[{id:'m1',t:'Módulo 1 — Persona e Fundamentos do Negócio',h:'<h4>Persona</h4><p>Defina seu cliente ideal…</p>'},
-{id:'m2',t:'Módulo 2 — Algoritmo do Meta',h:'<h4>Algoritmo</h4><p>Entenda sinais de entrega…</p>'},
-{id:'m3',t:'Módulo 3 — Calendário Editorial',h:'<h4>Calendário</h4><p>Temas, formatos, metas…</p>'},
-{id:'m4',t:'Módulo 4 — Conteúdo Visual',h:'<h4>Visual</h4><p>Hook, cortes, ritmo…</p>'},
-{id:'m5',t:'Módulo 5 — Copy com IA',h:'<h4>Copy</h4><p>Estrutura de prompts…</p>'},
-{id:'m6',t:'Módulo 6 — CRM e Rotina Comercial',h:'<h4>CRM</h4><p>Pipeline e follow-up…</p>'},
-{id:'m7',t:'Módulo 7 — Técnicas de Vendas',h:'<h4>Vendas</h4><p>Rapport, objeções…</p>'},
-{id:'m8',t:'Módulo 8 — Implementação + Tráfego',h:'<h4>Implementação</h4><p>Integração WhatsApp + Ads…</p>'}];
-const modulesList=byId('modulesList'), lessonTitle=byId('lessonTitle'), lessonBody=byId('lessonBody'); let currentModule=null;
-function mkey(id){return'px_mod_'+id;} function loadMod(id){const s=ls.get(mkey(id),null); return s&&s.html?s.html:(seedMods.find(x=>x.id===id)?.h||'(sem conteúdo)');}
-function saveMod(id,html){ls.set(mkey(id),{html});}
-function renderModules(){modulesList.innerHTML='';seedMods.forEach(m=>{const b=document.createElement('button');b.className='btn secondary';b.style.width='100%';b.textContent=m.t;b.onclick=()=>selectModule(m);modulesList.appendChild(b);});}
-async function selectModule(m){currentModule=m.id;lessonTitle.textContent=m.t;lessonBody.innerHTML=loadMod(m.id);
-  try{const res=await fetch(`/mentoria/${m.id}.docx`,{cache:'no-store'}); if(res.ok){const ab=await res.arrayBuffer(); const html=(await window.mammoth.convertToHtml({arrayBuffer:ab})).value||''; if(html){saveMod(m.id,html);lessonBody.innerHTML=html;}}}catch{}}
-byId('importDocx').onclick=async()=>{const f=byId('docxInput').files?.[0]; if(!f) return alert('Selecione um .docx'); if(!currentModule) return alert('Escolha um módulo à esquerda');
-  try{const ab=await f.arrayBuffer(); const html=(await window.mammoth.convertToHtml({arrayBuffer:ab})).value||'(vazio)'; saveMod(currentModule,html); lessonBody.innerHTML=html; alert('Conteúdo importado!');}catch{alert('Falha ao ler .docx');}};
-renderModules();
-
-/* ===== Config ===== */
-const userName=byId('userName'), saveUser=byId('saveUser'); userName.value=state.userName||''; saveUser.onclick=()=>{state.userName=(userName.value||'').trim(); ls.set('px_user_name',state.userName); alert('Nome salvo!');};
-
-/* ===== Diagnóstico ===== */
-async function runDiagnostics(){const out=[]; try{const r=await fetch(`${window.PIXELUP.WA_BASE}/status`,{cache:'no-store'});const j=await r.json(); out.push(`Proxy /api/wa/status: ${r.ok?'OK':'FAIL'} ${r.ok?JSON.stringify(j):''}`);}catch{out.push('Proxy /api/wa/status: FAIL');}
-  try{await fetch(window.PIXELUP.REPLIT_DIRECT+'/api/wa/status',{mode:'no-cors'}); out.push('Replit /api/wa/status: tentativa enviada');}catch{out.push('Replit /api/wa/status: FAIL');}
-  byId('diagBox').innerText=out.join(' | ');}
-
-/* ===== Boot ===== */
-try{waEvents(); waStatus(); renderKanban(); renderThread(null); refreshCounters(); runDiagnostics();}catch(e){console.error(e);}
-</script>
-
-<footer class="muted" style="text-align:center;padding:20px">© PixelUp — SuperApp Classic</footer>
+      // Editar / excluir caixa
+      $('#tabelaCaixa tbody').on('click', 'button', function () {
+        const row = tabelaCaixa.row($(this).parents('tr'));
+        if($(this).hasClass('btn-excluir')) {
+          row.remove().draw();
+        } else if($(this).hasClass('btn-editar')) {
+          const data = row.data();
+          data[0] = prompt("Data:", data[0]);
+          data[1] = prompt("Descrição:", data[1]);
+          data[2] = prompt("Entrada (R$):", data[2]);
+          data[3] = prompt("Saída (R$):", data[3]);
+          data[4] = prompt("Observações:", data[4]);
+          row.data(data).draw();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
