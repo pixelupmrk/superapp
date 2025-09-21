@@ -1,245 +1,363 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SuperApp PixelUp</title>
-  <!-- DataTables CSS -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0ea5e9" />
+  <title>CRM PixelUp — Kanban + Bot</title>
+
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f7fa;
-      color: #333;
-    }
-    header {
-      background: #0056d2;
-      color: #fff;
-      padding: 15px;
-      text-align: center;
-    }
-    nav {
-      width: 220px;
-      background: #fff;
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      border-right: 1px solid #ddd;
-      padding-top: 20px;
-    }
-    nav ul {
-      list-style: none;
-      padding: 0;
-    }
-    nav ul li {
-      padding: 12px;
-      cursor: pointer;
-      border-bottom: 1px solid #eee;
-      transition: background 0.3s;
-    }
-    nav ul li:hover, nav ul li.active {
-      background: #0056d2;
-      color: #fff;
-    }
-    main {
-      margin-left: 240px;
-      padding: 20px;
-    }
-    section {
-      display: none;
-    }
-    section.active {
-      display: block;
-    }
-    .btn {
-      background: #0056d2;
-      color: #fff;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-    .btn:hover {
-      background: #0040a8;
-    }
-    table.dataTable thead th {
-      background: #0056d2;
-      color: #fff;
-    }
+    :root { --px-blue: #00b2ff; }
+    .glow { box-shadow: 0 0 18px rgba(0,178,255,.6); }
+    .neon { text-shadow: 0 0 12px rgba(0,178,255,.8); }
+    .drop-on { outline: 2px dashed rgba(0,178,255,.7); outline-offset: 2px; }
   </style>
 </head>
-<body>
+<body class="bg-neutral-950 text-neutral-100 selection:bg-cyan-500/30">
 
-  <header>
-    <h1>SuperApp PixelUp</h1>
+  <!-- Header -->
+  <header class="border-b border-neutral-800/70 bg-neutral-900/40 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-3 h-6 rounded-full bg-cyan-400 glow"></div>
+        <h1 class="text-lg sm:text-xl font-semibold neon">CRM PixelUp</h1>
+      </div>
+      <nav class="text-sm text-neutral-300 flex items-center gap-3">
+        <a href="#kanban" class="hover:text-white">Kanban</a>
+        <span class="opacity-30">•</span>
+        <a href="#bot" class="hover:text-white">Bot</a>
+      </nav>
+    </div>
   </header>
 
-  <nav>
-    <ul>
-      <li data-tab="crm">CRM</li>
-      <li data-tab="mentoria">Mentoria</li>
-      <li data-tab="bot">Chatbot</li>
-      <li data-tab="veiculos">Administração de Veículos</li>
-      <li data-tab="caixa">Caixa Geral</li>
-    </ul>
-  </nav>
+  <!-- Intro -->
+  <section class="relative">
+    <div class="absolute inset-0 pointer-events-none opacity-40 blur-3xl" style="background: radial-gradient(900px 300px at 70% -10%, rgba(0,178,255,.35), transparent 60%), radial-gradient(700px 250px at 10% -10%, rgba(56,189,248,.25), transparent 60%);"></div>
+    <div class="max-w-7xl mx-auto px-4 py-10 relative">
+      <h2 class="text-2xl font-semibold">Pipeline de Vendas</h2>
+      <p class="text-neutral-300 mt-1">Arraste e solte os cards entre as colunas. Tudo salvo no navegador.</p>
+      <div class="mt-4 flex items-center gap-2">
+        <button id="btn-novo" class="bg-cyan-500 text-black font-semibold px-4 py-2 rounded-xl glow hover:bg-cyan-400 active:scale-95 transition">+ Novo Lead</button>
+        <button id="btn-reset" class="bg-neutral-800 border border-neutral-700 px-4 py-2 rounded-xl hover:bg-neutral-700 active:scale-95 transition">Resetar Demo</button>
+      </div>
+    </div>
+  </section>
 
-  <main>
-    <!-- CRM -->
-    <section id="crm">
-      <h2>CRM PixelUp</h2>
-      <p>Aqui fica o CRM já existente...</p>
-    </section>
+  <!-- Kanban -->
+  <main id="kanban" class="max-w-7xl mx-auto px-4 pb-24">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- A Fazer -->
+      <section class="bg-neutral-900/40 border border-neutral-800 rounded-2xl overflow-hidden">
+        <header class="px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-neutral-500"></span>
+            <h3 class="font-semibold">A Fazer</h3>
+          </div>
+          <span id="count-todo" class="text-xs text-neutral-400">0</span>
+        </header>
+        <div id="col-todo" class="p-3 min-h-[40vh] space-y-3" data-col="todo"></div>
+      </section>
 
-    <!-- Mentoria -->
-    <section id="mentoria">
-      <h2>Mentoria</h2>
-      <p>Conteúdo da mentoria PixelUp...</p>
-    </section>
+      <!-- Fazendo -->
+      <section class="bg-neutral-900/40 border border-neutral-800 rounded-2xl overflow-hidden">
+        <header class="px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
+            <h3 class="font-semibold">Fazendo</h3>
+          </div>
+          <span id="count-doing" class="text-xs text-neutral-400">0</span>
+        </header>
+        <div id="col-doing" class="p-3 min-h-[40vh] space-y-3" data-col="doing"></div>
+      </section>
 
-    <!-- Chatbot -->
-    <section id="bot">
-      <h2>Chatbot</h2>
-      <p>Integração do bot de pré-atendimento...</p>
-    </section>
-
-    <!-- Administração de Veículos -->
-    <section id="veiculos">
-      <h2>Administração de Veículos</h2>
-      <button class="btn" id="addVeiculo">Adicionar Veículo</button>
-      <table id="tabelaVeiculos" class="display" style="width:100%">
-        <thead>
-          <tr>
-            <th>Veículo</th>
-            <th>Placa</th>
-            <th>Valor FIPE</th>
-            <th>Valor Compra</th>
-            <th>Data Entrada</th>
-            <th>Custos</th>
-            <th>Valor Venda</th>
-            <th>Lucro</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <!-- Caixa Geral -->
-    <section id="caixa">
-      <h2>Caixa Geral</h2>
-      <button class="btn" id="addCaixa">Adicionar Lançamento</button>
-      <table id="tabelaCaixa" class="display" style="width:100%">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Descrição</th>
-            <th>Entrada (R$)</th>
-            <th>Saída (R$)</th>
-            <th>Observações</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
+      <!-- Feito -->
+      <section class="bg-neutral-900/40 border border-neutral-800 rounded-2xl overflow-hidden">
+        <header class="px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <h3 class="font-semibold">Feito</h3>
+          </div>
+          <span id="count-done" class="text-xs text-neutral-400">0</span>
+        </header>
+        <div id="col-done" class="p-3 min-h-[40vh] space-y-3" data-col="done"></div>
+      </section>
+    </div>
   </main>
 
-  <!-- jQuery e DataTables -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <!-- Launcher do Chat -->
+  <button id="bot-launcher" class="fixed bottom-5 right-5 z-40 rounded-full px-4 py-3 bg-cyan-500 text-black font-semibold glow hover:bg-cyan-400 active:scale-95 transition" aria-label="Abrir chat do bot">
+    Abrir Chat
+  </button>
+
+  <!-- Widget do Bot -->
+  <div id="bot-widget" class="fixed bottom-24 right-5 z-40 w-[min(92vw,380px)] max-h-[70vh] bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden hidden">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-neutral-800 bg-neutral-900/70">
+      <div class="flex items-center gap-2">
+        <div class="w-2.5 h-5 rounded-full bg-cyan-400 glow"></div>
+        <span class="font-medium">PixelUp • Bot</span>
+      </div>
+      <button id="bot-close" class="text-neutral-400 hover:text-white">✕</button>
+    </div>
+    <div id="chat-log" class="p-3 space-y-3 overflow-y-auto" style="max-height: 50vh;">
+      <div class="text-xs text-neutral-400">Dica: qualquer mensagem enviada aqui chama sua API.</div>
+    </div>
+    <form id="chat-form" class="p-3 border-t border-neutral-800 bg-neutral-900/70">
+      <div class="flex items-center gap-2">
+        <input id="chat-input" type="text" placeholder="Escreva sua mensagem..." class="flex-1 bg-neutral-800/80 border border-neutral-700 rounded-lg px-3 py-2 outline-none focus:border-cyan-500" required />
+        <button class="bg-cyan-500 text-black font-semibold px-3 py-2 rounded-lg hover:bg-cyan-400 active:scale-95 transition">Enviar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal Add/Edit -->
+  <div id="modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/60"></div>
+    <div class="relative max-w-lg mx-auto mt-24 bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden">
+      <div class="px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
+        <h4 id="modal-title" class="font-semibold">Novo Lead</h4>
+        <button id="modal-close" class="text-neutral-400 hover:text-white">✕</button>
+      </div>
+      <form id="modal-form" class="p-4 space-y-3">
+        <input type="hidden" id="task-id" />
+        <div>
+          <label class="text-sm text-neutral-300">Título</label>
+          <input id="task-title" class="w-full bg-neutral-800/70 border border-neutral-700 rounded-lg px-3 py-2 outline-none focus:border-cyan-500" required />
+        </div>
+        <div>
+          <label class="text-sm text-neutral-300">Detalhes</label>
+          <textarea id="task-desc" rows="3" class="w-full bg-neutral-800/70 border border-neutral-700 rounded-lg px-3 py-2 outline-none focus:border-cyan-500"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-sm text-neutral-300">Coluna</label>
+            <select id="task-col" class="w-full bg-neutral-800/70 border border-neutral-700 rounded-lg px-3 py-2 outline-none focus:border-cyan-500">
+              <option value="todo">A Fazer</option>
+              <option value="doing">Fazendo</option>
+              <option value="done">Feito</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-sm text-neutral-300">WhatsApp (opcional)</label>
+            <input id="task-wa" placeholder="55DDDNUMERO" class="w-full bg-neutral-800/70 border border-neutral-700 rounded-lg px-3 py-2 outline-none focus:border-cyan-500" />
+          </div>
+        </div>
+        <div class="flex items-center justify-between pt-2">
+          <button type="button" id="task-delete" class="text-red-400 hover:text-red-300 hidden">Remover</button>
+          <button class="bg-cyan-500 text-black font-semibold px-4 py-2 rounded-xl hover:bg-cyan-400 active:scale-95 transition">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- BLOCO DE CONFIG DO BOT (AJUSTE AQUI) -->
   <script>
-    // Alternar abas
-    const tabs = document.querySelectorAll("nav ul li");
-    const sections = document.querySelectorAll("main section");
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        tabs.forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        sections.forEach(sec => sec.classList.remove("active"));
-        document.getElementById(tab.dataset.tab).classList.add("active");
-      });
-    });
-    tabs[0].click(); // Abre a primeira aba por padrão
-
-    let tabelaVeiculos;
-    let tabelaCaixa;
-
-    $(document).ready(function() {
-      // Inicializa DataTables
-      tabelaVeiculos = $('#tabelaVeiculos').DataTable();
-      tabelaCaixa = $('#tabelaCaixa').DataTable();
-
-      // Adicionar veículo
-      $("#addVeiculo").on("click", function() {
-        const veiculo = prompt("Veículo:");
-        const placa = prompt("Placa:");
-        const fipe = prompt("Valor FIPE:");
-        const compra = prompt("Valor de compra:");
-        const dataEntrada = prompt("Data de entrada:");
-        const custos = prompt("Custos:");
-        const venda = prompt("Valor de venda:");
-        const lucro = prompt("Lucro:");
-        if(veiculo) {
-          tabelaVeiculos.row.add([
-            veiculo, placa, fipe, compra, dataEntrada, custos, venda, lucro,
-            "<button class='btn btn-editar'>Editar</button> <button class='btn btn-excluir'>Excluir</button>"
-          ]).draw();
-        }
-      });
-
-      // Adicionar lançamento no caixa
-      $("#addCaixa").on("click", function() {
-        const data = prompt("Data:");
-        const descricao = prompt("Descrição:");
-        const entrada = prompt("Entrada (R$):");
-        const saida = prompt("Saída (R$):");
-        const obs = prompt("Observações:");
-        if(data) {
-          tabelaCaixa.row.add([
-            data, descricao, entrada, saida, obs,
-            "<button class='btn btn-editar'>Editar</button> <button class='btn btn-excluir'>Excluir</button>"
-          ]).draw();
-        }
-      });
-
-      // Editar / excluir veículo
-      $('#tabelaVeiculos tbody').on('click', 'button', function () {
-        const row = tabelaVeiculos.row($(this).parents('tr'));
-        if($(this).hasClass('btn-excluir')) {
-          row.remove().draw();
-        } else if($(this).hasClass('btn-editar')) {
-          const data = row.data();
-          data[0] = prompt("Veículo:", data[0]);
-          data[1] = prompt("Placa:", data[1]);
-          data[2] = prompt("Valor FIPE:", data[2]);
-          data[3] = prompt("Valor de compra:", data[3]);
-          data[4] = prompt("Data entrada:", data[4]);
-          data[5] = prompt("Custos:", data[5]);
-          data[6] = prompt("Valor venda:", data[6]);
-          data[7] = prompt("Lucro:", data[7]);
-          row.data(data).draw();
-        }
-      });
-
-      // Editar / excluir caixa
-      $('#tabelaCaixa tbody').on('click', 'button', function () {
-        const row = tabelaCaixa.row($(this).parents('tr'));
-        if($(this).hasClass('btn-excluir')) {
-          row.remove().draw();
-        } else if($(this).hasClass('btn-editar')) {
-          const data = row.data();
-          data[0] = prompt("Data:", data[0]);
-          data[1] = prompt("Descrição:", data[1]);
-          data[2] = prompt("Entrada (R$):", data[2]);
-          data[3] = prompt("Saída (R$):", data[3]);
-          data[4] = prompt("Observações:", data[4]);
-          row.data(data).draw();
-        }
-      });
-    });
+    window.PIXELUP_BOT_CONFIG = {
+      API_URL: "https://seu-endpoint.com/api/messages", // <- troque para o seu endpoint real
+      API_TOKEN: "",                                    // <- preencha se sua API exigir
+      WA_BOT_SCRIPT: "wa-bot/wa-bot.js"                 // <- mantenha APENAS esse arquivo na pasta /wa-bot/
+    };
   </script>
+
+  <!-- App: Kanban + Bot -->
+  <script>
+    (function () {
+      /* ======= KANBAN / STORAGE ======= */
+      const LS_KEY = "pxu_kanban_v1";
+      let data = load() || demo();
+
+      const cols = {
+        todo: document.getElementById("col-todo"),
+        doing: document.getElementById("col-doing"),
+        done: document.getElementById("col-done"),
+      };
+      const counts = {
+        todo: document.getElementById("count-todo"),
+        doing: document.getElementById("count-doing"),
+        done: document.getElementById("count-done"),
+      };
+
+      function demo() {
+        return [
+          { id: uid(), title: "Novo lead M2 Multimarcas", desc: "Agendar ligação de qualificação.", col: "todo", wa: "5547997605173" },
+          { id: uid(), title: "Criar criativo Meta Ads", desc: "PixelUp — arte 1080x1350 azul neon.", col: "doing" },
+          { id: uid(), title: "Revisar landing PixelUp", desc: "CTA WhatsApp + prova social.", col: "done" },
+        ];
+      }
+      function uid() { return Math.random().toString(36).slice(2, 10); }
+      function save() { localStorage.setItem(LS_KEY, JSON.stringify(data)); }
+      function load() { try { return JSON.parse(localStorage.getItem(LS_KEY)||""); } catch { return null; } }
+
+      function render() {
+        Object.values(cols).forEach(c => c.innerHTML = "");
+        let cts = { todo:0, doing:0, done:0 };
+
+        for (const t of data) {
+          const el = card(t);
+          cols[t.col].appendChild(el);
+          cts[t.col]++;
+        }
+        counts.todo.textContent = cts.todo;
+        counts.doing.textContent = cts.doing;
+        counts.done.textContent = cts.done;
+      }
+
+      function card(t) {
+        const el = document.createElement("article");
+        el.className = "bg-neutral-800/70 border border-neutral-700 rounded-xl p-3 cursor-grab active:cursor-grabbing";
+        el.draggable = true;
+        el.dataset.id = t.id;
+        el.innerHTML = `
+          <div class="flex items-start justify-between gap-3">
+            <h4 class="font-semibold">${escapeHtml(t.title)}</h4>
+            <button class="text-xs text-neutral-400 hover:text-white edit-btn">Editar</button>
+          </div>
+          ${t.desc ? `<p class="text-sm text-neutral-300 mt-1 whitespace-pre-line">${escapeHtml(t.desc)}</p>` : ""}
+          ${t.wa ? `<a class="inline-block mt-2 text-xs text-cyan-400 hover:text-cyan-300 underline" target="_blank" href="https://wa.me/${t.wa}">Abrir WhatsApp</a>` : ""}
+        `;
+        el.addEventListener("dragstart", ev => {
+          ev.dataTransfer.setData("text/plain", t.id);
+          setTimeout(() => el.classList.add("opacity-70"), 0);
+        });
+        el.addEventListener("dragend", () => el.classList.remove("opacity-70"));
+        el.querySelector(".edit-btn").addEventListener("click", () => openModal(t));
+        return el;
+      }
+
+      Object.values(cols).forEach(zone => {
+        zone.addEventListener("dragover", ev => { ev.preventDefault(); zone.classList.add("drop-on"); });
+        ["dragleave","drop"].forEach(e => zone.addEventListener(e, () => zone.classList.remove("drop-on")));
+        zone.addEventListener("drop", ev => {
+          ev.preventDefault();
+          const id = ev.dataTransfer.getData("text/plain");
+          const item = data.find(x => x.id === id);
+          if (item) {
+            item.col = zone.dataset.col;
+            save(); render();
+          }
+        });
+      });
+
+      // Modal
+      const modal = document.getElementById("modal");
+      const mTitle = document.getElementById("modal-title");
+      const mForm = document.getElementById("modal-form");
+      const mClose = document.getElementById("modal-close");
+      const fId = document.getElementById("task-id");
+      const fTitle = document.getElementById("task-title");
+      const fDesc = document.getElementById("task-desc");
+      const fCol = document.getElementById("task-col");
+      const fWa = document.getElementById("task-wa");
+      const btnDel = document.getElementById("task-delete");
+
+      function openModal(t) {
+        modal.classList.remove("hidden");
+        if (t) {
+          mTitle.textContent = "Editar Lead";
+          fId.value = t.id; fTitle.value = t.title; fDesc.value = t.desc||""; fCol.value = t.col; fWa.value = t.wa||"";
+          btnDel.classList.remove("hidden");
+        } else {
+          mTitle.textContent = "Novo Lead";
+          fId.value = ""; fTitle.value = ""; fDesc.value = ""; fCol.value = "todo"; fWa.value = "";
+          btnDel.classList.add("hidden");
+        }
+      }
+      function closeModal(){ modal.classList.add("hidden"); }
+      document.getElementById("btn-novo").addEventListener("click", () => openModal());
+      document.getElementById("btn-reset").addEventListener("click", () => { data = demo(); save(); render(); });
+      mClose.addEventListener("click", closeModal);
+      modal.addEventListener("click", (e)=>{ if(e.target===modal) closeModal(); });
+
+      mForm.addEventListener("submit", (ev)=>{
+        ev.preventDefault();
+        const id = fId.value || uid();
+        const exists = data.find(x=>x.id===id);
+        const obj = { id, title:fTitle.value.trim(), desc:fDesc.value.trim(), col:fCol.value, wa:(fWa.value||"").trim() };
+        if (!obj.title) return;
+        if (exists) Object.assign(exists, obj); else data.push(obj);
+        save(); render(); closeModal();
+      });
+      btnDel.addEventListener("click", ()=>{
+        const id = fId.value;
+        const idx = data.findIndex(x=>x.id===id);
+        if (idx>-1) data.splice(idx,1);
+        save(); render(); closeModal();
+      });
+
+      function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
+
+      render();
+
+      /* ======= BOT / API ======= */
+      const cfg = window.PIXELUP_BOT_CONFIG || {};
+      const widget = document.getElementById("bot-widget");
+      const openBtn = document.getElementById("bot-launcher");
+      const closeBtn = document.getElementById("bot-close");
+      const form = document.getElementById("chat-form");
+      const input = document.getElementById("chat-input");
+      const log = document.getElementById("chat-log");
+
+      openBtn.addEventListener("click", () => widget.classList.toggle("hidden"));
+      closeBtn.addEventListener("click", () => widget.classList.add("hidden"));
+
+      function appendMsg(text, role="user"){
+        const wrap = document.createElement("div");
+        wrap.className = "flex";
+        wrap.innerHTML = role==="user"
+          ? `<div class="ml-auto max-w-[85%] bg-cyan-500 text-black rounded-xl px-3 py-2">${escapeHtml(text)}</div>`
+          : `<div class="max-w-[85%] bg-neutral-800 text-neutral-100 rounded-xl px-3 py-2 border border-neutral-700">${escapeHtml(text)}</div>`;
+        log.appendChild(wrap);
+        log.scrollTop = log.scrollHeight;
+      }
+
+      async function callApi(message){
+        if(!cfg.API_URL){ appendMsg("⚠️ API_URL não configurada no index.html.", "bot"); return; }
+        try{
+          const headers = { "Content-Type":"application/json" };
+          if (cfg.API_TOKEN) headers["Authorization"] = `Bearer ${cfg.API_TOKEN}`;
+          const res = await fetch(cfg.API_URL, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ message, source:"pixelup-web", ts: Date.now() })
+          });
+          if(!res.ok){
+            const t = await res.text();
+            appendMsg(`Erro da API (${res.status}): ${t || "sem detalhes"}`, "bot");
+            return;
+          }
+          const data = await res.json().catch(()=>({}));
+          const reply = (data && (data.reply||data.message||data.text)) || "✅ Mensagem enviada.";
+          appendMsg(String(reply), "bot");
+        }catch(e){
+          appendMsg(`Erro de rede: ${e.message}`, "bot");
+        }
+      }
+
+      form.addEventListener("submit", (ev)=>{
+        ev.preventDefault();
+        const text = (input.value||"").trim();
+        if(!text) return;
+        appendMsg(text, "user");
+        input.value = "";
+        callApi(text); // qualquer mensagem ativa a API
+      });
+
+      if (cfg.WA_BOT_SCRIPT) {
+        const s = document.createElement("script");
+        s.src = cfg.WA_BOT_SCRIPT; s.defer = true;
+        s.onload  = () => console.log("[wa-bot] carregado.");
+        s.onerror = () => console.log("[wa-bot] não encontrado (ok se não usar).");
+        document.body.appendChild(s);
+      }
+    })();
+  </script>
+
+  <noscript>
+    <div class="fixed inset-0 bg-neutral-900 text-white p-6">
+      Habilite JavaScript para usar o CRM e o bot.
+    </div>
+  </noscript>
 </body>
 </html>
