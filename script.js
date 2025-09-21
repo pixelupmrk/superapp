@@ -70,4 +70,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+});// Lógica para o formulário de novo lead
+const leadForm = document.getElementById('lead-form');
+
+leadForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const newLead = {
+        nome: document.getElementById('lead-name').value,
+        email: document.getElementById('lead-email').value,
+        whatsapp: document.getElementById('lead-whatsapp').value,
+        status: document.getElementById('lead-status').value,
+        atendente: document.getElementById('lead-attendant').value,
+        origem: document.getElementById('lead-origin').value,
+        data: document.getElementById('lead-date').value,
+        qualificacao: document.getElementById('lead-qualification').value,
+        notas: document.getElementById('lead-notes').value,
+    };
+
+    console.log('Novo Lead Salvo (localmente):', newLead);
+
+    leadForm.reset();
 });
