@@ -87,10 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <small>WhatsApp: ${lead.whatsapp}</small><br>
             <small>Origem: ${lead.origem}</small><br>
             <small>Qualificação: ${lead.qualificacao}</small>
-            <div class="card-actions">
-                <button class="edit-card-btn"><i class="ph-fill ph-note-pencil"></i></button>
-                <button class="delete-card-btn"><i class="ph-fill ph-trash"></i></button>
-            </div>
+            <button class="edit-card-btn"><i class="ph-fill ph-note-pencil"></i></button>
         `;
 
         return newCard;
@@ -119,17 +116,15 @@ document.addEventListener('DOMContentLoaded', () => {
         leadForm.reset();
     });
 
-    // Lógica para o Modal de Edição (agora com botões dedicados)
+    // Lógica para o Modal de Edição
     const editModal = document.getElementById('edit-lead-modal');
     const editForm = document.getElementById('edit-lead-form');
-    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    const deleteLeadBtn = document.getElementById('delete-lead-btn');
     let currentCard = null;
 
     kanbanBoard.addEventListener('click', (e) => {
-        // Encontra o botão de edição ou exclusão clicado, se houver
         const editButton = e.target.closest('.edit-card-btn');
-        const deleteButton = e.target.closest('.delete-card-btn');
-
+        
         if (editButton) {
             currentCard = editButton.closest('.kanban-card');
             
@@ -145,17 +140,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             editModal.style.display = 'flex';
         }
-
-        if (deleteButton) {
-            const cardToDelete = deleteButton.closest('.kanban-card');
-            if (confirm('Tem certeza que deseja excluir este lead?')) {
-                 cardToDelete.remove();
-            }
-        }
     });
 
-    cancelEditBtn.addEventListener('click', () => {
-        editModal.style.display = 'none';
+    deleteLeadBtn.addEventListener('click', () => {
+        if (confirm('Tem certeza que deseja excluir este lead?')) {
+            currentCard.remove();
+            editModal.style.display = 'none';
+        }
     });
 
     editForm.addEventListener('submit', (e) => {
