@@ -1,363 +1,287 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0ea5e9" />
-  <title>CRM PixelUp — Kanban + Bot</title>
-
-  <!-- Tailwind (CDN) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    :root { --px-blue: #00b2ff; }
-    .glow { box-shadow: 0 0 18px rgba(0,178,255,.6); }
-    .neon { text-shadow: 0 0 12px rgba(0,178,255,.8); }
-    .drop-on { outline: 2px dashed rgba(0,178,255,.7); outline-offset: 2px; }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>CRM PixelUp + WhatsApp</title>
+<meta name="color-scheme" content="dark">
+<style>
+:root{--bg:#0b1016;--panel:#0f1722;--muted:#9fb1c4;--text:#eaf6ff;--brand:#00b3ff;--line:#12334c;--ok:#16a34a;--warn:#f59e0b}
+*{box-sizing:border-box} html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:
+linear-gradient(180deg,rgba(2,8,18,.92),rgba(2,8,18,.92)),
+radial-gradient(900px 520px at 90% -10%, rgba(0,179,255,.18), transparent 60%),
+radial-gradient(800px 500px at -10% 120%, rgba(0,179,255,.12), transparent 60%), #0e1013;color:var(--text)}
+.topbar{position:sticky;top:0;z-index:10;display:flex;gap:12px;align-items:center;padding:12px 16px;background:rgba(9,16,24,.8);backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800}
+.dot{width:12px;height:12px;border-radius:50%;background:linear-gradient(180deg,var(--brand),#39dbff)}
+nav{margin-left:auto;display:flex;gap:6px}
+nav a{padding:8px 10px;border-radius:10px;text-decoration:none;color:#d7eeff;border:1px solid transparent}
+nav a.active,nav a:hover{border-color:#174464;background:rgba(0,179,255,.08)}
+.container{max-width:1100px;margin:22px auto;padding:0 14px}
+.page{display:none}.page.active{display:block}
+.card{background:linear-gradient(180deg,rgba(14,22,33,.9),rgba(9,15,24,.9));border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 10px 40px rgba(0,179,255,.06)}
+h1{font-size:22px;margin:6px 0 12px} h2{font-size:18px;margin:12px 0 8px}
+.muted{color:var(--muted)} .small{font-size:12px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;gap:16px}.grid-2{grid-template-columns:1.1fr .9fr}@media (max-width:900px){.grid-2{grid-template-columns:1fr}}
+input,textarea{width:100%;padding:10px 12px;border-radius:10px;background:#0b1520;border:1px solid #183149;color:#dff1ff;outline:none}
+.btn{appearance:none;border:none;cursor:pointer;padding:10px 14px;border-radius:12px;color:#05121b;font-weight:800;background:linear-gradient(180deg,#79d2ff,#27b0ff);box-shadow:0 4px 18px rgba(0,179,255,.3)}
+.btn.secondary{color:#dbeafe;background:transparent;border:1px solid #1b4663}
+.badge{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid #123249;background:#09151f;color:#cfeaff;font-size:12px;font-weight:700}
+.b-ok{border-color:#134e27;color:#b7ffd3;background:#0a1a12}
+.b-warn{border-color:#614214;color:#ffe9bd;background:#1b1407}
+.table{width:100%;border-collapse:collapse}.table th,.table td{border-bottom:1px solid #102437;padding:10px 8px;text-align:left}
+.kb{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kb-col{border:1px solid #13304a;border-radius:12px;padding:10px;background:#0b1622}
+.kb-card{border:1px solid #143149;border-radius:10px;padding:10px;background:#0a1824;margin-bottom:8px}
+.qrbox{display:grid;place-items:center;min-height:280px;border:1px dashed #1f415c;border-radius:16px;background:#08121a;overflow:hidden}
+.qrimg{max-width:100%;image-rendering:pixelated}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:#bcd7f0}
+.log{max-height:170px;overflow:auto;background:#08131b;border:1px solid #15324a;border-radius:10px;padding:8px;font-size:12px}
+</style>
 </head>
-<body class="bg-neutral-950 text-neutral-100 selection:bg-cyan-500/30">
+<body>
+<header class="topbar">
+  <div class="brand"><span class="dot"></span> PixelUp CRM</div>
+  <nav>
+    <a href="#crm" class="active">CRM</a>
+    <a href="#whatsapp">WhatsApp</a>
+  </nav>
+</header>
 
-  <!-- Header -->
-  <header class="border-b border-neutral-800/70 bg-neutral-900/40 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-3 h-6 rounded-full bg-cyan-400 glow"></div>
-        <h1 class="text-lg sm:text-xl font-semibold neon">CRM PixelUp</h1>
-      </div>
-      <nav class="text-sm text-neutral-300 flex items-center gap-3">
-        <a href="#kanban" class="hover:text-white">Kanban</a>
-        <span class="opacity-30">•</span>
-        <a href="#bot" class="hover:text-white">Bot</a>
-      </nav>
-    </div>
-  </header>
+<main class="container">
+  <!-- CRM (igual ao início) -->
+  <section id="crm" class="page active">
+    <div class="card grid grid-2">
+      <section>
+        <h1>Contatos</h1>
+        <div class="row" id="authRow">
+          <span id="authBadge" class="badge b-warn">⏺ Deslogado</span>
+          <button id="btnLogout" class="btn secondary" style="display:none">Sair</button>
+        </div>
+        <div id="loginBox" style="margin-top:10px">
+          <div class="row">
+            <input id="email" type="email" placeholder="E-mail"/>
+            <input id="pass" type="password" placeholder="Senha"/>
+          </div>
+          <div class="row">
+            <button id="btnLogin" class="btn">Entrar</button>
+            <button id="btnSignup" class="btn secondary">Criar conta</button>
+          </div>
+          <p class="small muted">Autenticação Firebase. Sem Firebase, usa <b>localStorage</b>.</p>
+        </div>
 
-  <!-- Intro -->
-  <section class="relative">
-    <div class="absolute inset-0 pointer-events-none opacity-40 blur-3xl" style="background: radial-gradient(900px 300px at 70% -10%, rgba(0,178,255,.35), transparent 60%), radial-gradient(700px 250px at 10% -10%, rgba(56,189,248,.25), transparent 60%);"></div>
-    <div class="max-w-7xl mx-auto px-4 py-10 relative">
-      <h2 class="text-2xl font-semibold">Pipeline de Vendas</h2>
-      <p class="text-neutral-300 mt-1">Arraste e solte os cards entre as colunas. Tudo salvo no navegador.</p>
-      <div class="mt-4 flex items-center gap-2">
-        <button id="btn-novo" class="bg-cyan-500 text-black font-semibold px-4 py-2 rounded-xl glow hover:bg-cyan-400 active:scale-95 transition">+ Novo Lead</button>
-        <button id="btn-reset" class="bg-neutral-800 border border-neutral-700 px-4 py-2 rounded-xl hover:bg-neutral-700 active:scale-95 transition">Resetar Demo</button>
-      </div>
+        <div id="contactForm" style="display:none;margin-top:10px">
+          <h2>Novo contato</h2>
+          <div class="row">
+            <input id="c_name" placeholder="Nome"/>
+            <input id="c_phone" placeholder="Telefone (DDD)"/>
+          </div>
+          <div class="row">
+            <input id="c_email" placeholder="E-mail"/>
+          </div>
+          <textarea id="c_notes" rows="3" placeholder="Observações"></textarea>
+          <div class="row" style="margin-top:8px">
+            <button id="btnSaveContact" class="btn">Salvar contato</button>
+            <span id="saveInfo" class="muted small"></span>
+          </div>
+
+          <h2 style="margin-top:18px">Lista</h2>
+          <table class="table" id="tblContacts">
+            <thead><tr><th>Nome</th><th>Telefone</th><th>E-mail</th><th>Obs.</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <aside>
+        <h2>Kanban</h2>
+        <div class="kb" id="kanban">
+          <div class="kb-col" data-col="novo"><b>Novo</b><div class="kb-list"></div></div>
+          <div class="kb-col" data-col="progresso"><b>Em Progresso</b><div class="kb-list"></div></div>
+          <div class="kb-col" data-col="fechado"><b>Fechado</b><div class="kb-list"></div></div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <input id="leadTitle" placeholder="Título do lead"/>
+          <button id="btnAddLead" class="btn">Adicionar lead</button>
+        </div>
+        <p class="small muted">Arraste os cards. Estado salvo no Firestore (logado) ou localStorage.</p>
+      </aside>
     </div>
   </section>
 
-  <!-- Kanban -->
-  <main id="kanban" class="max-w-7xl mx-auto px-4 pb-24">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- A Fazer -->
-      <section class="bg-neutral-900/40 border border-neutral-800 rounded-2xl overflow-hidden">
-        <header class="px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-neutral-500"></span>
-            <h3 class="font-semibold">A Fazer</h3>
-          </div>
-          <span id="count-todo" class="text-xs text-neutral-400">0</span>
-        </header>
-        <div id="col-todo" class="p-3 min-h-[40vh] space-y-3" data-col="todo"></div>
-      </section>
-
-      <!-- Fazendo -->
-      <section class="bg-neutral-900/40 border border-neutral-800 rounded-2xl overflow-hidden">
-        <header class="px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
-            <h3 class="font-semibold">Fazendo</h3>
-          </div>
-          <span id="count-doing" class="text-xs text-neutral-400">0</span>
-        </header>
-        <div id="col-doing" class="p-3 min-h-[40vh] space-y-3" data-col="doing"></div>
-      </section>
-
-      <!-- Feito -->
-      <section class="bg-neutral-900/40 border border-neutral-800 rounded-2xl overflow-hidden">
-        <header class="px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-            <h3 class="font-semibold">Feito</h3>
-          </div>
-          <span id="count-done" class="text-xs text-neutral-400">0</span>
-        </header>
-        <div id="col-done" class="p-3 min-h-[40vh] space-y-3" data-col="done"></div>
-      </section>
-    </div>
-  </main>
-
-  <!-- Launcher do Chat -->
-  <button id="bot-launcher" class="fixed bottom-5 right-5 z-40 rounded-full px-4 py-3 bg-cyan-500 text-black font-semibold glow hover:bg-cyan-400 active:scale-95 transition" aria-label="Abrir chat do bot">
-    Abrir Chat
-  </button>
-
-  <!-- Widget do Bot -->
-  <div id="bot-widget" class="fixed bottom-24 right-5 z-40 w-[min(92vw,380px)] max-h-[70vh] bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden hidden">
-    <div class="flex items-center justify-between px-4 py-3 border-b border-neutral-800 bg-neutral-900/70">
-      <div class="flex items-center gap-2">
-        <div class="w-2.5 h-5 rounded-full bg-cyan-400 glow"></div>
-        <span class="font-medium">PixelUp • Bot</span>
-      </div>
-      <button id="bot-close" class="text-neutral-400 hover:text-white">✕</button>
-    </div>
-    <div id="chat-log" class="p-3 space-y-3 overflow-y-auto" style="max-height: 50vh;">
-      <div class="text-xs text-neutral-400">Dica: qualquer mensagem enviada aqui chama sua API.</div>
-    </div>
-    <form id="chat-form" class="p-3 border-t border-neutral-800 bg-neutral-900/70">
-      <div class="flex items-center gap-2">
-        <input id="chat-input" type="text" placeholder="Escreva sua mensagem..." class="flex-1 bg-neutral-800/80 border border-neutral-700 rounded-lg px-3 py-2 outline-none focus:border-cyan-500" required />
-        <button class="bg-cyan-500 text-black font-semibold px-3 py-2 rounded-lg hover:bg-cyan-400 active:scale-95 transition">Enviar</button>
-      </div>
-    </form>
-  </div>
-
-  <!-- Modal Add/Edit -->
-  <div id="modal" class="fixed inset-0 z-50 hidden">
-    <div class="absolute inset-0 bg-black/60"></div>
-    <div class="relative max-w-lg mx-auto mt-24 bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden">
-      <div class="px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
-        <h4 id="modal-title" class="font-semibold">Novo Lead</h4>
-        <button id="modal-close" class="text-neutral-400 hover:text-white">✕</button>
-      </div>
-      <form id="modal-form" class="p-4 space-y-3">
-        <input type="hidden" id="task-id" />
+  <!-- WhatsApp (conectar e mostrar QR) -->
+  <section id="whatsapp" class="page">
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
         <div>
-          <label class="text-sm text-neutral-300">Título</label>
-          <input id="task-title" class="w-full bg-neutral-800/70 border border-neutral-700 rounded-lg px-3 py-2 outline-none focus:border-cyan-500" required />
+          <div class="muted">APIs: <span class="code">/api/wa/status • /start • /qr</span></div>
+          <h1>Conexão WhatsApp</h1>
         </div>
-        <div>
-          <label class="text-sm text-neutral-300">Detalhes</label>
-          <textarea id="task-desc" rows="3" class="w-full bg-neutral-800/70 border border-neutral-700 rounded-lg px-3 py-2 outline-none focus:border-cyan-500"></textarea>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-sm text-neutral-300">Coluna</label>
-            <select id="task-col" class="w-full bg-neutral-800/70 border border-neutral-700 rounded-lg px-3 py-2 outline-none focus:border-cyan-500">
-              <option value="todo">A Fazer</option>
-              <option value="doing">Fazendo</option>
-              <option value="done">Feito</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-sm text-neutral-300">WhatsApp (opcional)</label>
-            <input id="task-wa" placeholder="55DDDNUMERO" class="w-full bg-neutral-800/70 border border-neutral-700 rounded-lg px-3 py-2 outline-none focus:border-cyan-500" />
-          </div>
-        </div>
-        <div class="flex items-center justify-between pt-2">
-          <button type="button" id="task-delete" class="text-red-400 hover:text-red-300 hidden">Remover</button>
-          <button class="bg-cyan-500 text-black font-semibold px-4 py-2 rounded-xl hover:bg-cyan-400 active:scale-95 transition">Salvar</button>
-        </div>
-      </form>
+        <div id="waStatus" class="badge b-warn">⏺ Desconectado</div>
+      </div>
+      <div class="row" style="margin:10px 0">
+        <button id="waConnect" class="btn">Conectar / Mostrar QR</button>
+        <button id="waStatusBtn" class="btn secondary">Atualizar status</button>
+      </div>
+      <div class="qrbox" id="qrBox">
+        <div class="muted">Clique em <b>Conectar / Mostrar QR</b> e escaneie no WhatsApp → Aparelhos conectados.</div>
+      </div>
+      <p class="small muted" style="margin-top:8px">O bot responde automaticamente (saudação/menu). Contatos podem ser gravados no CRM via Firestore Admin no Replit.</p>
+      <div class="log" id="waLog" style="margin-top:10px"></div>
     </div>
-  </div>
+  </section>
+</main>
 
-  <!-- BLOCO DE CONFIG DO BOT (AJUSTE AQUI) -->
-  <script>
-    window.PIXELUP_BOT_CONFIG = {
-      API_URL: "https://seu-endpoint.com/api/messages", // <- troque para o seu endpoint real
-      API_TOKEN: "",                                    // <- preencha se sua API exigir
-      WA_BOT_SCRIPT: "wa-bot/wa-bot.js"                 // <- mantenha APENAS esse arquivo na pasta /wa-bot/
-    };
-  </script>
+<!-- Firebase compat -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
-  <!-- App: Kanban + Bot -->
-  <script>
-    (function () {
-      /* ======= KANBAN / STORAGE ======= */
-      const LS_KEY = "pxu_kanban_v1";
-      let data = load() || demo();
+<script>
+// Router simples
+const pages=["crm","whatsapp"];
+function setPage(p){ pages.forEach(id=>{document.getElementById(id).classList.toggle("active", id===p)}); [...document.querySelectorAll("nav a")].forEach(a=>{a.classList.toggle("active", a.getAttribute("href")==="#"+p)}); }
+window.addEventListener("hashchange", ()=> setPage((location.hash||"#crm").slice(1)));
+setPage((location.hash||"#crm").slice(1));
 
-      const cols = {
-        todo: document.getElementById("col-todo"),
-        doing: document.getElementById("col-doing"),
-        done: document.getElementById("col-done"),
-      };
-      const counts = {
-        todo: document.getElementById("count-todo"),
-        doing: document.getElementById("count-doing"),
-        done: document.getElementById("count-done"),
-      };
+// Firebase (igual ao início)
+const firebaseConfig = {
+  apiKey:"AIzaSyCjuQZP80sd4FtX83Zp5YgDmySpn7s6GZw",
+  authDomain:"pixelup-crm.firebaseapp.com",
+  projectId:"pixelup-crm",
+  storageBucket:"pixelup-crm.firebasestorage.app",
+  messagingSenderId:"286127901698",
+  appId:"1:286127901698:web:f4dd954937fad94757ab1b",
+  measurementId:"G-MBV63RYPN0"
+};
+let fb={ok:false}, auth=null, db=null;
+try{ const app=firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); fb.ok=true; }catch(e){ console.warn("Sem Firebase; usando localStorage."); }
 
-      function demo() {
-        return [
-          { id: uid(), title: "Novo lead M2 Multimarcas", desc: "Agendar ligação de qualificação.", col: "todo", wa: "5547997605173" },
-          { id: uid(), title: "Criar criativo Meta Ads", desc: "PixelUp — arte 1080x1350 azul neon.", col: "doing" },
-          { id: uid(), title: "Revisar landing PixelUp", desc: "CTA WhatsApp + prova social.", col: "done" },
-        ];
-      }
-      function uid() { return Math.random().toString(36).slice(2, 10); }
-      function save() { localStorage.setItem(LS_KEY, JSON.stringify(data)); }
-      function load() { try { return JSON.parse(localStorage.getItem(LS_KEY)||""); } catch { return null; } }
+const authBadge=document.getElementById("authBadge");
+const loginBox=document.getElementById("loginBox");
+const btnLogout=document.getElementById("btnLogout");
+const contactForm=document.getElementById("contactForm");
+function setAuthUI(user){
+  if(user){ authBadge.className="badge b-ok"; authBadge.textContent="✅ "+(user.email||"Logado"); loginBox.style.display="none"; btnLogout.style.display=""; contactForm.style.display=""; loadContacts(); loadKanban(); }
+  else{ authBadge.className="badge b-warn"; authBadge.textContent="⏺ Deslogado"; loginBox.style.display=""; btnLogout.style.display="none"; contactForm.style.display="none"; }
+}
+if(fb.ok){ auth.onAuthStateChanged(setAuthUI); } else { setAuthUI({email:"modo local"}); }
+document.getElementById("btnLogin").onclick = async ()=>{
+  const email=document.getElementById("email").value.trim(); const pass=document.getElementById("pass").value;
+  if(!email||!pass) return alert("Preencha e-mail e senha");
+  if(!fb.ok) return alert("Sem Firebase. Use modo local.");
+  await auth.signInWithEmailAndPassword(email, pass);
+};
+document.getElementById("btnSignup").onclick = async ()=>{
+  const email=document.getElementById("email").value.trim(); const pass=document.getElementById("pass").value;
+  if(!email||!pass) return alert("Preencha e-mail e senha");
+  if(!fb.ok) return alert("Sem Firebase. Use modo local.");
+  await auth.createUserWithEmailAndPassword(email, pass);
+};
+btnLogout.onclick = ()=> fb.ok ? auth.signOut() : location.reload();
 
-      function render() {
-        Object.values(cols).forEach(c => c.innerHTML = "");
-        let cts = { todo:0, doing:0, done:0 };
+function getUID(){ return fb.ok && auth.currentUser ? auth.currentUser.uid : "local"; }
 
-        for (const t of data) {
-          const el = card(t);
-          cols[t.col].appendChild(el);
-          cts[t.col]++;
-        }
-        counts.todo.textContent = cts.todo;
-        counts.doing.textContent = cts.doing;
-        counts.done.textContent = cts.done;
-      }
+// Contatos
+const tblBody=document.querySelector("#tblContacts tbody");
+function row(c){ const tr=document.createElement("tr"); tr.innerHTML = `<td>${c.name||""}</td><td>${c.phone||""}</td><td>${c.email||""}</td><td>${c.notes||""}</td>`; return tr; }
+function renderContacts(list){ tblBody.innerHTML=""; list.sort((a,b)=>b.ts-a.ts).forEach(c=> tblBody.appendChild(row(c))); }
+async function loadContacts(){
+  const uid=getUID();
+  if(fb.ok){
+    db.collection("users").doc(uid).collection("contacts").orderBy("ts","desc").onSnapshot(snap=>{
+      const arr=[]; snap.forEach(d=>arr.push(d.data())); renderContacts(arr);
+    });
+  }else{
+    const arr=JSON.parse(localStorage.getItem("px_contacts_"+uid)||"[]"); renderContacts(arr);
+  }
+}
+async function saveContact(){
+  const c={ name: c_name.value.trim(), phone:c_phone.value.trim(), email:c_email.value.trim(), notes:c_notes.value.trim(), ts:Date.now() };
+  if(!c.name) return alert("Digite um nome");
+  const info=document.getElementById("saveInfo");
+  try{
+    if(fb.ok){
+      await db.collection("users").doc(getUID()).collection("contacts").add(c);
+    }else{
+      const key="px_contacts_"+getUID(); const arr=JSON.parse(localStorage.getItem(key)||"[]"); arr.push(c); localStorage.setItem(key, JSON.stringify(arr));
+    }
+    info.textContent="Salvo!"; c_name.value=c_phone.value=c_email.value=c_notes.value="";
+  }catch(e){ info.textContent="Erro"; }
+}
+document.getElementById("btnSaveContact").onclick = saveContact;
 
-      function card(t) {
-        const el = document.createElement("article");
-        el.className = "bg-neutral-800/70 border border-neutral-700 rounded-xl p-3 cursor-grab active:cursor-grabbing";
-        el.draggable = true;
-        el.dataset.id = t.id;
-        el.innerHTML = `
-          <div class="flex items-start justify-between gap-3">
-            <h4 class="font-semibold">${escapeHtml(t.title)}</h4>
-            <button class="text-xs text-neutral-400 hover:text-white edit-btn">Editar</button>
-          </div>
-          ${t.desc ? `<p class="text-sm text-neutral-300 mt-1 whitespace-pre-line">${escapeHtml(t.desc)}</p>` : ""}
-          ${t.wa ? `<a class="inline-block mt-2 text-xs text-cyan-400 hover:text-cyan-300 underline" target="_blank" href="https://wa.me/${t.wa}">Abrir WhatsApp</a>` : ""}
-        `;
-        el.addEventListener("dragstart", ev => {
-          ev.dataTransfer.setData("text/plain", t.id);
-          setTimeout(() => el.classList.add("opacity-70"), 0);
-        });
-        el.addEventListener("dragend", () => el.classList.remove("opacity-70"));
-        el.querySelector(".edit-btn").addEventListener("click", () => openModal(t));
-        return el;
-      }
+// Kanban simples
+const kb=document.getElementById("kanban");
+btnAddLead.onclick = ()=>{ const t=leadTitle.value.trim(); if(!t) return; addCard({title:t,col:"novo",ts:Date.now()}); leadTitle.value=""; saveKanban(); };
+kb.addEventListener("dragstart", e=>{ if(e.target.classList.contains("kb-card")) e.dataTransfer.setData("id", e.target.dataset.id); });
+kb.querySelectorAll(".kb-col").forEach(col=>{
+  col.addEventListener("dragover", e=>e.preventDefault());
+  col.addEventListener("drop", e=>{
+    e.preventDefault();
+    const id=e.dataTransfer.getData("id");
+    const card=kb.querySelector(`.kb-card[data-id="${id}"]`);
+    col.querySelector(".kb-list").appendChild(card);
+    card.dataset.col=col.dataset.col; saveKanban();
+  });
+});
+function addCard(c){ const el=document.createElement("div"); el.className="kb-card"; el.draggable=true; el.dataset.id=String(c.ts); el.dataset.col=c.col; el.innerHTML=`<div>${c.title}</div>`; kb.querySelector(`.kb-col[data-col="${c.col}"] .kb-list`).appendChild(el); }
+function saveKanban(){
+  const cards=[...kb.querySelectorAll(".kb-card")].map(el=>({title:el.textContent.trim(), col:el.dataset.col, ts:Number(el.dataset.id)}));
+  const uid=getUID();
+  if(fb.ok){ db.collection("users").doc(uid).collection("kv").doc("kanban").set({cards}); }
+  else{ localStorage.setItem("px_kanban_"+uid, JSON.stringify(cards)); }
+}
+function loadKanban(){
+  kb.querySelectorAll(".kb-list").forEach(l=> l.innerHTML="");
+  const uid=getUID();
+  if(fb.ok){
+    db.collection("users").doc(uid).collection("kv").doc("kanban").onSnapshot(doc=>{
+      const cards=(doc.data()&&doc.data().cards)||[]; kb.querySelectorAll(".kb-list").forEach(l=> l.innerHTML=""); cards.forEach(addCard);
+    });
+  }else{
+    const cards=JSON.parse(localStorage.getItem("px_kanban_"+uid)||"[]"); cards.forEach(addCard);
+  }
+}
 
-      Object.values(cols).forEach(zone => {
-        zone.addEventListener("dragover", ev => { ev.preventDefault(); zone.classList.add("drop-on"); });
-        ["dragleave","drop"].forEach(e => zone.addEventListener(e, () => zone.classList.remove("drop-on")));
-        zone.addEventListener("drop", ev => {
-          ev.preventDefault();
-          const id = ev.dataTransfer.getData("text/plain");
-          const item = data.find(x => x.id === id);
-          if (item) {
-            item.col = zone.dataset.col;
-            save(); render();
-          }
-        });
-      });
-
-      // Modal
-      const modal = document.getElementById("modal");
-      const mTitle = document.getElementById("modal-title");
-      const mForm = document.getElementById("modal-form");
-      const mClose = document.getElementById("modal-close");
-      const fId = document.getElementById("task-id");
-      const fTitle = document.getElementById("task-title");
-      const fDesc = document.getElementById("task-desc");
-      const fCol = document.getElementById("task-col");
-      const fWa = document.getElementById("task-wa");
-      const btnDel = document.getElementById("task-delete");
-
-      function openModal(t) {
-        modal.classList.remove("hidden");
-        if (t) {
-          mTitle.textContent = "Editar Lead";
-          fId.value = t.id; fTitle.value = t.title; fDesc.value = t.desc||""; fCol.value = t.col; fWa.value = t.wa||"";
-          btnDel.classList.remove("hidden");
-        } else {
-          mTitle.textContent = "Novo Lead";
-          fId.value = ""; fTitle.value = ""; fDesc.value = ""; fCol.value = "todo"; fWa.value = "";
-          btnDel.classList.add("hidden");
-        }
-      }
-      function closeModal(){ modal.classList.add("hidden"); }
-      document.getElementById("btn-novo").addEventListener("click", () => openModal());
-      document.getElementById("btn-reset").addEventListener("click", () => { data = demo(); save(); render(); });
-      mClose.addEventListener("click", closeModal);
-      modal.addEventListener("click", (e)=>{ if(e.target===modal) closeModal(); });
-
-      mForm.addEventListener("submit", (ev)=>{
-        ev.preventDefault();
-        const id = fId.value || uid();
-        const exists = data.find(x=>x.id===id);
-        const obj = { id, title:fTitle.value.trim(), desc:fDesc.value.trim(), col:fCol.value, wa:(fWa.value||"").trim() };
-        if (!obj.title) return;
-        if (exists) Object.assign(exists, obj); else data.push(obj);
-        save(); render(); closeModal();
-      });
-      btnDel.addEventListener("click", ()=>{
-        const id = fId.value;
-        const idx = data.findIndex(x=>x.id===id);
-        if (idx>-1) data.splice(idx,1);
-        save(); render(); closeModal();
-      });
-
-      function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
-
-      render();
-
-      /* ======= BOT / API ======= */
-      const cfg = window.PIXELUP_BOT_CONFIG || {};
-      const widget = document.getElementById("bot-widget");
-      const openBtn = document.getElementById("bot-launcher");
-      const closeBtn = document.getElementById("bot-close");
-      const form = document.getElementById("chat-form");
-      const input = document.getElementById("chat-input");
-      const log = document.getElementById("chat-log");
-
-      openBtn.addEventListener("click", () => widget.classList.toggle("hidden"));
-      closeBtn.addEventListener("click", () => widget.classList.add("hidden"));
-
-      function appendMsg(text, role="user"){
-        const wrap = document.createElement("div");
-        wrap.className = "flex";
-        wrap.innerHTML = role==="user"
-          ? `<div class="ml-auto max-w-[85%] bg-cyan-500 text-black rounded-xl px-3 py-2">${escapeHtml(text)}</div>`
-          : `<div class="max-w-[85%] bg-neutral-800 text-neutral-100 rounded-xl px-3 py-2 border border-neutral-700">${escapeHtml(text)}</div>`;
-        log.appendChild(wrap);
-        log.scrollTop = log.scrollHeight;
-      }
-
-      async function callApi(message){
-        if(!cfg.API_URL){ appendMsg("⚠️ API_URL não configurada no index.html.", "bot"); return; }
-        try{
-          const headers = { "Content-Type":"application/json" };
-          if (cfg.API_TOKEN) headers["Authorization"] = `Bearer ${cfg.API_TOKEN}`;
-          const res = await fetch(cfg.API_URL, {
-            method: "POST",
-            headers,
-            body: JSON.stringify({ message, source:"pixelup-web", ts: Date.now() })
-          });
-          if(!res.ok){
-            const t = await res.text();
-            appendMsg(`Erro da API (${res.status}): ${t || "sem detalhes"}`, "bot");
-            return;
-          }
-          const data = await res.json().catch(()=>({}));
-          const reply = (data && (data.reply||data.message||data.text)) || "✅ Mensagem enviada.";
-          appendMsg(String(reply), "bot");
-        }catch(e){
-          appendMsg(`Erro de rede: ${e.message}`, "bot");
-        }
-      }
-
-      form.addEventListener("submit", (ev)=>{
-        ev.preventDefault();
-        const text = (input.value||"").trim();
-        if(!text) return;
-        appendMsg(text, "user");
-        input.value = "";
-        callApi(text); // qualquer mensagem ativa a API
-      });
-
-      if (cfg.WA_BOT_SCRIPT) {
-        const s = document.createElement("script");
-        s.src = cfg.WA_BOT_SCRIPT; s.defer = true;
-        s.onload  = () => console.log("[wa-bot] carregado.");
-        s.onerror = () => console.log("[wa-bot] não encontrado (ok se não usar).");
-        document.body.appendChild(s);
-      }
-    })();
-  </script>
-
-  <noscript>
-    <div class="fixed inset-0 bg-neutral-900 text-white p-6">
-      Habilite JavaScript para usar o CRM e o bot.
-    </div>
-  </noscript>
+// WhatsApp (via proxy /api/wa para Vercel -> Replit)
+const waLog=document.getElementById("waLog");
+const waStatus=document.getElementById("waStatus");
+function walog(s){ const d=document.createElement("div"); d.textContent=s; waLog.prepend(d); }
+function setWABadge(state){
+  if(state==="connected"){ waStatus.className="badge b-ok"; waStatus.textContent="✅ Conectado"; }
+  else if(state==="error"){ waStatus.className="badge b-warn"; waStatus.textContent="⚠️ Erro"; }
+  else { waStatus.className="badge b-warn"; waStatus.textContent="⏺ Desconectado"; }
+}
+async function waGET(p){ const r=await fetch("/api/wa"+p); return r; }
+async function waPOST(p,body){ const r=await fetch("/api/wa"+p,{method:"POST",headers:{'Content-Type':'application/json'},body: body?JSON.stringify(body):null}); return r; }
+async function refreshWA(){
+  const r=await waGET(`/status?session=pixelup`); walog(`GET /api/wa/status → ${r.status}`);
+  if(!r.ok){ setWABadge("error"); return false; }
+  const j=await r.json(); setWABadge(j.connected? "connected": ""); return j.connected;
+}
+async function connectShowQR(){
+  setWABadge("connecting");
+  const s=await waPOST(`/start?session=pixelup`); walog(`POST /api/wa/start → ${s.status}`);
+  const box=document.getElementById("qrBox");
+  const tick=async ()=>{
+    const r=await waGET(`/qr?session=pixelup`); walog(`GET /api/wa/qr → ${r.status}`);
+    if(r.status===204){ box.innerHTML='<div class="muted">✅ Já conectado.</div>'; return true; }
+    if(!r.ok){ box.innerHTML='<div class="muted">QR não disponível agora. Tente de novo.</div>'; return false; }
+    const j=await r.json(); if(j.qr){ box.innerHTML=`<img class="qrimg" src="${j.qr}">`; }
+    return false;
+  };
+  let tries=0;
+  const t=setInterval(async ()=>{
+    tries++; const done=await tick(); const ok=await refreshWA();
+    if(done || ok || tries>20){ clearInterval(t); if(ok) box.innerHTML='<div class="muted">✅ Dispositivo conectado.</div>'; }
+  }, 3000);
+}
+document.getElementById("waConnect").onclick = connectShowQR;
+document.getElementById("waStatusBtn").onclick = refreshWA;
+refreshWA();
+</script>
 </body>
 </html>
