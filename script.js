@@ -19,26 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-
     // Lógica para o Kanban (Drag and Drop)
     const columns = document.querySelectorAll('.kanban-column');
-    const addLeadBtn = document.getElementById('add-lead-btn');
-    const leadTitleInput = document.getElementById('lead-title');
-    const kanbanCardsList = document.querySelector('.kanban-column[data-status="novo"] .kanban-cards-list');
-
-    // Adiciona um novo card
-    addLeadBtn.addEventListener('click', () => {
-        const title = leadTitleInput.value.trim();
-        if (title) {
-            const newCard = document.createElement('div');
-            newCard.classList.add('kanban-card');
-            newCard.draggable = true;
-            newCard.textContent = title;
-            kanbanCardsList.appendChild(newCard);
-            leadTitleInput.value = '';
-        }
-    });
-
+    const kanbanBoard = document.getElementById('kanban-board');
     let draggedItem = null;
 
     document.addEventListener('dragstart', (e) => {
@@ -57,38 +40,60 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    columns.forEach(column => {
-        column.addEventListener('dragover', (e) => {
-            e.preventDefault();
-        });
-
-        column.addEventListener('drop', (e) => {
-            e.preventDefault();
+    kanbanBoard.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(e.target, e.clientY);
+        const column = e.target.closest('.kanban-column');
+        if (draggedItem && column) {
             const list = column.querySelector('.kanban-cards-list');
-            if (draggedItem) {
+            if (afterElement == null) {
                 list.appendChild(draggedItem);
+            } else {
+                list.insertBefore(draggedItem, afterElement);
             }
-        });
+        }
     });
-});// Lógica para o formulário de novo lead
-const leadForm = document.getElementById('lead-form');
 
-leadForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.kanban-card:not(.dragging)')];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
 
-    const newLead = {
-        nome: document.getElementById('lead-name').value,
-        email: document.getElementById('lead-email').value,
-        whatsapp: document.getElementById('lead-whatsapp').value,
-        status: document.getElementById('lead-status').value,
-        atendente: document.getElementById('lead-attendant').value,
-        origem: document.getElementById('lead-origin').value,
-        data: document.getElementById('lead-date').value,
-        qualificacao: document.getElementById('lead-qualification').value,
-        notas: document.getElementById('lead-notes').value,
-    };
+    // Lógica para o formulário de novo lead e sua integração com o Kanban
+    const leadForm = document.getElementById('lead-form');
+    const kanbanCardsListNovo = document.querySelector('.kanban-column[data-status="novo"] .kanban-cards-list');
 
-    console.log('Novo Lead Salvo (localmente):', newLead);
+    leadForm.addEventListener('submit', (e) => {
+        e.preventDefault();
 
-    leadForm.reset();
+        const newLead = {
+            nome: document.getElementById('lead-name').value,
+            whatsapp: document.getElementById('lead-whatsapp').value,
+            origem: document.getElementById('lead-origin').value,
+            qualificacao: document.getElementById('lead-qualification').value
+        };
+
+        const newCard = document.createElement('div');
+        newCard.classList.add('kanban-card');
+        newCard.draggable = true;
+        
+        // Criando o conteúdo do card com os dados do formulário
+        newCard.innerHTML = `
+            <strong>${newLead.nome}</strong><br>
+            <small>WhatsApp: ${newLead.whatsapp}</small><br>
+            <small>Origem: ${newLead.origem}</small><br>
+            <small>Qualificação: ${newLead.qualificacao}</small>
+        `;
+
+        kanbanCardsListNovo.appendChild(newCard);
+        leadForm.reset();
+    });
 });
