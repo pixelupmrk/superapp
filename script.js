@@ -128,14 +128,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (editButton) {
             currentCard = editButton.closest('.kanban-card');
             
+            // Preenche os campos do formulário de edição com os dados do card
             document.getElementById('edit-lead-name').value = currentCard.getAttribute('data-name') || '';
             document.getElementById('edit-lead-email').value = currentCard.getAttribute('data-email') || '';
             document.getElementById('edit-lead-whatsapp').value = currentCard.getAttribute('data-whatsapp') || '';
-            document.getElementById('edit-lead-status').value = currentCard.parentElement.closest('.kanban-column').getAttribute('data-status');
+            
+            const currentStatus = currentCard.parentElement.closest('.kanban-column').getAttribute('data-status');
+            const editStatusSelect = document.getElementById('edit-lead-status');
+            if (editStatusSelect) {
+                editStatusSelect.value = currentStatus;
+            }
+
             document.getElementById('edit-lead-attendant').value = currentCard.getAttribute('data-atendente') || '';
             document.getElementById('edit-lead-origem').value = currentCard.getAttribute('data-origem') || '';
             document.getElementById('edit-lead-date').value = currentCard.getAttribute('data-data') || '';
-            document.getElementById('edit-lead-qualification').value = currentCard.getAttribute('data-qualificacao') || '';
+            
+            const editQualificationSelect = document.getElementById('edit-lead-qualification');
+            if (editQualificationSelect) {
+                editQualificationSelect.value = currentCard.getAttribute('data-qualificacao') || '';
+            }
+
             document.getElementById('edit-lead-notes').value = currentCard.getAttribute('data-notas') || '';
             
             editModal.style.display = 'flex';
