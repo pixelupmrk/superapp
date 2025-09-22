@@ -220,26 +220,29 @@
 
                 <div class="finance-content" id="custos-tab-content" style="display: none;">
                     <div class="card">
-                        <h3>Adicionar Novo Veículo</h3>
+                        <h3>Adicionar Novo Produto</h3>
                         <form id="estoque-form">
                             <div class="input-grid">
-                                <input type="text" id="estoque-veiculo" placeholder="Veículo" required>
-                                <input type="text" id="estoque-placa" placeholder="Placa" required>
+                                <input type="text" id="estoque-produto" placeholder="Produto" required>
+                                <input type="text" id="estoque-descricao" placeholder="Descrição" required>
                                 <input type="number" id="estoque-compra" placeholder="Valor de Compra (R$)" required step="0.01">
                                 <input type="number" id="estoque-venda" placeholder="Valor de Venda (R$)" required step="0.01">
                             </div>
-                            <button type="submit" class="btn-save">Adicionar Veículo</button>
+                            <button type="submit" class="btn-save">Adicionar Produto</button>
                         </form>
                     </div>
 
                     <div class="card">
-                        <h3>Estoque de Veículos</h3>
+                        <h3>Estoque de Produtos</h3>
+                        <div class="search-container">
+                            <input type="text" id="estoque-search" placeholder="Pesquisar por produto ou descrição...">
+                        </div>
                         <div class="table-container">
                             <table id="estoque-table">
                                 <thead>
                                     <tr>
-                                        <th>Veículo</th>
-                                        <th>Placa</th>
+                                        <th>Produto</th>
+                                        <th>Descrição</th>
                                         <th>Valor de Compra</th>
                                         <th>Custos</th>
                                         <th>Valor de Venda</th>
@@ -306,9 +309,9 @@
         <div class="modal-content">
             <h2>Adicionar Custo</h2>
             <form id="add-custo-form">
-                <input type="hidden" id="add-custo-placa">
+                <input type="hidden" id="add-custo-descricao-veiculo">
                 <div class="input-grid">
-                    <input type="text" id="custo-descricao" placeholder="Descrição do Custo" required>
+                    <input type="text" id="custo-descricao-custo" placeholder="Descrição do Custo" required>
                     <input type="number" id="custo-valor" placeholder="Valor (R$)" required step="0.01">
                 </div>
                 <div class="modal-actions">
