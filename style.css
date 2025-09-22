@@ -109,6 +109,47 @@ body {
     display: none;
 }
 
+/* --- Dashboard Styles --- */
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: var(--secondary-color);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.stat-card h3 {
+    font-size: 1rem;
+    color: var(--text-color-muted);
+    margin-bottom: 0.5rem;
+}
+
+.stat-card p {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.dashboard-charts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.chart-card {
+    background-color: var(--secondary-color);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
 /* --- Kanban Styles --- */
 .kanban-board {
     display: grid;
@@ -159,39 +200,7 @@ body {
     box-shadow: 0 4px 15px rgba(0, 247, 255, 0.2);
 }
 
-.new-lead-form {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-}
-
-.new-lead-form input {
-    flex-grow: 1;
-    padding: 0.75rem;
-    border: 1px solid var(--secondary-color);
-    border-radius: 8px;
-    background-color: var(--primary-color);
-    color: var(--text-color);
-}
-
-.new-lead-form button {
-    padding: 0.75rem 1.5rem;
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 700;
-    transition: all 0.2s ease;
-}
-
-.new-lead-form button:hover {
-    opacity: 0.9;
-    box-shadow: 0 0 10px var(--border-glow);
-}
-
-/* Estilos para o novo formulário de Leads */
-
+/* Estilos para o formulário de Leads */
 .card {
     background-color: var(--secondary-color);
     padding: 2rem;
@@ -351,7 +360,32 @@ body {
     box-shadow: 0 0 10px #d9534f;
 }
 
-/* Novos estilos para a tabela */
+/* Novos estilos para a tabela e o botão de exportar */
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.btn-export {
+    background-color: #2e7d32;
+    color: var(--text-color);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.btn-export:hover {
+    background-color: #1b5e20;
+}
+
 .table-container {
     overflow-x: auto;
 }
