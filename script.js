@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let statusChart;
     let caixa = [];
     let estoque = [];
-    let currentVeiculoPlaca = null;
+    let currentEstoqueDescricao = null;
 
     // Lógica para a navegação da sidebar
     const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('leads-progresso').textContent = leadsProgresso;
         document.getElementById('leads-fechado').textContent = leadsFechado;
 
-        updateStatusChart(leadsNovo, leadsProgresso, leadsFechado);
+        updateStatusChart(novo, progresso, fechado);
     }
 
     function updateStatusChart(novo, progresso, fechado) {
@@ -414,12 +414,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Lógica para a área de Estoque e Custos
     const estoqueForm = document.getElementById('estoque-form');
+    const estoqueSearch = document.getElementById('estoque-search');
     estoqueForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        const novoVeiculo = {
-            veiculo: document.getElementById('estoque-veiculo').value,
-            placa: document.getElementById('estoque-placa').value.toUpperCase(),
+        const novoProduto = {
+            produto: document.getElementById('estoque-produto').value,
+            descricao: document.getElementById('estoque-descricao').value.toUpperCase(),
             compra: parseFloat(document.getElementById('estoque-compra').value),
             venda: parseFloat(document.getElementById('estoque-venda').value),
             custos: [],
@@ -427,17 +428,17 @@ document.addEventListener('DOMContentLoaded', () => {
             lucro: 0
         };
 
-        estoque.push(novoVeiculo);
+        estoque.push(novoProduto);
         updateEstoque();
         renderEstoqueTable();
         estoqueForm.reset();
     });
 
     function updateEstoque() {
-        estoque.forEach(veiculo => {
-            const totalCustos = veiculo.custos.reduce((sum, custo) => sum + custo.valor, 0);
-            veiculo.totalCustos = totalCustos;
-            veiculo.lucro = veiculo.venda - (veiculo.compra + totalCustos);
+        estoque.forEach(produto => {
+            const totalCustos = produto.custos.reduce((sum, custo) => sum + custo.valor, 0);
+            produto.totalCustos = totalCustos;
+            produto.lucro = produto.venda - (produto.compra + totalCustos);
         });
     }
 
@@ -445,53 +446,61 @@ document.addEventListener('DOMContentLoaded', () => {
         const tableBody = document.querySelector('#estoque-table tbody');
         tableBody.innerHTML = '';
         
-        estoque.forEach(veiculo => {
-            const row = document.createElement('tr');
-            row.setAttribute('data-placa', veiculo.placa);
+        const searchTerm = estoqueSearch.value.toLowerCase();
+        const filteredEstoque = estoque.filter(produto => 
+            produto.produto.toLowerCase().includes(searchTerm) || 
+            produto.descricao.toLowerCase().includes(searchTerm)
+        );
 
-            const custosHtml = veiculo.custos.length > 0
-                ? veiculo.custos.map(c => `<li>${c.descricao}: R$ ${c.valor.toFixed(2).replace('.', ',')}</li>`).join('')
+        filteredEstoque.forEach(produto => {
+            const row = document.createElement('tr');
+            row.setAttribute('data-descricao', produto.descricao);
+
+            const custosHtml = produto.custos.length > 0
+                ? produto.custos.map(c => `<li>${c.descricao}: R$ ${c.valor.toFixed(2).replace('.', ',')}</li>`).join('')
                 : 'Nenhum custo adicionado.';
 
             row.innerHTML = `
-                <td>${veiculo.veiculo}</td>
-                <td>${veiculo.placa}</td>
-                <td>R$ ${veiculo.compra.toFixed(2).replace('.', ',')}</td>
+                <td>${produto.produto}</td>
+                <td>${produto.descricao}</td>
+                <td>R$ ${produto.compra.toFixed(2).replace('.', ',')}</td>
                 <td>
                     <ul class="custos-list">${custosHtml}</ul>
-                    <button class="custos-info-btn" data-placa="${veiculo.placa}">+ Add Custo</button>
+                    <button class="custos-info-btn" data-descricao="${produto.descricao}">+ Add Custo</button>
                 </td>
-                <td>R$ ${veiculo.venda.toFixed(2).replace('.', ',')}</td>
-                <td>R$ ${veiculo.lucro.toFixed(2).replace('.', ',')}</td>
+                <td>R$ ${produto.venda.toFixed(2).replace('.', ',')}</td>
+                <td>R$ ${produto.lucro.toFixed(2).replace('.', ',')}</td>
                 <td>
-                    <button class="btn-delete-veiculo"><i class="ph-fill ph-trash"></i></button>
+                    <button class="btn-delete-produto"><i class="ph-fill ph-trash"></i></button>
                 </td>
             `;
             tableBody.appendChild(row);
         });
     }
 
-    // Lógica para Adicionar Custos e Excluir Veículos
+    estoqueSearch.addEventListener('input', renderEstoqueTable);
+
+    // Lógica para Adicionar Custos e Excluir Produtos
     const addCustoModal = document.getElementById('add-custo-modal');
     const addCustoForm = document.getElementById('add-custo-form');
     const closeCustoModalBtn = document.getElementById('close-custo-modal');
 
     document.addEventListener('click', (e) => {
         const addCustoBtn = e.target.closest('.custos-info-btn');
-        const deleteVeiculoBtn = e.target.closest('.btn-delete-veiculo');
+        const deleteProdutoBtn = e.target.closest('.btn-delete-produto');
         
         if (addCustoBtn) {
-            currentVeiculoPlaca = addCustoBtn.getAttribute('data-placa');
+            currentEstoqueDescricao = addCustoBtn.getAttribute('data-descricao');
             addCustoModal.style.display = 'flex';
         }
         
-        if (deleteVeiculoBtn) {
-            const row = deleteVeiculoBtn.closest('tr');
-            const placa = row.getAttribute('data-placa');
-            if (confirm(`Tem certeza que deseja excluir o veículo de placa ${placa}?`)) {
-                const veiculoIndex = estoque.findIndex(v => v.placa === placa);
-                if (veiculoIndex > -1) {
-                    estoque.splice(veiculoIndex, 1);
+        if (deleteProdutoBtn) {
+            const row = deleteProdutoBtn.closest('tr');
+            const descricao = row.getAttribute('data-descricao');
+            if (confirm(`Tem certeza que deseja excluir o produto com a descrição ${descricao}?`)) {
+                const produtoIndex = estoque.findIndex(p => p.descricao === descricao);
+                if (produtoIndex > -1) {
+                    estoque.splice(produtoIndex, 1);
                     updateEstoque();
                     renderEstoqueTable();
                 }
@@ -506,13 +515,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addCustoForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const veiculo = estoque.find(v => v.placa === currentVeiculoPlaca);
-        if (veiculo) {
+        const produto = estoque.find(p => p.descricao === currentEstoqueDescricao);
+        if (produto) {
             const novoCusto = {
-                descricao: document.getElementById('custo-descricao').value,
+                descricao: document.getElementById('custo-descricao-custo').value,
                 valor: parseFloat(document.getElementById('custo-valor').value)
             };
-            veiculo.custos.push(novoCusto);
+            produto.custos.push(novoCusto);
             updateEstoque();
             renderEstoqueTable();
             addCustoModal.style.display = 'none';
