@@ -155,9 +155,75 @@
             </div>
 
             <div class="content-area" id="finance-section" style="display: none;">
-                <h2>Financeiro</h2>
-                <p>Aqui entra o conteúdo financeiro.</p>
+                <div class="finance-header">
+                    <h2>Caixa Geral</h2>
+                    <div class="finance-nav">
+                        <a href="#" class="finance-tab active" data-tab="caixa">Caixa</a>
+                        <a href="#" class="finance-tab" data-tab="custos">Custos</a>
+                    </div>
+                </div>
+
+                <div class="finance-content active" id="caixa-tab-content">
+                    <div class="caixa-stats">
+                        <div class="stat-card entrada-card">
+                            <h3>Total de Entradas</h3>
+                            <p id="total-entradas">R$ 0,00</p>
+                        </div>
+                        <div class="stat-card saida-card">
+                            <h3>Total de Saídas</h3>
+                            <p id="total-saidas">R$ 0,00</p>
+                        </div>
+                        <div class="stat-card saldo-card">
+                            <h3>Saldo Atual</h3>
+                            <p id="caixa-atual">R$ 0,00</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Adicionar Movimentação</h3>
+                        <form id="caixa-form">
+                            <div class="input-grid">
+                                <input type="date" id="caixa-data" required>
+                                <input type="text" id="caixa-descricao" placeholder="Descrição" required>
+                                <input type="number" id="caixa-valor" placeholder="Valor (R$)" required step="0.01">
+                                <div class="select-group">
+                                    <select id="caixa-tipo" required>
+                                        <option value="">Tipo</option>
+                                        <option value="entrada">Entrada</option>
+                                        <option value="saida">Saída</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <textarea id="caixa-observacoes" placeholder="Observações"></textarea>
+                            <button type="submit" class="btn-save">Adicionar</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h3>Histórico de Movimentações</h3>
+                        <div class="table-container">
+                            <table id="caixa-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Descrição</th>
+                                        <th>Entrada (R$)</th>
+                                        <th>Saída (R$)</th>
+                                        <th>Observações</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="finance-content" id="custos-tab-content" style="display: none;">
+                    <h2>Em breve...</h2>
+                    <p>Aqui você poderá visualizar e gerenciar os custos e o estoque de veículos.</p>
+                </div>
             </div>
+            
             <div class="content-area" id="mentoring-section" style="display: none;">
                 <h2>Mentoria</h2>
                 <p>Aqui entra o conteúdo da mentoria.</p>
