@@ -3,338 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM | Super App PixelUp</title>
+    <title>Mentoria SuperApp - PixelUp</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="app-container">
+    <header class="header">
+        <h1>PixelUp Mentoria</h1>
+    </header>
+
+    <div class="container">
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <img src="logo.png" alt="Logo PixelUp" class="logo">
-            </div>
-            <nav class="sidebar-nav">
-                <a href="#" id="nav-dashboard" class="nav-item active" data-target="dashboard-section">
-                    <i class="ph-fill ph-gauge"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" id="nav-crm-kanban" class="nav-item" data-target="crm-kanban-section">
-                    <i class="ph-fill ph-trello-logo"></i>
-                    <span>CRM / Kanban</span>
-                </a>
-                <a href="#" id="nav-crm-list" class="nav-item" data-target="crm-list-section">
-                    <i class="ph-fill ph-list-dashes"></i>
-                    <span>Lista de Leads</span>
-                </a>
-                <a href="#" id="nav-finance" class="nav-item" data-target="finance-section">
-                    <i class="ph-fill ph-chart-bar"></i>
-                    <span>Financeiro</span>
-                </a>
-                <a href="#" id="nav-mentoring" class="nav-item" data-target="mentoring-section">
-                    <i class="ph-fill ph-graduation-cap"></i>
-                    <span>Mentoria</span>
-                </a>
-                <a href="#" id="nav-chatbot" class="nav-item" data-target="chatbot-section">
-                    <i class="ph-fill ph-robot"></i>
-                    <span>Chatbot AI</span>
-                </a>
+            <nav class="menu">
+                <h2>Módulos</h2>
+                <ul>
+                    <li class="menu-item active" data-content="modulo1">Módulo 1: Fundamentos do Negócio</li>
+                    <li class="menu-item" data-content="modulo2">Módulo 2: O Algoritmo do Meta</li>
+                    <li class="menu-item" data-content="modulo3">Módulo 3: Cronograma de Postagens</li>
+                    <li class="menu-item" data-content="modulo4">Módulo 4: Conteúdo que Conecta</li>
+                    <li class="menu-item" data-content="modulo5">Módulo 5: Copywriting com ChatGPT</li>
+                    <li class="menu-item" data-content="modulo6">Módulo 6: Implementação de CRM</li>
+                    <li class="menu-item" data-content="modulo7">Módulo 7: Processo Comercial e Vendas</li>
+                    <li class="menu-item" data-content="modulo8">Módulo 8: Conexão com a Audiência</li>
+                </ul>
             </nav>
-            <div class="sidebar-footer">
-                <a href="#" class="nav-item">
-                    <i class="ph-fill ph-gear-six"></i>
-                    <span>Configurações</span>
-                </a>
-            </div>
         </aside>
 
-        <main class="main-content">
-            <header class="main-header">
-                <h1 id="page-title">Dashboard</h1>
-                <div class="user-profile">
-                    <span>Olá, [Nome do Usuário]</span>
+        <main class="content">
+            <section id="modulo1" class="module-content active">
+                <h2>Módulo 1: Fundamentos do Negócio e Posicionamento</h2>
+                <div class="section">
+                    <h3>1. Definição da Persona Ideal</h3>
+                    <p>Antes de qualquer estratégia, é essencial saber <strong>com quem você está falando</strong>. A persona é a representação semifictícia do seu cliente ideal, baseada em dados reais e comportamentos.</p>
+                    <p><strong>Exercício prático:</strong> Crie sua persona respondendo perguntas como:</p>
+                    <ul>
+                        <li>Nome fictício, idade, profissão</li>
+                        <li>Quais são suas dores e desejos?</li>
+                        <li>Onde ela busca informação?</li>
+                        <li>Que tipo de conteúdo ela consome?</li>
+                    </ul>
                 </div>
-            </header>
-            
-            <div class="content-area" id="dashboard-section" style="display: block;">
-                <div class="dashboard-stats">
-                    <div class="stat-card">
-                        <h3>Total de Leads</h3>
-                        <p id="total-leads">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Leads Novos</h3>
-                        <p id="leads-novo">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Leads em Progresso</h3>
-                        <p id="leads-progresso">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Leads Fechados</h3>
-                        <p id="leads-fechado">0</p>
-                    </div>
+                <div class="section">
+                    <h3>2. Proposta de Valor e Diferenciação no Mercado</h3>
+                    <p>Aqui o foco é entender: <strong>Por que alguém deve comprar de você e não do concorrente?</strong> A proposta de valor comunica o que você entrega, como entrega e por que é relevante.</p>
+                    <p><strong>Dica prática:</strong> Escreva uma frase simples que responda: “Eu ajudo [persona] a [solução] através de [diferencial].”</p>
+                    <p>Exemplo: “Ajudo clínicas de estética a atrair clientes todos os dias com vídeos estratégicos e tráfego pago.”</p>
                 </div>
-                <div class="dashboard-charts">
-                    <div class="chart-card">
-                        <h3>Status dos Leads</h3>
-                        <div class="chart-container">
-                            <canvas id="statusChart"></canvas>
-                        </div>
-                    </div>
+                <div class="section">
+                    <h3>3. Escolha do Plano de Serviço Ideal</h3>
+                    <p>Com base na persona e na proposta de valor, o cliente pode escolher o plano mais adequado (básico, intermediário ou avançado). Esse alinhamento evita frustrações e melhora a entrega.</p>
                 </div>
-            </div>
+            </section>
 
-            <div class="content-area" id="crm-kanban-section" style="display: none;">
-                <div class="card new-lead-card">
-                    <h2>Novo Lead</h2>
-                    <form id="lead-form">
-                        <div class="input-grid">
-                            <input type="text" id="lead-name" placeholder="Nome" required>
-                            <input type="email" id="lead-email" placeholder="E-mail" required>
-                            <input type="tel" id="lead-whatsapp" placeholder="WhatsApp" required>
-                            <input type="text" id="lead-attendant" placeholder="Atendente (quem atende)">
-                            <input type="text" id="lead-origin" placeholder="Origem">
-                            <input type="date" id="lead-date" placeholder="dd/mm/aaaa">
-                            <div class="select-group">
-                                <select id="lead-qualification">
-                                    <option value="">Qualificação</option>
-                                    <option value="quente">Lead Quente</option>
-                                    <option value="morno">Lead Morno</option>
-                                    <option value="frio">Lead Frio</option>
-                                </select>
-                            </div>
-                        </div>
-                        <textarea id="lead-notes" placeholder="Notas"></textarea>
-                        <button type="submit" class="btn-save">Salvar</button>
-                    </form>
+            <section id="modulo2" class="module-content">
+                <h2>Módulo 2: O Algoritmo do Meta (Facebook & Instagram)</h2>
+                <div class="section">
+                    <h3>1. Como o algoritmo funciona</h3>
+                    <p>O algoritmo da Meta prioriza conteúdos que geram interação rápida, como curtidas, comentários, compartilhamentos e tempo de visualização. Quanto mais engajamento nos primeiros minutos, maior o alcance.</p>
+                    <p><strong>Dica:</strong> O primeiro segundo do seu conteúdo precisa chamar a atenção. Use ganchos como "3 erros que estão matando o seu Instagram...".</p>
                 </div>
-
-                <div class="kanban-board" id="kanban-board">
-                    <div class="kanban-column" data-status="novo">
-                        <h3>Novo</h3>
-                        <div class="kanban-cards-list"></div>
-                    </div>
-                    <div class="kanban-column" data-status="progresso">
-                        <h3>Em Progresso</h3>
-                        <div class="kanban-cards-list"></div>
-                    </div>
-                    <div class="kanban-column" data-status="fechado">
-                        <h3>Fechado</h3>
-                        <div class="kanban-cards-list"></div>
-                    </div>
+                <div class="section">
+                    <h3>2. Estrutura de Conteúdo</h3>
+                    <p>A estrutura ideal para vídeos e posts é: <strong>Gancho Forte → Entrega de Valor → Chamada para Ação (CTA)</strong>.</p>
+                    <ul>
+                        <li><strong>Gancho:</strong> Uma frase impactante para fazer a pessoa parar.</li>
+                        <li><strong>Valor:</strong> A dica, solução ou informação útil.</li>
+                        <li><strong>CTA:</strong> O que você quer que a pessoa faça (salvar, comentar, compartilhar).</li>
+                    </ul>
                 </div>
-            </div>
+            </section>
 
-            <div class="content-area" id="crm-list-section" style="display: none;">
-                <div class="list-header">
-                    <h2>Lista de Leads</h2>
-                    <button class="btn-export" id="export-excel-btn">
-                        <i class="ph-fill ph-file-excel"></i> Exportar para Excel
-                    </button>
+            <section id="modulo3" class="module-content">
+                <h2>Módulo 3: Cronograma de Postagens Estratégico</h2>
+                <div class="section">
+                    <h3>1. Melhores horários e dias</h3>
+                    <p>O ideal é postar quando seu público está mais ativo — geralmente entre 11h e 13h ou 18h e 20h. As métricas do Instagram (Insights) são a melhor fonte para verificar isso.</p>
                 </div>
-                <div class="card">
-                    <div class="table-container">
-                        <table id="leads-table">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>WhatsApp</th>
-                                    <th>Origem</th>
-                                    <th>Qualificação</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                </tbody>
-                        </table>
-                    </div>
+                <div class="section">
+                    <h3>2. Frequência ideal por nicho</h3>
+                    <p>A consistência é mais importante que a quantidade. Sugere-se: <strong>Estética e beleza:</strong> 4 a 5 posts por semana. <strong>B2B e serviços:</strong> 3 posts por semana.</p>
+                    <p><strong>Exemplo de Cronograma Semanal:</strong></p>
+                    <ul>
+                        <li><strong>Segunda:</strong> Conteúdo Educativo</li>
+                        <li><strong>Terça:</strong> Prova Social (depoimentos)</li>
+                        <li><strong>Quarta:</strong> Vídeo Reels</li>
+                        <li><strong>Quinta:</strong> Dica + Engajamento (Carrossel)</li>
+                        <li><strong>Sexta:</strong> Chamada para Ação (Oferta)</li>
+                    </ul>
                 </div>
-            </div>
+            </section>
 
-            <div class="content-area" id="finance-section" style="display: none;">
-                <div class="finance-header">
-                    <h2>Financeiro</h2>
-                    <div class="finance-nav">
-                        <a href="#" class="finance-tab active" data-tab="caixa">Caixa</a>
-                        <a href="#" class="finance-tab" data-tab="custos">Custos e Estoque</a>
-                    </div>
+            <section id="modulo4" class="module-content">
+                <h2>Módulo 4: Conteúdo que Conecta</h2>
+                <div class="section">
+                    <h3>1. Como gravar vídeos que engajam</h3>
+                    <p>Um vídeo precisa seguir uma ordem estratégica: <strong>Gancho</strong> (1º segundo) → <strong>Valor</strong> (dica ou solução) → <strong>CTA</strong> (incentivo à ação).</p>
                 </div>
-
-                <div class="finance-content active" id="caixa-tab-content">
-                    <div class="caixa-stats">
-                        <div class="stat-card entrada-card">
-                            <h3>Total de Entradas</h3>
-                            <p id="total-entradas">R$ 0,00</p>
-                        </div>
-                        <div class="stat-card saida-card">
-                            <h3>Total de Saídas</h3>
-                            <p id="total-saidas">R$ 0,00</p>
-                        </div>
-                        <div class="stat-card saldo-card">
-                            <h3>Saldo Atual</h3>
-                            <p id="caixa-atual">R$ 0,00</p>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Adicionar Movimentação</h3>
-                        <form id="caixa-form">
-                            <div class="input-grid">
-                                <input type="date" id="caixa-data" required>
-                                <input type="text" id="caixa-descricao" placeholder="Descrição" required>
-                                <input type="number" id="caixa-valor" placeholder="Valor (R$)" required step="0.01">
-                                <div class="select-group">
-                                    <select id="caixa-tipo" required>
-                                        <option value="">Tipo</option>
-                                        <option value="entrada">Entrada</option>
-                                        <option value="saida">Saída</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <textarea id="caixa-observacoes" placeholder="Observações"></textarea>
-                            <button type="submit" class="btn-save">Adicionar</button>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <h3>Histórico de Movimentações</h3>
-                        <div class="table-container">
-                            <table id="caixa-table">
-                                <thead>
-                                    <tr>
-                                        <th>Data</th>
-                                        <th>Descrição</th>
-                                        <th>Entrada (R$)</th>
-                                        <th>Saída (R$)</th>
-                                        <th>Observações</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="section">
+                    <h3>2. Edição prática com CapCut ou InShot</h3>
+                    <p>Use ferramentas simples como <strong>CapCut</strong> ou <strong>InShot</strong> para cortar partes, adicionar legendas automáticas, inserir trilha sonora e efeitos. Mantenha os cortes rápidos para reter a atenção.</p>
                 </div>
-
-                <div class="finance-content" id="custos-tab-content" style="display: none;">
-                    <div class="card">
-                        <h3>Adicionar Novo Produto</h3>
-                        <form id="estoque-form">
-                            <div class="input-grid">
-                                <input type="text" id="estoque-produto" placeholder="Produto" required>
-                                <input type="text" id="estoque-descricao" placeholder="Descrição" required>
-                                <input type="number" id="estoque-compra" placeholder="Valor de Compra (R$)" required step="0.01">
-                                <input type="number" id="estoque-venda" placeholder="Valor de Venda (R$)" required step="0.01">
-                            </div>
-                            <button type="submit" class="btn-save">Adicionar Produto</button>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <h3>Estoque de Produtos</h3>
-                        <div class="estoque-actions">
-                            <div class="search-container">
-                                <input type="text" id="estoque-search" placeholder="Pesquisar por produto ou descrição...">
-                            </div>
-                            <div class="buttons-container">
-                                <button class="btn-import" id="import-estoque-btn">
-                                    <i class="ph-fill ph-file-arrow-down"></i> Importar
-                                    <input type="file" id="import-estoque-file" accept=".xlsx, .xls, .csv">
-                                </button>
-                                <button class="btn-export" id="export-estoque-btn">
-                                    <i class="ph-fill ph-file-arrow-up"></i> Exportar
-                                </button>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table id="estoque-table">
-                                <thead>
-                                    <tr>
-                                        <th>Produto</th>
-                                        <th>Descrição</th>
-                                        <th>Valor de Compra</th>
-                                        <th>Custos</th>
-                                        <th>Valor de Venda</th>
-                                        <th>Lucro</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="section">
+                    <h3>3. Design com Canva</h3>
+                    <p>O <strong>Canva</strong> é ideal para criar imagens que conectam. Use fontes legíveis e as cores da sua marca para criar um padrão visual.</p>
                 </div>
-            </div>
-            
-            <div class="content-area" id="mentoring-section" style="display: none;">
-                <h2>Mentoria</h2>
-                <p>Aqui entra o conteúdo da mentoria.</p>
-            </div>
-            <div class="content-area" id="chatbot-section" style="display: none;">
-                <h2>Chatbot AI</h2>
-                <p>Aqui entra o conteúdo do chatbot.</p>
-            </div>
+            </section>
+
+            <section id="modulo5" class="module-content">
+                <h2>Módulo 5: Copywriting com ChatGPT</h2>
+                <div class="section">
+                    <h3>1. Como criar textos persuasivos com IA</h3>
+                    <p>O <strong>ChatGPT</strong> pode gerar textos que vendem, mas a chave é saber o que pedir. Direcione a IA com prompts claros e específicos.</p>
+                </div>
+                <div class="section">
+                    <h3>2. Fórmulas testadas de Copywriting</h3>
+                    <p>Use fórmulas como base para os seus prompts:</p>
+                    <ul>
+                        <li><strong>AIDA:</strong> Atenção, Interesse, Desejo, Ação</li>
+                        <li><strong>PAS:</strong> Problema, Agitação, Solução</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <h3>3. Títulos e legendas que geram cliques</h3>
+                    <p>Use ganchos fortes e títulos que provoquem curiosidade, como perguntas ou listas, para gerar cliques e salvamentos.</p>
+                </div>
+            </section>
+
+            <section id="modulo6" class="module-content">
+                <h2>Módulo 6: Implementação de CRM</h2>
+                <div class="section">
+                    <h3>1. O que é CRM e por que usar</h3>
+                    <p>CRM (Customer Relationship Management) é uma ferramenta que organiza o relacionamento com leads e clientes. Ele ajuda a acompanhar o cliente desde o primeiro contato até o fechamento da venda, sem perder oportunidades.</p>
+                </div>
+                <div class="section">
+                    <h3>2. Ferramentas gratuitas e pagas</h3>
+                    <p>Você pode começar com o <strong>Trello</strong> (adaptado com colunas para cada etapa) ou o <strong>HubSpot CRM</strong>. Ferramentas pagas como RD Station e Pipedrive são ideais para equipes maiores.</p>
+                </div>
+                <div class="section">
+                    <h3>3. Funil de Vendas Básico</h3>
+                    <p>Um funil simples pode ter as etapas: <strong>Novo Lead → Contato Feito → Proposta Enviada → Cliente Fechado</strong>. Isso ajuda a manter o foco e a eficiência comercial.</p>
+                </div>
+            </section>
+
+            <section id="modulo7" class="module-content">
+                <h2>Módulo 7: Processo Comercial e Técnicas de Venda</h2>
+                <div class="section">
+                    <h3>1. Como montar um pitch comercial</h3>
+                    <p>O pitch deve ser claro, direto e despertar curiosidade. Inclua: quem você ajuda, o problema que resolve e o diferencial do seu serviço.</p>
+                    <p>Exemplo: “Nós ajudamos negócios locais a atrair clientes todos os dias usando vídeos e tráfego pago com baixo custo.”</p>
+                </div>
+                <div class="section">
+                    <h3>2. Rapport e Gatilhos Mentais</h3>
+                    <p>Para vender, crie conexão e confiança. Use técnicas como <strong>rapport</strong> (linguagem parecida), <strong>espelhamento</strong> e <strong>gatilhos mentais</strong> como escassez, autoridade e prova social.</p>
+                </div>
+                <div class="section">
+                    <h3>3. Como conduzir um follow-up</h3>
+                    <p>A maioria das vendas acontece no 2º ou 3º contato. Use o CRM para agendar retornos e sempre traga um novo valor em cada abordagem.</p>
+                </div>
+            </section>
+
+            <section id="modulo8" class="module-content">
+                <h2>Módulo 8: Conexão com a Audiência e Humanização</h2>
+                <div class="section">
+                    <h3>1. Como gerar conexão real</h3>
+                    <p>Pessoas se conectam com pessoas, e não com marcas frias. Seja autêntico e mostre sua rotina, bastidores e valores. Você não precisa ser perfeito, apenas verdadeiro.</p>
+                </div>
+                <div class="section">
+                    <h3>2. Estratégias para Stories</h3>
+                    <p>Use os stories para mostrar o que acontece por trás do conteúdo pronto: sua rotina de trabalho, erros, aprendizados e bastidores. Isso aumenta a identificação com o público.</p>
+                </div>
+                <div class="section">
+                    <h3>3. Criando uma comunidade leal</h3>
+                    <p>Uma audiência fiel é construída com interação constante. Responda a comentários e DMs, e envolva os seguidores com perguntas e enquetes. Quem se sente visto, volta e compra.</p>
+                </div>
+            </section>
         </main>
     </div>
-
-    <div class="modal-overlay" id="edit-lead-modal">
-        <div class="modal-content">
-            <h2>Editar Lead</h2>
-            <form id="edit-lead-form">
-                <input type="hidden" id="edit-lead-id">
-                <div class="input-grid">
-                    <input type="text" id="edit-lead-name" placeholder="Nome">
-                    <input type="email" id="edit-lead-email" placeholder="E-mail">
-                    <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
-                    <div class="select-group">
-                        <select id="edit-lead-status">
-                            <option value="novo">Novo</option>
-                            <option value="progresso">Em Progresso</option>
-                            <option value="fechado">Fechado</option>
-                        </select>
-                    </div>
-                    <input type="text" id="edit-lead-attendant" placeholder="Atendente (quem atende)">
-                    <input type="text" id="edit-lead-origem" placeholder="Origem">
-                    <input type="date" id="edit-lead-date" placeholder="dd/mm/aaaa">
-                    <div class="select-group">
-                        <select id="edit-lead-qualification">
-                            <option value="">Qualificação</option>
-                            <option value="quente">Lead Quente</option>
-                            <option value="morno">Lead Morno</option>
-                            <option value="frio">Lead Frio</option>
-                        </select>
-                    </div>
-                </div>
-                <textarea id="edit-lead-notes" placeholder="Notas"></textarea>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" id="delete-lead-btn">Excluir</button>
-                    <button type="submit" class="btn-save">Salvar Alterações</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="add-custo-modal">
-        <div class="modal-content">
-            <h2>Adicionar Custo</h2>
-            <form id="add-custo-form">
-                <input type="hidden" id="add-custo-descricao-produto">
-                <div class="input-grid">
-                    <input type="text" id="custo-descricao-custo" placeholder="Descrição do Custo" required>
-                    <input type="number" id="custo-valor" placeholder="Valor (R$)" required step="0.01">
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" id="close-custo-modal">Cancelar</button>
-                    <button type="submit" class="btn-save">Adicionar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
+    
     <script src="script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 </body>
 </html>
