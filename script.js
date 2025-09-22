@@ -645,4 +645,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inicialização
     updateDashboard();
-});
+});// Exemplo de como carregar e renderizar a mentoria no seu super app
+// A partir de um arquivo JSON.
+
+// URL do seu arquivo JSON.
+// Certifique-se de que o caminho está correto de acordo com a sua estrutura de projeto.
+const MENTORSHIP_DATA_URL = './data/mentoria.json';
+
+// Elemento HTML onde os módulos da mentoria serão renderizados
+const modulesContainer = document.getElementById('mentorship-modules-container');
+
+// A função assíncrona para carregar o arquivo JSON
+async function loadMentorshipContent() {
+    try {
+        const response = await fetch(MENTORSHIP_DATA_URL);
+
+        // Verifica se a resposta foi bem-sucedida
+        if (!response.ok) {
+            throw new Error(`Erro ao carregar o arquivo: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        // Chama a função para renderizar os módulos na tela
+        renderModules(data.mentorship);
+
+    } catch (error) {
+        console.error('Ocorreu um erro ao carregar o conteúdo da mentoria:', error);
+        // Pode ser útil exibir uma mensagem de erro na interface do usuário também
+        if (modulesContainer) {
+            modulesContainer.innerHTML = '<p>Não foi possível carregar o conteúdo da mentoria. Por favor, tente novamente mais tarde.</p>';
+        }
+    }
+}
+
+// A função para criar e adicionar os elementos HTML para cada módulo
+function renderModules(modules) {
+    if (!modulesContainer) {
+        console.error("Elemento HTML 'mentorship-modules-container' não encontrado.");
+        return;
+    }
+    
+    // Limpa o container para evitar duplicação caso a função seja chamada novamente
+    modulesContainer.innerHTML = '';
+
+    // Loop que percorre cada módulo do JSON e cria um elemento HTML para ele
+    modules.forEach(module => {
+        const moduleElement = document.createElement('div');
+        moduleElement.classList.add('module-card');
+        moduleElement.innerHTML = `
+            <h2>${module.title}</h2>
+            <p>${module.description}</p>
+        `;
+        modulesContainer.appendChild(moduleElement);
+    });
+}
+
+// Chama a função para iniciar o processo de carregamento quando a página é carregada
+document.addEventListener('DOMContentLoaded', loadMentorshipContent);
