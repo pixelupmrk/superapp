@@ -232,7 +232,13 @@ body {
 #lead-form textarea,
 #edit-lead-form input,
 #edit-lead-form select,
-#edit-lead-form textarea {
+#edit-lead-form textarea,
+#caixa-form input,
+#caixa-form select,
+#caixa-form textarea,
+#estoque-form input,
+#estoque-form select,
+#add-custo-form input {
     width: 100%;
     padding: 0.75rem 1rem;
     background-color: var(--primary-color);
@@ -248,7 +254,13 @@ body {
 #lead-form textarea:focus,
 #edit-lead-form input:focus,
 #edit-lead-form select:focus,
-#edit-lead-form textarea:focus {
+#edit-lead-form textarea:focus,
+#caixa-form input:focus,
+#caixa-form select:focus,
+#caixa-form textarea:focus,
+#estoque-form input:focus,
+#estoque-form select:focus,
+#add-custo-form input:focus {
     outline: none;
     border-color: var(--accent-color);
     box-shadow: 0 0 10px var(--border-glow);
@@ -494,4 +506,19 @@ body {
 
 .saldo-card p {
     color: #00f7ff;
+}
+
+.custos-info-btn {
+    background-color: transparent;
+    border: 1px solid var(--text-color-muted);
+    color: var(--text-color-muted);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.custos-info-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
 }
