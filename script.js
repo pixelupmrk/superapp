@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         newCard.innerHTML = `
             <strong>${lead.nome || ''}</strong><br>
-            <small>WhatsApp: ${lead.whatsapp || ''}</small><br>
+            <small>WhatsApp: <a href="https://wa.me/${lead.whatsapp || ''}" target="_blank">${lead.whatsapp || ''}</a></small><br>
             <small>Origem: ${lead.origem || ''}</small><br>
             <small>Qualificação: ${lead.qualificacao || ''}</small>
         `;
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         row.innerHTML = `
             <td>${lead.nome || ''}</td>
-            <td>${lead.whatsapp || ''}</td>
+            <td><a href="https://wa.me/${lead.whatsapp || ''}" target="_blank">${lead.whatsapp || ''}</a></td>
             <td>${lead.origem || ''}</td>
             <td>${lead.qualificacao || ''}</td>
             <td>${lead.status || ''}</td>
