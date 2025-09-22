@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('leads-progresso').textContent = leadsProgresso;
         document.getElementById('leads-fechado').textContent = leadsFechado;
 
-        updateStatusChart(novo, progresso, fechado);
+        updateStatusChart(leadsNovo, leadsProgresso, leadsFechado);
     }
 
     function updateStatusChart(novo, progresso, fechado) {
@@ -528,6 +528,120 @@ document.addEventListener('DOMContentLoaded', () => {
             addCustoForm.reset();
         }
     });
+
+    // Lógica de Importação/Exportação para a tabela de Estoque
+    const importEstoqueFile = document.getElementById('import-estoque-file');
+    const exportEstoqueBtn = document.getElementById('export-estoque-btn');
+
+    importEstoqueFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const data = event.target.result;
+            const workbook = XLSX.read(data, { type: 'binary' });
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            const json = XLSX.utils.sheet_to_json(sheet, {
+                header: 1,
+                raw: false,
+                defval: "",
+            });
+            
+            // Mapear os dados da planilha para a estrutura do aplicativo
+            const newEstoque = parseEstoqueData(json);
+            estoque = newEstoque;
+            updateEstoque();
+            renderEstoqueTable();
+            alert('Dados importados com sucesso!');
+        };
+        reader.readAsBinaryString(file);
+    });
+
+    exportEstoqueBtn.addEventListener('click', () => {
+        const dataToExport = [];
+        estoque.forEach(item => {
+            const baseRow = {
+                "Produto": item.produto,
+                "Descrição": item.descricao,
+                "Valor de Compra": item.compra,
+                "Valor de Venda": item.venda,
+                "Total de Custos": item.totalCustos,
+                "Lucro": item.lucro
+            };
+            if (item.custos.length > 0) {
+                item.custos.forEach(custo => {
+                    dataToExport.push({
+                        ...baseRow,
+                        "Custo - Descrição": custo.descricao,
+                        "Custo - Valor": custo.valor
+                    });
+                });
+            } else {
+                dataToExport.push(baseRow);
+            }
+        });
+        
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Estoque");
+        XLSX.writeFile(workbook, "estoque_e_custos.xlsx");
+    });
+    
+    function parseEstoqueData(data) {
+        const parsedData = [];
+        const headerIndex = data.findIndex(row => row[0] === "Veículo" || row[0] === "Produto");
+        if (headerIndex === -1) {
+            alert("Não foi possível encontrar o cabeçalho da planilha. Verifique se as colunas 'Veículo'/'Produto' e 'Placa'/'Descrição' existem.");
+            return [];
+        }
+
+        let currentProduto = null;
+        for (let i = headerIndex + 1; i < data.length; i++) {
+            const row = data[i];
+            const rowProduto = row[0] || currentProduto?.produto;
+            const rowDescricao = row[1] || currentProduto?.descricao;
+
+            if (rowProduto && rowDescricao) {
+                const existingProduct = parsedData.find(p => p.descricao === rowDescricao);
+                if (existingProduct) {
+                    const custoDescricao = row[5];
+                    const custoValor = parseFloat(row[6].toString().replace(',', '.'));
+                    if (custoDescricao && !isNaN(custoValor)) {
+                        existingProduct.custos.push({
+                            descricao: custoDescricao,
+                            valor: custoValor
+                        });
+                    }
+                } else {
+                    const compra = parseFloat(row[4]?.toString().replace(',', '.'));
+                    const venda = parseFloat(row[8]?.toString().replace(',', '.'));
+                    const novoProduto = {
+                        produto: rowProduto,
+                        descricao: rowDescricao,
+                        compra: compra,
+                        venda: venda,
+                        custos: [],
+                    };
+                    
+                    const custoDescricao = row[5];
+                    const custoValor = parseFloat(row[6]?.toString().replace(',', '.'));
+                    if (custoDescricao && !isNaN(custoValor)) {
+                        novoProduto.custos.push({
+                            descricao: custoDescricao,
+                            valor: custoValor
+                        });
+                    }
+                    parsedData.push(novoProduto);
+                    currentProduto = novoProduto;
+                }
+            } else {
+                currentProduto = null; // Reset for empty rows between products
+            }
+        }
+        return parsedData;
+    }
 
     // Inicialização
     updateDashboard();
