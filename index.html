@@ -156,10 +156,10 @@
 
             <div class="content-area" id="finance-section" style="display: none;">
                 <div class="finance-header">
-                    <h2>Caixa Geral</h2>
+                    <h2>Financeiro</h2>
                     <div class="finance-nav">
                         <a href="#" class="finance-tab active" data-tab="caixa">Caixa</a>
-                        <a href="#" class="finance-tab" data-tab="custos">Custos</a>
+                        <a href="#" class="finance-tab" data-tab="custos">Custos e Estoque</a>
                     </div>
                 </div>
 
@@ -219,8 +219,38 @@
                 </div>
 
                 <div class="finance-content" id="custos-tab-content" style="display: none;">
-                    <h2>Em breve...</h2>
-                    <p>Aqui você poderá visualizar e gerenciar os custos e o estoque de veículos.</p>
+                    <div class="card">
+                        <h3>Adicionar Novo Veículo</h3>
+                        <form id="estoque-form">
+                            <div class="input-grid">
+                                <input type="text" id="estoque-veiculo" placeholder="Veículo" required>
+                                <input type="text" id="estoque-placa" placeholder="Placa" required>
+                                <input type="number" id="estoque-compra" placeholder="Valor de Compra (R$)" required step="0.01">
+                                <input type="number" id="estoque-venda" placeholder="Valor de Venda (R$)" required step="0.01">
+                            </div>
+                            <button type="submit" class="btn-save">Adicionar Veículo</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h3>Estoque de Veículos</h3>
+                        <div class="table-container">
+                            <table id="estoque-table">
+                                <thead>
+                                    <tr>
+                                        <th>Veículo</th>
+                                        <th>Placa</th>
+                                        <th>Valor de Compra</th>
+                                        <th>Custos</th>
+                                        <th>Valor de Venda</th>
+                                        <th>Lucro</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -267,6 +297,23 @@
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" id="delete-lead-btn">Excluir</button>
                     <button type="submit" class="btn-save">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="add-custo-modal">
+        <div class="modal-content">
+            <h2>Adicionar Custo</h2>
+            <form id="add-custo-form">
+                <input type="hidden" id="add-custo-placa">
+                <div class="input-grid">
+                    <input type="text" id="custo-descricao" placeholder="Descrição do Custo" required>
+                    <input type="number" id="custo-valor" placeholder="Valor (R$)" required step="0.01">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="close-custo-modal">Cancelar</button>
+                    <button type="submit" class="btn-save">Adicionar</button>
                 </div>
             </form>
         </div>
