@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const leads = [];
     let nextLeadId = 0;
     let statusChart;
+    let caixa = [];
 
     // Lógica para a navegação da sidebar
     const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
@@ -28,6 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateDashboard();
             } else if (targetId === 'crm-list-section') {
                 renderLeadsTable();
+            } else if (targetId === 'finance-section') {
+                updateCaixa();
+                renderCaixaTable();
             }
         });
     });
@@ -331,6 +335,77 @@ document.addEventListener('DOMContentLoaded', () => {
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
         XLSX.writeFile(workbook, "leads_crm.xlsx");
+    });
+    
+    // Lógica para a área Financeira
+    const caixaForm = document.getElementById('caixa-form');
+    caixaForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const tipo = document.getElementById('caixa-tipo').value;
+        const valor = parseFloat(document.getElementById('caixa-valor').value);
+        const novaMovimentacao = {
+            data: document.getElementById('caixa-data').value,
+            descricao: document.getElementById('caixa-descricao').value,
+            valor: valor,
+            tipo: tipo,
+            observacoes: document.getElementById('caixa-observacoes').value
+        };
+
+        caixa.push(novaMovimentacao);
+        updateCaixa();
+        renderCaixaTable();
+        caixaForm.reset();
+    });
+
+    function updateCaixa() {
+        let totalEntradas = 0;
+        let totalSaidas = 0;
+
+        caixa.forEach(mov => {
+            if (mov.tipo === 'entrada') {
+                totalEntradas += mov.valor;
+            } else if (mov.tipo === 'saida') {
+                totalSaidas += mov.valor;
+            }
+        });
+
+        const caixaAtual = totalEntradas - totalSaidas;
+        document.getElementById('total-entradas').textContent = `R$ ${totalEntradas.toFixed(2).replace('.', ',')}`;
+        document.getElementById('total-saidas').textContent = `R$ ${totalSaidas.toFixed(2).replace('.', ',')}`;
+        document.getElementById('caixa-atual').textContent = `R$ ${caixaAtual.toFixed(2).replace('.', ',')}`;
+    }
+
+    function renderCaixaTable() {
+        const tableBody = document.querySelector('#caixa-table tbody');
+        tableBody.innerHTML = '';
+        
+        caixa.forEach(mov => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${mov.data}</td>
+                <td>${mov.descricao}</td>
+                <td class="entrada">${mov.tipo === 'entrada' ? `R$ ${mov.valor.toFixed(2).replace('.', ',')}` : ''}</td>
+                <td class="saida">${mov.tipo === 'saida' ? `R$ ${mov.valor.toFixed(2).replace('.', ',')}` : ''}</td>
+                <td>${mov.observacoes}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+    
+    // Lógica para as abas do Financeiro
+    const financeTabs = document.querySelectorAll('.finance-tab');
+    financeTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetTabId = e.target.getAttribute('data-tab') + '-tab-content';
+            
+            financeTabs.forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.finance-content').forEach(c => c.style.display = 'none');
+            
+            e.target.classList.add('active');
+            document.getElementById(targetTabId).style.display = 'block';
+        });
     });
 
     // Inicialização
