@@ -522,3 +522,18 @@ body {
     background-color: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
 }
+
+/* Novo estilo para o campo de pesquisa */
+.search-container {
+    margin-bottom: 1.5rem;
+}
+
+#estoque-search {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--primary-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1rem;
+}
