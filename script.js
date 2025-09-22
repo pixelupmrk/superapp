@@ -2,15 +2,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const leads = [];
     let nextLeadId = 0;
+    let statusChart;
 
     // Lógica para a navegação da sidebar
     const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
     const contentAreas = document.querySelectorAll('.main-content .content-area');
+    const pageTitle = document.getElementById('page-title');
 
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const targetId = e.currentTarget.getAttribute('data-target');
+            const targetText = e.currentTarget.querySelector('span').textContent;
 
             navItems.forEach(nav => nav.classList.remove('active'));
             e.currentTarget.classList.add('active');
@@ -19,8 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 area.style.display = 'none';
             });
             document.getElementById(targetId).style.display = 'block';
+            pageTitle.textContent = targetText;
 
-            if (targetId === 'crm-list-section') {
+            if (targetId === 'dashboard-section') {
+                updateDashboard();
+            } else if (targetId === 'crm-list-section') {
                 renderLeadsTable();
             }
         });
@@ -72,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const lead = leads.find(l => l.id == cardId);
             if (lead) {
                 lead.status = newStatus;
+                updateDashboard();
             }
         }
     });
@@ -168,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         leads.push(newLead);
         renderKanbanCards();
         renderLeadsTable();
+        updateDashboard();
         leadForm.reset();
     });
 
@@ -183,8 +191,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (editButton) {
             const row = editButton.closest('tr');
-            currentLeadId = row.getAttribute('data-id');
-            const lead = leads.find(l => l.id == currentLeadId);
+            currentLeadId = parseInt(row.getAttribute('data-id'));
+            const lead = leads.find(l => l.id === currentLeadId);
             
             if (lead) {
                 document.getElementById('edit-lead-name').value = lead.nome || '';
@@ -203,13 +211,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (deleteButton) {
             const row = deleteButton.closest('tr');
-            const leadId = row.getAttribute('data-id');
+            const leadId = parseInt(row.getAttribute('data-id'));
             if (confirm('Tem certeza que deseja excluir este lead?')) {
-                const leadIndex = leads.findIndex(l => l.id == leadId);
+                const leadIndex = leads.findIndex(l => l.id === leadId);
                 if (leadIndex > -1) {
                     leads.splice(leadIndex, 1);
                     renderKanbanCards();
                     renderLeadsTable();
+                    updateDashboard();
                 }
             }
         }
@@ -217,11 +226,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     deleteLeadBtn.addEventListener('click', () => {
         if (confirm('Tem certeza que deseja excluir este lead?')) {
-            const leadIndex = leads.findIndex(l => l.id == currentLeadId);
+            const leadIndex = leads.findIndex(l => l.id === currentLeadId);
             if (leadIndex > -1) {
                 leads.splice(leadIndex, 1);
                 renderKanbanCards();
                 renderLeadsTable();
+                updateDashboard();
             }
             editModal.style.display = 'none';
         }
@@ -230,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
     editForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        const lead = leads.find(l => l.id == currentLeadId);
+        const lead = leads.find(l => l.id === currentLeadId);
         
         if (lead) {
             lead.nome = document.getElementById('edit-lead-name').value;
@@ -245,7 +255,84 @@ document.addEventListener('DOMContentLoaded', () => {
 
             renderKanbanCards();
             renderLeadsTable();
+            updateDashboard();
             editModal.style.display = 'none';
         }
     });
+
+    // Lógica do Dashboard
+    function updateDashboard() {
+        const totalLeads = leads.length;
+        const leadsNovo = leads.filter(l => l.status === 'novo').length;
+        const leadsProgresso = leads.filter(l => l.status === 'progresso').length;
+        const leadsFechado = leads.filter(l => l.status === 'fechado').length;
+
+        document.getElementById('total-leads').textContent = totalLeads;
+        document.getElementById('leads-novo').textContent = leadsNovo;
+        document.getElementById('leads-progresso').textContent = leadsProgresso;
+        document.getElementById('leads-fechado').textContent = leadsFechado;
+
+        updateStatusChart(leadsNovo, leadsProgresso, leadsFechado);
+    }
+
+    function updateStatusChart(novo, progresso, fechado) {
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        if (statusChart) {
+            statusChart.destroy();
+        }
+
+        statusChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Novo', 'Em Progresso', 'Fechado'],
+                datasets: [{
+                    data: [novo, progresso, fechado],
+                    backgroundColor: ['#00f7ff', '#ffc107', '#28a745'],
+                    borderColor: ['#0d1117', '#0d1117', '#0d1117'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#cdd6f4',
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        enabled: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Lógica de Exportação para Excel
+    document.getElementById('export-excel-btn').addEventListener('click', () => {
+        const dataToExport = leads.map(lead => ({
+            "Nome": lead.nome,
+            "Email": lead.email,
+            "WhatsApp": lead.whatsapp,
+            "Atendente": lead.atendente,
+            "Origem": lead.origem,
+            "Data de Contato": lead.data,
+            "Qualificação": lead.qualificacao,
+            "Status": lead.status,
+            "Notas": lead.notas
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
+        XLSX.writeFile(workbook, "leads_crm.xlsx");
+    });
+
+    // Inicialização
+    updateDashboard();
 });
