@@ -580,4 +580,27 @@ body {
 
 .btn-import:hover {
     box-shadow: 0 0 15px var(--border-glow);
-}
+}<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentoria Super App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Mentoria de Vendas</h1>
+        <p>Acelerando suas vendas com o super app</p>
+    </header>
+
+    <main id="mentorship-main-container">
+        </main>
+
+    <footer>
+        <p>&copy; 2024 Super App. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
