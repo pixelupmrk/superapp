@@ -150,6 +150,12 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
+.chart-container {
+    position: relative;
+    height: 400px;
+    margin-top: 1.5rem;
+}
+
 /* --- Kanban Styles --- */
 .kanban-board {
     display: grid;
