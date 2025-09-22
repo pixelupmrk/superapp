@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let nextLeadId = 0;
     let statusChart;
     let caixa = [];
+    let estoque = [];
+    let currentVeiculoPlaca = null;
 
     // Lógica para a navegação da sidebar
     const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
@@ -32,6 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (targetId === 'finance-section') {
                 updateCaixa();
                 renderCaixaTable();
+                updateEstoque();
+                renderEstoqueTable();
             }
         });
     });
@@ -392,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tableBody.appendChild(row);
         });
     }
-    
+
     // Lógica para as abas do Financeiro
     const financeTabs = document.querySelectorAll('.finance-tab');
     financeTabs.forEach(tab => {
@@ -406,6 +410,114 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.classList.add('active');
             document.getElementById(targetTabId).style.display = 'block';
         });
+    });
+
+    // Lógica para a área de Estoque e Custos
+    const estoqueForm = document.getElementById('estoque-form');
+    estoqueForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const novoVeiculo = {
+            veiculo: document.getElementById('estoque-veiculo').value,
+            placa: document.getElementById('estoque-placa').value.toUpperCase(),
+            compra: parseFloat(document.getElementById('estoque-compra').value),
+            venda: parseFloat(document.getElementById('estoque-venda').value),
+            custos: [],
+            totalCustos: 0,
+            lucro: 0
+        };
+
+        estoque.push(novoVeiculo);
+        updateEstoque();
+        renderEstoqueTable();
+        estoqueForm.reset();
+    });
+
+    function updateEstoque() {
+        estoque.forEach(veiculo => {
+            const totalCustos = veiculo.custos.reduce((sum, custo) => sum + custo.valor, 0);
+            veiculo.totalCustos = totalCustos;
+            veiculo.lucro = veiculo.venda - (veiculo.compra + totalCustos);
+        });
+    }
+
+    function renderEstoqueTable() {
+        const tableBody = document.querySelector('#estoque-table tbody');
+        tableBody.innerHTML = '';
+        
+        estoque.forEach(veiculo => {
+            const row = document.createElement('tr');
+            row.setAttribute('data-placa', veiculo.placa);
+
+            const custosHtml = veiculo.custos.length > 0
+                ? veiculo.custos.map(c => `<li>${c.descricao}: R$ ${c.valor.toFixed(2).replace('.', ',')}</li>`).join('')
+                : 'Nenhum custo adicionado.';
+
+            row.innerHTML = `
+                <td>${veiculo.veiculo}</td>
+                <td>${veiculo.placa}</td>
+                <td>R$ ${veiculo.compra.toFixed(2).replace('.', ',')}</td>
+                <td>
+                    <ul class="custos-list">${custosHtml}</ul>
+                    <button class="custos-info-btn" data-placa="${veiculo.placa}">+ Add Custo</button>
+                </td>
+                <td>R$ ${veiculo.venda.toFixed(2).replace('.', ',')}</td>
+                <td>R$ ${veiculo.lucro.toFixed(2).replace('.', ',')}</td>
+                <td>
+                    <button class="btn-delete-veiculo"><i class="ph-fill ph-trash"></i></button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Lógica para Adicionar Custos e Excluir Veículos
+    const addCustoModal = document.getElementById('add-custo-modal');
+    const addCustoForm = document.getElementById('add-custo-form');
+    const closeCustoModalBtn = document.getElementById('close-custo-modal');
+
+    document.addEventListener('click', (e) => {
+        const addCustoBtn = e.target.closest('.custos-info-btn');
+        const deleteVeiculoBtn = e.target.closest('.btn-delete-veiculo');
+        
+        if (addCustoBtn) {
+            currentVeiculoPlaca = addCustoBtn.getAttribute('data-placa');
+            addCustoModal.style.display = 'flex';
+        }
+        
+        if (deleteVeiculoBtn) {
+            const row = deleteVeiculoBtn.closest('tr');
+            const placa = row.getAttribute('data-placa');
+            if (confirm(`Tem certeza que deseja excluir o veículo de placa ${placa}?`)) {
+                const veiculoIndex = estoque.findIndex(v => v.placa === placa);
+                if (veiculoIndex > -1) {
+                    estoque.splice(veiculoIndex, 1);
+                    updateEstoque();
+                    renderEstoqueTable();
+                }
+            }
+        }
+    });
+
+    closeCustoModalBtn.addEventListener('click', () => {
+        addCustoModal.style.display = 'none';
+        addCustoForm.reset();
+    });
+
+    addCustoForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const veiculo = estoque.find(v => v.placa === currentVeiculoPlaca);
+        if (veiculo) {
+            const novoCusto = {
+                descricao: document.getElementById('custo-descricao').value,
+                valor: parseFloat(document.getElementById('custo-valor').value)
+            };
+            veiculo.custos.push(novoCusto);
+            updateEstoque();
+            renderEstoqueTable();
+            addCustoModal.style.display = 'none';
+            addCustoForm.reset();
+        }
     });
 
     // Inicialização
