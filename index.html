@@ -234,8 +234,19 @@
 
                     <div class="card">
                         <h3>Estoque de Produtos</h3>
-                        <div class="search-container">
-                            <input type="text" id="estoque-search" placeholder="Pesquisar por produto ou descrição...">
+                        <div class="estoque-actions">
+                            <div class="search-container">
+                                <input type="text" id="estoque-search" placeholder="Pesquisar por produto ou descrição...">
+                            </div>
+                            <div class="buttons-container">
+                                <button class="btn-import" id="import-estoque-btn">
+                                    <i class="ph-fill ph-file-arrow-down"></i> Importar
+                                    <input type="file" id="import-estoque-file" accept=".xlsx, .xls, .csv">
+                                </button>
+                                <button class="btn-export" id="export-estoque-btn">
+                                    <i class="ph-fill ph-file-arrow-up"></i> Exportar
+                                </button>
+                            </div>
                         </div>
                         <div class="table-container">
                             <table id="estoque-table">
@@ -309,7 +320,7 @@
         <div class="modal-content">
             <h2>Adicionar Custo</h2>
             <form id="add-custo-form">
-                <input type="hidden" id="add-custo-descricao-veiculo">
+                <input type="hidden" id="add-custo-descricao-produto">
                 <div class="input-grid">
                     <input type="text" id="custo-descricao-custo" placeholder="Descrição do Custo" required>
                     <input type="number" id="custo-valor" placeholder="Valor (R$)" required step="0.01">
