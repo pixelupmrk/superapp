@@ -6,6 +6,7 @@
     <title>CRM | Super App PixelUp</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -15,7 +16,11 @@
                 <img src="logo.png" alt="Logo PixelUp" class="logo">
             </div>
             <nav class="sidebar-nav">
-                <a href="#" id="nav-crm-kanban" class="nav-item active" data-target="crm-kanban-section">
+                <a href="#" id="nav-dashboard" class="nav-item active" data-target="dashboard-section">
+                    <i class="ph-fill ph-gauge"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" id="nav-crm-kanban" class="nav-item" data-target="crm-kanban-section">
                     <i class="ph-fill ph-trello-logo"></i>
                     <span>CRM / Kanban</span>
                 </a>
@@ -46,13 +51,40 @@
 
         <main class="main-content">
             <header class="main-header">
-                <h1>CRM / Kanban</h1>
+                <h1 id="page-title">Dashboard</h1>
                 <div class="user-profile">
                     <span>Olá, [Nome do Usuário]</span>
                 </div>
             </header>
             
-            <div class="content-area active" id="crm-kanban-section">
+            <div class="content-area" id="dashboard-section" style="display: block;">
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>Total de Leads</h3>
+                        <p id="total-leads">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Leads Novos</h3>
+                        <p id="leads-novo">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Leads em Progresso</h3>
+                        <p id="leads-progresso">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Leads Fechados</h3>
+                        <p id="leads-fechado">0</p>
+                    </div>
+                </div>
+                <div class="dashboard-charts">
+                    <div class="chart-card">
+                        <h3>Status dos Leads</h3>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area" id="crm-kanban-section" style="display: none;">
                 <div class="card new-lead-card">
                     <h2>Novo Lead</h2>
                     <form id="lead-form">
@@ -94,7 +126,12 @@
             </div>
 
             <div class="content-area" id="crm-list-section" style="display: none;">
-                <h2>Lista de Leads</h2>
+                <div class="list-header">
+                    <h2>Lista de Leads</h2>
+                    <button class="btn-export" id="export-excel-btn">
+                        <i class="ph-fill ph-file-excel"></i> Exportar para Excel
+                    </button>
+                </div>
                 <div class="card">
                     <div class="table-container">
                         <table id="leads-table">
@@ -168,6 +205,7 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 </body>
 </html>
