@@ -523,9 +523,18 @@ body {
     color: var(--text-color);
 }
 
-/* Novo estilo para o campo de pesquisa */
-.search-container {
+/* Novo estilo para o campo de pesquisa e botões */
+.estoque-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
     margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.search-container {
+    flex-grow: 1;
 }
 
 #estoque-search {
@@ -536,4 +545,39 @@ body {
     border-radius: 8px;
     color: var(--text-color);
     font-size: 1rem;
+}
+
+.buttons-container {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-import {
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-import input[type="file"] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.btn-import:hover {
+    box-shadow: 0 0 15px var(--border-glow);
 }
