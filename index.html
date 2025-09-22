@@ -1,340 +1,430 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM | Super App PixelUp</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Mentoria - Conteúdo dos Módulos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            color: #333;
+        }
+        .modulo {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .modulo-titulo {
+            color: #005a8b;
+            border-bottom: 2px solid #005a8b;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        h3 {
+            color: #007bb5;
+        }
+        strong {
+            color: #d63384;
+        }
+        ul, ol {
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <img src="logo.png" alt="Logo PixelUp" class="logo">
-            </div>
-            <nav class="sidebar-nav">
-                <a href="#" id="nav-dashboard" class="nav-item active" data-target="dashboard-section">
-                    <i class="ph-fill ph-gauge"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" id="nav-crm-kanban" class="nav-item" data-target="crm-kanban-section">
-                    <i class="ph-fill ph-trello-logo"></i>
-                    <span>CRM / Kanban</span>
-                </a>
-                <a href="#" id="nav-crm-list" class="nav-item" data-target="crm-list-section">
-                    <i class="ph-fill ph-list-dashes"></i>
-                    <span>Lista de Leads</span>
-                </a>
-                <a href="#" id="nav-finance" class="nav-item" data-target="finance-section">
-                    <i class="ph-fill ph-chart-bar"></i>
-                    <span>Financeiro</span>
-                </a>
-                <a href="#" id="nav-mentoring" class="nav-item" data-target="mentoring-section">
-                    <i class="ph-fill ph-graduation-cap"></i>
-                    <span>Mentoria</span>
-                </a>
-                <a href="#" id="nav-chatbot" class="nav-item" data-target="chatbot-section">
-                    <i class="ph-fill ph-robot"></i>
-                    <span>Chatbot AI</span>
-                </a>
-            </nav>
-            <div class="sidebar-footer">
-                <a href="#" class="nav-item">
-                    <i class="ph-fill ph-gear-six"></i>
-                    <span>Configurações</span>
-                </a>
-            </div>
-        </aside>
-
-        <main class="main-content">
-            <header class="main-header">
-                <h1 id="page-title">Dashboard</h1>
-                <div class="user-profile">
-                    <span>Olá, [Nome do Usuário]</span>
-                </div>
-            </header>
-            
-            <div class="content-area" id="dashboard-section" style="display: block;">
-                <div class="dashboard-stats">
-                    <div class="stat-card">
-                        <h3>Total de Leads</h3>
-                        <p id="total-leads">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Leads Novos</h3>
-                        <p id="leads-novo">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Leads em Progresso</h3>
-                        <p id="leads-progresso">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Leads Fechados</h3>
-                        <p id="leads-fechado">0</p>
-                    </div>
-                </div>
-                <div class="dashboard-charts">
-                    <div class="chart-card">
-                        <h3>Status dos Leads</h3>
-                        <div class="chart-container">
-                            <canvas id="statusChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="content-area" id="crm-kanban-section" style="display: none;">
-                <div class="card new-lead-card">
-                    <h2>Novo Lead</h2>
-                    <form id="lead-form">
-                        <div class="input-grid">
-                            <input type="text" id="lead-name" placeholder="Nome" required>
-                            <input type="email" id="lead-email" placeholder="E-mail" required>
-                            <input type="tel" id="lead-whatsapp" placeholder="WhatsApp" required>
-                            <input type="text" id="lead-attendant" placeholder="Atendente (quem atende)">
-                            <input type="text" id="lead-origin" placeholder="Origem">
-                            <input type="date" id="lead-date" placeholder="dd/mm/aaaa">
-                            <div class="select-group">
-                                <select id="lead-qualification">
-                                    <option value="">Qualificação</option>
-                                    <option value="quente">Lead Quente</option>
-                                    <option value="morno">Lead Morno</option>
-                                    <option value="frio">Lead Frio</option>
-                                </select>
-                            </div>
-                        </div>
-                        <textarea id="lead-notes" placeholder="Notas"></textarea>
-                        <button type="submit" class="btn-save">Salvar</button>
-                    </form>
-                </div>
-
-                <div class="kanban-board" id="kanban-board">
-                    <div class="kanban-column" data-status="novo">
-                        <h3>Novo</h3>
-                        <div class="kanban-cards-list"></div>
-                    </div>
-                    <div class="kanban-column" data-status="progresso">
-                        <h3>Em Progresso</h3>
-                        <div class="kanban-cards-list"></div>
-                    </div>
-                    <div class="kanban-column" data-status="fechado">
-                        <h3>Fechado</h3>
-                        <div class="kanban-cards-list"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="content-area" id="crm-list-section" style="display: none;">
-                <div class="list-header">
-                    <h2>Lista de Leads</h2>
-                    <button class="btn-export" id="export-excel-btn">
-                        <i class="ph-fill ph-file-excel"></i> Exportar para Excel
-                    </button>
-                </div>
-                <div class="card">
-                    <div class="table-container">
-                        <table id="leads-table">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>WhatsApp</th>
-                                    <th>Origem</th>
-                                    <th>Qualificação</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="content-area" id="finance-section" style="display: none;">
-                <div class="finance-header">
-                    <h2>Financeiro</h2>
-                    <div class="finance-nav">
-                        <a href="#" class="finance-tab active" data-tab="caixa">Caixa</a>
-                        <a href="#" class="finance-tab" data-tab="custos">Custos e Estoque</a>
-                    </div>
-                </div>
-
-                <div class="finance-content active" id="caixa-tab-content">
-                    <div class="caixa-stats">
-                        <div class="stat-card entrada-card">
-                            <h3>Total de Entradas</h3>
-                            <p id="total-entradas">R$ 0,00</p>
-                        </div>
-                        <div class="stat-card saida-card">
-                            <h3>Total de Saídas</h3>
-                            <p id="total-saidas">R$ 0,00</p>
-                        </div>
-                        <div class="stat-card saldo-card">
-                            <h3>Saldo Atual</h3>
-                            <p id="caixa-atual">R$ 0,00</p>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Adicionar Movimentação</h3>
-                        <form id="caixa-form">
-                            <div class="input-grid">
-                                <input type="date" id="caixa-data" required>
-                                <input type="text" id="caixa-descricao" placeholder="Descrição" required>
-                                <input type="number" id="caixa-valor" placeholder="Valor (R$)" required step="0.01">
-                                <div class="select-group">
-                                    <select id="caixa-tipo" required>
-                                        <option value="">Tipo</option>
-                                        <option value="entrada">Entrada</option>
-                                        <option value="saida">Saída</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <textarea id="caixa-observacoes" placeholder="Observações"></textarea>
-                            <button type="submit" class="btn-save">Adicionar</button>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <h3>Histórico de Movimentações</h3>
-                        <div class="table-container">
-                            <table id="caixa-table">
-                                <thead>
-                                    <tr>
-                                        <th>Data</th>
-                                        <th>Descrição</th>
-                                        <th>Entrada (R$)</th>
-                                        <th>Saída (R$)</th>
-                                        <th>Observações</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="finance-content" id="custos-tab-content" style="display: none;">
-                    <div class="card">
-                        <h3>Adicionar Novo Produto</h3>
-                        <form id="estoque-form">
-                            <div class="input-grid">
-                                <input type="text" id="estoque-produto" placeholder="Produto" required>
-                                <input type="text" id="estoque-descricao" placeholder="Descrição" required>
-                                <input type="number" id="estoque-compra" placeholder="Valor de Compra (R$)" required step="0.01">
-                                <input type="number" id="estoque-venda" placeholder="Valor de Venda (R$)" required step="0.01">
-                            </div>
-                            <button type="submit" class="btn-save">Adicionar Produto</button>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <h3>Estoque de Produtos</h3>
-                        <div class="estoque-actions">
-                            <div class="search-container">
-                                <input type="text" id="estoque-search" placeholder="Pesquisar por produto ou descrição...">
-                            </div>
-                            <div class="buttons-container">
-                                <button class="btn-import" id="import-estoque-btn">
-                                    <i class="ph-fill ph-file-arrow-down"></i> Importar
-                                    <input type="file" id="import-estoque-file" accept=".xlsx, .xls, .csv">
-                                </button>
-                                <button class="btn-export" id="export-estoque-btn">
-                                    <i class="ph-fill ph-file-arrow-up"></i> Exportar
-                                </button>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table id="estoque-table">
-                                <thead>
-                                    <tr>
-                                        <th>Produto</th>
-                                        <th>Descrição</th>
-                                        <th>Valor de Compra</th>
-                                        <th>Custos</th>
-                                        <th>Valor de Venda</th>
-                                        <th>Lucro</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="content-area" id="mentoring-section" style="display: none;">
-                <h2>Mentoria</h2>
-                <p>Aqui entra o conteúdo da mentoria.</p>
-            </div>
-            <div class="content-area" id="chatbot-section" style="display: none;">
-                <h2>Chatbot AI</h2>
-                <p>Aqui entra o conteúdo do chatbot.</p>
-            </div>
-        </main>
+    <div class="modulo">
+        <h2 class="modulo-titulo">Módulo 1: Fundamentos do Negócio e Posicionamento</h2>
+        <h3>1. Definição da Persona Ideal</h3>
+        <p>Antes de qualquer estratégia, é essencial saber com quem você está falando. A persona é a representação semifictícia do seu cliente ideal, baseada em dados reais e comportamentos.</p>
+        <p><strong>Exercício prático sugerido:</strong> Crie sua persona respondendo perguntas como:</p>
+        <ul>
+            <li>Nome fictício, idade, profissão</li>
+            <li>Quais são suas dores e desejos?</li>
+            <li>Onde ela busca informação?</li>
+            <li>Quais redes sociais usa?</li>
+            <li>Que tipo de conteúdo ela consome?</li>
+        </ul>
+        <h3>2. Proposta de Valor e Diferenciação no Mercado</h3>
+        <p>Aqui o foco é entender: Por que alguém deve comprar de você e não do concorrente? A proposta de valor comunica o que você entrega, como entrega e por que é relevante.</p>
+        <p><strong>Dica prática:</strong> Escreva uma frase simples que responda: “Eu ajudo [persona] a [solução] através de [diferencial].”</p>
+        <p><strong>Exemplo:</strong> “Ajudo clínicas de estética a atrair clientes todos os dias com vídeos estratégicos e tráfego pago.”</p>
+        <h3>3. Escolha do Plano de Serviço Ideal</h3>
+        <p>Com base na persona e na proposta de valor, o cliente pode escolher o plano mais adequado (básico, intermediário ou avançado). Esse alinhamento evita frustrações e melhora a entrega.</p>
+        <p><strong>Atividade orientada:</strong></p>
+        <ul>
+            <li>Reflita: Qual plano atende melhor o estágio atual do seu negócio?</li>
+            <li>Quais recursos e suportes você realmente precisa agora?</li>
+        </ul>
     </div>
 
-    <div class="modal-overlay" id="edit-lead-modal">
-        <div class="modal-content">
-            <h2>Editar Lead</h2>
-            <form id="edit-lead-form">
-                <input type="hidden" id="edit-lead-id">
-                <div class="input-grid">
-                    <input type="text" id="edit-lead-name" placeholder="Nome">
-                    <input type="email" id="edit-lead-email" placeholder="E-mail">
-                    <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
-                    <div class="select-group">
-                        <select id="edit-lead-status">
-                            <option value="novo">Novo</option>
-                            <option value="progresso">Em Progresso</option>
-                            <option value="fechado">Fechado</option>
-                        </select>
-                    </div>
-                    <input type="text" id="edit-lead-attendant" placeholder="Atendente (quem atende)">
-                    <input type="text" id="edit-lead-origem" placeholder="Origem">
-                    <input type="date" id="edit-lead-date" placeholder="dd/mm/aaaa">
-                    <div class="select-group">
-                        <select id="edit-lead-qualification">
-                            <option value="">Qualificação</option>
-                            <option value="quente">Lead Quente</option>
-                            <option value="morno">Lead Morno</option>
-                            <option value="frio">Lead Frio</option>
-                        </select>
-                    </div>
-                </div>
-                <textarea id="edit-lead-notes" placeholder="Notas"></textarea>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" id="delete-lead-btn">Excluir</button>
-                    <button type="submit" class="btn-save">Salvar Alterações</button>
-                </div>
-            </form>
-        </div>
+    <div class="modulo">
+        <h2 class="modulo-titulo">Módulo 2: O Algoritmo do Meta (Facebook & Instagram)</h2>
+        <h3>1. Como o algoritmo funciona e entrega os conteúdos</h3>
+        <p>O algoritmo da Meta analisa o comportamento dos usuários para decidir o que mostrar no feed, nos stories e nos reels. Ele prioriza conteúdos que geram interação rápida (curtidas, comentários, compartilhamentos e tempo de visualização).</p>
+        <p><strong>📌 Ou seja:</strong> quanto mais relevante for o seu conteúdo para o público, mais ele será entregue.</p>
+        <h3>2. O que influencia o alcance orgânico</h3>
+        <p>O alcance orgânico depende de alguns fatores-chave:</p>
+        <ul>
+            <li>Qualidade do conteúdo</li>
+            <li>Engajamento nos primeiros minutos</li>
+            <li>Frequência de publicações</li>
+            <li>Relacionamento com o público (DMs, respostas, salvamentos)</li>
+        </ul>
+        <p><strong>💡 Postagens</strong> com muitos salvamentos, comentários ou tempo de retenção tendem a ser mais distribuídas.</p>
+        <h3>3. Engajamento inicial e comportamento do usuário</h3>
+        <p>Os primeiros minutos após a publicação são decisivos. O algoritmo testa seu conteúdo com um grupo pequeno: se houver boas reações, ele expande a entrega.</p>
+        <p><strong>👁️ Além disso,</strong> o comportamento do usuário também conta: se ele interage com seus stories, posts e responde mensagens, o algoritmo entende que há conexão e mostra mais conteúdos seus a ele.</p>
+        <h3>DICA: Comece com um GANCHO FORTE</h3>
+        <p>O primeiro segundo do seu conteúdo (vídeo, post ou legenda) precisa <strong>chamar a atenção imediatamente</strong>. É ele que faz a pessoa parar de rolar o feed.</p>
+        <p><strong>Exemplos de ganchos:</strong></p>
+        <ul>
+            <li>“3 erros que estão matando o seu Instagram...”</li>
+            <li>“Você está postando, mas ninguém engaja? Isso aqui é pra você.”</li>
+            <li>“Se eu tivesse que começar do zero, faria isso aqui…”</li>
+        </ul>
+        <p>Depois do gancho, <strong>entregue valor real</strong> (uma dica, um passo a passo, uma história) e finalize com uma <strong>chamada para ação (CTA)</strong>:</p>
+        <ul>
+            <li><strong>👉 “Salva</strong> esse post pra não esquecer”</li>
+            <li><strong>👉 “Me conta</strong> nos comentários se isso faz sentido pra você”</li>
+        </ul>
     </div>
 
-    <div class="modal-overlay" id="add-custo-modal">
-        <div class="modal-content">
-            <h2>Adicionar Custo</h2>
-            <form id="add-custo-form">
-                <input type="hidden" id="add-custo-descricao-produto">
-                <div class="input-grid">
-                    <input type="text" id="custo-descricao-custo" placeholder="Descrição do Custo" required>
-                    <input type="number" id="custo-valor" placeholder="Valor (R$)" required step="0.01">
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" id="close-custo-modal">Cancelar</button>
-                    <button type="submit" class="btn-save">Adicionar</button>
-                </div>
-            </form>
-        </div>
+    <div class="modulo">
+        <h2 class="modulo-titulo">Módulo 3: Cronograma de Postagens Estratégico</h2>
+        <h3>1. Melhores horários e dias para postagem</h3>
+        <p>Publicar no momento certo faz toda a diferença para o alcance. O ideal é postar quando seu público está mais ativo — geralmente entre 11h e 13h ou 18h e 20h, de terça a quinta.</p>
+        <p><strong>📌 Dica:</strong> Use as métricas do Instagram (Insights) para ver quando seus seguidores estão online.</p>
+        <h3>2. Frequência ideal por nicho</h3>
+        <p>Cada segmento exige uma constância diferente.</p>
+        <ul>
+            <li><strong>Estética e beleza:</strong> 4 a 5 posts por semana (reels + stories)</li>
+            <li><strong>B2B e serviços:</strong> 3 posts bem elaborados por semana</li>
+            <li><strong>Varejo e produto:</strong> diária ou intercalada com promoções, depoimentos e bastidores</li>
+        </ul>
+        <p><strong>🎯 Mais importante que a quantidade, é a consistência.</strong></p>
+        <h3>3. Templates e modelos de calendário</h3>
+        <p>Facilite a organização com um calendário mensal ou semanal de conteúdo. Use modelos prontos no Canva ou chatGPT com categorias como:</p>
+        <ul>
+            <li>Conteúdo educativo</li>
+            <li>Prova social (depoimentos, bastidores)</li>
+            <li>Chamada para ação</li>
+            <li>Oferta/promoção</li>
+        </ul>
+        <p><strong>📂 Você pode</strong> montar blocos fixos por dia da semana e deixar espaço para conteúdo espontâneo.</p>
+        <h4>Exemplo de Cronograma de Postagens – Formato Semanal</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Dia da Semana</th>
+                    <th>Tipo de Conteúdo</th>
+                    <th>Descrição / Objetivo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Segunda-feira</td>
+                    <td>📚 Conteúdo Educativo</td>
+                    <td>Dica prática, curiosidade, tutorial, bastidor</td>
+                </tr>
+                <tr>
+                    <td>Terça-feira</td>
+                    <td>🗣 Prova Social</td>
+                    <td>Depoimento, print de feedback, antes e depois</td>
+                </tr>
+                <tr>
+                    <td>Quarta-feira</td>
+                    <td>🎥 Vídeo Reels</td>
+                    <td>Dica rápida em vídeo, bastidores, rotina do dia</td>
+                </tr>
+                <tr>
+                    <td>Quinta-feira</td>
+                    <td>💡 Dica + Engajamento</td>
+                    <td>Carrossel com dica + pergunta para o público</td>
+                </tr>
+                <tr>
+                    <td>Sexta-feira</td>
+                    <td>🎯 Chamada para Ação / Oferta</td>
+                    <td>Promoção, agendamento, CTA com urgência</td>
+                </tr>
+                <tr>
+                    <td>Sábado</td>
+                    <td>😍 Conteúdo leve / bastidor</td>
+                    <td>Bastidor, rotina, curiosidade, making of</td>
+                </tr>
+                <tr>
+                    <td>Domingo</td>
+                    <td>(Opcional) Inspiração ou Repost</td>
+                    <td>Mensagem leve, repost de cliente, frase motivacional</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><strong>✅ Dicas extras:</strong></p>
+        <ul>
+            <li><strong>Stories todos os dias</strong> com bastidores, enquetes e interações rápidas</li>
+            <li>Planeje com <strong>1 semana de antecedência.</strong></li>
+            <li>Utilize <strong>Canva</strong> para preparar os criativos com base nos temas</li>
+            <li>Separe os posts em cores ou etiquetas: “Educar”, “Engajar”, “Vender”</li>
+        </ul>
     </div>
 
-    <script src="script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <div class="modulo">
+        <h2 class="modulo-titulo">Módulo 4: Conteúdo que Conecta</h2>
+        <h3>1. Como gravar vídeos que engajam: estrutura (gancho, valor, CTA)</h3>
+        <p>Para reter a atenção do público, um vídeo precisa seguir uma ordem estratégica:</p>
+        <ul>
+            <li><strong>Gancho (1º segundo):</strong> Frase impactante ou provocativa para fazer a pessoa parar.</li>
+            <li><strong>Valor:</strong> Entregue uma dica, solução ou informação útil rapidamente.</li>
+            <li><strong>CTA (chamada para ação):</strong> Incentive o público a comentar, salvar, compartilhar ou te chamar no Whats.</li>
+        </ul>
+        <p><strong>🎯 Exemplo de estrutura:</strong> “Você quer mais clientes? Então evita esse erro aqui…”</p>
+        <h3>2. Edição prática com CapCut ou InShot</h3>
+        <p>Você não precisa de programas complexos: com o <strong>CapCut</strong> ou <strong>InShot</strong>, é possível:</p>
+        <ul>
+            <li>Cortar partes desnecessárias</li>
+            <li>Adicionar legendas automáticas</li>
+            <li>Inserir trilha sonora e efeitos de zoom</li>
+            <li>Colocar logotipo e identidade visual</li>
+        </ul>
+        <p><strong>💡 Dica:</strong> Mantenha cortes rápidos e música de fundo suave para manter o ritmo.</p>
+        <h3>3. Design com Canva: dicas de layout, fontes e identidade visual</h3>
+        <p>O Canva é uma ferramenta poderosa e acessível para criar imagens que conectam com sua audiência.</p>
+        <ul>
+            <li>Use <strong>fontes legíveis</strong> e <strong>cores da sua marca</strong></li>
+            <li>Crie <strong>padrão visual</strong> para que seus posts sejam reconhecidos no feed</li>
+            <li>Mantenha espaço em branco e organização nos elementos (não polua!)</li>
+        </ul>
+        <p><strong>📌 Dica bônus:</strong> Crie um kit de marca no Canva com logotipo, fontes e cores fixas.</p>
+        <h3>Desafio de Vídeo Teste – “1 Dica, 1 Minuto”</h3>
+        <p><strong>Objetivo:</strong> Criar um vídeo curto e direto com potencial de engajamento.</p>
+        <p><strong>Formato:</strong> Reels, TikTok ou Story com legenda.</p>
+        <p><strong>📋 Roteiro:</strong></p>
+        <ul>
+            <li><strong>Gancho (1–3 segundos):</strong> 👉 “Você sabia que isso pode estar afastando clientes do seu Instagram?”</li>
+            <li><strong>Valor (até 45 segundos):</strong> Explique um erro comum e dê uma dica de correção. Exemplo: “Muita gente posta sem mostrar o rosto. Mostrar quem está por trás da marca aumenta a confiança do público.”</li>
+            <li><strong>Chamada para Ação (últimos 5 segundos):</strong> 👉 “Se fez sentido, salva esse vídeo e me acompanha pra mais dicas!”</li>
+        </ul>
+        <p><strong>🎯 Teste:</strong></p>
+        <ul>
+            <li>Poste com e sem legenda para ver o impacto</li>
+            <li>Teste dois horários diferentes (manhã e noite)</li>
+            <li>Reposte nos stories no dia seguinte com enquete: “Essa dica fez sentido pra você?”</li>
+        </ul>
+    </div>
+
+    <div class="modulo">
+        <h2 class="modulo-titulo">Módulo 5: Copywriting com ChatGPT</h2>
+        <h3>1. Como criar textos persuasivos com IA</h3>
+        <p>O ChatGPT é uma ferramenta poderosa para gerar textos que vendem. Com os prompts certos, você consegue criar chamadas, legendas, descrições e mensagens comerciais que despertam o interesse do público.</p>
+        <p><strong>💡 A chave</strong> está em saber o que pedir e como direcionar a IA com clareza.</p>
+        <h3>2. Fórmulas testadas: AIDA, PAS, 4Ps</h3>
+        <p>Essas estruturas ajudam a organizar o texto de forma persuasiva:</p>
+        <ul>
+            <li><strong>AIDA:</strong> Atenção, Interesse, Desejo, Ação</li>
+            <li><strong>PAS:</strong> Problema, Agitação, Solução</li>
+            <li><strong>4Ps:</strong> Problema, Promessa, Prova, Proposta</li>
+        </ul>
+        <p><strong>📌 Use essas</strong> fórmulas como base para montar seus prompts.</p>
+        <h3>3. Prompts inteligentes e exemplos prontos</h3>
+        <p>Um bom prompt direciona o ChatGPT a criar algo útil. <strong>Exemplo:</strong></p>
+        <p>“Crie uma legenda para Instagram usando a fórmula AIDA, falando sobre como atrair mais clientes com vídeos curtos, voltado para esteticistas.”</p>
+        <p><strong>🧠 Você também pode</strong> salvar modelos prontos para adaptar conforme o conteúdo.</p>
+        <h3>4. Títulos e legendas que geram cliques e salvamentos</h3>
+        <p>Títulos e primeiras frases precisam ser chamativas. Use perguntas, listas, números e ganchos fortes, como:</p>
+        <ul>
+            <li>“Você está fazendo isso errado no seu Instagram?”</li>
+            <li>“3 dicas para dobrar o engajamento sem gastar em anúncios”</li>
+        </ul>
+        <p><strong>✨ O segredo</strong> está em provocar curiosidade e entregar valor.</p>
+        <h3>Como desenvolver uma boa relação com o ChatGPT (e usar com inteligência)</h3>
+        <ol>
+            <li><strong>Seja claro e específico no que quer.</strong>
+                <p>Quanto mais direto e contextualizado for seu pedido, melhor será o resultado.</p>
+                <p>💬 Evite: “Faz um post aí pra mim”</p>
+                <p>✅ Prefira: “Crie uma legenda para Instagram sobre o poder do vídeo marketing para clínicas de estética, com um tom persuasivo e profissional.”</p>
+            </li>
+            <li><strong>Contextualize como se fosse um briefing.</strong>
+                <p>O ChatGPT trabalha melhor com cenário. Diga quem você é, para quem é o conteúdo e o objetivo.</p>
+                <p>💬 Exemplo: “Sou dono de uma agência de marketing chamada PixelUp. Quero um texto explicando o que é tráfego pago para empresários locais que não entendem nada sobre isso.”</p>
+            </li>
+            <li><strong>Use estrutura nos pedidos.</strong>
+                <p>Uma ótima fórmula para prompt é:</p>
+                <p><strong>[Ação] + [Assunto] + [Objetivo] + [Estilo/Tom]</strong></p>
+                <p>💬 Exemplo: “Escreva uma copy para anúncio no Instagram sobre mentoria de marketing, com objetivo de gerar leads, num tom direto e persuasivo.”</p>
+            </li>
+            <li><strong>Reutilize conversas e refine os resultados.</strong>
+                <p>Você pode pedir ajustes: 🔁 “Mais curto”, “Mais informal”, “Inclui emojis”, “Dá um exemplo real”, etc.</p>
+            </li>
+        </ol>
+        <h3>Crie seus próprios “prompts fixos”</h3>
+        <p>Salve comandos que funcionam bem para você e use como modelo. <strong>Exemplo:</strong></p>
+        <p>“Crie um roteiro para Reels com base na fórmula gancho + valor + CTA. Tema: [insira aqui]. Público: [descreva aqui]. Tom: leve, profissional.”</p>
+        <p><strong>📌 Prompt Base – PixelUp (Modelo Personalizado)</strong></p>
+        <p>Sou dono(a) de uma agência de marketing digital chamada PixelUp, especializada em tráfego pago, criação de conteúdo e vídeos estratégicos. Quero que você atue como um especialista em marketing e copywriting. Gere um conteúdo com base nas informações abaixo:</p>
+        <ul>
+            <li><strong>📍 Tema:</strong> [Insira o assunto principal – ex: “Importância do tráfego pago para negócios locais”]</li>
+            <li><strong>🎯 Objetivo:</strong> [O que você quer alcançar – ex: “gerar leads”, “educar o público”, “criar autoridade”]</li>
+            <li><strong>🧑 Público-alvo:</strong> [Descreva a persona – ex: “Dona de clínica de estética que quer atrair mais clientes pelo Instagram”]</li>
+            <li><strong>🗣 Tom de voz:</strong> [Ex: leve, profissional, direto, amigável, descontraído]</li>
+            <li><strong>📱 Formato desejado:</strong> [Post para feed, legenda de carrossel, roteiro para Reels, copy para anúncio, etc.]</li>
+            <li><strong>🧠 Extras (opcional):</strong> Use uma fórmula de copy (AIDA, PAS, 4Ps), inclua CTA e exemplos práticos. Se possível, adicione emojis.</li>
+        </ul>
+    </div>
+
+    <div class="modulo">
+        <h2 class="modulo-titulo">Módulo 6: Implementação de CRM</h2>
+        <h3>1. O que é CRM e por que sua empresa precisa</h3>
+        <p>CRM (Customer Relationship Management) é uma ferramenta que organiza o relacionamento com seus leads e clientes. Com ele, você consegue <strong>acompanhá-los desde o primeiro contato até o fechamento da venda</strong>, mantendo tudo organizado e sem perder oportunidades.</p>
+        <p><strong>📌 Empresas</strong> que usam CRM vendem mais porque mantêm o controle sobre o funil e sabem exatamente onde cada cliente está.</p>
+        <h3>2. Ferramentas gratuitas e pagas (Trello adaptado, RD Station, etc.)</h3>
+        <p>Você pode começar com soluções simples e gratuitas, como:</p>
+        <ul>
+            <li><strong>Trello:</strong> adaptado com colunas como “Novo Lead”, “Contato Feito”, “Negociação”, “Fechado”</li>
+            <li><strong>HubSpot CRM (gratuito):</strong> ideal para gestão mais profissional</li>
+            <li><strong>RD Station, Pipedrive (pagas):</strong> indicadas para times de vendas</li>
+        </ul>
+        <p><strong>🛠️ Não é</strong> sobre a ferramenta mais cara, mas sobre a que você vai usar de verdade!</p>
+        <h3>3. Construção de funil de vendas básico e organização de leads</h3>
+        <p>Um funil simples pode ter 4 etapas:</p>
+        <ol>
+            <li>Contato Inicial</li>
+            <li>Conversa/Apresentação</li>
+            <li>Proposta enviada</li>
+            <li>Cliente fechado</li>
+        </ol>
+        <p><strong>🎯 Organizar</strong> os leads por estágio ajuda a manter o foco e a eficiência comercial.</p>
+        <h4>Exemplo de Funil de Vendas no CRM – Agência de Marketing Digital (PixelUp)</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Etapa do Funil</th>
+                    <th>O que acontece aqui</th>
+                    <th>Ação no CRM</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1. Novo Lead</td>
+                    <td>Cliente entra em contato pelo WhatsApp, Instagram ou anúncio</td>
+                    <td>Cadastrar no CRM com nome, interesse e origem</td>
+                </tr>
+                <tr>
+                    <td>2. Primeiro Contato</td>
+                    <td>Mensagem de apresentação enviada / agendamento de reunião</td>
+                    <td>Marcar como “Contato Iniciado”</td>
+                </tr>
+                <tr>
+                    <td>3. Diagnóstico/Briefing</td>
+                    <td>Entendimento da necessidade do cliente e sugestão de solução</td>
+                    <td>Anotar necessidades e preferências no card</td>
+                </tr>
+                <tr>
+                    <td>4. Proposta Enviada</td>
+                    <td>Enviar proposta de plano (básico, intermediário ou mentoria)</td>
+                    <td>Mover para coluna “Proposta Enviada”</td>
+                </tr>
+                <tr>
+                    <td>5. Negociação</td>
+                    <td>Cliente pede ajustes, pensa na decisão, compara opções</td>
+                    <td>Agendar follow-up e manter contato ativo</td>
+                </tr>
+                <tr>
+                    <td>6. Fechamento</td>
+                    <td>Cliente aceita a proposta e faz o pagamento inicial</td>
+                    <td>Mover para “Cliente Fechado”</td>
+                </tr>
+                <tr>
+                    <td>7. Pós-venda / Onboarding</td>
+                    <td>Envio de contrato, boas-vindas e início da entrega de serviços</td>
+                    <td>Mover para “Em Andamento”</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><strong>📌 Ferramentas indicadas:</strong></p>
+        <ul>
+            <li>Trello ou Notion com colunas para cada etapa</li>
+            <li>Etiquetas com: tipo de plano, data de follow-up, status de pagamento</li>
+            <li>Comentários dentro do card para registrar conversas e objeções</li>
+        </ul>
+        <h4>Opções de Remarketing com Leads do CRM</h4>
+        <p><strong>✅ 1. Segmento:</strong> Leads que não fecharam após a proposta</p>
+        <p><strong>Ação:</strong> Criar uma campanha de anúncios no Instagram/Facebook com o tema: "Ainda pensando em profissionalizar seu marketing? Veja como já ajudamos outras empresas!"</p>
+        <p><strong>Formato:</strong> 📹 Vídeo com case de cliente + depoimento 📩 Email ou mensagem com nova proposta + bônus limitado (ex: consultoria gratuita)</p>
+        <p><strong>✅ 2. Segmento:</strong> Leads que interagiram, mas sumiram</p>
+        <p><strong>Ação:</strong> Enviar uma mensagem personalizada via WhatsApp ou e-mail: "Oi [nome], percebi que conversamos há um tempo e fiquei curioso: ainda tem interesse em melhorar sua presença online? Podemos ajustar a proposta pra você."</p>
+        <p><strong>Complemento:</strong> Enviar link de conteúdo gratuito (ebook, vídeo, checklist)</p>
+        <p><strong>✅ 3. Segmento:</strong> Ex-clientes ou inativos há mais de 3 meses</p>
+        <p><strong>Ação:</strong> Oferecer um <strong>plano relâmpago de retorno com benefício exclusivo</strong>: "Estamos com uma condição especial para ex-clientes da PixelUp. Volte com 30% de bônus em serviços e análise gratuita do seu perfil atual."</p>
+        <p><strong>Campanha recomendada:</strong> Anúncio de retargeting + disparo segmentado por e-mail</p>
+        <p><strong>🎯 Dica final:</strong> Use o <strong>CRM para separar leads por etapa e comportamento</strong> (ex: “Proposta não aceita”, “Inativo 90 dias”, “Cliente perdido”). Com isso, suas campanhas serão <strong>mais personalizadas e com maior taxa de conversão</strong>.</p>
+    </div>
+
+    <div class="modulo">
+        <h2 class="modulo-titulo">Módulo 7: Processo Comercial e Técnicas de Venda</h2>
+        <h3>1. Como montar um pitch comercial que gera interesse</h3>
+        <p>O pitch é a sua “apresentação relâmpago”. Ele precisa ser claro, direto e despertar curiosidade. Inclua:</p>
+        <ul>
+            <li>Quem você ajuda</li>
+            <li>O problema que resolve</li>
+            <li>O diferencial do seu serviço</li>
+        </ul>
+        <p><strong>🎯 Exemplo:</strong> “Nós ajudamos negócios locais a atrair clientes todos os dias usando vídeos e tráfego pago com baixo custo.”</p>
+        <h3>2. Rapport, gatilhos mentais e técnicas de espelhamento</h3>
+        <p>Criar conexão é essencial para vender. Técnicas como:</p>
+        <ul>
+            <li><strong>Rapport:</strong> usar linguagem e ritmo parecidos com o do cliente</li>
+            <li><strong>Espelhamento:</strong> repetir sutilmente gestos ou expressões</li>
+            <li><strong>Gatilhos mentais:</strong> usar escassez, autoridade, prova social, urgência...</li>
+        </ul>
+        <p><strong>🧠 O cliente</strong> compra quando sente confiança e identificação.</p>
+        <h3>3. Como conduzir um follow-up eficiente e sem pressão</h3>
+        <p>A maioria das vendas acontece no <strong>2º ou 3º contato</strong>. Por isso, o acompanhamento é essencial.</p>
+        <ul>
+            <li>Use o CRM para agendar retornos</li>
+            <li>Sempre traga um valor novo na abordagem (ex: nova condição, dica extra, resultado de outro cliente)</li>
+        </ul>
+        <p><strong>💬 Evite</strong> ser insistente. Seja consultivo e mostre que está ali para ajudar, não só para vender.</p>
+    </div>
+
+    <div class="modulo">
+        <h2 class="modulo-titulo">Módulo 8: Conexão com a Audiência e Humanização</h2>
+        <h3>1. Como gerar conexão real com o público (sem forçar)</h3>
+        <p>Pessoas se conectam com pessoas — e não com marcas frias. Mostrar sua rotina, bastidores e valores cria empatia. O segredo é <strong>ser autêntico, não perfeito</strong>. Você não precisa forçar intimidade: apenas esteja presente com verdade.</p>
+        <p><strong>💡 Dica:</strong> Use a câmera frontal e fale como se fosse para um amigo.</p>
+        <h3>2. Estratégias de bastidores, vulnerabilidade e rotina nos stories</h3>
+        <p>Os stories são um ótimo canal para <strong>mostrar o que acontece por trás</strong> do conteúdo pronto.</p>
+        <ul>
+            <li>Mostre sua rotina de trabalho</li>
+            <li>Compartilhe erros e aprendizados</li>
+            <li>Traga o público para os bastidores de uma entrega, gravação ou atendimento</li>
+        </ul>
+        <p><strong>📲 Quanto</strong> mais humano, maior a identificação.</p>
+        <h3>3. Criando uma comunidade engajada e leal</h3>
+        <p>Uma audiência fiel é construída com <strong>interação real e constância</strong>.</p>
+        <ul>
+            <li>Responda comentários e DMs com atenção</li>
+            <li>Envolva seguidores com perguntas, enquetes e opiniões</li>
+            <li>Chame os seguidores pelo nome quando possível</li>
+        </ul>
+        <p><strong>🎯 Quem</strong> se sente visto, volta. E quem volta, compra.</p>
+    </div>
 
 </body>
 </html>
