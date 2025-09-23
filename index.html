@@ -36,13 +36,13 @@
                     <i class="ph-fill ph-graduation-cap"></i>
                     <span>Mentoria</span>
                 </a>
-                <a href="#" id="nav-chatbot" class="nav-item" data-target="chatbot-section">
+                 <a href="#" id="nav-chatbot" class="nav-item" data-target="chatbot-section">
                     <i class="ph-fill ph-robot"></i>
                     <span>Chatbot AI</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
-                <a href="#" class="nav-item">
+                 <a href="#" class="nav-item">
                     <i class="ph-fill ph-gear-six"></i>
                     <span>Configurações</span>
                 </a>
@@ -50,14 +50,14 @@
         </aside>
 
         <main class="main-content">
-            <header class="main-header">
+             <header class="main-header">
                 <h1 id="page-title">Dashboard</h1>
                 <div class="user-profile">
                     <span>Olá, [Nome do Usuário]</span>
                 </div>
             </header>
+        
             
-            <!-- Dashboard -->
             <div class="content-area" id="dashboard-section" style="display: block;">
                 <div class="dashboard-stats">
                     <div class="stat-card">
@@ -80,22 +80,21 @@
                 <div class="dashboard-charts">
                     <div class="chart-card">
                         <h3>Status dos Leads</h3>
-                        <div class="chart-container">
+                         <div class="chart-container">
                             <canvas id="statusChart"></canvas>
                         </div>
                     </div>
                 </div>
-            </div>
+             </div>
 
-            <!-- CRM Kanban -->
             <div class="content-area" id="crm-kanban-section" style="display: none;">
                 <div class="card new-lead-card">
                     <h2>Novo Lead</h2>
                     <form id="lead-form">
-                        <div class="input-grid">
+                         <div class="input-grid">
                             <input type="text" id="lead-name" placeholder="Nome" required>
                             <input type="email" id="lead-email" placeholder="E-mail" required>
-                            <input type="tel" id="lead-whatsapp" placeholder="WhatsApp" required>
+                             <input type="tel" id="lead-whatsapp" placeholder="WhatsApp" required>
                             <input type="text" id="lead-attendant" placeholder="Atendente (quem atende)">
                             <input type="text" id="lead-origin" placeholder="Origem">
                             <input type="date" id="lead-date" placeholder="dd/mm/aaaa">
@@ -108,95 +107,318 @@
                                 </select>
                             </div>
                         </div>
-                        <textarea id="lead-notes" placeholder="Notas"></textarea>
+                         <textarea id="lead-notes" placeholder="Notas"></textarea>
                         <button type="submit" class="btn-save">Salvar</button>
                     </form>
                 </div>
 
-                <div class="kanban-board" id="kanban-board">
+                 <div class="kanban-board" id="kanban-board">
                     <div class="kanban-column" data-status="novo">
                         <h3>Novo</h3>
                         <div class="kanban-cards-list"></div>
                     </div>
-                    <div class="kanban-column" data-status="progresso">
+                     <div class="kanban-column" data-status="progresso">
                         <h3>Em Progresso</h3>
                         <div class="kanban-cards-list"></div>
                     </div>
-                    <div class="kanban-column" data-status="fechado">
+                     <div class="kanban-column" data-status="fechado">
                         <h3>Fechado</h3>
                         <div class="kanban-cards-list"></div>
                     </div>
                 </div>
-            </div>
+             </div>
 
-            <!-- CRM List -->
             <div class="content-area" id="crm-list-section" style="display: none;">
                 <div class="list-header">
                     <h2>Lista de Leads</h2>
                     <button class="btn-export" id="export-excel-btn">
-                        <i class="ph-fill ph-file-excel"></i> Exportar para Excel
+                         <i class="ph-fill ph-file-excel"></i> Exportar para Excel
                     </button>
                 </div>
                 <div class="card">
                     <div class="table-container">
-                        <table id="leads-table">
+                         <table id="leads-table">
                             <thead>
                                 <tr>
-                                    <th>Nome</th>
+                                     <th>Nome</th>
                                     <th>WhatsApp</th>
                                     <th>Origem</th>
-                                    <th>Qualificação</th>
+                                     <th>Qualificação</th>
                                     <th>Status</th>
                                     <th>Ações</th>
-                                </tr>
+                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody>
+                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Financeiro -->
             <div class="content-area" id="finance-section" style="display: none;">
-                <!-- Caixa + Estoque (igual ao seu original) -->
+                 <div class="finance-header">
+                    <h2>Financeiro</h2>
+                    <div class="finance-nav">
+                        <a href="#" class="finance-tab active" data-tab="caixa">Caixa</a>
+                         <a href="#" class="finance-tab" data-tab="custos">Custos e Estoque</a>
+                    </div>
+                </div>
+
+                <div class="finance-content active" id="caixa-tab-content">
+                    <div class="caixa-stats">
+                         <div class="stat-card entrada-card">
+                            <h3>Total de Entradas</h3>
+                            <p id="total-entradas">R$ 0,00</p>
+                        </div>
+                         <div class="stat-card saida-card">
+                            <h3>Total de Saídas</h3>
+                            <p id="total-saidas">R$ 0,00</p>
+                         </div>
+                        <div class="stat-card saldo-card">
+                            <h3>Saldo Atual</h3>
+                            <p id="caixa-atual">R$ 0,00</p>
+                         </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Adicionar Movimentação</h3>
+                        <form id="caixa-form">
+                            <div class="input-grid">
+                                <input type="date" id="caixa-data" required>
+                                 <input type="text" id="caixa-descricao" placeholder="Descrição" required>
+                                <input type="number" id="caixa-valor" placeholder="Valor (R$)" required step="0.01">
+                                <div class="select-group">
+                                     <select id="caixa-tipo" required>
+                                        <option value="">Tipo</option>
+                                         <option value="entrada">Entrada</option>
+                                        <option value="saida">Saída</option>
+                                    </select>
+                                 </div>
+                            </div>
+                            <textarea id="caixa-observacoes" placeholder="Observações"></textarea>
+                             <button type="submit" class="btn-save">Adicionar</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                         <h3>Histórico de Movimentações</h3>
+                        <div class="table-container">
+                            <table id="caixa-table">
+                                <thead>
+                                     <tr>
+                                        <th>Data</th>
+                                         <th>Descrição</th>
+                                        <th>Entrada (R$)</th>
+                                        <th>Saída (R$)</th>
+                                         <th>Observações</th>
+                                    </tr>
+                                </thead>
+                                 <tbody></tbody>
+                            </table>
+                        </div>
+                     </div>
+                </div>
+
+                <div class="finance-content" id="custos-tab-content" style="display: none;">
+                    <div class="card">
+                        <h3>Adicionar Novo Produto</h3>
+                         <form id="estoque-form">
+                            <div class="input-grid">
+                                <input type="text" id="estoque-produto" placeholder="Produto" required>
+                                 <input type="text" id="estoque-descricao" placeholder="Descrição" required>
+                                <input type="number" id="estoque-compra" placeholder="Valor de Compra (R$)" required step="0.01">
+                                <input type="number" id="estoque-venda" placeholder="Valor de Venda (R$)" required step="0.01">
+                             </div>
+                            <button type="submit" class="btn-save">Adicionar Produto</button>
+                        </form>
+                    </div>
+
+                     <div class="card">
+                        <h3>Estoque de Produtos</h3>
+                        <div class="estoque-actions">
+                            <div class="search-container">
+                                 <input type="text" id="estoque-search" placeholder="Pesquisar por produto ou descrição...">
+                            </div>
+                            <div class="buttons-container">
+                                 <button class="btn-import" id="import-estoque-btn">
+                                    <i class="ph-fill ph-file-arrow-down"></i> Importar
+                                    <input type="file" id="import-estoque-file" accept=".xlsx, .xls, .csv">
+                                </button>
+                                <button class="btn-export" id="export-estoque-btn">
+                                     <i class="ph-fill ph-file-arrow-up"></i> Exportar
+                                </button>
+                            </div>
+                        </div>
+                         <div class="table-container">
+                            <table id="estoque-table">
+                                <thead>
+                                     <tr>
+                                        <th>Produto</th>
+                                        <th>Descrição</th>
+                                         <th>Valor de Compra</th>
+                                        <th>Custos</th>
+                                         <th>Valor de Venda</th>
+                                        <th>Lucro</th>
+                                        <th>Ações</th>
+                                     </tr>
+                                </thead>
+                                <tbody></tbody>
+                             </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             
+            <div class="content-area" id="mentoring-section" style="display: none;">
+                <div class="mentoria-container">
+                    <aside class="mentoria-sidebar">
+                        <nav class="mentoria-menu">
+                            <h2>Módulos</h2>
+                            <ul>
+                                <li class="mentoria-menu-item active" data-content="modulo1">Módulo 1: Fundamentos do Negócio</li>
+                                <li class="mentoria-menu-item" data-content="modulo2">Módulo 2: O Algoritmo do Meta</li>
+                                <li class="mentoria-menu-item" data-content="modulo3">Módulo 3: Cronograma de Postagens</li>
+                            </ul>
+                        </nav>
+                    </aside>
+                    <main class="mentoria-content">
+                        <section id="modulo1" class="mentoria-module-content active">
+                            <h2>Módulo 1: Fundamentos do Negócio e Posicionamento</h2>
+                            <div class="section">
+                                <h3>1. Definição da Persona Ideal</h3>
+                                <p>Antes de qualquer estratégia, é essencial saber <strong>com quem você está falando</strong>. A persona é a representação semifictícia do seu cliente ideal, baseada em dados reais e comportamentos.</p>
+                                <p><strong>Exercício prático:</strong> Crie sua persona respondendo perguntas como:</p>
+                                <ul>
+                                    <li>Nome fictício, idade, profissão</li>
+                                    <li>Quais são suas dores e desejos?</li>
+                                    <li>Onde ela busca informação?</li>
+                                </ul>
+                            </div>
+                            <div class="section">
+                                <h3>2. Proposta de Valor e Diferenciação</h3>
+                                <p>Aqui o foco é entender: <strong>Por que alguém deve comprar de você e não do concorrente?</strong> A proposta de valor comunica o que você entrega, como entrega e por que é relevante.</p>
+                                <p><strong>Dica prática:</strong> Escreva uma frase simples que responda: “Eu ajudo [persona] a [solução] através de [diferencial].”</p>
+                            </div>
+                        </section>
+                        <section id="modulo2" class="mentoria-module-content">
+                            <h2>Módulo 2: O Algoritmo do Meta (Facebook & Instagram)</h2>
+                            <div class="section">
+                                <h3>1. Como o algoritmo funciona</h3>
+                                <p>O algoritmo da Meta prioriza conteúdos que geram interação rápida (curtidas, comentários, compartilhamentos e tempo de visualização). Quanto mais relevante seu conteúdo for, mais ele será entregue.</p>
+                            </div>
+                            <div class="section tip-section">
+                                <h3>🚀 DICA: Comece com um GANCHO FORTE</h3>
+                                <p>O primeiro segundo do seu conteúdo é o que faz a pessoa parar de rolar o feed. Exemplos de ganchos:</p>
+                                <ul>
+                                    <li>“3 erros que estão matando o seu Instagram...”</li>
+                                    <li>“Você está postando, mas ninguém engaja? Isso aqui é pra você.”</li>
+                                </ul>
+                                <p>Depois do gancho, entregue valor real e finalize com uma chamada para ação (CTA).</p>
+                            </div>
+                        </section>
+                        <section id="modulo3" class="mentoria-module-content">
+                            <h2>Módulo 3: Cronograma de Postagens Estratégico</h2>
+                            <div class="section">
+                                <h3>1. Melhores horários e dias</h3>
+                                <p>O ideal é postar quando seu público está mais ativo — geralmente entre 11h e 13h ou 18h e 20h. Use as métricas do Instagram (Insights) para confirmar.</p>
+                            </div>
+                            <div class="section">
+                                <h3>2. Exemplo de Cronograma Semanal</h3>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Dia da Semana</th>
+                                            <th>Tipo de Conteúdo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Segunda-feira</td>
+                                            <td>📚 Conteúdo Educativo (Dica, tutorial)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Terça-feira</td>
+                                            <td>🗣 Prova Social (Depoimento, feedback)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Quarta-feira</td>
+                                            <td>🎥 Vídeo Reels (Dica rápida, bastidores)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sexta-feira</td>
+                                            <td>🎯 Chamada para Ação / Oferta</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </main>
+                </div>
             </div>
             
-            <!-- Mentoria -->
-            <div class="content-area" id="mentoring-section" style="display: none;">
-                <h2>Mentoria PixelUp</h2>
-                <div class="card">
-                    <p>Bem-vindo à <strong>Mentoria PixelUp</strong> 🚀</p>
-                    <ul>
-                        <li>📌 Definição de Persona</li>
-                        <li>📌 Funcionamento do Algoritmo da Meta</li>
-                        <li>📌 Cronograma de Postagens</li>
-                        <li>📌 Edição de Vídeos e Conteúdo Visual</li>
-                        <li>📌 Copywriting com IA</li>
-                        <li>📌 CRM e Vendas</li>
-                        <li>📌 Técnicas de Rapport e Humanização</li>
-                    </ul>
-                    <p>Aqui você terá acesso a apostilas, vídeos e exercícios práticos.</p>
-                </div>
-            </div>
-
-            <!-- Chatbot -->
             <div class="content-area" id="chatbot-section" style="display: none;">
-                <h2>Chatbot AI - Gemini</h2>
-                <div class="card">
-                    <p>Converse com nossa IA integrada ao <strong>Gemini</strong> para tirar dúvidas de marketing e CRM.</p>
-                    <div id="chat-window" class="chat-window"></div>
-                    <form id="chat-form">
-                        <input type="text" id="chat-input" placeholder="Digite sua mensagem..." required>
-                        <button type="submit" class="btn-save">Enviar</button>
-                    </form>
-                </div>
+                 <h2>Chatbot AI</h2>
+                <p>Aqui entra o conteúdo do chatbot.</p>
             </div>
         </main>
     </div>
 
-    <!-- Modais (Editar Lead, Custos) iguais ao seu original -->
+    <div class="modal-overlay" id="edit-lead-modal">
+        <div class="modal-content">
+            <h2>Editar Lead</h2>
+            <form id="edit-lead-form">
+                 <input type="hidden" id="edit-lead-id">
+                <div class="input-grid">
+                    <input type="text" id="edit-lead-name" placeholder="Nome">
+                    <input type="email" id="edit-lead-email" placeholder="E-mail">
+                    <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
+                     <div class="select-group">
+                        <select id="edit-lead-status">
+                            <option value="novo">Novo</option>
+                             <option value="progresso">Em Progresso</option>
+                            <option value="fechado">Fechado</option>
+                        </select>
+                    </div>
+                    <input type="text" id="edit-lead-attendant" placeholder="Atendente (quem atende)">
+                    <input type="text" id="edit-lead-origem" placeholder="Origem">
+                    <input type="date" id="edit-lead-date" placeholder="dd/mm/aaaa">
+                    <div class="select-group">
+                        <select id="edit-lead-qualification">
+                             <option value="">Qualificação</option>
+                            <option value="quente">Lead Quente</option>
+                            <option value="morno">Lead Morno</option>
+                             <option value="frio">Lead Frio</option>
+                        </select>
+                    </div>
+                </div>
+                <textarea id="edit-lead-notes" placeholder="Notas"></textarea>
+                 <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="delete-lead-btn">Excluir</button>
+                    <button type="submit" class="btn-save">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="add-custo-modal">
+        <div class="modal-content">
+            <h2>Adicionar Custo</h2>
+            <form id="add-custo-form">
+                <input type="hidden" id="add-custo-descricao-produto">
+                <div class="input-grid">
+                    <input type="text" id="custo-descricao-custo" placeholder="Descrição do Custo" required>
+                     <input type="number" id="custo-valor" placeholder="Valor (R$)" required step="0.01">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="close-custo-modal">Cancelar</button>
+                    <button type="submit" class="btn-save">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 </body>
 </html>
