@@ -29,254 +29,182 @@
                     <span>Lista de Leads</span>
                 </a>
                 <a href="#" id="nav-finance" class="nav-item" data-target="finance-section">
-                    <i class="ph-fill ph-chart-bar"></i>
+                    <i class="ph-fill ph-currency-circle-dollar"></i>
                     <span>Financeiro</span>
                 </a>
-                <a href="#" id="nav-mentoring" class="nav-item" data-target="mentoring-section">
-                    <i class="ph-fill ph-graduation-cap"></i>
-                    <span>Mentoria</span>
-                </a>
-                <a href="#" id="nav-chatbot" class="nav-item" data-target="chatbot-section">
-                    <i class="ph-fill ph-robot"></i>
-                    <span>Chatbot AI</span>
+                <a href="#" id="nav-estoque" class="nav-item" data-target="estoque-section">
+                    <i class="ph-fill ph-package"></i>
+                    <span>Estoque</span>
                 </a>
             </nav>
-            <div class="sidebar-footer">
-                <a href="#" class="nav-item">
-                    <i class="ph-fill ph-gear-six"></i>
-                    <span>Configurações</span>
-                </a>
-            </div>
         </aside>
 
         <main class="main-content">
             <header class="main-header">
                 <h1 id="page-title">Dashboard</h1>
-                <div class="user-profile">
-                    <span>Olá, [Nome do Usuário]</span>
-                </div>
             </header>
-            
-            <div class="content-area" id="dashboard-section" style="display: block;">
-                <div class="dashboard-stats">
-                    <div class="stat-card">
-                        <h3>Total de Leads</h3>
-                        <p id="total-leads">0</p>
+
+            <section id="dashboard-section" class="content-area active">
+                <div class="dashboard-cards">
+                    <div class="card card-leads">
+                        <div class="card-icon"><i class="ph-fill ph-users"></i></div>
+                        <div class="card-text">
+                            <h3>Leads no Funil</h3>
+                            <p id="total-leads">0</p>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h3>Leads Novos</h3>
-                        <p id="leads-novo">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Leads em Progresso</h3>
-                        <p id="leads-progresso">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Leads Fechados</h3>
-                        <p id="leads-fechado">0</p>
-                    </div>
-                </div>
-                <div class="dashboard-charts">
-                    <div class="chart-card">
-                        <h3>Status dos Leads</h3>
-                        <div class="chart-container">
-                            <canvas id="statusChart"></canvas>
+                    <div class="card card-leads">
+                        <div class="card-icon"><i class="ph-fill ph-trend-up"></i></div>
+                        <div class="card-text">
+                            <h3>Leads Fechados</h3>
+                            <p id="leads-fechados">0</p>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="content-area" id="crm-kanban-section" style="display: none;">
-                <div class="card new-lead-card">
-                    <h2>Novo Lead</h2>
-                    <form id="lead-form">
-                        <div class="input-grid">
-                            <input type="text" id="lead-name" placeholder="Nome" required>
-                            <input type="email" id="lead-email" placeholder="E-mail" required>
-                            <input type="tel" id="lead-whatsapp" placeholder="WhatsApp" required>
-                            <input type="text" id="lead-attendant" placeholder="Atendente (quem atende)">
-                            <input type="text" id="lead-origin" placeholder="Origem">
-                            <input type="date" id="lead-date" placeholder="dd/mm/aaaa">
-                            <div class="select-group">
-                                <select id="lead-qualification">
-                                    <option value="">Qualificação</option>
-                                    <option value="quente">Lead Quente</option>
-                                    <option value="morno">Lead Morno</option>
-                                    <option value="frio">Lead Frio</option>
-                                </select>
-                            </div>
-                        </div>
-                        <textarea id="lead-notes" placeholder="Notas"></textarea>
-                        <button type="submit" class="btn-save">Salvar</button>
-                    </form>
+                <div class="chart-container">
+                    <h2>Status dos Leads</h2>
+                    <canvas id="leads-status-chart"></canvas>
                 </div>
+            </section>
 
-                <div class="kanban-board" id="kanban-board">
-                    <div class="kanban-column" data-status="novo">
-                        <h3>Novo</h3>
-                        <div class="kanban-cards-list"></div>
+            <section id="crm-kanban-section" class="content-area">
+                <div class="kanban-board">
+                    <div class="kanban-column" id="kanban-quente" data-status="quente">
+                        <h3>Quente</h3>
+                        <div class="kanban-cards"></div>
                     </div>
-                    <div class="kanban-column" data-status="progresso">
-                        <h3>Em Progresso</h3>
-                        <div class="kanban-cards-list"></div>
+                    <div class="kanban-column" id="kanban-morno" data-status="morno">
+                        <h3>Morno</h3>
+                        <div class="kanban-cards"></div>
                     </div>
-                    <div class="kanban-column" data-status="fechado">
+                    <div class="kanban-column" id="kanban-frio" data-status="frio">
+                        <h3>Frio</h3>
+                        <div class="kanban-cards"></div>
+                    </div>
+                    <div class="kanban-column" id="kanban-fechado" data-status="fechado">
                         <h3>Fechado</h3>
-                        <div class="kanban-cards-list"></div>
+                        <div class="kanban-cards"></div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="content-area" id="crm-list-section" style="display: none;">
-                <div class="list-header">
+            <section id="crm-list-section" class="content-area">
+                <div class="actions-header">
                     <h2>Lista de Leads</h2>
-                    <button class="btn-export" id="export-excel-btn">
-                        <i class="ph-fill ph-file-excel"></i> Exportar para Excel
-                    </button>
+                    <button class="btn-add-lead" id="add-lead-btn"><i class="ph-fill ph-plus-circle"></i> Adicionar Lead</button>
                 </div>
-                <div class="card">
-                    <div class="table-container">
-                        <table id="leads-table">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>WhatsApp</th>
-                                    <th>Origem</th>
-                                    <th>Qualificação</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                </tbody>
-                        </table>
+                <div class="search-sort-container">
+                    <input type="text" id="lead-search" placeholder="Pesquisar leads...">
+                    <div class="sort-container">
+                        <span>Ordenar por:</span>
+                        <select id="lead-sort">
+                            <option value="data">Data de Criação</option>
+                            <option value="status">Status</option>
+                        </select>
                     </div>
                 </div>
-            </div>
+                <table id="leads-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
 
-            <div class="content-area" id="finance-section" style="display: none;">
+            <section id="finance-section" class="content-area">
                 <div class="finance-header">
-                    <h2>Financeiro</h2>
-                    <div class="finance-nav">
-                        <a href="#" class="finance-tab active" data-tab="caixa">Caixa</a>
-                        <a href="#" class="finance-tab" data-tab="custos">Custos e Estoque</a>
+                    <h2>Fluxo de Caixa</h2>
+                    <button class="btn-add-receita" id="add-receita-btn"><i class="ph-fill ph-plus-circle"></i> Adicionar Receita</button>
+                    <button class="btn-add-despesa" id="add-despesa-btn"><i class="ph-fill ph-minus-circle"></i> Adicionar Despesa</button>
+                </div>
+                <div class="finance-overview">
+                    <div class="balance-card receita">
+                        <h3>Receita</h3>
+                        <p id="total-receita">R$ 0,00</p>
+                    </div>
+                    <div class="balance-card despesa">
+                        <h3>Despesa</h3>
+                        <p id="total-despesa">R$ 0,00</p>
+                    </div>
+                    <div class="balance-card saldo">
+                        <h3>Saldo</h3>
+                        <p id="total-saldo">R$ 0,00</p>
                     </div>
                 </div>
-
-                <div class="finance-content active" id="caixa-tab-content">
-                    <div class="caixa-stats">
-                        <div class="stat-card entrada-card">
-                            <h3>Total de Entradas</h3>
-                            <p id="total-entradas">R$ 0,00</p>
-                        </div>
-                        <div class="stat-card saida-card">
-                            <h3>Total de Saídas</h3>
-                            <p id="total-saidas">R$ 0,00</p>
-                        </div>
-                        <div class="stat-card saldo-card">
-                            <h3>Saldo Atual</h3>
-                            <p id="caixa-atual">R$ 0,00</p>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Adicionar Movimentação</h3>
-                        <form id="caixa-form">
-                            <div class="input-grid">
-                                <input type="date" id="caixa-data" required>
-                                <input type="text" id="caixa-descricao" placeholder="Descrição" required>
-                                <input type="number" id="caixa-valor" placeholder="Valor (R$)" required step="0.01">
-                                <div class="select-group">
-                                    <select id="caixa-tipo" required>
-                                        <option value="">Tipo</option>
-                                        <option value="entrada">Entrada</option>
-                                        <option value="saida">Saída</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <textarea id="caixa-observacoes" placeholder="Observações"></textarea>
-                            <button type="submit" class="btn-save">Adicionar</button>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <h3>Histórico de Movimentações</h3>
-                        <div class="table-container">
-                            <table id="caixa-table">
-                                <thead>
-                                    <tr>
-                                        <th>Data</th>
-                                        <th>Descrição</th>
-                                        <th>Entrada (R$)</th>
-                                        <th>Saída (R$)</th>
-                                        <th>Observações</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="table-container">
+                    <table id="caixa-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
-
-                <div class="finance-content" id="custos-tab-content" style="display: none;">
-                    <div class="card">
-                        <h3>Adicionar Novo Produto</h3>
-                        <form id="estoque-form">
-                            <div class="input-grid">
-                                <input type="text" id="estoque-produto" placeholder="Produto" required>
-                                <input type="text" id="estoque-descricao" placeholder="Descrição" required>
-                                <input type="number" id="estoque-compra" placeholder="Valor de Compra (R$)" required step="0.01">
-                                <input type="number" id="estoque-venda" placeholder="Valor de Venda (R$)" required step="0.01">
-                            </div>
-                            <button type="submit" class="btn-save">Adicionar Produto</button>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <h3>Estoque de Produtos</h3>
-                        <div class="estoque-actions">
-                            <div class="search-container">
-                                <input type="text" id="estoque-search" placeholder="Pesquisar por produto ou descrição...">
-                            </div>
-                            <div class="buttons-container">
-                                <button class="btn-import" id="import-estoque-btn">
-                                    <i class="ph-fill ph-file-arrow-down"></i> Importar
-                                    <input type="file" id="import-estoque-file" accept=".xlsx, .xls, .csv">
-                                </button>
-                                <button class="btn-export" id="export-estoque-btn">
-                                    <i class="ph-fill ph-file-arrow-up"></i> Exportar
-                                </button>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table id="estoque-table">
-                                <thead>
-                                    <tr>
-                                        <th>Produto</th>
-                                        <th>Descrição</th>
-                                        <th>Valor de Compra</th>
-                                        <th>Custos</th>
-                                        <th>Valor de Venda</th>
-                                        <th>Lucro</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </section>
             
-            <div class="content-area" id="mentoring-section" style="display: none;">
-                <h2>Mentoria</h2>
-                <p>Aqui entra o conteúdo da mentoria.</p>
-            </div>
-            <div class="content-area" id="chatbot-section" style="display: none;">
-                <h2>Chatbot AI</h2>
-                <p>Aqui entra o conteúdo do chatbot.</p>
-            </div>
+            <section id="estoque-section" class="content-area">
+                <div class="estoque-actions">
+                    <div class="search-container">
+                        <input type="text" id="estoque-search" placeholder="Pesquisar produto...">
+                    </div>
+                    <div class="buttons-container">
+                        <button class="btn-importar" id="import-estoque-btn"><i class="ph-fill ph-upload-simple"></i> Importar CSV</button>
+                        <button class="btn-adicionar" id="add-estoque-btn"><i class="ph-fill ph-plus-circle"></i> Adicionar Produto</button>
+                    </div>
+                </div>
+                <div class="estoque-table-container">
+                    <table id="estoque-table">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Descrição</th>
+                                <th>Custo Total</th>
+                                <th>Valor de Venda</th>
+                                <th>Lucro Estimado</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
         </main>
+    </div>
+
+    <div class="modal-overlay" id="add-lead-modal">
+        <div class="modal-content">
+            <h2>Adicionar Lead</h2>
+            <form id="add-lead-form">
+                <input type="text" id="lead-name" placeholder="Nome do Lead" required>
+                <input type="text" id="lead-email" placeholder="Email (opcional)">
+                <input type="text" id="lead-phone" placeholder="Telefone (opcional)">
+                <div class="input-group">
+                    <label for="lead-status">Status:</label>
+                    <select id="lead-status">
+                        <option value="quente">Lead Quente</option>
+                        <option value="morno">Lead Morno</option>
+                        <option value="frio">Lead Frio</option>
+                        <option value="fechado">Fechado</option>
+                    </select>
+                </div>
+                <textarea id="lead-notes" placeholder="Notas sobre o lead"></textarea>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="close-add-lead-modal">Cancelar</button>
+                    <button type="submit" class="btn-save">Adicionar Lead</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <div class="modal-overlay" id="edit-lead-modal">
@@ -284,28 +212,17 @@
             <h2>Editar Lead</h2>
             <form id="edit-lead-form">
                 <input type="hidden" id="edit-lead-id">
-                <div class="input-grid">
-                    <input type="text" id="edit-lead-name" placeholder="Nome">
-                    <input type="email" id="edit-lead-email" placeholder="E-mail">
-                    <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
-                    <div class="select-group">
-                        <select id="edit-lead-status">
-                            <option value="novo">Novo</option>
-                            <option value="progresso">Em Progresso</option>
-                            <option value="fechado">Fechado</option>
-                        </select>
-                    </div>
-                    <input type="text" id="edit-lead-attendant" placeholder="Atendente (quem atende)">
-                    <input type="text" id="edit-lead-origem" placeholder="Origem">
-                    <input type="date" id="edit-lead-date" placeholder="dd/mm/aaaa">
-                    <div class="select-group">
-                        <select id="edit-lead-qualification">
-                            <option value="">Qualificação</option>
-                            <option value="quente">Lead Quente</option>
-                            <option value="morno">Lead Morno</option>
-                            <option value="frio">Lead Frio</option>
-                        </select>
-                    </div>
+                <input type="text" id="edit-lead-name" placeholder="Nome do Lead" required>
+                <input type="text" id="edit-lead-email" placeholder="Email (opcional)">
+                <input type="text" id="edit-lead-phone" placeholder="Telefone (opcional)">
+                <div class="input-group">
+                    <label for="edit-lead-status">Status:</label>
+                    <select id="edit-lead-status">
+                        <option value="quente">Lead Quente</option>
+                        <option value="morno">Lead Morno</option>
+                        <option value="frio">Lead Frio</option>
+                        <option value="fechado">Fechado</option>
+                    </select>
                 </div>
                 <textarea id="edit-lead-notes" placeholder="Notas"></textarea>
                 <div class="modal-actions">
@@ -334,7 +251,6 @@
     </div>
 
     <script src="script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 </body>
 </html>
