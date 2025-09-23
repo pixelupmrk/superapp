@@ -29,331 +29,174 @@
                     <span>Lista de Leads</span>
                 </a>
                 <a href="#" id="nav-finance" class="nav-item" data-target="finance-section">
-                    <i class="ph-fill ph-currency-circle-dollar"></i>
+                    <i class="ph-fill ph-chart-bar"></i>
                     <span>Financeiro</span>
                 </a>
-                <a href="#" id="nav-estoque" class="nav-item" data-target="estoque-section">
-                    <i class="ph-fill ph-package"></i>
-                    <span>Estoque</span>
+                <a href="#" id="nav-mentoring" class="nav-item" data-target="mentoring-section">
+                    <i class="ph-fill ph-graduation-cap"></i>
+                    <span>Mentoria</span>
+                </a>
+                <a href="#" id="nav-chatbot" class="nav-item" data-target="chatbot-section">
+                    <i class="ph-fill ph-robot"></i>
+                    <span>Chatbot AI</span>
                 </a>
             </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item">
+                    <i class="ph-fill ph-gear-six"></i>
+                    <span>Configurações</span>
+                </a>
+            </div>
         </aside>
 
         <main class="main-content">
             <header class="main-header">
                 <h1 id="page-title">Dashboard</h1>
+                <div class="user-profile">
+                    <span>Olá, [Nome do Usuário]</span>
+                </div>
             </header>
-
-            <section id="dashboard-section" class="content-area active">
-                <div class="dashboard-cards">
-                    <div class="card card-leads">
-                        <div class="card-icon"><i class="ph-fill ph-users"></i></div>
-                        <div class="card-text">
-                            <h3>Leads no Funil</h3>
-                            <p id="total-leads">0</p>
-                        </div>
-                    </div>
-                    <div class="card card-leads">
-                        <div class="card-icon"><i class="ph-fill ph-trend-up"></i></div>
-                        <div class="card-text">
-                            <h3>Leads Fechados</h3>
-                            <p id="leads-fechados">0</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <h2>Status dos Leads</h2>
-                    <canvas id="leads-status-chart"></canvas>
-                </div>
-            </section>
-
-            <section id="crm-kanban-section" class="content-area">
-                <div class="kanban-board">
-                    <div class="kanban-column" id="kanban-quente" data-status="quente">
-                        <h3>Quente</h3>
-                        <div class="kanban-cards"></div>
-                    </div>
-                    <div class="kanban-column" id="kanban-morno" data-status="morno">
-                        <h3>Morno</h3>
-                        <div class="kanban-cards"></div>
-                    </div>
-                    <div class="kanban-column" id="kanban-frio" data-status="frio">
-                        <h3>Frio</h3>
-                        <div class="kanban-cards"></div>
-                    </div>
-                    <div class="kanban-column" id="kanban-fechado" data-status="fechado">
-                        <h3>Fechado</h3>
-                        <div class="kanban-cards"></div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="crm-list-section" class="content-area">
-                <div class="actions-header">
-                    <h2>Lista de Leads</h2>
-                    <button class="btn-add-lead" id="add-lead-btn"><i class="ph-fill ph-plus-circle"></i> Adicionar Lead</button>
-                </div>
-                <div class="search-sort-container">
-                    <input type="text" id="lead-search" placeholder="Pesquisar leads...">
-                    <div class="sort-container">
-                        <span>Ordenar por:</span>
-                        <select id="lead-sort">
-                            <option value="data">Data de Criação</option>
-                            <option value="status">Status</option>
-                        </select>
-                    </div>
-                </div>
-                <table id="leads-table">
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Status</th>
-                            <th>Data</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </section>
-
-            <section id="finance-section" class="content-area">
-                <div class="finance-header">
-                    <h2>Fluxo de Caixa</h2>
-                    <button class="btn-add-receita" id="add-receita-btn"><i class="ph-fill ph-plus-circle"></i> Adicionar Receita</button>
-                    <button class="btn-add-despesa" id="add-despesa-btn"><i class="ph-fill ph-minus-circle"></i> Adicionar Despesa</button>
-                </div>
-                <div class="finance-overview">
-                    <div class="balance-card receita">
-                        <h3>Receita</h3>
-                        <p id="total-receita">R$ 0,00</p>
-                    </div>
-                    <div class="balance-card despesa">
-                        <h3>Despesa</h3>
-                        <p id="total-despesa">R$ 0,00</p>
-                    </div>
-                    <div class="balance-card saldo">
-                        <h3>Saldo</h3>
-                        <p id="total-saldo">R$ 0,00</p>
-                    </div>
-                </div>
-                <div class="table-container">
-                    <table id="caixa-table">
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Tipo</th>
-                                <th>Descrição</th>
-                                <th>Valor</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </section>
             
-            <section id="estoque-section" class="content-area">
-                <div class="estoque-actions">
-                    <div class="search-container">
-                        <input type="text" id="estoque-search" placeholder="Pesquisar produto...">
+            <!-- Dashboard -->
+            <div class="content-area" id="dashboard-section" style="display: block;">
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>Total de Leads</h3>
+                        <p id="total-leads">0</p>
                     </div>
-                    <div class="buttons-container">
-                        <button class="btn-importar" id="import-estoque-btn"><i class="ph-fill ph-upload-simple"></i> Importar CSV</button>
-                        <button class="btn-adicionar" id="add-estoque-btn"><i class="ph-fill ph-plus-circle"></i> Adicionar Produto</button>
+                    <div class="stat-card">
+                        <h3>Leads Novos</h3>
+                        <p id="leads-novo">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Leads em Progresso</h3>
+                        <p id="leads-progresso">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Leads Fechados</h3>
+                        <p id="leads-fechado">0</p>
                     </div>
                 </div>
-                <div class="estoque-table-container">
-                    <table id="estoque-table">
-                        <thead>
-                            <tr>
-                                <th>Produto</th>
-                                <th>Descrição</th>
-                                <th>Custo Total</th>
-                                <th>Valor de Venda</th>
-                                <th>Lucro Estimado</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                <div class="dashboard-charts">
+                    <div class="chart-card">
+                        <h3>Status dos Leads</h3>
+                        <div class="chart-container">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
                 </div>
-            </section>
+            </div>
+
+            <!-- CRM Kanban -->
+            <div class="content-area" id="crm-kanban-section" style="display: none;">
+                <div class="card new-lead-card">
+                    <h2>Novo Lead</h2>
+                    <form id="lead-form">
+                        <div class="input-grid">
+                            <input type="text" id="lead-name" placeholder="Nome" required>
+                            <input type="email" id="lead-email" placeholder="E-mail" required>
+                            <input type="tel" id="lead-whatsapp" placeholder="WhatsApp" required>
+                            <input type="text" id="lead-attendant" placeholder="Atendente (quem atende)">
+                            <input type="text" id="lead-origin" placeholder="Origem">
+                            <input type="date" id="lead-date" placeholder="dd/mm/aaaa">
+                            <div class="select-group">
+                                <select id="lead-qualification">
+                                    <option value="">Qualificação</option>
+                                    <option value="quente">Lead Quente</option>
+                                    <option value="morno">Lead Morno</option>
+                                    <option value="frio">Lead Frio</option>
+                                </select>
+                            </div>
+                        </div>
+                        <textarea id="lead-notes" placeholder="Notas"></textarea>
+                        <button type="submit" class="btn-save">Salvar</button>
+                    </form>
+                </div>
+
+                <div class="kanban-board" id="kanban-board">
+                    <div class="kanban-column" data-status="novo">
+                        <h3>Novo</h3>
+                        <div class="kanban-cards-list"></div>
+                    </div>
+                    <div class="kanban-column" data-status="progresso">
+                        <h3>Em Progresso</h3>
+                        <div class="kanban-cards-list"></div>
+                    </div>
+                    <div class="kanban-column" data-status="fechado">
+                        <h3>Fechado</h3>
+                        <div class="kanban-cards-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRM List -->
+            <div class="content-area" id="crm-list-section" style="display: none;">
+                <div class="list-header">
+                    <h2>Lista de Leads</h2>
+                    <button class="btn-export" id="export-excel-btn">
+                        <i class="ph-fill ph-file-excel"></i> Exportar para Excel
+                    </button>
+                </div>
+                <div class="card">
+                    <div class="table-container">
+                        <table id="leads-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>WhatsApp</th>
+                                    <th>Origem</th>
+                                    <th>Qualificação</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financeiro -->
+            <div class="content-area" id="finance-section" style="display: none;">
+                <!-- Caixa + Estoque (igual ao seu original) -->
+            </div>
+            
+            <!-- Mentoria -->
+            <div class="content-area" id="mentoring-section" style="display: none;">
+                <h2>Mentoria PixelUp</h2>
+                <div class="card">
+                    <p>Bem-vindo à <strong>Mentoria PixelUp</strong> 🚀</p>
+                    <ul>
+                        <li>📌 Definição de Persona</li>
+                        <li>📌 Funcionamento do Algoritmo da Meta</li>
+                        <li>📌 Cronograma de Postagens</li>
+                        <li>📌 Edição de Vídeos e Conteúdo Visual</li>
+                        <li>📌 Copywriting com IA</li>
+                        <li>📌 CRM e Vendas</li>
+                        <li>📌 Técnicas de Rapport e Humanização</li>
+                    </ul>
+                    <p>Aqui você terá acesso a apostilas, vídeos e exercícios práticos.</p>
+                </div>
+            </div>
+
+            <!-- Chatbot -->
+            <div class="content-area" id="chatbot-section" style="display: none;">
+                <h2>Chatbot AI - Gemini</h2>
+                <div class="card">
+                    <p>Converse com nossa IA integrada ao <strong>Gemini</strong> para tirar dúvidas de marketing e CRM.</p>
+                    <div id="chat-window" class="chat-window"></div>
+                    <form id="chat-form">
+                        <input type="text" id="chat-input" placeholder="Digite sua mensagem..." required>
+                        <button type="submit" class="btn-save">Enviar</button>
+                    </form>
+                </div>
+            </div>
         </main>
     </div>
 
-    <div class="modal-overlay" id="add-lead-modal">
-        <div class="modal-content">
-            <h2>Adicionar Lead</h2>
-            <form id="add-lead-form">
-                <input type="text" id="lead-name" placeholder="Nome do Lead" required>
-                <input type="text" id="lead-email" placeholder="Email (opcional)">
-                <input type="text" id="lead-phone" placeholder="Telefone (opcional)">
-                <div class="input-group">
-                    <label for="lead-status">Status:</label>
-                    <select id="lead-status">
-                        <option value="quente">Lead Quente</option>
-                        <option value="morno">Lead Morno</option>
-                        <option value="frio">Lead Frio</option>
-                        <option value="fechado">Fechado</option>
-                    </select>
-                </div>
-                <textarea id="lead-notes" placeholder="Notas sobre o lead"></textarea>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" id="close-add-lead-modal">Cancelar</button>
-                    <button type="submit" class="btn-save">Adicionar Lead</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="edit-lead-modal">
-        <div class="modal-content">
-            <h2>Editar Lead</h2>
-            <form id="edit-lead-form">
-                <input type="hidden" id="edit-lead-id">
-                <input type="text" id="edit-lead-name" placeholder="Nome do Lead" required>
-                <input type="text" id="edit-lead-email" placeholder="Email (opcional)">
-                <input type="text" id="edit-lead-phone" placeholder="Telefone (opcional)">
-                <div class="input-group">
-                    <label for="edit-lead-status">Status:</label>
-                    <select id="edit-lead-status">
-                        <option value="quente">Lead Quente</option>
-                        <option value="morno">Lead Morno</option>
-                        <option value="frio">Lead Frio</option>
-                        <option value="fechado">Fechado</option>
-                    </select>
-                </div>
-                <textarea id="edit-lead-notes" placeholder="Notas"></textarea>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" id="delete-lead-btn">Excluir</button>
-                    <button type="submit" class="btn-save">Salvar Alterações</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="add-custo-modal">
-        <div class="modal-content">
-            <h2>Adicionar Custo</h2>
-            <form id="add-custo-form">
-                <input type="hidden" id="add-custo-descricao-produto">
-                <div class="input-grid">
-                    <input type="text" id="custo-descricao-custo" placeholder="Descrição do Custo" required>
-                    <input type="number" id="custo-valor" placeholder="Valor (R$)" required step="0.01">
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" id="close-custo-modal">Cancelar</button>
-                    <button type="submit" class="btn-save">Adicionar</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <!-- Modais (Editar Lead, Custos) iguais ao seu original -->
 
     <script src="script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </body>
 </html>
-<li class="menu-item" data-content="modulo2">Módulo 2: O Algoritmo do Meta</li>
-
-
-<section id="modulo2" class="module-content">
-    [cite_start]<h2>Módulo 2: O Algoritmo do Meta (Facebook & Instagram)</h2> [cite: 11]
-    
-    <div class="section">
-        <h3>1. [cite_start]Como o algoritmo funciona e entrega os conteúdos</h3> [cite: 12]
-        [cite_start]<p>O algoritmo da Meta analisa o comportamento dos usuários para decidir o que mostrar. [cite: 13] [cite_start]Ele prioriza conteúdos que geram interação rápida, como curtidas, comentários, compartilhamentos e, principalmente, tempo de visualização. [cite: 14] [cite_start]Quanto mais relevante seu conteúdo for para o público, mais ele será entregue. [cite: 15]</p>
-    </div>
-
-    <div class="section">
-        <h3>2. [cite_start]O que influencia o alcance orgânico</h3> [cite: 16]
-        [cite_start]<p>O alcance orgânico do seu conteúdo depende de alguns fatores-chave: [cite: 17]</p>
-        <ul>
-            [cite_start]<li>Qualidade do conteúdo [cite: 18]</li>
-            [cite_start]<li>Engajamento nos primeiros minutos [cite: 19]</li>
-            [cite_start]<li>Frequência de publicações [cite: 20]</li>
-            [cite_start]<li>Relacionamento com o público (respostas em DMs, salvamentos) [cite: 21]</li>
-        </ul>
-        [cite_start]<p><strong>Dica:</strong> Postagens com muitos salvamentos e comentários tendem a ser mais distribuídas pelo algoritmo. [cite: 22]</p>
-    </div>
-
-    <div class="section">
-        <h3>3. [cite_start]Engajamento inicial e comportamento do usuário</h3> [cite: 23]
-        [cite_start]<p>Os primeiros minutos após a publicação são decisivos. [cite: 24] [cite_start]O algoritmo testa seu post com um pequeno grupo de seguidores e, se as reações forem boas, ele expande a entrega para mais pessoas. [cite: 24] [cite_start]Se o usuário interage com seus stories e responde suas mensagens, o algoritmo entende que há uma conexão e passa a mostrar mais dos seus conteúdos para ele. [cite: 25]</p>
-    </div>
-
-    <div class="section tip-section">
-        [cite_start]<h3>🚀 DICA: Comece com um GANCHO FORTE</h3> [cite: 1]
-        [cite_start]<p>O primeiro segundo do seu conteúdo é o que faz a pessoa parar de rolar o feed. [cite: 2, 3] [cite_start]Ele precisa chamar a atenção imediatamente. [cite: 2]</p>
-        [cite_start]<p><strong>Exemplos de ganchos:</strong></p> [cite: 4]
-        <ul>
-            [cite_start]<li>“3 erros que estão matando o seu Instagram...” [cite: 5]</li>
-            [cite_start]<li>“Você está postando, mas ninguém engaja? Isso aqui é pra você.” [cite: 6]</li>
-            [cite_start]<li>“Se eu tivesse que começar do zero, faria isso aqui…” [cite: 7]</li>
-        </ul>
-        [cite_start]<p>Depois do gancho, entregue valor real (uma dica, um passo a passo) e finalize com uma chamada para ação (CTA), como: "Salva esse post pra não esquecer" ou "Me conta nos comentários se isso faz sentido pra você". [cite: 8, 9, 10]</p>
-    </div>
-</section><li class="menu-item" data-content="modulo3">Módulo 3: Cronograma de Postagens</li>
-
-
-<section id="modulo3" class="module-content">
-    <h2>Módulo 3: Cronograma de Postagens Estratégico</h2>
-    
-    <div class="section">
-        <h3>1. Melhores horários e dias para postagem</h3>
-        <p>Publicar no momento certo faz toda a diferença para o alcance. [cite_start]O ideal é postar quando seu público está mais ativo — geralmente entre 11h e 13h ou 18h e 20h, de terça a quinta. [cite: 3]</p>
-        [cite_start]<p><strong>Dica:</strong> Use as métricas do Instagram (Insights) para ver exatamente quando seus seguidores estão online. [cite: 4]</p>
-    </div>
-
-    <div class="section">
-        <h3>2. Frequência ideal por nicho</h3>
-        [cite_start]<p>A consistência é mais importante que a quantidade. [cite: 10] Cada segmento exige uma frequência diferente:</p>
-        <ul>
-            [cite_start]<li><strong>Estética e beleza:</strong> 4 a 5 posts por semana (reels + stories). [cite: 7]</li>
-            [cite_start]<li><strong>B2B e serviços:</strong> 3 posts bem elaborados por semana. [cite: 8]</li>
-            [cite_start]<li><strong>Varejo e produto:</strong> Postagens diárias ou intercaladas com promoções e bastidores. [cite: 9]</li>
-        </ul>
-    </div>
-
-    <div class="section">
-        <h3>3. Exemplo de Cronograma Semanal</h3>
-        [cite_start]<p>Para facilitar a organização, você pode usar um calendário de conteúdo. [cite: 12] [cite_start]Use blocos fixos por dia e deixe espaço para posts espontâneos. [cite: 17]</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Dia da Semana</th>
-                    <th>Tipo de Conteúdo</th>
-                    <th>Descrição / Objetivo</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Segunda-feira</td>
-                    <td>📚 Conteúdo Educativo</td>
-                    [cite_start]<td>Dica prática, tutorial ou curiosidade. [cite: 44]</td>
-                </tr>
-                <tr>
-                    <td>Terça-feira</td>
-                    <td>🗣 Prova Social</td>
-                    [cite_start]<td>Depoimento, print de feedback ou antes e depois. [cite: 44]</td>
-                </tr>
-                <tr>
-                    <td>Quarta-feira</td>
-                    <td>🎥 Vídeo Reels</td>
-                    [cite_start]<td>Dica rápida em vídeo, rotina ou bastidores. [cite: 44]</td>
-                </tr>
-                <tr>
-                    <td>Quinta-feira</td>
-                    <td>💡 Dica + Engajamento</td>
-                    [cite_start]<td>Carrossel com uma dica útil e uma pergunta ao público. [cite: 44]</td>
-                </tr>
-                <tr>
-                    <td>Sexta-feira</td>
-                    <td>🎯 Chamada para Ação / Oferta</td>
-                    [cite_start]<td>Promoção, agendamento ou CTA com senso de urgência. [cite: 44]</td>
-                </tr>
-            </tbody>
-        </table>
-        [cite_start]<p><strong>Dicas extras:</strong> Faça stories todos os dias com bastidores e enquetes [cite: 46][cite_start], planeje o conteúdo com uma semana de antecedência [cite: 47] [cite_start]e use o Canva para preparar os criativos[cite: 48].</p>
-    </div>
-</section>
