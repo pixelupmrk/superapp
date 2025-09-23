@@ -675,3 +675,35 @@ body {
 .mentoria-content th {
     background-color: var(--primary-color);
 }
+
+/* Estilos para a área de exercício e anotações */
+.exercise-section {
+    border-color: #ffc107; /* Cor de destaque para exercícios */
+}
+.anotacoes-aluno {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--primary-color);
+}
+.anotacoes-aluno label {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+.anotacoes-aluno textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--primary-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 120px;
+}
+.anotacoes-aluno textarea:focus {
+    outline: none;
+    border-color: #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
