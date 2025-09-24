@@ -1,45 +1,163 @@
-// App.js
-import React, 'useState', { useEffect } from 'react';
-import Settings from './Settings'; // Importa o novo componente de configurações
-import './App.css'; // Importa a folha de estilos
+// Espera todo o HTML carregar antes de executar o script
+document.addEventListener('DOMContentLoaded', () => {
+    // Carrega o conteúdo dos módulos do arquivo data.json
+    loadModules();
 
-// Importe sua imagem aqui. Coloque o arquivo da imagem na mesma pasta (src) para facilitar.
-import logoPixelUp from './logo.png'; 
+    // Configura a navegação entre as seções (Módulos e Configurações)
+    setupNavigation();
 
-function App() {
-  // Estado para controlar o tema atual ('light' ou 'dark')
-  const [theme, setTheme] = useState('light');
+    // Configura o seletor de tema (claro/escuro)
+    setupThemeSwitcher();
 
-  // Função para alternar o tema
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-  };
+    // Configura o salvamento das informações da empresa
+    setupBusinessInfo();
+});
 
-  // Efeito que adiciona a classe do tema ao body do documento
-  useEffect(() => {
-    document.body.className = '';
-    document.body.classList.add(theme);
-  }, [theme]);
+// Função para carregar e exibir os módulos de Aceleração de Vendas
+async function loadModules() {
+    const menu = document.querySelector('#modulos-menu ul');
+    const contentArea = document.getElementById('modulos-content');
+    
+    try {
+        const response = await fetch('data.json');
+        const data = await response.json();
+        const modules = data.aceleracao_vendas;
 
-  return (
-    <div className={`app-container ${theme}`}>
-      <header className="app-header">
-        <div className="logo-container">
-          {/* Use a imagem importada aqui */}
-          <img src={logoPixelUp} alt="Pixel Up Logo" className="header-logo" />
-          <h1>Aceleração de Vendas</h1> {/* NOME ALTERADO AQUI */}
-        </div>
-      </header>
-      
-      <main className="app-main">
-        {/* Renderiza o novo componente de Configurações */}
-        <Settings toggleTheme={toggleTheme} currentTheme={theme} />
-        
-        {/* Você pode adicionar outras seções da sua aplicação aqui */}
-      </main>
-    </div>
-  );
+        if (!modules) {
+            menu.innerHTML = '<li>Erro ao carregar módulos.</li>';
+            return;
+        }
+
+        // Limpa o menu antes de adicionar os novos itens
+        menu.innerHTML = '';
+
+        // Cria um item de menu para cada módulo
+        modules.forEach((module, index) => {
+            const menuItem = document.createElement('li');
+            menuItem.className = 'modulos-menu-item';
+            menuItem.textContent = module.title;
+            menuItem.dataset.moduleId = module.moduleId;
+
+            // Adiciona evento de clique para mostrar o conteúdo do módulo
+            menuItem.addEventListener('click', () => {
+                // Remove a classe 'active' de outros itens e a adiciona no clicado
+                document.querySelectorAll('.modulos-menu-item').forEach(item => item.classList.remove('active'));
+                menuItem.classList.add('active');
+                displayModuleContent(module);
+            });
+
+            menu.appendChild(menuItem);
+
+            // Deixa o primeiro módulo ativo por padrão
+            if (index === 0) {
+                menuItem.click();
+            }
+        });
+
+    } catch (error) {
+        console.error('Falha ao buscar o arquivo data.json:', error);
+        menu.innerHTML = '<li>Não foi possível carregar o conteúdo.</li>';
+    }
 }
 
-export default App;
+// Função para exibir o conteúdo detalhado de um módulo
+function displayModuleContent(module) {
+    const contentArea = document.getElementById('modulos-content');
+    let contentHTML = `
+        <div class="card">
+            <h2>${module.title}</h2>
+            <p>${module.description}</p>
+        </div>
+    `;
+
+    module.lessons.forEach(lesson => {
+        contentHTML += `
+            <div class="card section">
+                <h3>${lesson.title}</h3>
+                <p>${lesson.content || lesson.description}</p>
+                ${lesson.type === 'video' ? '<p><i>(Conteúdo em vídeo)</i></p>' : ''}
+                ${lesson.type === 'interactive' ? '<button class="btn-save">Iniciar Exercício</button>' : ''}
+            </div>
+        `;
+    });
+
+    contentArea.innerHTML = contentHTML;
+}
+
+// Função para configurar a navegação principal (abas)
+function setupNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const contentAreas = document.querySelectorAll('.content-area');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Gerencia a classe 'active' nos botões de navegação
+            navItems.forEach(nav => nav.classList.remove('active'));
+            item.classList.add('active');
+
+            // Mostra a área de conteúdo correspondente
+            const targetId = item.dataset.target;
+            contentAreas.forEach(area => {
+                area.classList.remove('active');
+                if (area.id === targetId) {
+                    area.classList.add('active');
+                }
+            });
+        });
+    });
+}
+
+// Função para gerenciar o tema claro e escuro
+function setupThemeSwitcher() {
+    const lightThemeBtn = document.getElementById('theme-light');
+    const darkThemeBtn = document.getElementById('theme-dark');
+    const body = document.body;
+
+    // Função para aplicar o tema
+    const applyTheme = (theme) => {
+        body.dataset.theme = theme;
+        localStorage.setItem('app-theme', theme); // Salva a preferência
+        
+        // Atualiza a aparência dos botões
+        lightThemeBtn.classList.toggle('active', theme === 'light');
+        darkThemeBtn.classList.toggle('active', theme === 'dark');
+    };
+
+    // Eventos de clique nos botões
+    lightThemeBtn.addEventListener('click', () => applyTheme('light'));
+    darkThemeBtn.addEventListener('click', () => applyTheme('dark'));
+
+    // Carrega o tema salvo ao iniciar a página
+    const savedTheme = localStorage.getItem('app-theme') || 'dark'; // Padrão escuro
+    applyTheme(savedTheme);
+}
+
+// Função para salvar e carregar as informações da empresa
+function setupBusinessInfo() {
+    const saveBtn = document.getElementById('save-business-info');
+    const nameInput = document.getElementById('business-name');
+    const emailInput = document.getElementById('business-email');
+    const phoneInput = document.getElementById('business-phone');
+
+    // Salva as informações no localStorage quando o botão é clicado
+    saveBtn.addEventListener('click', () => {
+        const info = {
+            name: nameInput.value,
+            email: emailInput.value,
+            phone: phoneInput.value,
+        };
+        localStorage.setItem('business-info', JSON.stringify(info));
+        alert('Informações da empresa salvas com sucesso!');
+    });
+
+    // Carrega as informações salvas ao iniciar a página
+    const savedInfo = localStorage.getItem('business-info');
+    if (savedInfo) {
+        const info = JSON.parse(savedInfo);
+        nameInput.value = info.name || '';
+        emailInput.value = info.email || '';
+        phoneInput.value = info.phone || '';
+    }
+}
