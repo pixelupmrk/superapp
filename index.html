@@ -1,54 +1,45 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acelerador de Vendas | Super App PixelUp</title>
-    <link rel="icon" href="logo.png" type="image/x-icon">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-</head>
-<body>
+// App.js
+import React, 'useState', { useEffect } from 'react';
+import Settings from './Settings'; // Importa o novo componente de configurações
+import './App.css'; // Importa a folha de estilos
 
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <img src="logo.png" alt="Logo PixelUp" class="logo">
-            </div>
-            <nav class="sidebar-nav">
-                <a href="#" id="nav-dashboard" class="nav-item active" data-target="dashboard-section"><i class="ph-fill ph-gauge"></i><span>Dashboard</span></a>
-                <a href="#" id="nav-crm-kanban" class="nav-item" data-target="crm-kanban-section"><i class="ph-fill ph-trello-logo"></i><span>CRM / Kanban</span></a>
-                <a href="#" id="nav-crm-list" class="nav-item" data-target="crm-list-section"><i class="ph-fill ph-list-dashes"></i><span>Lista de Leads</span></a>
-                <a href="#" id="nav-finance" class="nav-item" data-target="finance-section"><i class="ph-fill ph-chart-bar"></i><span>Financeiro</span></a>
-                <a href="#" id="nav-acelerador" class="nav-item" data-target="acelerador-section"><i class="ph-fill ph-rocket-launch"></i><span>Acelerador de Vendas</span></a>
-                <a href="#" id="nav-chatbot" class="nav-item" data-target="chatbot-section"><i class="ph-fill ph-robot"></i><span>Chatbot AI</span></a>
-            </nav>
-            <div class="sidebar-footer">
-                <a href="#" id="nav-settings" class="nav-item" data-target="settings-section"><i class="ph-fill ph-gear-six"></i><span>Configurações</span></a>
-            </div>
-        </aside>
+// Importe sua imagem aqui. Coloque o arquivo da imagem na mesma pasta (src) para facilitar.
+import logoPixelUp from './logo.png'; 
 
-        <main class="main-content">
-            <header class="main-header">
-                <h1 id="page-title">Dashboard</h1>
-                <div class="user-profile"><span id="user-name-display">Olá, Usuário</span></div>
-            </header>
-            
-            <div class="content-area active" id="dashboard-section"></div>
-            <div class="content-area" id="crm-kanban-section"></div>
-            <div class="content-area" id="crm-list-section"></div>
-            <div class="content-area" id="finance-section"></div>
-            <div class="content-area" id="acelerador-section"></div>
-            <div class="content-area" id="chatbot-section"></div>
-            <div class="content-area" id="settings-section"></div>
-        </main>
+function App() {
+  // Estado para controlar o tema atual ('light' ou 'dark')
+  const [theme, setTheme] = useState('light');
+
+  // Função para alternar o tema
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+  };
+
+  // Efeito que adiciona a classe do tema ao body do documento
+  useEffect(() => {
+    document.body.className = '';
+    document.body.classList.add(theme);
+  }, [theme]);
+
+  return (
+    <div className={`app-container ${theme}`}>
+      <header className="app-header">
+        <div className="logo-container">
+          {/* Use a imagem importada aqui */}
+          <img src={logoPixelUp} alt="Pixel Up Logo" className="header-logo" />
+          <h1>Aceleração de Vendas</h1> {/* NOME ALTERADO AQUI */}
+        </div>
+      </header>
+      
+      <main className="app-main">
+        {/* Renderiza o novo componente de Configurações */}
+        <Settings toggleTheme={toggleTheme} currentTheme={theme} />
+        
+        {/* Você pode adicionar outras seções da sua aplicação aqui */}
+      </main>
     </div>
+  );
+}
 
-    <div class="modal-overlay" id="edit-lead-modal"></div>
-    <div class="modal-overlay" id="add-custo-modal"></div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="script.js"></script>
-</body>
-</html>
+export default App;
