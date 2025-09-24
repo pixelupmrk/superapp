@@ -1,36 +1,53 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // --- VARIÁVEIS GLOBAIS ---
-    let leads = [], caixa = [], estoque = [];
-    let nextLeadId = 0, nextEstoqueId = 0;
-    let statusChart, currentLeadId = null, draggedItem = null;
+document.addEventListener("DOMContentLoaded", () => {
+  const navItems = document.querySelectorAll(".nav-item");
+  const contentAreas = document.querySelectorAll(".content-area");
+  const pageTitle = document.getElementById("page-title");
 
-    // --- INICIALIZAÇÃO ---
-    const initializeApp = () => {
-        loadDataFromLocalStorage();
-        setupEventListeners();
-        renderAll();
-    };
+  // Navegação
+  navItems.forEach(item => {
+    item.addEventListener("click", e => {
+      e.preventDefault();
+      navItems.forEach(nav => nav.classList.remove("active"));
+      item.classList.add("active");
 
-    // --- DADOS (LOCALSTORAGE) ---
-    const loadDataFromLocalStorage = () => {
-        // ... Lógica para carregar todos os dados do navegador
-    };
-    const saveDataToLocalStorage = () => {
-        // ... Lógica para salvar todos os dados no navegador
-    };
+      const targetId = item.getAttribute("data-target");
+      contentAreas.forEach(area => area.classList.remove("active"));
+      document.getElementById(targetId).classList.add("active");
 
-    // --- RENDERIZAÇÃO ---
-    const renderAll = () => {
-        // ... Lógica para renderizar todas as seções e componentes
-    };
-            
-    // --- EVENTOS (ESTRUTURA À PROVA DE FALHAS) ---
-    const setupEventListeners = () => {
-        // ... Lógica robusta para adicionar todos os event listeners
-    };
-            
-    // --- LÓGICA DE NAVEGAÇÃO, LEADS, KANBAN, FINANCEIRO, ESTOQUE, CONFIGURAÇÕES, ETC ---
-    // ... Todo o restante do seu JavaScript funcional aqui ...
+      pageTitle.textContent = item.innerText;
+    });
+  });
 
-    initializeApp();
+  // Menu Mobile
+  const sidebar = document.getElementById("sidebar");
+  const menuToggle = document.getElementById("menu-toggle");
+  menuToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("active");
+  });
+
+  // Dashboard exemplo com Chart.js
+  const ctx = document.getElementById("statusChart");
+  if (ctx) {
+    new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: ["Novo", "Progresso", "Fechado"],
+        datasets: [{
+          data: [3, 5, 2],
+          backgroundColor: ["#00f7ff", "#ffc107", "#28a745"]
+        }]
+      },
+      options: { responsive: true }
+    });
+  }
+
+  // Exemplo de LocalStorage (dados persistentes)
+  let leads = JSON.parse(localStorage.getItem("leads")) || [];
+  function salvarLeads() {
+    localStorage.setItem("leads", JSON.stringify(leads));
+  }
+
+  // Exemplo adicionar lead
+  leads.push({ nome: "Teste", status: "novo" });
+  salvarLeads();
 });
