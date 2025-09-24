@@ -6,3 +6,48 @@
   ]
 }
 
+{
+  "aceleracao_vendas": [
+    {
+      "moduleId": "MD01",
+      "title": "Módulo 1: Conectando com o Cliente Ideal",
+      "description": "Aprenda a usar o CRM do super app para construir a persona do seu cliente, otimizando seu funil de vendas desde o início.",
+      "lessons": [
+        { "lessonId": "L01.01", "title": "Questionário para Definição de Persona", "type": "text", "content": "Antes de qualquer estratégia, é essencial saber com quem você está falando..." },
+        { "lessonId": "L01.02", "title": "Proposta de Valor e Posicionamento", "type": "video", "videoUrl": "URL_DO_VIDEO_A_SER_ADICIONADO_AQUI", "content": "Com base na persona, vamos definir a proposta de valor do seu serviço..." },
+        { "lessonId": "L01.03", "title": "Exercício Prático: Configurando o CRM", "type": "interactive", "description": "Este exercício prático irá guiá-lo a configurar o CRM do seu super app para a sua persona..." }
+      ]
+    },
+    {
+      "moduleId": "MD02",
+      "title": "Módulo 2: O Algoritmo da Meta (Facebook & Instagram)",
+      "description": "Entenda como o algoritmo da Meta funciona e aprenda a criar ganchos e conteúdos que direcionam tráfego para o seu super app.",
+      "lessons": [
+        { "lessonId": "L02.01", "title": "Como o Algoritmo Funciona", "type": "text", "content": "O algoritmo da Meta analisa o comportamento dos usuários para decidir o que mostrar..." },
+        { "lessonId": "L02.02", "title": "O que Influencia o Alcance Orgânico", "type": "text", "content": "O alcance orgânico depende de fatores como: qualidade do conteúdo, engajamento..." },
+        { "lessonId": "L02.03", "title": "Comece com um Gancho Forte", "type": "text", "content": "O primeiro segundo do seu conteúdo precisa chamar a atenção imediatamente..." },
+        { "lessonId": "L02.04", "title": "Desafio Prático: Criação de Gancho", "type": "interactive", "description": "Crie três ganchos diferentes para o seu super app, focando nas dores da sua persona..." }
+      ]
+    },
+    {
+      "moduleId": "MD03",
+      "title": "Módulo 3: Cronograma de Postagens Estratégico",
+      "description": "Planeje a sua rotina de conteúdo nas redes sociais com um calendário que aumenta o seu alcance e consistência.",
+      "lessons": [
+        { "lessonId": "L03.01", "title": "Melhores Horários e Dias para Postagem", "type": "text", "content": "O ideal é postar quando seu público está mais ativo..." },
+        { "lessonId": "L03.02", "title": "Frequência Ideal e Consistência", "type": "text", "content": "A frequência ideal varia por nicho. A Aceleração de Vendas sugere: Estética e beleza (4 a 5 posts por semana); B2B (3 posts bem elaborados por semana); Varejo (diária)." },
+        { "lessonId": "L03.03", "title": "Exemplo de Cronograma Semanal", "type": "text", "content": "Utilize um calendário para organizar o conteúdo por dia da semana..." }
+      ]
+    },
+    {
+      "moduleId": "MD05",
+      "title": "Módulo 5: Copywriting com ChatGPT",
+      "description": "Utilize o ChatGPT para criar textos persuasivos para suas redes sociais e anúncios, usando fórmulas de copy que realmente convertem.",
+      "lessons": [
+          { "lessonId": "L05.01", "title": "Como Criar Textos Persuasivos com IA", "type": "text", "content": "O ChatGPT é uma ferramenta poderosa para gerar textos que vendem..." },
+          { "lessonId": "L05.02", "title": "Fórmulas Testadas: AIDA e PAS", "type": "text", "content": "Aprenda a usar as estruturas de texto persuasivo: AIDA e PAS..." },
+          { "lessonId": "L05.03", "title": "Criando Prompts Inteligentes", "type": "text", "content": "Exemplo: 'Escreva uma copy para anúncio no Instagram sobre aceleração de marketing, com objetivo de gerar leads, num tom direto e persuasivo.'" }
+      ]
+    }
+  ]
+}
