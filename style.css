@@ -1,4 +1,6 @@
 /* --- DEFINIÇÃO DE TEMAS --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
 :root { /* TEMA ESCURO (PADRÃO) */
     --background-color: #0d1117;
     --primary-color: #0a192f;
@@ -39,11 +41,12 @@ body { font-family: 'Inter', sans-serif; background-color: var(--background-colo
 .sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-color); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; transition: background-color 0.3s, border-color 0.3s; }
 .sidebar-header .logo { max-width: 160px; margin-bottom: 3rem; margin-left: -20px; }
 .sidebar-nav { flex-grow: 1; }
-.nav-item { display: flex; align-items: center; padding: 0.9rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; text-decoration: none; color: var(--text-color-muted); transition: all 0.3s ease; }
+.nav-item { display: flex; align-items: center; padding: 0.9rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; text-decoration: none; color: var(--text-color-muted); transition: all 0.3s ease; cursor: pointer; }
 .nav-item:hover { background-color: var(--secondary-color); color: var(--text-color); }
 .nav-item.active { background-color: var(--accent-color); color: var(--primary-color); font-weight: 600; box-shadow: 0 0 15px var(--border-glow); }
 body[data-theme="light"] .nav-item.active { color: #fff; }
 .nav-item i { font-size: 1.5rem; margin-right: 1rem; }
+.sidebar-footer { margin-top: auto; }
 
 /* --- CONTEÚDO PRINCIPAL --- */
 .main-content { flex-grow: 1; margin-left: var(--sidebar-width); padding: 2rem; }
@@ -51,7 +54,8 @@ body[data-theme="light"] .nav-item.active { color: #fff; }
 .main-header h1 { font-size: 2rem; }
 .user-profile { font-weight: 600; }
 .content-area { display: none; }
-.content-area:first-of-type, .content-area.active { display: block; }
+.content-area.active, #dashboard-section { display: block; } /* Mantém o dashboard visível por padrão */
+
 
 /* --- ESTILOS GENÉRICOS (CARDS, INPUTS, BOTÕES) --- */
 .card { background-color: var(--primary-color); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; }
@@ -63,6 +67,7 @@ textarea { min-height: 100px; resize: vertical; margin-bottom: 1rem; }
 .select-group { position: relative; }
 .select-group::after { content: '▼'; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-color-muted); }
 .btn-save { padding: 0.8rem 1.5rem; background-color: var(--accent-color); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; }
+body[data-theme="dark"] .btn-save { color: var(--primary-color); }
 .btn-save:hover { box-shadow: 0 0 15px var(--border-glow); transform: translateY(-2px); opacity: 0.9; }
 .btn-delete { background-color: var(--danger-color); color: #fff; border: none; font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
 .btn-delete:hover { background-color: var(--danger-hover-color); box-shadow: 0 0 10px var(--danger-color); }
@@ -102,7 +107,6 @@ td { padding: 1rem; vertical-align: middle; }
 .btn-delete-table:hover, .btn-delete-produto:hover { color: var(--danger-color); }
 .btn-add-custo:hover { color: var(--warning-color); }
 
-
 /* --- FINANCEIRO E ESTOQUE --- */
 .finance-header, .estoque-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
 .finance-nav { display: flex; gap: 0.5rem; }
@@ -116,10 +120,11 @@ td { padding: 1rem; vertical-align: middle; }
 .search-container { flex-grow: 1; }
 .buttons-container { display: flex; gap: 1rem; }
 .btn-import { background-color: var(--accent-color); color: #fff; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease; position: relative; overflow: hidden; }
+body[data-theme="dark"] .btn-import { color: var(--primary-color); }
 .btn-import input[type="file"] { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 .btn-import:hover { box-shadow: 0 0 15px var(--border-glow); }
 
-/* --- ACELERADOR DE VENDAS --- */
+/* --- ACELERADOR DE VENDAS (ANTIGA MENTORIA) --- */
 .modulos-container { display: flex; gap: 2rem; }
 .modulos-sidebar { flex: 0 0 280px; background-color: var(--primary-color); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; align-self: flex-start; }
 .modulos-menu h2 { color: var(--accent-color); margin-bottom: 1.5rem; }
@@ -131,6 +136,7 @@ td { padding: 1rem; vertical-align: middle; }
 .modulos-module-content { display: none; }
 .modulos-module-content.active { display: block; }
 .modulos-content .section { background-color: var(--primary-color); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid var(--accent-color); border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+.exercise-section { border-color: var(--warning-color); }
 .anotacoes-aluno { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
 .anotacoes-aluno label { display: block; margin-bottom: 0.75rem; font-weight: 600; }
 
