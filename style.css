@@ -4,12 +4,13 @@
     --background-color: #0d1117;
     --primary-color: #0a192f;
     --secondary-color: #162b4d;
-    --accent-color: #00f7ff;
-    /* Azul Neon Forte */
+    --accent-color: #00f7ff; /* Azul Neon Forte */
     --text-color: #cdd6f4;
     --text-color-muted: #8892b0;
     --border-glow: rgba(0, 247, 255, 0.5);
     --sidebar-width: 250px;
+    --danger-color: #d9534f;
+    --danger-hover-color: #c9302c;
 }
 
 * {
@@ -41,8 +42,9 @@ body {
 }
 
 .sidebar-header .logo {
-    max-width: 120px;
+    max-width: 150px; /* Aumentado para melhor visualização */
     margin-bottom: 3rem;
+    margin-left: -15px; /* Ajuste fino */
 }
 
 .sidebar-nav {
@@ -100,15 +102,14 @@ body {
 }
 
 .content-area {
-    background-color: var(--primary-color);
-    padding: 2rem;
-    border-radius: 12px;
-    min-height: 80vh;
+    display: none; /* Oculto por padrão */
 }
 
-.content-area:not(.active) {
-    display: none;
+.content-area:first-of-type,
+.content-area.active {
+    display: block; /* Mostra o primeiro ou o ativo */
 }
+
 
 /* --- Dashboard Styles --- */
 .dashboard-stats {
@@ -207,7 +208,7 @@ body {
     box-shadow: 0 4px 15px rgba(0, 247, 255, 0.2);
 }
 
-/* Estilos para o formulário de Leads */
+/* --- Estilos Genéricos para Forms e Cards --- */
 .card {
     background-color: var(--secondary-color);
     padding: 2rem;
@@ -215,7 +216,7 @@ body {
     margin-bottom: 2rem;
 }
 
-.new-lead-card h2 {
+.card h2, .card h3 {
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
     color: var(--text-color);
@@ -228,18 +229,13 @@ body {
     margin-bottom: 1rem;
 }
 
-#lead-form input,
-#lead-form select,
-#lead-form textarea,
-#edit-lead-form input,
-#edit-lead-form select,
-#edit-lead-form textarea,
-#caixa-form input,
-#caixa-form select,
-#caixa-form textarea,
-#estoque-form input,
-#estoque-form select,
-#add-custo-form input {
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+input[type="number"],
+select,
+textarea {
     width: 100%;
     padding: 0.75rem 1rem;
     background-color: var(--primary-color);
@@ -247,21 +243,13 @@ body {
     border-radius: 8px;
     color: var(--text-color);
     font-size: 1rem;
+    font-family: 'Inter', sans-serif;
     appearance: none;
 }
 
-#lead-form input:focus,
-#lead-form select:focus,
-#lead-form textarea:focus,
-#edit-lead-form input:focus,
-#edit-lead-form select:focus,
-#edit-lead-form textarea:focus,
-#caixa-form input:focus,
-#caixa-form select:focus,
-#caixa-form textarea:focus,
-#estoque-form input:focus,
-#estoque-form select:focus,
-#add-custo-form input:focus {
+input:focus,
+select:focus,
+textarea:focus {
     outline: none;
     border-color: var(--accent-color);
     box-shadow: 0 0 10px var(--border-glow);
@@ -281,7 +269,7 @@ body {
     color: var(--text-color-muted);
 }
 
-#lead-form textarea, #edit-lead-form textarea {
+textarea {
     min-height: 100px;
     resize: vertical;
     margin-bottom: 1rem;
@@ -305,7 +293,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* Estilos para o Modal de Edição */
+/* --- Estilos para Modal --- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -367,19 +355,23 @@ body {
     color: var(--text-color);
 }
 
-#delete-lead-btn {
-    background-color: #d9534f;
+.btn-delete {
+    background-color: var(--danger-color);
     color: var(--text-color);
     border: none;
     font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-#delete-lead-btn:hover {
-    background-color: #c9302c;
-    box-shadow: 0 0 10px #d9534f;
+.btn-delete:hover {
+    background-color: var(--danger-hover-color);
+    box-shadow: 0 0 10px var(--danger-color);
 }
 
-/* Novos estilos para a tabela e o botão de exportar */
+/* --- Tabela & Botões de Ação --- */
 .list-header {
     display: flex;
     justify-content: space-between;
@@ -409,29 +401,29 @@ body {
     overflow-x: auto;
 }
 
-#leads-table, #caixa-table, #estoque-table {
+table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1.5rem;
 }
 
-#leads-table thead th, #caixa-table thead th, #estoque-table thead th {
+thead th {
     background-color: var(--primary-color);
     padding: 1rem;
     text-align: left;
     border-bottom: 2px solid var(--secondary-color);
 }
 
-#leads-table tbody tr, #caixa-table tbody tr, #estoque-table tbody tr {
+tbody tr {
     border-bottom: 1px solid var(--secondary-color);
     transition: background-color 0.2s ease;
 }
 
-#leads-table tbody tr:hover, #caixa-table tbody tr:hover, #estoque-table tbody tr:hover {
+tbody tr:hover {
     background-color: var(--primary-color);
 }
 
-#leads-table td, #caixa-table td, #estoque-table td {
+td {
     padding: 1rem;
 }
 
@@ -451,11 +443,11 @@ body {
 }
 
 .btn-delete-table:hover, .btn-delete-produto:hover {
-    color: #d9534f;
+    color: var(--danger-color);
     transform: scale(1.1);
 }
 
-/* Estilos Específicos do Financeiro */
+/* --- Estilos Financeiro --- */
 .finance-header {
     display: flex;
     justify-content: space-between;
@@ -497,12 +489,9 @@ body {
     margin-bottom: 2rem;
 }
 
-.entrada-card p { color: #28a745; }
-.saida-card p { color: #dc3545; }
+.entrada-card p, #caixa-table .entrada { color: #28a745; font-weight: 600; }
+.saida-card p, #caixa-table .saida { color: #dc3545; font-weight: 600; }
 .saldo-card p { color: #00f7ff; }
-#caixa-table .entrada { color: #28a745; font-weight: 600; }
-#caixa-table .saida { color: #dc3545; font-weight: 600; }
-
 
 .custos-list {
     list-style: none;
@@ -528,7 +517,6 @@ body {
     color: var(--text-color);
 }
 
-/* Novo estilo para o campo de pesquisa e botões */
 .estoque-actions {
     display: flex;
     justify-content: space-between;
@@ -544,12 +532,6 @@ body {
 
 #estoque-search {
     width: 100%;
-    padding: 0.75rem 1rem;
-    background-color: var(--primary-color);
-    border: 1px solid var(--secondary-color);
-    border-radius: 8px;
-    color: var(--text-color);
-    font-size: 1rem;
 }
 
 .buttons-container {
@@ -587,29 +569,29 @@ body {
     box-shadow: 0 0 15px var(--border-glow);
 }
 
-/* --- NOVOS ESTILOS PARA A SEÇÃO DE MENTORIA --- */
-.mentoria-container {
+/* --- ESTILOS PARA ACELERADOR DE VENDAS --- */
+.modulos-container {
     display: flex;
     gap: 2rem;
 }
 
-.mentoria-sidebar {
-    flex: 0 0 250px; /* Largura fixa para o menu da mentoria */
+.modulos-sidebar {
+    flex: 0 0 280px; /* Largura ajustada */
     background-color: var(--secondary-color);
     padding: 1.5rem;
     border-radius: 12px;
 }
 
-.mentoria-menu h2 {
+.modulos-menu h2 {
     color: var(--accent-color);
     margin-bottom: 1.5rem;
 }
 
-.mentoria-menu ul {
+.modulos-menu ul {
     list-style: none;
 }
 
-.mentoria-menu-item {
+.modulos-menu-item {
     padding: 0.8rem 1rem;
     margin-bottom: 0.5rem;
     border-radius: 8px;
@@ -617,33 +599,33 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.mentoria-menu-item:hover {
+.modulos-menu-item:hover {
     background-color: var(--primary-color);
 }
 
-.mentoria-menu-item.active {
+.modulos-menu-item.active {
     background-color: var(--accent-color);
     color: var(--primary-color);
     font-weight: 600;
 }
 
-.mentoria-content {
+.modulos-content {
     flex-grow: 1;
 }
 
-.mentoria-module-content {
-    display: none; /* Esconde todos os módulos por padrão */
+.modulos-module-content {
+    display: none;
 }
 
-.mentoria-module-content.active {
-    display: block; /* Mostra apenas o módulo ativo */
+.modulos-module-content.active {
+    display: block;
 }
 
-.mentoria-content h2 {
+.modulos-content h2 {
     margin-bottom: 1.5rem;
 }
 
-.mentoria-content .section {
+.modulos-content .section {
     background-color: var(--secondary-color);
     padding: 1.5rem;
     border-radius: 8px;
@@ -651,34 +633,33 @@ body {
     border-left: 4px solid var(--accent-color);
 }
 
-.mentoria-content .section h3 {
+.modulos-content .section h3 {
     margin-bottom: 1rem;
 }
 
-.mentoria-content ul {
+.modulos-content ul {
     padding-left: 20px;
     margin-top: 0.5rem;
 }
 
-.mentoria-content table {
+.modulos-content table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
 }
 
-.mentoria-content th, .mentoria-content td {
+.modulos-content th, .modulos-content td {
     padding: 0.8rem;
     border: 1px solid var(--primary-color);
     text-align: left;
 }
 
-.mentoria-content th {
+.modulos-content th {
     background-color: var(--primary-color);
 }
 
-/* Estilos para a área de exercício e anotações */
 .exercise-section {
-    border-color: #ffc107; /* Cor de destaque para exercícios */
+    border-color: #ffc107;
 }
 .anotacoes-aluno {
     margin-top: 1.5rem;
@@ -706,4 +687,27 @@ body {
     outline: none;
     border-color: #ffc107;
     box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+/* --- ESTILOS PARA CONFIGURAÇÕES --- */
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 400px;
+}
+
+.settings-form label {
+    font-weight: 600;
+}
+
+.settings-form .btn-save {
+    width: auto;
+    align-self: flex-start;
+    padding: 0.75rem 1.5rem;
+}
+
+#clear-all-data-btn {
+    width: auto;
+    margin-top: 1rem;
 }
