@@ -5,7 +5,6 @@
     --primary-color: #0a192f;
     --secondary-color: #162b4d;
     --accent-color: #00f7ff;
-    /* Azul Neon Forte */
     --text-color: #cdd6f4;
     --text-color-muted: #8892b0;
     --border-glow: rgba(0, 247, 255, 0.5);
@@ -22,6 +21,7 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: var(--background-color);
     color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .app-container {
@@ -38,6 +38,7 @@ body {
     flex-direction: column;
     padding: 1.5rem;
     position: fixed;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 .sidebar-header .logo {
@@ -67,7 +68,7 @@ body {
 
 .nav-item.active {
     background-color: var(--accent-color);
-    color: var(--primary-color);
+    color: var(--primary-color) !important;
     font-weight: 600;
     box-shadow: 0 0 15px var(--border-glow);
 }
@@ -104,121 +105,21 @@ body {
     padding: 2rem;
     border-radius: 12px;
     min-height: 80vh;
-}
-
-.content-area:not(.active) {
     display: none;
+    transition: background-color 0.3s;
 }
 
-/* --- Dashboard Styles --- */
-.dashboard-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+.content-area.active {
+    display: block;
 }
 
-.stat-card {
-    background-color: var(--secondary-color);
-    padding: 1.5rem;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.stat-card h3 {
-    font-size: 1rem;
-    color: var(--text-color-muted);
-    margin-bottom: 0.5rem;
-}
-
-.stat-card p {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: var(--accent-color);
-}
-
-.dashboard-charts {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-}
-
-.chart-card {
-    background-color: var(--secondary-color);
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.chart-container {
-    position: relative;
-    height: 400px;
-    margin-top: 1.5rem;
-}
-
-/* --- Kanban Styles --- */
-.kanban-board {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    min-height: 400px;
-}
-
-.kanban-column {
-    background-color: var(--secondary-color);
-    padding: 1rem;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-}
-
-.kanban-column h3 {
-    text-align: center;
-    margin-bottom: 1rem;
-    color: var(--text-color);
-}
-
-.kanban-cards-list {
-    flex-grow: 1;
-    min-height: 100px;
-    padding: 0.5rem;
-    border: 1px dashed var(--text-color-muted);
-    border-radius: 8px;
-}
-
-.kanban-card {
-    position: relative;
-    background-color: var(--primary-color);
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid var(--secondary-color);
-    margin-bottom: 0.75rem;
-    cursor: grab;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.kanban-card:active {
-    cursor: grabbing;
-}
-
-.kanban-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 15px rgba(0, 247, 255, 0.2);
-}
-
-/* Estilos para o formulário de Leads */
+/* Estilos para o formulário e cards */
 .card {
     background-color: var(--secondary-color);
     padding: 2rem;
     border-radius: 12px;
     margin-bottom: 2rem;
-}
-
-.new-lead-card h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    color: var(--text-color);
+    transition: background-color 0.3s;
 }
 
 .input-grid {
@@ -228,18 +129,7 @@ body {
     margin-bottom: 1rem;
 }
 
-#lead-form input,
-#lead-form select,
-#lead-form textarea,
-#edit-lead-form input,
-#edit-lead-form select,
-#edit-lead-form textarea,
-#caixa-form input,
-#caixa-form select,
-#caixa-form textarea,
-#estoque-form input,
-#estoque-form select,
-#add-custo-form input {
+input, select, textarea {
     width: 100%;
     padding: 0.75rem 1rem;
     background-color: var(--primary-color);
@@ -248,20 +138,10 @@ body {
     color: var(--text-color);
     font-size: 1rem;
     appearance: none;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
 }
 
-#lead-form input:focus,
-#lead-form select:focus,
-#lead-form textarea:focus,
-#edit-lead-form input:focus,
-#edit-lead-form select:focus,
-#edit-lead-form textarea:focus,
-#caixa-form input:focus,
-#caixa-form select:focus,
-#caixa-form textarea:focus,
-#estoque-form input:focus,
-#estoque-form select:focus,
-#add-custo-form input:focus {
+input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--accent-color);
     box-shadow: 0 0 10px var(--border-glow);
@@ -281,17 +161,11 @@ body {
     color: var(--text-color-muted);
 }
 
-#lead-form textarea, #edit-lead-form textarea {
-    min-height: 100px;
-    resize: vertical;
-    margin-bottom: 1rem;
-}
-
 .btn-save {
     width: 100%;
     padding: 1rem;
     background-color: var(--accent-color);
-    color: var(--primary-color);
+    color: var(--primary-color) !important;
     border: none;
     border-radius: 8px;
     font-weight: 700;
@@ -305,344 +179,114 @@ body {
     transform: translateY(-2px);
 }
 
-/* Estilos para o Modal de Edição */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.75);
-    display: none; /* Inicia oculto */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+/* --- TEMA CLARO --- */
+body.light-mode {
+    --background-color: #f0f2f5;
+    --primary-color: #ffffff;
+    --secondary-color: #e9ecef;
+    --accent-color: #007bff;
+    --text-color: #212529;
+    --text-color-muted: #6c757d;
+    --border-glow: rgba(0, 123, 255, 0.5);
 }
 
-.modal-content {
-    background-color: var(--secondary-color);
-    padding: 2rem;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 800px;
-    box-shadow: 0 0 25px var(--border-glow);
-    animation: fadeIn 0.3s ease-out;
-}
+/* --- ESTILOS ADICIONAIS --- */
+/* (Estilos para Kanban, Tabelas, Financeiro, Mentoria e Configurações) */
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.modal-content h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    color: var(--text-color);
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.modal-actions .btn-save {
-    width: auto;
-    padding: 0.75rem 1.5rem;
-}
-
-.btn-cancel {
-    background-color: transparent;
-    border: 1px solid var(--text-color-muted);
-    color: var(--text-color-muted);
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-cancel:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--text-color);
-}
-
-#delete-lead-btn {
-    background-color: #d9534f;
-    color: var(--text-color);
-    border: none;
-    font-weight: 600;
-}
-
-#delete-lead-btn:hover {
-    background-color: #c9302c;
-    box-shadow: 0 0 10px #d9534f;
-}
-
-/* Novos estilos para a tabela e o botão de exportar */
-.list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.btn-export {
-    background-color: #2e7d32;
-    color: var(--text-color);
-    border: none;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: background-color 0.3s ease;
-}
-
-.btn-export:hover {
-    background-color: #1b5e20;
-}
-
-.table-container {
-    overflow-x: auto;
-}
-
-#leads-table, #caixa-table, #estoque-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1.5rem;
-}
-
-#leads-table thead th, #caixa-table thead th, #estoque-table thead th {
-    background-color: var(--primary-color);
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 2px solid var(--secondary-color);
-}
-
-#leads-table tbody tr, #caixa-table tbody tr, #estoque-table tbody tr {
-    border-bottom: 1px solid var(--secondary-color);
-    transition: background-color 0.2s ease;
-}
-
-#leads-table tbody tr:hover, #caixa-table tbody tr:hover, #estoque-table tbody tr:hover {
-    background-color: var(--primary-color);
-}
-
-#leads-table td, #caixa-table td, #estoque-table td {
-    padding: 1rem;
-}
-
-.btn-edit-table, .btn-delete-table, .btn-delete-produto {
-    background: none;
-    border: none;
-    color: var(--text-color-muted);
-    cursor: pointer;
-    font-size: 1.2rem;
-    margin-right: 0.5rem;
-    transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.btn-edit-table:hover {
-    color: var(--accent-color);
-    transform: scale(1.1);
-}
-
-.btn-delete-table:hover, .btn-delete-produto:hover {
-    color: #d9534f;
-    transform: scale(1.1);
-}
-
-/* Estilos Específicos do Financeiro */
-.finance-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.finance-nav {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.finance-tab {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    color: var(--text-color-muted);
-    background-color: var(--primary-color);
-    border: 1px solid var(--secondary-color);
-    transition: all 0.3s ease;
-}
-
-.finance-tab:hover {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-}
-
-.finance-tab.active {
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    font-weight: 600;
-    box-shadow: 0 0 15px var(--border-glow);
-}
-
-.caixa-stats {
+.dashboard-stats, .caixa-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
-
-.entrada-card p { color: #28a745; }
-.saida-card p { color: #dc3545; }
-.saldo-card p { color: #00f7ff; }
-#caixa-table .entrada { color: #28a745; font-weight: 600; }
-#caixa-table .saida { color: #dc3545; font-weight: 600; }
-
-
-.custos-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    font-size: 0.9rem;
+.stat-card {
+    background-color: var(--secondary-color);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
 }
-
-.custos-info-btn {
-    background-color: transparent;
-    border: 1px solid var(--text-color-muted);
+.stat-card h3 {
+    font-size: 1rem;
     color: var(--text-color-muted);
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 0.5rem;
-    display: inline-block;
+    margin-bottom: 0.5rem;
 }
-
-.custos-info-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--text-color);
+.stat-card p {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--accent-color);
 }
-
-/* Novo estilo para o campo de pesquisa e botões */
-.estoque-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-}
-
-.search-container {
-    flex-grow: 1;
-}
-
-#estoque-search {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background-color: var(--primary-color);
-    border: 1px solid var(--secondary-color);
-    border-radius: 8px;
-    color: var(--text-color);
-    font-size: 1rem;
-}
-
-.buttons-container {
-    display: flex;
-    gap: 1rem;
-}
-
-.btn-import {
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    border: none;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
+.chart-container {
     position: relative;
-    overflow: hidden;
+    height: 400px;
+    margin-top: 1.5rem;
 }
 
-.btn-import input[type="file"] {
-    position: absolute;
-    left: 0;
-    top: 0;
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+.kanban-column {
+    background-color: var(--secondary-color);
+    padding: 1rem;
+    border-radius: 12px;
+}
+.kanban-cards-list {
+    min-height: 100px;
+    padding: 0.5rem;
+    border: 1px dashed var(--text-color-muted);
+    border-radius: 8px;
+}
+.kanban-card {
+    background-color: var(--primary-color);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    cursor: grab;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+table {
     width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--secondary-color);
+}
+thead th {
+    background-color: var(--primary-color);
 }
 
-.btn-import:hover {
-    box-shadow: 0 0 15px var(--border-glow);
-}
-
-/* --- NOVOS ESTILOS PARA A SEÇÃO DE MENTORIA --- */
 .mentoria-container {
     display: flex;
     gap: 2rem;
 }
-
 .mentoria-sidebar {
-    flex: 0 0 250px; /* Largura fixa para o menu da mentoria */
+    flex: 0 0 250px;
     background-color: var(--secondary-color);
     padding: 1.5rem;
     border-radius: 12px;
 }
-
-.mentoria-menu h2 {
-    color: var(--accent-color);
-    margin-bottom: 1.5rem;
-}
-
-.mentoria-menu ul {
-    list-style: none;
-}
-
+.mentoria-menu ul { list-style: none; }
 .mentoria-menu-item {
     padding: 0.8rem 1rem;
     margin-bottom: 0.5rem;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: all 0.3s ease;
 }
-
-.mentoria-menu-item:hover {
-    background-color: var(--primary-color);
-}
-
+.mentoria-menu-item:hover { background-color: var(--primary-color); }
 .mentoria-menu-item.active {
     background-color: var(--accent-color);
-    color: var(--primary-color);
+    color: var(--primary-color) !important;
     font-weight: 600;
 }
-
-.mentoria-content {
-    flex-grow: 1;
-}
-
-.mentoria-module-content {
-    display: none; /* Esconde todos os módulos por padrão */
-}
-
-.mentoria-module-content.active {
-    display: block; /* Mostra apenas o módulo ativo */
-}
-
-.mentoria-content h2 {
-    margin-bottom: 1.5rem;
-}
-
 .mentoria-content .section {
     background-color: var(--secondary-color);
     padding: 1.5rem;
@@ -650,36 +294,7 @@ body {
     margin-bottom: 1.5rem;
     border-left: 4px solid var(--accent-color);
 }
-
-.mentoria-content .section h3 {
-    margin-bottom: 1rem;
-}
-
-.mentoria-content ul {
-    padding-left: 20px;
-    margin-top: 0.5rem;
-}
-
-.mentoria-content table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-}
-
-.mentoria-content th, .mentoria-content td {
-    padding: 0.8rem;
-    border: 1px solid var(--primary-color);
-    text-align: left;
-}
-
-.mentoria-content th {
-    background-color: var(--primary-color);
-}
-
-/* Estilos para a área de exercício e anotações */
-.exercise-section {
-    border-color: #ffc107; /* Cor de destaque para exercícios */
-}
+.exercise-section { border-color: #ffc107; }
 .anotacoes-aluno {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
@@ -689,21 +304,36 @@ body {
     display: block;
     margin-bottom: 0.75rem;
     font-weight: 600;
-    color: var(--text-color);
 }
-.anotacoes-aluno textarea {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background-color: var(--primary-color);
-    border: 1px solid var(--secondary-color);
+
+#config-section .settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--primary-color);
+}
+.btn-secondary, .btn-danger {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--text-color-muted);
+    background-color: transparent;
+    color: var(--text-color-muted);
     border-radius: 8px;
-    color: var(--text-color);
-    font-size: 1rem;
-    resize: vertical;
-    min-height: 120px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
-.anotacoes-aluno textarea:focus {
-    outline: none;
-    border-color: #ffc107;
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+.btn-danger {
+    border-color: #d9534f;
+    color: #d9534f;
 }
+.btn-secondary:hover { background-color: var(--secondary-color); color: var(--text-color); }
+.btn-danger:hover { background-color: #d9534f; color: #fff; }
+
+.switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; }
+input:checked + .slider { background-color: var(--accent-color); }
+input:checked + .slider:before { transform: translateX(26px); }
+.slider.round { border-radius: 34px; }
+.slider.round:before { border-radius: 50%; }
