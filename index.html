@@ -8,12 +8,10 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body data-theme="dark">
-
-    <div class="app-container">
+<body data-theme="dark"> <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="logo.jpg" alt="Logo PixelUp" class="logo">
+                <img src="logo.png" alt="Logo PixelUp" class="logo">
             </div>
             <nav class="sidebar-nav">
                 <a href="#" class="nav-item active" data-target="dashboard-section"><i class="ph-fill ph-gauge"></i><span>Dashboard</span></a>
@@ -24,7 +22,9 @@
                 <a href="#" class="nav-item" data-target="chatbot-section"><i class="ph-fill ph-robot"></i><span>Chatbot AI</span></a>
             </nav>
             <div class="sidebar-footer">
-                <a href="#" class="nav-item" data-target="settings-section"><i class="ph-fill ph-gear-six"></i><span>Configurações</span></a>
+                <a href="#" class="nav-item" data-target="settings-section">
+                    <i class="ph-fill ph-gear-six"></i><span>Configurações</span>
+                </a>
             </div>
         </aside>
 
@@ -36,27 +36,30 @@
                 </div>
             </header>
             
-            <div class="content-area" id="dashboard-section" style="display: block;"> </div>
-            <div class="content-area" id="crm-kanban-section" style="display: none;"> </div>
-            <div class="content-area" id="crm-list-section" style="display: none;"> </div>
-            <div class="content-area" id="finance-section" style="display: none;"> </div>
+            <div class="content-area" id="dashboard-section" style="display: block;"></div>
+            <div class="content-area" id="crm-kanban-section" style="display: none;"></div>
+            <div class="content-area" id="crm-list-section" style="display: none;"></div>
+            <div class="content-area" id="finance-section" style="display: none;"></div>
+            <div class="content-area" id="chatbot-section" style="display: none;"></div>
 
             <div class="content-area" id="aceleracao-section" style="display: none;">
                 <div class="aceleracao-container">
                     <aside class="aceleracao-sidebar">
-                        <nav id="aceleracao-menu" class="aceleracao-menu">
+                        <nav class="aceleracao-menu">
                             <h2>Módulos</h2>
-                            <ul></ul>
+                            <ul>
+                                <li class="aceleracao-menu-item active" data-content="modulo1">Módulo 1: Fundamentos do Negócio</li>
+                                <li class="aceleracao-menu-item" data-content="modulo2">Módulo 2: O Algoritmo do Meta</li>
+                            </ul>
                         </nav>
                     </aside>
-                    <main id="aceleracao-content" class="aceleracao-content">
-                        <div class="card"><h2>Bem-vindo!</h2><p>Selecione um módulo para começar.</p></div>
+                    <main class="aceleracao-content">
+                        <section id="modulo1" class="aceleracao-module-content active"></section>
+                        <section id="modulo2" class="aceleracao-module-content"></section>
                     </main>
                 </div>
             </div>
             
-            <div class="content-area" id="chatbot-section" style="display: none;"><h2>Chatbot AI</h2><p>Em breve.</p></div>
-
             <div class="content-area" id="settings-section" style="display: none;">
                 <div class="card">
                     <h2>Configurações Gerais</h2>
@@ -80,6 +83,9 @@
             </div>
         </main>
     </div>
+
+    <div class="modal-overlay" id="edit-lead-modal"></div>
+    <div class="modal-overlay" id="add-custo-modal"></div>
 
     <script src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
