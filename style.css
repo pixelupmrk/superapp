@@ -1,713 +1,157 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-
-:root {
+/* --- DEFINIÇÃO DE TEMAS --- */
+:root { /* TEMA ESCURO (PADRÃO) */
     --background-color: #0d1117;
     --primary-color: #0a192f;
     --secondary-color: #162b4d;
-    --accent-color: #00f7ff; /* Azul Neon Forte */
+    --accent-color: #00f7ff;
     --text-color: #cdd6f4;
     --text-color-muted: #8892b0;
+    --border-color: #304269;
     --border-glow: rgba(0, 247, 255, 0.5);
     --sidebar-width: 250px;
     --danger-color: #d9534f;
     --danger-hover-color: #c9302c;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--background-color);
-    color: var(--text-color);
-}
-
-.app-container {
-    display: flex;
-}
-
-/* --- Sidebar --- */
-.sidebar {
-    width: var(--sidebar-width);
-    height: 100vh;
-    background-color: var(--primary-color);
-    border-right: 1px solid var(--secondary-color);
-    display: flex;
-    flex-direction: column;
-    padding: 1.5rem;
-    position: fixed;
-}
-
-.sidebar-header .logo {
-    max-width: 150px; /* Aumentado para melhor visualização */
-    margin-bottom: 3rem;
-    margin-left: -15px; /* Ajuste fino */
-}
-
-.sidebar-nav {
-    flex-grow: 1;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    padding: 0.9rem 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    color: var(--text-color-muted);
-    transition: all 0.3s ease;
-}
-
-.nav-item:hover {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-}
-
-.nav-item.active {
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    font-weight: 600;
-    box-shadow: 0 0 15px var(--border-glow);
-}
-
-.nav-item i {
-    font-size: 1.5rem;
-    margin-right: 1rem;
-}
-
-/* --- Conteúdo Principal --- */
-.main-content {
-    flex-grow: 1;
-    margin-left: var(--sidebar-width);
-    padding: 2rem;
-}
-
-.main-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.main-header h1 {
-    font-size: 2rem;
-}
-
-.user-profile {
-    font-weight: 600;
-}
-
-.content-area {
-    display: none; /* Oculto por padrão */
-}
-
-.content-area:first-of-type,
-.content-area.active {
-    display: block; /* Mostra o primeiro ou o ativo */
-}
-
-
-/* --- Dashboard Styles --- */
-.dashboard-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.stat-card {
-    background-color: var(--secondary-color);
-    padding: 1.5rem;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.stat-card h3 {
-    font-size: 1rem;
-    color: var(--text-color-muted);
-    margin-bottom: 0.5rem;
-}
-
-.stat-card p {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: var(--accent-color);
-}
-
-.dashboard-charts {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-}
-
-.chart-card {
-    background-color: var(--secondary-color);
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.chart-container {
-    position: relative;
-    height: 400px;
-    margin-top: 1.5rem;
-}
-
-/* --- Kanban Styles --- */
-.kanban-board {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    min-height: 400px;
-}
-
-.kanban-column {
-    background-color: var(--secondary-color);
-    padding: 1rem;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-}
-
-.kanban-column h3 {
-    text-align: center;
-    margin-bottom: 1rem;
-    color: var(--text-color);
-}
-
-.kanban-cards-list {
-    flex-grow: 1;
-    min-height: 100px;
-    padding: 0.5rem;
-    border: 1px dashed var(--text-color-muted);
-    border-radius: 8px;
-}
-
-.kanban-card {
-    position: relative;
-    background-color: var(--primary-color);
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid var(--secondary-color);
-    margin-bottom: 0.75rem;
-    cursor: grab;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.kanban-card:active {
-    cursor: grabbing;
-}
-
-.kanban-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 15px rgba(0, 247, 255, 0.2);
-}
-
-/* --- Estilos Genéricos para Forms e Cards --- */
-.card {
-    background-color: var(--secondary-color);
-    padding: 2rem;
-    border-radius: 12px;
-    margin-bottom: 2rem;
-}
-
-.card h2, .card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    color: var(--text-color);
-}
-
-.input-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="date"],
-input[type="number"],
-select,
-textarea {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background-color: var(--primary-color);
-    border: 1px solid var(--secondary-color);
-    border-radius: 8px;
-    color: var(--text-color);
-    font-size: 1rem;
-    font-family: 'Inter', sans-serif;
-    appearance: none;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 10px var(--border-glow);
-}
-
-.select-group {
-    position: relative;
-}
-
-.select-group::after {
-    content: '▼';
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    color: var(--text-color-muted);
-}
-
-textarea {
-    min-height: 100px;
-    resize: vertical;
-    margin-bottom: 1rem;
-}
-
-.btn-save {
-    width: 100%;
-    padding: 1rem;
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-save:hover {
-    box-shadow: 0 0 15px var(--border-glow);
-    transform: translateY(-2px);
-}
-
-/* --- Estilos para Modal --- */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.75);
-    display: none; /* Inicia oculto */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background-color: var(--secondary-color);
-    padding: 2rem;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 800px;
-    box-shadow: 0 0 25px var(--border-glow);
-    animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.modal-content h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    color: var(--text-color);
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.modal-actions .btn-save {
-    width: auto;
-    padding: 0.75rem 1.5rem;
-}
-
-.btn-cancel {
-    background-color: transparent;
-    border: 1px solid var(--text-color-muted);
-    color: var(--text-color-muted);
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-cancel:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--text-color);
-}
-
-.btn-delete {
-    background-color: var(--danger-color);
-    color: var(--text-color);
-    border: none;
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-delete:hover {
-    background-color: var(--danger-hover-color);
-    box-shadow: 0 0 10px var(--danger-color);
-}
-
-/* --- Tabela & Botões de Ação --- */
-.list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.btn-export {
-    background-color: #2e7d32;
-    color: var(--text-color);
-    border: none;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: background-color 0.3s ease;
-}
-
-.btn-export:hover {
-    background-color: #1b5e20;
-}
-
-.table-container {
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1.5rem;
-}
-
-thead th {
-    background-color: var(--primary-color);
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 2px solid var(--secondary-color);
-}
-
-tbody tr {
-    border-bottom: 1px solid var(--secondary-color);
-    transition: background-color 0.2s ease;
-}
-
-tbody tr:hover {
-    background-color: var(--primary-color);
-}
-
-td {
-    padding: 1rem;
-}
-
-.btn-edit-table, .btn-delete-table, .btn-delete-produto {
-    background: none;
-    border: none;
-    color: var(--text-color-muted);
-    cursor: pointer;
-    font-size: 1.2rem;
-    margin-right: 0.5rem;
-    transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.btn-edit-table:hover {
-    color: var(--accent-color);
-    transform: scale(1.1);
-}
-
-.btn-delete-table:hover, .btn-delete-produto:hover {
-    color: var(--danger-color);
-    transform: scale(1.1);
-}
-
-/* --- Estilos Financeiro --- */
-.finance-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.finance-nav {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.finance-tab {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    color: var(--text-color-muted);
-    background-color: var(--primary-color);
-    border: 1px solid var(--secondary-color);
-    transition: all 0.3s ease;
-}
-
-.finance-tab:hover {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-}
-
-.finance-tab.active {
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    font-weight: 600;
-    box-shadow: 0 0 15px var(--border-glow);
-}
-
-.caixa-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.entrada-card p, #caixa-table .entrada { color: #28a745; font-weight: 600; }
-.saida-card p, #caixa-table .saida { color: #dc3545; font-weight: 600; }
-.saldo-card p { color: #00f7ff; }
-
-.custos-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    font-size: 0.9rem;
-}
-
-.custos-info-btn {
-    background-color: transparent;
-    border: 1px solid var(--text-color-muted);
-    color: var(--text-color-muted);
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 0.5rem;
-    display: inline-block;
-}
-
-.custos-info-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--text-color);
-}
-
-.estoque-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-}
-
-.search-container {
-    flex-grow: 1;
-}
-
-#estoque-search {
-    width: 100%;
-}
-
-.buttons-container {
-    display: flex;
-    gap: 1rem;
-}
-
-.btn-import {
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    border: none;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-import input[type="file"] {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-}
-
-.btn-import:hover {
-    box-shadow: 0 0 15px var(--border-glow);
-}
-
-/* --- ESTILOS PARA ACELERADOR DE VENDAS --- */
-.modulos-container {
-    display: flex;
-    gap: 2rem;
-}
-
-.modulos-sidebar {
-    flex: 0 0 280px; /* Largura ajustada */
-    background-color: var(--secondary-color);
-    padding: 1.5rem;
-    border-radius: 12px;
-}
-
-.modulos-menu h2 {
-    color: var(--accent-color);
-    margin-bottom: 1.5rem;
-}
-
-.modulos-menu ul {
-    list-style: none;
-}
-
-.modulos-menu-item {
-    padding: 0.8rem 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.modulos-menu-item:hover {
-    background-color: var(--primary-color);
-}
-
-.modulos-menu-item.active {
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    font-weight: 600;
-}
-
-.modulos-content {
-    flex-grow: 1;
-}
-
-.modulos-module-content {
-    display: none;
-}
-
-.modulos-module-content.active {
-    display: block;
-}
-
-.modulos-content h2 {
-    margin-bottom: 1.5rem;
-}
-
-.modulos-content .section {
-    background-color: var(--secondary-color);
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-    border-left: 4px solid var(--accent-color);
-}
-
-.modulos-content .section h3 {
-    margin-bottom: 1rem;
-}
-
-.modulos-content ul {
-    padding-left: 20px;
-    margin-top: 0.5rem;
-}
-
-.modulos-content table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-}
-
-.modulos-content th, .modulos-content td {
-    padding: 0.8rem;
-    border: 1px solid var(--primary-color);
-    text-align: left;
-}
-
-.modulos-content th {
-    background-color: var(--primary-color);
-}
-
-.exercise-section {
-    border-color: #ffc107;
-}
-.anotacoes-aluno {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--primary-color);
-}
-.anotacoes-aluno label {
-    display: block;
-    margin-bottom: 0.75rem;
-    font-weight: 600;
-    color: var(--text-color);
-}
-.anotacoes-aluno textarea {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background-color: var(--primary-color);
-    border: 1px solid var(--secondary-color);
-    border-radius: 8px;
-    color: var(--text-color);
-    font-size: 1rem;
-    resize: vertical;
-    min-height: 120px;
-}
-.anotacoes-aluno textarea:focus {
-    outline: none;
-    border-color: #ffc107;
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
-}
-
-/* --- ESTILOS PARA CONFIGURAÇÕES --- */
-.settings-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-width: 400px;
-}
-
-.settings-form label {
-    font-weight: 600;
-}
-
-.settings-form .btn-save {
-    width: auto;
-    align-self: flex-start;
-    padding: 0.75rem 1.5rem;
-}
-
-#clear-all-data-btn {
-    width: auto;
-    margin-top: 1rem;
-}
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+}
+
+body[data-theme="light"] {
+    --background-color: #f0f2f5;
+    --primary-color: #ffffff;
+    --secondary-color: #e9ecef;
+    --accent-color: #007bff;
+    --text-color: #212529;
+    --text-color-muted: #6c757d;
+    --border-color: #dee2e6;
+    --border-glow: rgba(0, 123, 255, 0.4);
+    --danger-color: #dc3545;
+    --danger-hover-color: #c82333;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+}
+
+/* --- ESTILOS GERAIS --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
+.app-container { display: flex; }
+
+/* --- SIDEBAR --- */
+.sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-color); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; transition: background-color 0.3s, border-color 0.3s; }
+.sidebar-header .logo { max-width: 160px; margin-bottom: 3rem; margin-left: -20px; }
+.sidebar-nav { flex-grow: 1; }
+.nav-item { display: flex; align-items: center; padding: 0.9rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; text-decoration: none; color: var(--text-color-muted); transition: all 0.3s ease; }
+.nav-item:hover { background-color: var(--secondary-color); color: var(--text-color); }
+.nav-item.active { background-color: var(--accent-color); color: var(--primary-color); font-weight: 600; box-shadow: 0 0 15px var(--border-glow); }
+body[data-theme="light"] .nav-item.active { color: #fff; }
+.nav-item i { font-size: 1.5rem; margin-right: 1rem; }
+
+/* --- CONTEÚDO PRINCIPAL --- */
+.main-content { flex-grow: 1; margin-left: var(--sidebar-width); padding: 2rem; }
+.main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.main-header h1 { font-size: 2rem; }
+.user-profile { font-weight: 600; }
+.content-area { display: none; }
+.content-area:first-of-type, .content-area.active { display: block; }
+
+/* --- ESTILOS GENÉRICOS (CARDS, INPUTS, BOTÕES) --- */
+.card { background-color: var(--primary-color); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; }
+.card h2, .card h3 { font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-color); }
+.input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+input, select, textarea { width: 100%; padding: 0.75rem 1rem; background-color: var(--secondary-color); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-size: 1rem; font-family: 'Inter', sans-serif; appearance: none; transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 10px var(--border-glow); }
+textarea { min-height: 100px; resize: vertical; margin-bottom: 1rem; }
+.select-group { position: relative; }
+.select-group::after { content: '▼'; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-color-muted); }
+.btn-save { padding: 0.8rem 1.5rem; background-color: var(--accent-color); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; }
+.btn-save:hover { box-shadow: 0 0 15px var(--border-glow); transform: translateY(-2px); opacity: 0.9; }
+.btn-delete { background-color: var(--danger-color); color: #fff; border: none; font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
+.btn-delete:hover { background-color: var(--danger-hover-color); box-shadow: 0 0 10px var(--danger-color); }
+.btn-cancel { background-color: transparent; border: 1px solid var(--text-color-muted); color: var(--text-color-muted); padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
+.btn-cancel:hover { background-color: var(--secondary-color); color: var(--text-color); }
+
+/* --- DASHBOARD & GRÁFICOS --- */
+.dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+.stat-card { background-color: var(--primary-color); padding: 1.5rem; border-radius: 12px; text-align: center; border: 1px solid var(--border-color); }
+.stat-card h3 { font-size: 1rem; color: var(--text-color-muted); margin-bottom: 0.5rem; }
+.stat-card p { font-size: 2.5rem; font-weight: bold; color: var(--accent-color); }
+.chart-card { background-color: var(--primary-color); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; }
+.chart-container { position: relative; height: 350px; margin-top: 1.5rem; }
+
+/* --- KANBAN --- */
+.kanban-board { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+.kanban-column { background-color: var(--secondary-color); padding: 1rem; border-radius: 12px; display: flex; flex-direction: column; }
+.kanban-column h3 { text-align: center; margin-bottom: 1rem; color: var(--text-color); }
+.kanban-cards-list { flex-grow: 1; min-height: 100px; padding: 0.5rem; border: 1px dashed var(--text-color-muted); border-radius: 8px; }
+.kanban-card { background-color: var(--primary-color); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 0.75rem; cursor: grab; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.kanban-card:hover { transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+body[data-theme="dark"] .kanban-card:hover { box-shadow: 0 4px 15px var(--border-glow); }
+
+/* --- TABELAS --- */
+.list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.btn-export { background-color: #1e6e3c; color: #fff; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: background-color 0.3s ease; }
+.btn-export:hover { background-color: #13542a; }
+.table-container { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+thead th { background-color: var(--secondary-color); padding: 1rem; text-align: left; border-bottom: 2px solid var(--border-color); }
+tbody tr { border-bottom: 1px solid var(--border-color); transition: background-color 0.2s ease; }
+tbody tr:hover { background-color: var(--secondary-color); }
+td { padding: 1rem; vertical-align: middle; }
+.table-actions button { background: none; border: none; color: var(--text-color-muted); cursor: pointer; font-size: 1.2rem; margin-right: 0.5rem; transition: color 0.2s ease, transform 0.2s ease; padding: 0.25rem; }
+.table-actions button:hover { transform: scale(1.1); }
+.btn-edit-table:hover { color: var(--accent-color); }
+.btn-delete-table:hover, .btn-delete-produto:hover { color: var(--danger-color); }
+.btn-add-custo:hover { color: var(--warning-color); }
+
+
+/* --- FINANCEIRO E ESTOQUE --- */
+.finance-header, .estoque-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+.finance-nav { display: flex; gap: 0.5rem; }
+.finance-tab { padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; color: var(--text-color-muted); background-color: var(--secondary-color); border: 1px solid var(--border-color); transition: all 0.3s ease; }
+.finance-tab.active { background-color: var(--accent-color); color: #fff; font-weight: 600; box-shadow: 0 0 15px var(--border-glow); }
+.entrada-card p, #caixa-table .entrada { color: var(--success-color); font-weight: 600; }
+.saida-card p, #caixa-table .saida { color: var(--danger-color); font-weight: 600; }
+.saldo-card p { color: var(--accent-color); }
+.custos-list { list-style: none; padding: 0; margin: 0; font-size: 0.9rem; }
+.custos-list li { padding: 2px 0; }
+.search-container { flex-grow: 1; }
+.buttons-container { display: flex; gap: 1rem; }
+.btn-import { background-color: var(--accent-color); color: #fff; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease; position: relative; overflow: hidden; }
+.btn-import input[type="file"] { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.btn-import:hover { box-shadow: 0 0 15px var(--border-glow); }
+
+/* --- ACELERADOR DE VENDAS --- */
+.modulos-container { display: flex; gap: 2rem; }
+.modulos-sidebar { flex: 0 0 280px; background-color: var(--primary-color); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; align-self: flex-start; }
+.modulos-menu h2 { color: var(--accent-color); margin-bottom: 1.5rem; }
+.modulos-menu ul { list-style: none; }
+.modulos-menu-item { padding: 0.8rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
+.modulos-menu-item:hover { background-color: var(--secondary-color); color: var(--text-color); }
+.modulos-menu-item.active { background-color: var(--accent-color); color: #fff; font-weight: 600; }
+.modulos-content { flex-grow: 1; }
+.modulos-module-content { display: none; }
+.modulos-module-content.active { display: block; }
+.modulos-content .section { background-color: var(--primary-color); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid var(--accent-color); border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+.anotacoes-aluno { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+.anotacoes-aluno label { display: block; margin-bottom: 0.75rem; font-weight: 600; }
+
+/* --- CONFIGURAÇÕES --- */
+.settings-group { margin-bottom: 1.5rem; }
+.settings-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+.theme-switcher { display: flex; gap: 0.5rem; border: 1px solid var(--border-color); border-radius: 8px; padding: 4px; width: fit-content; }
+.btn-theme { padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; background-color: transparent; color: var(--text-color-muted); font-weight: 600; transition: all 0.3s ease; }
+.btn-theme.active { background-color: var(--accent-color); color: #fff; }
+.input-group { display: flex; gap: 0.5rem; max-width: 450px; }
+.input-group input { flex-grow: 1; }
+.input-group button { flex-shrink: 0; }
+#business-info-form .btn-save { margin-top: 1rem; }
+.input-grid-settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+.form-group { display: flex; flex-direction: column; }
+.form-group label { font-weight: 600; margin-bottom: 0.5rem; }
+
+/* --- MODAIS --- */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background-color: var(--primary-color); padding: 2rem; border-radius: 12px; width: 90%; max-width: 800px; border: 1px solid var(--border-color); box-shadow: 0 0 25px rgba(0, 0, 0, 0.5); animation: fadeIn 0.3s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.modal-content h2 { font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-color); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
+.modal-actions .btn-save, .modal-actions .btn-delete, .modal-actions .btn-cancel { width: auto; }
