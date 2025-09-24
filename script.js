@@ -1,23 +1,51 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // COLE AQUI TODO O CÓDIGO DO SEU ARQUIVO `javamentoriaok.txt`
-    // (Desde o início, com a lógica de leads, kanban, financeiro, etc.)
 
-    // DEPOIS DE COLAR TODO O SEU CÓDIGO, ADICIONE AS FUNÇÕES ABAIXO NO FINAL,
-    // DENTRO DO `DOMContentLoaded`
+    // --- LÓGICA ORIGINAL DO CRM ---
+    const leads = [];
+    let nextLeadId = 0;
+    let statusChart;
+    let caixa = [];
+    let estoque = [];
+
+    // --- LÓGICA PARA NAVEGAÇÃO PRINCIPAL (SIDEBAR) ---
+    const navItems = document.querySelectorAll('.sidebar .nav-item');
+    const contentAreas = document.querySelectorAll('.main-content .content-area');
+    const pageTitle = document.getElementById('page-title');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('data-target');
+            if (!targetId) return;
+
+            const targetText = e.currentTarget.querySelector('span').textContent;
+
+            navItems.forEach(nav => nav.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+
+            contentAreas.forEach(area => {
+                area.style.display = 'none';
+            });
+            
+            const targetArea = document.getElementById(targetId);
+            if(targetArea) {
+                targetArea.style.display = 'block';
+                pageTitle.textContent = targetText;
+            }
+        });
+    });
 
     // --- LÓGICA PARA CARREGAR MÓDULOS DE ACELERAÇÃO ---
     async function loadAceleracaoModules() {
         const menu = document.querySelector('#aceleracao-menu ul');
         const contentArea = document.getElementById('aceleracao-content');
-        
         try {
             const response = await fetch('data.json');
             const data = await response.json();
             const modules = data.aceleracao_vendas;
 
             if (!modules) {
-                menu.innerHTML = '<li>Erro ao carregar módulos.</li>';
+                menu.innerHTML = '<li>Erro ao carregar.</li>';
                 return;
             }
             menu.innerHTML = '';
@@ -35,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } catch (error) {
             console.error('Falha ao carregar data.json:', error);
-            menu.innerHTML = '<li>Conteúdo indisponível.</li>';
+            menu.innerHTML = '<li>Erro ao carregar conteúdo.</li>';
         }
     }
 
@@ -43,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let html = `<div class="card"><h2>${module.title}</h2><p>${module.description}</p></div>`;
         if (module.lessons) {
             module.lessons.forEach(lesson => {
-                html += `<div class="card section"><h3>${lesson.title}</h3><p>${lesson.content || lesson.description}</p></div>`;
+                html += `<div class="section card"><h3>${lesson.title}</h3><p>${lesson.content || lesson.description}</p></div>`;
             });
         }
         contentArea.innerHTML = html;
@@ -81,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
             updateUserGreeting();
         });
 
-        // Carregar dados salvos na inicialização
         const savedTheme = localStorage.getItem('appTheme') || 'dark';
         applyTheme(savedTheme);
         nameInput.value = localStorage.getItem('businessName') || '';
@@ -90,7 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUserGreeting();
     }
 
-    // Inicializa as novas funções
+    // --- INICIALIZAÇÃO DE TODAS AS FUNÇÕES ---
     loadAceleracaoModules();
     setupSettings();
+    // Aqui você pode adicionar as chamadas de inicialização do seu CRM, como `updateDashboard()`
 });
