@@ -3,85 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PixelUp SuperApp - Aceleração de Vendas</title>
+    <title>Super App PixelUp | Aceleração de Vendas</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-    <div class="app-container">
+<body data-theme="dark"> <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="logo.jpg" alt="PixelUp Logo" class="logo">
+                <img src="logo.png" alt="Logo PixelUp" class="logo">
             </div>
             <nav class="sidebar-nav">
-                <a href="#" class="nav-item active" data-target="modulos">
-                    <i class="fas fa-graduation-cap"></i> Aceleração de Vendas
+                <a href="#" class="nav-item active" data-target="dashboard-section">
+                    <i class="ph-fill ph-gauge"></i> <span>Dashboard</span>
                 </a>
-                <a href="#" class="nav-item" data-target="configuracoes">
-                    <i class="fas fa-cog"></i> Configurações
+                <a href="#" class="nav-item" data-target="crm-kanban-section">
+                    <i class="ph-fill ph-trello-logo"></i> <span>CRM / Kanban</span>
+                </a>
+                <a href="#" class="nav-item" data-target="crm-list-section">
+                    <i class="ph-fill ph-list-dashes"></i> <span>Lista de Leads</span>
+                </a>
+                <a href="#" class="nav-item" data-target="finance-section">
+                    <i class="ph-fill ph-chart-bar"></i> <span>Financeiro</span>
+                </a>
+                <a href="#" class="nav-item" data-target="aceleracao-section">
+                    <i class="ph-fill ph-rocket-launch"></i> <span>Aceleração de Vendas</span>
+                </a>
+                 <a href="#" class="nav-item" data-target="chatbot-section">
+                    <i class="ph-fill ph-robot"></i> <span>Chatbot AI</span>
                 </a>
             </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item" data-target="settings-section">
+                    <i class="ph-fill ph-gear-six"></i> <span>Configurações</span>
+                </a>
+            </div>
         </aside>
 
         <main class="main-content">
-            <div id="modulos" class="content-area active">
-                <div class="modulos-container">
-                    <aside class="modulos-sidebar">
-                        <div id="modulos-menu" class="modulos-menu">
+            <header class="main-header">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="user-profile">
+                    <span>Olá, Usuário</span>
+                </div>
+            </header>
+            
+            <div class="content-area" id="dashboard-section" style="display: block;">
+                </div>
+            <div class="content-area" id="crm-kanban-section" style="display: none;">
+                </div>
+            <div class="content-area" id="crm-list-section" style="display: none;">
+                </div>
+             <div class="content-area" id="finance-section" style="display: none;">
+                </div>
+
+            <div class="content-area" id="aceleracao-section" style="display: none;">
+                <div class="aceleracao-container">
+                     <aside class="aceleracao-sidebar">
+                        <nav class="aceleracao-menu">
                             <h2>Módulos</h2>
-                            <ul></ul>
-                        </div>
+                            <ul>
+                                <li class="aceleracao-menu-item active" data-content="modulo1">Módulo 1: Fundamentos</li>
+                                <li class="aceleracao-menu-item" data-content="modulo2">Módulo 2: O Algoritmo do Meta</li>
+                                <li class="aceleracao-menu-item" data-content="modulo3">Módulo 3: Cronograma</li>
+                                </ul>
+                        </nav>
                     </aside>
-                    <div id="modulos-content" class="modulos-content">
-                        <div class="card">
-                            <h2>Bem-vindo à Aceleração de Vendas!</h2>
-                            <p>Selecione um módulo no menu ao lado para começar.</p>
-                        </div>
-                    </div>
+                    <main class="aceleracao-content">
+                         <section id="modulo1" class="aceleracao-module-content active">
+                            <h2>Módulo 1: Fundamentos do Negócio e Posicionamento</h2>
+                            </section>
+                        <section id="modulo2" class="aceleracao-module-content">
+                            <h2>Módulo 2: O Algoritmo do Meta (Facebook & Instagram)</h2>
+                            </section>
+                        </main>
                 </div>
             </div>
+            
+            <div class="content-area" id="chatbot-section" style="display: none;">
+                </div>
 
-            <div id="configuracoes" class="content-area">
+            <div class="content-area" id="settings-section" style="display: none;">
+                <h2>Configurações</h2>
                 <div class="card">
-                    <h2>Configurações Gerais</h2>
-                    
+                    <h3>Aparência</h3>
                     <div class="settings-group">
                         <label>Tema da Aplicação</label>
                         <div class="theme-switcher">
-                            <button id="theme-light" class="btn-theme">
-                                <i class="fas fa-sun"></i> Claro
-                            </button>
-                            <button id="theme-dark" class="btn-theme">
-                                <i class="fas fa-moon"></i> Escuro
-                            </button>
+                            <button class="btn-theme" data-theme="light"><i class="ph-fill ph-sun"></i> Claro</button>
+                            <button class="btn-theme active" data-theme="dark"><i class="ph-fill ph-moon"></i> Escuro</button>
                         </div>
-                    </div>
-
-                    <div id="business-info-form">
-                        <h3>Informações da Empresa</h3>
-                        <div class="input-grid-settings">
-                            <div class="form-group">
-                                <label for="business-name">Nome da Empresa</label>
-                                <input type="text" id="business-name" placeholder="Sua Empresa LTDA">
-                            </div>
-                            <div class="form-group">
-                                <label for="business-email">Email</label>
-                                <input type="email" id="business-email" placeholder="contato@suaempresa.com">
-                            </div>
-                            <div class="form-group">
-                                <label for="business-phone">Telefone</label>
-                                <input type="tel" id="business-phone" placeholder="(99) 99999-9999">
-                            </div>
-                        </div>
-                        <button id="save-business-info" class="btn-save">
-                            <i class="fas fa-save"></i> Salvar Informações
-                        </button>
                     </div>
                 </div>
+                <div class="card">
+                    <h3>Informações da Empresa</h3>
+                    <form id="business-info-form">
+                        <div class="input-grid">
+                           <input type="text" id="business-name" placeholder="Nome da sua Empresa">
+                           <input type="email" id="business-email" placeholder="E-mail de Contato">
+                           <input type="tel" id="business-phone" placeholder="Telefone Principal">
+                        </div>
+                        <button type="submit" class="btn-save">Salvar Informações</button>
+                    </form>
+                </div>
             </div>
+
         </main>
     </div>
 
     <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 </body>
 </html>
