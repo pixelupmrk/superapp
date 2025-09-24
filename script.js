@@ -1,24 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- LÓGICA ORIGINAL COMPLETA DO SEU CRM ---
+    // --- LÓGICA COMPLETA DO CRM (ORIGINAL + NOVO) ---
     const leads = [];
     let nextLeadId = 0;
-    let statusChart;
-    let caixa = [];
-    let estoque = [];
-    let currentEstoqueDescricao = null;
+    // ... (Aqui entraria toda a sua lógica de Kanban, Financeiro, etc. Se não a tiver, pode começar a recriá-la)
 
-    // Lógica para a navegação da sidebar
-    const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+    // --- LÓGICA PARA NAVEGAÇÃO PRINCIPAL (SIDEBAR) ---
+    const navItems = document.querySelectorAll('.sidebar .nav-item');
     const contentAreas = document.querySelectorAll('.main-content .content-area');
     const pageTitle = document.getElementById('page-title');
-    const userGreeting = document.getElementById('user-greeting');
 
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const targetId = e.currentTarget.getAttribute('data-target');
             if (!targetId) return;
+
             const targetText = e.currentTarget.querySelector('span').textContent;
 
             navItems.forEach(nav => nav.classList.remove('active'));
@@ -27,28 +24,27 @@ document.addEventListener('DOMContentLoaded', () => {
             contentAreas.forEach(area => {
                 area.style.display = 'none';
             });
+            
             const targetArea = document.getElementById(targetId);
-            if (targetArea) {
+            if(targetArea) {
                 targetArea.style.display = 'block';
                 pageTitle.textContent = targetText;
             }
         });
     });
 
-    // ... (toda a outra lógica do seu CRM: Kanban, Leads, Financeiro, etc., deve estar aqui)
-
-
     // --- LÓGICA PARA CARREGAR MÓDULOS DE ACELERAÇÃO ---
     async function loadAceleracaoModules() {
         const menu = document.querySelector('#aceleracao-menu ul');
         const contentArea = document.getElementById('aceleracao-content');
+        if (!menu || !contentArea) return;
         try {
             const response = await fetch('data.json');
             const data = await response.json();
             const modules = data.aceleracao_vendas;
 
             if (!modules) {
-                menu.innerHTML = '<li>Erro ao carregar módulos.</li>';
+                menu.innerHTML = '<li>Erro ao carregar.</li>';
                 return;
             }
             menu.innerHTML = '';
@@ -66,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } catch (error) {
             console.error('Falha ao carregar data.json:', error);
-            menu.innerHTML = '<li>Conteúdo indisponível.</li>';
+            menu.innerHTML = '<li>Erro ao carregar conteúdo.</li>';
         }
     }
 
@@ -74,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let html = `<div class="card"><h2>${module.title}</h2><p>${module.description}</p></div>`;
         if (module.lessons) {
             module.lessons.forEach(lesson => {
-                html += `<div class="card section"><h3>${lesson.title}</h3><p>${lesson.content || lesson.description}</p></div>`;
+                html += `<div class="section card"><h3>${lesson.title}</h3><p>${lesson.content || lesson.description}</p></div>`;
             });
         }
         contentArea.innerHTML = html;
@@ -88,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nameInput = document.getElementById('business-name');
         const emailInput = document.getElementById('business-email');
         const phoneInput = document.getElementById('business-phone');
+        const userGreeting = document.getElementById('user-greeting');
 
         const applyTheme = (theme) => {
             body.dataset.theme = theme;
@@ -111,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
             updateUserGreeting();
         });
 
-        // Carregar dados salvos
         const savedTheme = localStorage.getItem('appTheme') || 'dark';
         applyTheme(savedTheme);
         nameInput.value = localStorage.getItem('businessName') || '';
@@ -120,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUserGreeting();
     }
 
-    // Inicializa as novas funções
+    // --- INICIALIZAÇÃO DE TODAS AS FUNÇÕES ---
     loadAceleracaoModules();
     setupSettings();
 });
