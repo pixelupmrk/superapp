@@ -3,7 +3,7 @@
     {
       "moduleId": "MD01",
       "title": "Módulo 1: Fundamentos do Negócio",
-      "description": "Aprenda a usar o CRM para construir a persona do seu cliente, otimizando seu funil de vendas desde o início.",
+      "description": "Aprenda a usar o CRM para construir a persona do seu cliente, otimizando seu funil de vendas.",
       "lessons": [
         { "lessonId": "L01.01", "title": "Definição da Persona Ideal", "type": "text", "content": "Antes de qualquer estratégia, é essencial saber com quem você está falando. A persona é a representação do seu cliente ideal." },
         { "lessonId": "L01.02", "title": "Proposta de Valor e Diferenciação", "type": "text", "content": "Com base na persona, defina sua proposta de valor. Ela responde: 'Eu ajudo [persona] a [solução] através de [diferencial do seu serviço].'" }
