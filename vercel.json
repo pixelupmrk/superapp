@@ -2,37 +2,22 @@
   "aceleracao_vendas": [
     {
       "moduleId": "MD01",
-      "title": "Módulo 1: Conectando com o Cliente Ideal",
-      "description": "Aprenda a usar o CRM do super app para construir a persona do seu cliente, otimizando seu funil de vendas desde o início.",
+      "title": "Módulo 1: Fundamentos do Negócio",
+      "description": "Aprenda a usar o CRM para construir a persona do seu cliente, otimizando seu funil de vendas desde o início.",
       "lessons": [
-        { "lessonId": "L01.01", "title": "Questionário para Definição de Persona", "type": "text", "content": "Antes de qualquer estratégia, é essencial saber com quem você está falando. O questionário irá ajudar a identificar o perfil do seu cliente ideal..." },
-        { "lessonId": "L01.02", "title": "Proposta de Valor e Posicionamento", "type": "video", "videoUrl": "URL_DO_VIDEO_A_SER_ADICIONADO_AQUI", "content": "Com base na persona, vamos definir a proposta de valor do seu serviço. A proposta responde: 'Eu ajudo [persona] a [solução] através de [diferencial do seu serviço].' Exemplo: Ajudo [vendedores autônomos] a [acelerar vendas] usando [o super app com CRM e automação]." },
-        { "lessonId": "L01.03", "title": "Exercício Prático: Configurando o CRM", "type": "interactive", "description": "Este exercício prático irá guiá-lo a configurar o CRM do seu super app para a sua persona..." }
+        { "lessonId": "L01.01", "title": "Definição da Persona Ideal", "type": "text", "content": "Antes de qualquer estratégia, é essencial saber com quem você está falando. A persona é a representação do seu cliente ideal. Use o CRM para registrar as respostas e começar a segmentar seus leads." },
+        { "lessonId": "L01.02", "title": "Proposta de Valor e Diferenciação", "type": "text", "content": "Com base na persona, defina sua proposta de valor. Ela responde: 'Eu ajudo [persona] a [solução] através de [diferencial do seu serviço].'" },
+        { "lessonId": "L01.03", "title": "Exercício Prático: Configurando o CRM", "type": "interactive", "description": "Este exercício prático irá guiá-lo a configurar o CRM para a sua persona. Você irá criar as primeiras tags e campos para registrar as informações." }
       ]
     },
     {
       "moduleId": "MD02",
-      "title": "Módulo 2: O Algoritmo da Meta (Facebook & Instagram)",
-      "description": "Entenda como o algoritmo da Meta funciona e aprenda a criar ganchos e conteúdos que direcionam tráfego para o seu super app.",
+      "title": "Módulo 2: O Algoritmo da Meta",
+      "description": "Entenda como o algoritmo da Meta (Facebook & Instagram) funciona e aprenda a criar ganchos e conteúdos que direcionam tráfego para seu app.",
       "lessons": [
-        { "lessonId": "L02.01", "title": "Como o Algoritmo Funciona", "type": "text", "content": "O algoritmo da Meta analisa o comportamento dos usuários para decidir o que mostrar..." },
-        { "lessonId": "L02.04", "title": "Desafio Prático: Criação de Gancho", "type": "interactive", "description": "Crie três ganchos diferentes para o seu super app, focando nas dores da sua persona..." }
-      ]
-    },
-    {
-      "moduleId": "MD03",
-      "title": "Módulo 3: Cronograma de Postagens Estratégico",
-      "description": "Planeje a sua rotina de conteúdo nas redes sociais com um calendário que aumenta o seu alcance e consistência.",
-      "lessons": [
-        { "lessonId": "L03.02", "title": "Frequência Ideal e Consistência", "type": "text", "content": "Mais importante que a quantidade, é a consistência. A frequência ideal varia por nicho. A Aceleração de Vendas sugere: Estética e beleza (4 a 5 posts por semana); B2B (3 posts bem elaborados por semana); Varejo (diária)." }
-      ]
-    },
-    {
-      "moduleId": "MD05",
-      "title": "Módulo 5: Copywriting com ChatGPT",
-      "description": "Utilize o ChatGPT para criar textos persuasivos para suas redes sociais e anúncios.",
-      "lessons": [
-        { "lessonId": "L05.03", "title": "Criando Prompts Inteligentes", "type": "text", "content": "Exemplo: 'Escreva uma copy para anúncio no Instagram sobre Aceleração de Vendas, com objetivo de gerar leads, num tom direto e persuasivo.'" }
+        { "lessonId": "L02.01", "title": "Como o Algoritmo Funciona", "type": "text", "content": "O algoritmo da Meta analisa o comportamento dos usuários para decidir o que mostrar. Ele prioriza conteúdos que geram interação rápida. Quanto mais relevante seu conteúdo, mais ele será entregue." },
+        { "lessonId": "L02.02", "title": "Comece com um Gancho Forte", "type": "text", "content": "O primeiro segundo do seu conteúdo precisa chamar a atenção imediatamente. Depois do gancho, entregue valor real e finalize com uma chamada para ação (CTA)." },
+        { "lessonId": "L02.03", "title": "Desafio Prático: Criação de Gancho", "type": "interactive", "description": "Crie três ganchos diferentes para o seu super app, focando nas dores da sua persona." }
       ]
     }
   ]
