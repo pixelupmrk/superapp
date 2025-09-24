@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -16,33 +17,33 @@
                 <img src="logo.png" alt="Logo PixelUp" class="logo">
             </div>
             <nav class="sidebar-nav">
-                <a href="#" id="nav-dashboard" class="nav-item active" data-target="dashboard-section">
+                <a href="#" class="nav-item active" data-target="dashboard-section">
                     <i class="ph-fill ph-gauge"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" id="nav-crm-kanban" class="nav-item" data-target="crm-kanban-section">
+                <a href="#" class="nav-item" data-target="crm-kanban-section">
                     <i class="ph-fill ph-trello-logo"></i>
                     <span>CRM / Kanban</span>
                 </a>
-                <a href="#" id="nav-crm-list" class="nav-item" data-target="crm-list-section">
+                <a href="#" class="nav-item" data-target="crm-list-section">
                     <i class="ph-fill ph-list-dashes"></i>
                     <span>Lista de Leads</span>
                 </a>
-                <a href="#" id="nav-finance" class="nav-item" data-target="finance-section">
+                <a href="#" class="nav-item" data-target="finance-section">
                     <i class="ph-fill ph-chart-bar"></i>
                     <span>Financeiro</span>
                 </a>
-                <a href="#" id="nav-mentoring" class="nav-item" data-target="mentoring-section">
+                <a href="#" class="nav-item" data-target="mentoring-section">
                     <i class="ph-fill ph-rocket-launch"></i>
                     <span>Acelerador de Vendas</span>
                 </a>
-                 <a href="#" id="nav-chatbot" class="nav-item" data-target="chatbot-section">
+                 <a href="#" class="nav-item" data-target="chatbot-section">
                     <i class="ph-fill ph-robot"></i>
                     <span>Chatbot AI</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
-                 <a href="#" id="nav-config" class="nav-item" data-target="config-section">
+                 <a href="#" class="nav-item" data-target="config-section">
                     <i class="ph-fill ph-gear-six"></i>
                     <span>Configurações</span>
                 </a>
@@ -56,71 +57,15 @@
                     <span id="user-name-display">Olá, Usuário</span>
                 </div>
             </header>
-        
             
-            <div class="content-area active" id="dashboard-section">
+            <div id="content-container">
                 </div>
-
-            <div class="content-area" id="crm-kanban-section">
-                </div>
-
-            <div class="content-area" id="crm-list-section">
-                </div>
-
-            <div class="content-area" id="finance-section">
-                </div>
-             
-            <div class="content-area" id="mentoring-section">
-                </div>
-            
-            <div class="content-area" id="chatbot-section">
-                 <h2>Chatbot AI</h2>
-                <p>Funcionalidade em desenvolvimento.</p>
-            </div>
-            
-            <div class="content-area" id="config-section">
-                <h2>Configurações</h2>
-                
-                <div class="card">
-                    <h3>Perfil de Usuário</h3>
-                    <div class="input-grid">
-                        <div>
-                            <label for="config-user-name">Nome de Exibição</label>
-                            <input type="text" id="config-user-name" placeholder="Digite seu nome">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3>Aparência</h3>
-                    <div class="settings-item">
-                        <span>Tema Claro / Escuro</span>
-                        <label class="switch">
-                            <input type="checkbox" id="theme-switcher">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3>Gerenciamento de Dados</h3>
-                    <div class="settings-item">
-                        <span>Exportar todos os dados do aplicativo</span>
-                        <button id="export-all-data-btn" class="btn-secondary">Exportar</button>
-                    </div>
-                    <div class="settings-item">
-                        <span>Limpar todos os dados (leads, financeiro, etc.)</span>
-                        <button id="clear-all-data-btn" class="btn-danger">Limpar Dados</button>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 
-    <div id="modal-container"></div>
+    <div id="modal-container">
+        </div>
 
     <script src="script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
 </body>
 </html>
