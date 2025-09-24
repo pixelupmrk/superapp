@@ -1,91 +1,74 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acelerador de Vendas | Super App PixelUp</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRM | Super App PixelUp</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <img src="logo.png" alt="Logo PixelUp" class="logo">
-            </div>
-            <nav class="sidebar-nav">
-                <a href="#" id="nav-dashboard" class="nav-item active" data-target="dashboard-section">
-                    <i class="ph-fill ph-gauge"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" id="nav-crm-kanban" class="nav-item" data-target="crm-kanban-section">
-                    <i class="ph-fill ph-trello-logo"></i>
-                    <span>CRM / Kanban</span>
-                </a>
-                <a href="#" id="nav-crm-list" class="nav-item" data-target="crm-list-section">
-                    <i class="ph-fill ph-list-dashes"></i>
-                    <span>Lista de Leads</span>
-                </a>
-                <a href="#" id="nav-finance" class="nav-item" data-target="finance-section">
-                    <i class="ph-fill ph-chart-bar"></i>
-                    <span>Financeiro</span>
-                </a>
-                <a href="#" id="nav-acelerador" class="nav-item" data-target="acelerador-section">
-                    <i class="ph-fill ph-rocket-launch"></i>
-                    <span>Acelerador de Vendas</span>
-                </a>
-                <a href="#" id="nav-chatbot" class="nav-item" data-target="chatbot-section">
-                    <i class="ph-fill ph-robot"></i>
-                    <span>Chatbot AI</span>
-                </a>
-            </nav>
-            <div class="sidebar-footer">
-                <a href="#" id="nav-settings" class="nav-item" data-target="settings-section">
-                    <i class="ph-fill ph-gear-six"></i>
-                    <span>Configurações</span>
-                </a>
-            </div>
-        </aside>
+<div class="app-container">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <img src="logo.png" alt="Logo PixelUp" class="logo">
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-target="dashboard-section"><i class="ph-fill ph-gauge"></i><span>Dashboard</span></a>
+      <a href="#" class="nav-item" data-target="crm-kanban-section"><i class="ph-fill ph-trello-logo"></i><span>CRM</span></a>
+      <a href="#" class="nav-item" data-target="finance-section"><i class="ph-fill ph-chart-bar"></i><span>Financeiro</span></a>
+      <a href="#" class="nav-item" data-target="mentoring-section"><i class="ph-fill ph-graduation-cap"></i><span>Mentoria</span></a>
+      <a href="#" class="nav-item" data-target="chatbot-section"><i class="ph-fill ph-robot"></i><span>Chatbot AI</span></a>
+    </nav>
+  </aside>
 
-        <main class="main-content">
-            <header class="main-header">
-                <h1 id="page-title">Dashboard</h1>
-                <div class="user-profile">
-                    <span id="user-name-display">Olá, Usuário</span>
-                </div>
-            </header>
-            
-            <div class="content-area active" id="dashboard-section">
-                </div>
+  <!-- Conteúdo principal -->
+  <main class="main-content">
+    <span class="menu-toggle" id="menu-toggle"><i class="ph ph-list"></i></span>
+    <header class="main-header">
+      <h1 id="page-title">Dashboard</h1>
+    </header>
 
-            <div class="content-area" id="crm-kanban-section">
-                 </div>
-
-            <div class="content-area" id="crm-list-section">
-                </div>
-
-            <div class="content-area" id="finance-section">
-                </div>
-            
-            <div class="content-area" id="acelerador-section">
-                </div>
-            
-            <div class="content-area" id="chatbot-section">
-                 <h2>Chatbot AI</h2>
-                <p>Em breve...</p>
-            </div>
-
-            <div class="content-area" id="settings-section">
-                </div>
-        </main>
+    <div class="content-area active" id="dashboard-section">
+      <h2>📊 Dashboard</h2>
+      <canvas id="statusChart"></canvas>
     </div>
 
-    <div class="modal-overlay" id="edit-lead-modal"></div>
-    <div class="modal-overlay" id="add-custo-modal"></div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="script.js"></script>
+    <div class="content-area" id="crm-kanban-section">
+      <h2>📌 CRM Kanban</h2>
+      <div id="kanban-board"></div>
+    </div>
+
+    <div class="content-area" id="finance-section">
+      <h2>💰 Financeiro</h2>
+      <p>Aqui entra o controle financeiro.</p>
+    </div>
+
+    <div class="content-area" id="mentoring-section">
+      <h2>📚 Mentoria</h2>
+      <p>Conteúdo dos módulos de mentoria.</p>
+    </div>
+
+    <div class="content-area" id="chatbot-section">
+      <h2>🤖 Chatbot AI</h2>
+      <div id="chatbot-container"></div>
+    </div>
+  </main>
+</div>
+
+<!-- Configuração do chatbot -->
+<script>
+window.PIXELUP_BOT_CONFIG = {
+  API_URL: "https://sua-api.com/bot",
+  API_KEY: "SUA_CHAVE_AQUI",
+  placeholder: "Digite sua mensagem...",
+  theme: "dark"
+};
+</script>
+<script src="app.js"></script>
+<script src="chatbot.js"></script>
 </body>
 </html>
