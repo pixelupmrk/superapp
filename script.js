@@ -1,11 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- LÓGICA COMPLETA DO CRM (ORIGINAL + NOVO) ---
-    const leads = [];
-    let nextLeadId = 0;
-    // ... (Aqui entraria toda a sua lógica de Kanban, Financeiro, etc. Se não a tiver, pode começar a recriá-la)
+    // --- SUA LÓGICA ORIGINAL DE CRM (KANBAN, LEADS, FINANCEIRO) ---
+    // (Cole aqui toda a lógica do seu javamentoriaok.txt, exceto a parte final da "mentoria")
 
-    // --- LÓGICA PARA NAVEGAÇÃO PRINCIPAL (SIDEBAR) ---
+
+    // --- NOVA LÓGICA PARA NAVEGAÇÃO COMPLETA (INCLUI CONFIGURAÇÕES) ---
     const navItems = document.querySelectorAll('.sidebar .nav-item');
     const contentAreas = document.querySelectorAll('.main-content .content-area');
     const pageTitle = document.getElementById('page-title');
@@ -14,76 +13,43 @@ document.addEventListener('DOMContentLoaded', () => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const targetId = e.currentTarget.getAttribute('data-target');
-            if (!targetId) return;
-
+            if (!targetId) return; // Ignora links sem data-target
             const targetText = e.currentTarget.querySelector('span').textContent;
 
             navItems.forEach(nav => nav.classList.remove('active'));
             e.currentTarget.classList.add('active');
 
-            contentAreas.forEach(area => {
-                area.style.display = 'none';
-            });
-            
-            const targetArea = document.getElementById(targetId);
-            if(targetArea) {
-                targetArea.style.display = 'block';
-                pageTitle.textContent = targetText;
-            }
+            contentAreas.forEach(area => { area.style.display = 'none'; });
+            document.getElementById(targetId).style.display = 'block';
+            pageTitle.textContent = targetText;
         });
     });
 
-    // --- LÓGICA PARA CARREGAR MÓDULOS DE ACELERAÇÃO ---
-    async function loadAceleracaoModules() {
-        const menu = document.querySelector('#aceleracao-menu ul');
-        const contentArea = document.getElementById('aceleracao-content');
-        if (!menu || !contentArea) return;
-        try {
-            const response = await fetch('data.json');
-            const data = await response.json();
-            const modules = data.aceleracao_vendas;
+    // --- NOVA LÓGICA PARA A SEÇÃO DE ACELERAÇÃO DE VENDAS ---
+    const aceleracaoNavItems = document.querySelectorAll('.aceleracao-menu-item');
+    const aceleracaoContentAreas = document.querySelectorAll('.aceleracao-module-content');
 
-            if (!modules) {
-                menu.innerHTML = '<li>Erro ao carregar.</li>';
-                return;
-            }
-            menu.innerHTML = '';
-            modules.forEach((module, index) => {
-                const menuItem = document.createElement('li');
-                menuItem.className = 'aceleracao-menu-item';
-                menuItem.textContent = module.title;
-                menuItem.addEventListener('click', () => {
-                    document.querySelectorAll('.aceleracao-menu-item').forEach(item => item.classList.remove('active'));
-                    menuItem.classList.add('active');
-                    displayModuleContent(module, contentArea);
-                });
-                menu.appendChild(menuItem);
-                if (index === 0) menuItem.click();
+    aceleracaoNavItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('data-content');
+            aceleracaoNavItems.forEach(nav => nav.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            aceleracaoContentAreas.forEach(area => {
+                area.classList.remove('active');
+                if (area.id === targetId) {
+                    area.classList.add('active');
+                }
             });
-        } catch (error) {
-            console.error('Falha ao carregar data.json:', error);
-            menu.innerHTML = '<li>Erro ao carregar conteúdo.</li>';
-        }
-    }
+        });
+    });
 
-    function displayModuleContent(module, contentArea) {
-        let html = `<div class="card"><h2>${module.title}</h2><p>${module.description}</p></div>`;
-        if (module.lessons) {
-            module.lessons.forEach(lesson => {
-                html += `<div class="section card"><h3>${lesson.title}</h3><p>${lesson.content || lesson.description}</p></div>`;
-            });
-        }
-        contentArea.innerHTML = html;
-    }
-
-    // --- LÓGICA PARA A PÁGINA DE CONFIGURAÇÕES ---
+    // --- NOVA LÓGICA PARA A PÁGINA DE CONFIGURAÇÕES ---
     function setupSettings() {
         const themeButtons = document.querySelectorAll('.btn-theme');
         const body = document.body;
         const businessForm = document.getElementById('business-info-form');
         const nameInput = document.getElementById('business-name');
-        const emailInput = document.getElementById('business-email');
-        const phoneInput = document.getElementById('business-phone');
         const userGreeting = document.getElementById('user-greeting');
 
         const applyTheme = (theme) => {
@@ -97,26 +63,24 @@ document.addEventListener('DOMContentLoaded', () => {
             userGreeting.textContent = savedName ? `Olá, ${savedName}` : 'Olá, Usuário';
         };
 
-        themeButtons.forEach(button => button.addEventListener('click', () => applyTheme(button.dataset.theme)));
+        themeButtons.forEach(button => {
+            button.addEventListener('click', () => applyTheme(button.dataset.theme));
+        });
         
         businessForm.addEventListener('submit', (e) => {
             e.preventDefault();
             localStorage.setItem('businessName', nameInput.value);
-            localStorage.setItem('businessEmail', emailInput.value);
-            localStorage.setItem('businessPhone', phoneInput.value);
-            alert('Informações da empresa salvas com sucesso!');
+            alert('Informações salvas!');
             updateUserGreeting();
         });
 
+        // Carregar dados salvos na inicialização
         const savedTheme = localStorage.getItem('appTheme') || 'dark';
         applyTheme(savedTheme);
-        nameInput.value = localStorage.getItem('businessName') || '';
-        emailInput.value = localStorage.getItem('businessEmail') || '';
-        phoneInput.value = localStorage.getItem('businessPhone') || '';
         updateUserGreeting();
+        nameInput.value = localStorage.getItem('businessName') || '';
     }
-
-    // --- INICIALIZAÇÃO DE TODAS AS FUNÇÕES ---
-    loadAceleracaoModules();
+    
+    // Inicializa a nova função de configurações
     setupSettings();
 });
