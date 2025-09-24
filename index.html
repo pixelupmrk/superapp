@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM | Super App PixelUp</title>
+    <title>Acelerador de Vendas | Super App PixelUp</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,7 +13,7 @@
     <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="logo.png" alt="Logo PixelUp" class="logo">
+                <img src="logo-pixelup.jpg" alt="Logo PixelUp" class="logo">
             </div>
             <nav class="sidebar-nav">
                 <a href="#" id="nav-dashboard" class="nav-item active" data-target="dashboard-section">
@@ -32,17 +32,17 @@
                     <i class="ph-fill ph-chart-bar"></i>
                     <span>Financeiro</span>
                 </a>
-                <a href="#" id="nav-mentoring" class="nav-item" data-target="mentoring-section">
-                    <i class="ph-fill ph-graduation-cap"></i>
-                    <span>Mentoria</span>
+                <a href="#" id="nav-acelerador" class="nav-item" data-target="acelerador-section">
+                    <i class="ph-fill ph-rocket-launch"></i>
+                    <span>Acelerador de Vendas</span>
                 </a>
-                 <a href="#" id="nav-chatbot" class="nav-item" data-target="chatbot-section">
+                <a href="#" id="nav-chatbot" class="nav-item" data-target="chatbot-section">
                     <i class="ph-fill ph-robot"></i>
                     <span>Chatbot AI</span>
                 </a>
             </nav>
             <div class="sidebar-footer">
-                 <a href="#" class="nav-item">
+                <a href="#" id="nav-settings" class="nav-item" data-target="settings-section">
                     <i class="ph-fill ph-gear-six"></i>
                     <span>Configurações</span>
                 </a>
@@ -50,13 +50,12 @@
         </aside>
 
         <main class="main-content">
-             <header class="main-header">
+            <header class="main-header">
                 <h1 id="page-title">Dashboard</h1>
                 <div class="user-profile">
-                    <span>Olá, [Nome do Usuário]</span>
+                    <span id="user-name-display">Olá, Usuário</span>
                 </div>
             </header>
-        
             
             <div class="content-area" id="dashboard-section" style="display: block;">
                 <div class="dashboard-stats">
@@ -80,21 +79,21 @@
                 <div class="dashboard-charts">
                     <div class="chart-card">
                         <h3>Status dos Leads</h3>
-                         <div class="chart-container">
+                        <div class="chart-container">
                             <canvas id="statusChart"></canvas>
                         </div>
                     </div>
                 </div>
-             </div>
+            </div>
 
             <div class="content-area" id="crm-kanban-section" style="display: none;">
                 <div class="card new-lead-card">
                     <h2>Novo Lead</h2>
                     <form id="lead-form">
-                         <div class="input-grid">
+                        <div class="input-grid">
                             <input type="text" id="lead-name" placeholder="Nome" required>
                             <input type="email" id="lead-email" placeholder="E-mail" required>
-                             <input type="tel" id="lead-whatsapp" placeholder="WhatsApp" required>
+                            <input type="tel" id="lead-whatsapp" placeholder="WhatsApp" required>
                             <input type="text" id="lead-attendant" placeholder="Atendente (quem atende)">
                             <input type="text" id="lead-origin" placeholder="Origem">
                             <input type="date" id="lead-date" placeholder="dd/mm/aaaa">
@@ -106,7 +105,7 @@
                                     <option value="frio">Lead Frio</option>
                                 </select>
                             </div>
-                        </div>
+                         </div>
                          <textarea id="lead-notes" placeholder="Notas"></textarea>
                         <button type="submit" class="btn-save">Salvar</button>
                     </form>
@@ -126,7 +125,7 @@
                         <div class="kanban-cards-list"></div>
                     </div>
                 </div>
-             </div>
+            </div>
 
             <div class="content-area" id="crm-list-section" style="display: none;">
                 <div class="list-header">
@@ -140,7 +139,7 @@
                          <table id="leads-table">
                             <thead>
                                 <tr>
-                                     <th>Nome</th>
+                                    <th>Nome</th>
                                     <th>WhatsApp</th>
                                     <th>Origem</th>
                                      <th>Qualificação</th>
@@ -148,7 +147,7 @@
                                     <th>Ações</th>
                                  </tr>
                             </thead>
-                            <tbody>
+                             <tbody>
                              </tbody>
                         </table>
                     </div>
@@ -173,11 +172,11 @@
                          <div class="stat-card saida-card">
                             <h3>Total de Saídas</h3>
                             <p id="total-saidas">R$ 0,00</p>
-                         </div>
+                        </div>
                         <div class="stat-card saldo-card">
                             <h3>Saldo Atual</h3>
                             <p id="caixa-atual">R$ 0,00</p>
-                         </div>
+                        </div>
                     </div>
                     
                     <div class="card">
@@ -187,15 +186,15 @@
                                 <input type="date" id="caixa-data" required>
                                  <input type="text" id="caixa-descricao" placeholder="Descrição" required>
                                 <input type="number" id="caixa-valor" placeholder="Valor (R$)" required step="0.01">
-                                <div class="select-group">
+                                 <div class="select-group">
                                      <select id="caixa-tipo" required>
-                                        <option value="">Tipo</option>
+                                         <option value="">Tipo</option>
                                          <option value="entrada">Entrada</option>
                                         <option value="saida">Saída</option>
                                     </select>
                                  </div>
                             </div>
-                            <textarea id="caixa-observacoes" placeholder="Observações"></textarea>
+                             <textarea id="caixa-observacoes" placeholder="Observações"></textarea>
                              <button type="submit" class="btn-save">Adicionar</button>
                         </form>
                     </div>
@@ -204,12 +203,12 @@
                          <h3>Histórico de Movimentações</h3>
                         <div class="table-container">
                             <table id="caixa-table">
-                                <thead>
+                                 <thead>
                                      <tr>
-                                        <th>Data</th>
+                                         <th>Data</th>
                                          <th>Descrição</th>
                                         <th>Entrada (R$)</th>
-                                        <th>Saída (R$)</th>
+                                         <th>Saída (R$)</th>
                                          <th>Observações</th>
                                     </tr>
                                 </thead>
@@ -221,13 +220,13 @@
 
                 <div class="finance-content" id="custos-tab-content" style="display: none;">
                     <div class="card">
-                        <h3>Adicionar Novo Produto</h3>
+                         <h3>Adicionar Novo Produto</h3>
                          <form id="estoque-form">
                             <div class="input-grid">
                                 <input type="text" id="estoque-produto" placeholder="Produto" required>
                                  <input type="text" id="estoque-descricao" placeholder="Descrição" required>
                                 <input type="number" id="estoque-compra" placeholder="Valor de Compra (R$)" required step="0.01">
-                                <input type="number" id="estoque-venda" placeholder="Valor de Venda (R$)" required step="0.01">
+                                 <input type="number" id="estoque-venda" placeholder="Valor de Venda (R$)" required step="0.01">
                              </div>
                             <button type="submit" class="btn-save">Adicionar Produto</button>
                         </form>
@@ -241,53 +240,53 @@
                             </div>
                             <div class="buttons-container">
                                  <button class="btn-import" id="import-estoque-btn">
-                                    <i class="ph-fill ph-file-arrow-down"></i> Importar
+                                     <i class="ph-fill ph-file-arrow-down"></i> Importar
                                     <input type="file" id="import-estoque-file" accept=".xlsx, .xls, .csv">
                                 </button>
-                                <button class="btn-export" id="export-estoque-btn">
+                                 <button class="btn-export" id="export-estoque-btn">
                                      <i class="ph-fill ph-file-arrow-up"></i> Exportar
                                 </button>
                             </div>
                         </div>
                          <div class="table-container">
                             <table id="estoque-table">
-                                <thead>
+                                 <thead>
                                      <tr>
-                                        <th>Produto</th>
+                                         <th>Produto</th>
                                         <th>Descrição</th>
                                          <th>Valor de Compra</th>
-                                        <th>Custos</th>
+                                         <th>Custos</th>
                                          <th>Valor de Venda</th>
-                                        <th>Lucro</th>
+                                         <th>Lucro</th>
                                         <th>Ações</th>
                                      </tr>
-                                </thead>
+                                 </thead>
                                 <tbody></tbody>
                              </table>
                         </div>
                     </div>
                 </div>
             </div>
-             
-            <div class="content-area" id="mentoring-section" style="display: none;">
-                <div class="mentoria-container">
-                    <aside class="mentoria-sidebar">
-                        <nav class="mentoria-menu">
+
+            <div class="content-area" id="acelerador-section" style="display: none;">
+                <div class="modulos-container">
+                    <aside class="modulos-sidebar">
+                        <nav class="modulos-menu">
                             <h2>Módulos</h2>
                             <ul>
-                                <li class="mentoria-menu-item active" data-content="modulo1">Módulo 1: Fundamentos do Negócio</li>
-                                <li class="mentoria-menu-item" data-content="modulo2">Módulo 2: O Algoritmo do Meta</li>
-                                <li class="mentoria-menu-item" data-content="modulo3">Módulo 3: Cronograma de Postagens</li>
-                                <li class="mentoria-menu-item" data-content="modulo4">Módulo 4: Conteúdo que Conecta</li>
-                                <li class="mentoria-menu-item" data-content="modulo5">Módulo 5: Copywriting com ChatGPT</li>
-                                <li class="mentoria-menu-item" data-content="modulo6">Módulo 6: Implementação de CRM</li>
-                                <li class="mentoria-menu-item" data-content="modulo7">Módulo 7: Processo Comercial</li>
-                                <li class="mentoria-menu-item" data-content="modulo8">Módulo 8: Conexão e Humanização</li>
+                                <li class="modulos-menu-item active" data-content="modulo1">Módulo 1: Fundamentos do Negócio</li>
+                                <li class="modulos-menu-item" data-content="modulo2">Módulo 2: O Algoritmo do Meta</li>
+                                <li class="modulos-menu-item" data-content="modulo3">Módulo 3: Cronograma de Postagens</li>
+                                <li class="modulos-menu-item" data-content="modulo4">Módulo 4: Conteúdo que Conecta</li>
+                                <li class="modulos-menu-item" data-content="modulo5">Módulo 5: Copywriting com ChatGPT</li>
+                                <li class="modulos-menu-item" data-content="modulo6">Módulo 6: Implementação de CRM</li>
+                                <li class="modulos-menu-item" data-content="modulo7">Módulo 7: Processo Comercial</li>
+                                <li class="modulos-menu-item" data-content="modulo8">Módulo 8: Conexão e Humanização</li>
                             </ul>
                         </nav>
                     </aside>
-                    <main class="mentoria-content">
-                        <section id="modulo1" class="mentoria-module-content active">
+                    <main class="modulos-content">
+                        <section id="modulo1" class="modulos-module-content active">
                             <h2>Módulo 1: Fundamentos do Negócio e Posicionamento</h2>
                             <div class="section">
                                 <h3>1. Definição da Persona Ideal</h3>
@@ -307,7 +306,7 @@
                                 </div>
                             </div>
                         </section>
-                        <section id="modulo2" class="mentoria-module-content">
+                        <section id="modulo2" class="modulos-module-content">
                             <h2>Módulo 2: O Algoritmo do Meta (Facebook & Instagram)</h2>
                             <div class="section">
                                 <h3>1. Como o algoritmo funciona</h3>
@@ -326,14 +325,14 @@
                                 </div>
                             </div>
                         </section>
-                        <section id="modulo3" class="mentoria-module-content">
-                            <h2>Módulo 3: Cronograma de Postagens Estratégico</h2>
+                        <section id="modulo3" class="modulos-module-content">
+                             <h2>Módulo 3: Cronograma de Postagens Estratégico</h2>
                             <div class="section">
                                 <h3>1. Melhores horários e dias</h3>
                                 <p>O ideal é postar quando seu público está mais ativo. Use as métricas do Instagram (Insights) para confirmar os melhores horários para você.</p>
                             </div>
                             <div class="section">
-                                <h3>2. Exemplo de Cronograma Semanal</h3>
+                                 <h3>2. Exemplo de Cronograma Semanal</h3>
                                 <table>
                                     <thead>
                                         <tr><th>Dia</th><th>Tipo de Conteúdo</th></tr>
@@ -347,7 +346,7 @@
                                 </table>
                             </div>
                              <div class="section exercise-section">
-                                <h3>🚀 Exercício Prático: Monte seu Cronograma</h3>
+                                 <h3>🚀 Exercício Prático: Monte seu Cronograma</h3>
                                 <p>Com base no exemplo e no seu nicho, planeje os tipos de conteúdo para a sua próxima semana.</p>
                                 <div class="anotacoes-aluno">
                                     <label for="aluno-notas-mod3">Meu Cronograma</label>
@@ -355,7 +354,7 @@
                                 </div>
                             </div>
                         </section>
-                        <section id="modulo4" class="mentoria-module-content">
+                        <section id="modulo4" class="modulos-module-content">
                             <h2>Módulo 4: Conteúdo que Conecta</h2>
                             <div class="section">
                                 <h3>1. Como gravar vídeos que engajam</h3>
@@ -374,10 +373,10 @@
                                 </div>
                             </div>
                         </section>
-                        <section id="modulo5" class="mentoria-module-content">
+                        <section id="modulo5" class="modulos-module-content">
                             <h2>Módulo 5: Copywriting com ChatGPT</h2>
                             <div class="section">
-                                <h3>1. Como criar textos persuasivos com IA</h3>
+                                 <h3>1. Como criar textos persuasivos com IA</h3>
                                 <p>A chave para usar o ChatGPT é saber o que pedir e como direcionar a IA com clareza. Com os comandos (prompts) certos, você pode criar legendas, chamadas e mensagens que despertam o interesse do público.</p>
                             </div>
                              <div class="section">
@@ -394,7 +393,7 @@
                                 </div>
                             </div>
                         </section>
-                        <section id="modulo6" class="mentoria-module-content">
+                        <section id="modulo6" class="modulos-module-content">
                             <h2>Módulo 6: Implementação de CRM</h2>
                             <div class="section">
                                 <h3>1. O que é CRM e por que usar?</h3>
@@ -417,7 +416,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                             <div class="section exercise-section">
+                              <div class="section exercise-section">
                                 <h3>🚀 Exercício Prático: Defina seu Funil</h3>
                                 <p>Quais são as etapas essenciais do seu processo de vendas, desde o primeiro contato até o fechamento? Liste as colunas que você criaria no seu CRM.</p>
                                 <div class="anotacoes-aluno">
@@ -426,7 +425,7 @@
                                 </div>
                             </div>
                         </section>
-                        <section id="modulo7" class="mentoria-module-content">
+                        <section id="modulo7" class="modulos-module-content">
                             <h2>Módulo 7: Processo Comercial e Técnicas de Venda</h2>
                             <div class="section">
                                 <h3>1. Como montar um pitch comercial de impacto</h3>
@@ -441,7 +440,7 @@
                                     <li><strong>Gatilhos Mentais:</strong> Usar escassez, autoridade, prova social e urgência para gerar confiança.</li>
                                 </ul>
                             </div>
-                             <div class="section exercise-section">
+                            <div class="section exercise-section">
                                 <h3>🚀 Exercício Prático: Construa seu Pitch</h3>
                                 <p>Com base na estrutura apresentada, escreva a sua apresentação comercial em uma única frase.</p>
                                 <div class="anotacoes-aluno">
@@ -450,10 +449,10 @@
                                 </div>
                             </div>
                         </section>
-                        <section id="modulo8" class="mentoria-module-content">
+                        <section id="modulo8" class="modulos-module-content">
                             <h2>Módulo 8: Conexão com a Audiência e Humanização</h2>
                             <div class="section">
-                                <h3>1. Como gerar conexão real com o público</h3>
+                                 <h3>1. Como gerar conexão real com o público</h3>
                                 <p>Pessoas se conectam com pessoas, não com marcas frias. O segredo é ser autêntico, não perfeito. Mostre sua rotina, bastidores e valores para criar empatia.</p>
                                 <p><strong>Dica:</strong> Fale para a câmera como se estivesse conversando com um amigo.</p>
                             </div>
@@ -462,7 +461,7 @@
                                 <p>Os stories são o canal ideal para mostrar o que acontece por trás das câmeras. Compartilhe sua rotina de trabalho, seus erros e aprendizados para gerar mais identificação.</p>
                             </div>
                              <div class="section">
-                                <h3>3. Criando uma Comunidade Engajada</h3>
+                                 <h3>3. Criando uma Comunidade Engajada</h3>
                                 <p>Uma audiência fiel é construída com interação real e constância. Responda comentários e DMs com atenção e envolva seus seguidores com enquetes e perguntas.</p>
                             </div>
                              <div class="section exercise-section">
@@ -482,6 +481,24 @@
                  <h2>Chatbot AI</h2>
                 <p>Aqui entra o conteúdo do chatbot.</p>
             </div>
+
+            <div class="content-area" id="settings-section" style="display: none;">
+                <h2>Configurações</h2>
+                <div class="card">
+                    <h3>Personalização</h3>
+                    <div class="settings-form">
+                        <label for="user-name-input">Nome de Usuário</label>
+                        <input type="text" id="user-name-input" placeholder="Digite seu nome">
+                        <button id="save-user-name-btn" class="btn-save">Salvar Nome</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Gerenciamento de Dados</h3>
+                    <p>Cuidado: esta ação é irreversível e apagará todos os leads, registros financeiros e de estoque.</p>
+                    <button id="clear-all-data-btn" class="btn-delete">Limpar Todos os Dados</button>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -491,14 +508,14 @@
             <form id="edit-lead-form">
                  <input type="hidden" id="edit-lead-id">
                 <div class="input-grid">
-                    <input type="text" id="edit-lead-name" placeholder="Nome">
+                     <input type="text" id="edit-lead-name" placeholder="Nome">
                     <input type="email" id="edit-lead-email" placeholder="E-mail">
                     <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
                      <div class="select-group">
                         <select id="edit-lead-status">
                             <option value="novo">Novo</option>
                              <option value="progresso">Em Progresso</option>
-                            <option value="fechado">Fechado</option>
+                             <option value="fechado">Fechado</option>
                         </select>
                     </div>
                     <input type="text" id="edit-lead-attendant" placeholder="Atendente (quem atende)">
@@ -507,7 +524,7 @@
                     <div class="select-group">
                         <select id="edit-lead-qualification">
                              <option value="">Qualificação</option>
-                            <option value="quente">Lead Quente</option>
+                             <option value="quente">Lead Quente</option>
                             <option value="morno">Lead Morno</option>
                              <option value="frio">Lead Frio</option>
                         </select>
