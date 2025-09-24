@@ -1,0 +1,22 @@
+{
+  "aceleracao_vendas": [
+    {
+      "moduleId": "MD01",
+      "title": "Módulo 1: Fundamentos do Negócio",
+      "description": "Aprenda a usar o CRM para construir a persona do seu cliente, otimizando seu funil de vendas desde o início.",
+      "lessons": [
+        { "lessonId": "L01.01", "title": "Definição da Persona Ideal", "type": "text", "content": "Antes de qualquer estratégia, é essencial saber com quem você está falando. A persona é a representação do seu cliente ideal." },
+        { "lessonId": "L01.02", "title": "Proposta de Valor e Diferenciação", "type": "text", "content": "Com base na persona, defina sua proposta de valor. Ela responde: 'Eu ajudo [persona] a [solução] através de [diferencial do seu serviço].'" }
+      ]
+    },
+    {
+      "moduleId": "MD02",
+      "title": "Módulo 2: O Algoritmo da Meta",
+      "description": "Entenda como o algoritmo da Meta (Facebook & Instagram) funciona e aprenda a criar ganchos e conteúdos que direcionam tráfego.",
+      "lessons": [
+        { "lessonId": "L02.01", "title": "Como o Algoritmo Funciona", "type": "text", "content": "O algoritmo da Meta analisa o comportamento dos usuários para decidir o que mostrar. Ele prioriza conteúdos que geram interação rápida." },
+        { "lessonId": "L02.02", "title": "Comece com um Gancho Forte", "type": "text", "content": "O primeiro segundo do seu conteúdo precisa chamar a atenção imediatamente. Depois do gancho, entregue valor real e finalize com uma chamada para ação (CTA)." }
+      ]
+    }
+  ]
+}
