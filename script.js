@@ -1,10 +1,53 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- SEU CÓDIGO JAVASCRIPT ORIGINAL COMPLETO VEM AQUI ---
-    // (Copie e cole aqui todo o conteúdo do seu javamentoriaok.txt, desde o início até ao fim)
+    const leads = [];
+    let nextLeadId = 0;
+    let statusChart;
+    let caixa = [];
+    let estoque = [];
+    let currentEstoqueDescricao = null;
+
+    // Lógica para a navegação da sidebar (ATUALIZADA PARA INCLUIR CONFIGURAÇÕES)
+    const navItems = document.querySelectorAll('.sidebar .nav-item');
+    const contentAreas = document.querySelectorAll('.main-content .content-area');
+    const pageTitle = document.getElementById('page-title');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('data-target');
+            if (!targetId) return;
+            const targetText = e.currentTarget.querySelector('span').textContent;
+
+            navItems.forEach(nav => nav.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+
+            contentAreas.forEach(area => {
+                area.style.display = 'none';
+                area.classList.remove('active');
+            });
+            const targetArea = document.getElementById(targetId);
+            if (targetArea) {
+                targetArea.style.display = 'block';
+                targetArea.classList.add('active');
+                pageTitle.textContent = targetText;
+            }
+
+            if (targetId === 'dashboard-section') updateDashboard();
+            else if (targetId === 'crm-list-section') renderLeadsTable();
+            else if (targetId === 'finance-section') {
+                updateCaixa();
+                renderCaixaTable();
+                updateEstoque();
+                renderEstoqueTable();
+            }
+        });
+    });
+    
+    // (O resto do seu código JS original vem aqui... Kanban, Leads, Financeiro, etc.)
 
     // --- LÓGICA DA MENTORIA RENOMEADA PARA ACELERAÇÃO ---
-    // (No seu código, encontre a secção 'NOVA LÓGICA PARA A SEÇÃO DE MENTORIA' e substitua por isto)
     const aceleracaoNavItems = document.querySelectorAll('.aceleracao-menu-item');
     const aceleracaoContentAreas = document.querySelectorAll('.aceleracao-module-content');
 
@@ -23,8 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- NOVA LÓGICA ADICIONAL PARA A PÁGINA DE CONFIGURAÇÕES ---
-    // (Adicione esta função no final do seu ficheiro, antes do último '});')
+    // --- NOVA LÓGICA PARA A PÁGINA DE CONFIGURAÇÕES ---
     function setupSettings() {
         const themeButtons = document.querySelectorAll('.btn-theme');
         const body = document.body;
@@ -56,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateUserGreeting();
         });
 
-        // Carregar dados salvos
+        // Carregar dados salvos na inicialização
         const savedTheme = localStorage.getItem('appTheme') || 'dark';
         applyTheme(savedTheme);
         nameInput.value = localStorage.getItem('businessName') || '';
@@ -64,7 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
         phoneInput.value = localStorage.getItem('businessPhone') || '';
         updateUserGreeting();
     }
-
-    // Inicializa a nova função
-    setupSettings();
+    
+    // Inicialização
+    updateDashboard(); // Sua função original
+    setupSettings(); // Nova função de configurações
 });
