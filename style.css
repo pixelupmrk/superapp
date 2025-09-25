@@ -9,46 +9,20 @@ body[data-theme="light"] {
     --background-color: #f0f2f5; --primary-color: #ffffff; --secondary-color: #e9ecef; --accent-color: #007bff; --text-color: #212529; --text-color-muted: #6c757d; --border-color: #dee2e6;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
-.app-container { display: flex; }
-.sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-color); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; }
-.sidebar-header .logo { max-width: 160px; margin-bottom: 3rem; margin-left: -20px; }
-.sidebar-nav { flex-grow: 1; }
-.nav-item { display: flex; align-items: center; padding: 0.9rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; text-decoration: none; color: var(--text-color-muted); transition: all 0.3s ease; cursor: pointer; }
-.nav-item:hover { background-color: var(--secondary-color); color: var(--text-color); }
-.nav-item.active { background-color: var(--accent-color); color: var(--primary-color); font-weight: 600; box-shadow: 0 0 15px var(--border-glow); }
-body[data-theme="light"] .nav-item.active { color: #fff; }
-.nav-item i { font-size: 1.5rem; margin-right: 1rem; }
-.sidebar-footer { margin-top: auto; }
-.main-content { flex-grow: 1; margin-left: var(--sidebar-width); padding: 2rem; }
-.main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.main-header h1 { font-size: 2rem; }
-.user-profile { font-weight: 600; }
-.content-area { display: none; }
-/* Seu CSS original para .card, .kanban, etc., continua válido */
-.card { background-color: var(--primary-color); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid var(--border-color); }
-.card h2, .card h3 { margin-bottom: 1.5rem; }
-input, select, textarea { width: 100%; padding: 0.75rem 1rem; background-color: var(--secondary-color); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-size: 1rem; }
-.input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-.btn-save { padding: 0.8rem 1.5rem; background-color: var(--accent-color); color: var(--primary-color); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+/* --- SEU CSS ORIGINAL COMPLETO VEM AQUI --- */
+/* (Copie e cole aqui todo o conteúdo do seu cssmentoriaok.txt, desde o início até ao fim) */
 
-/* ESTILOS DA MENTORIA RENOMEADOS PARA ACELERAÇÃO */
+/* --- ESTILOS DA MENTORIA RENOMEADOS PARA ACELERAÇÃO --- */
+/* (No final do seu ficheiro, substitua as classes '.mentoria-*' por '.aceleracao-*') */
 .aceleracao-container { display: flex; gap: 2rem; }
-.aceleracao-sidebar { flex: 0 0 250px; background-color: var(--secondary-color); padding: 1.5rem; border-radius: 12px; }
-.aceleracao-menu h2 { color: var(--accent-color); margin-bottom: 1.5rem; }
-.aceleracao-menu ul { list-style: none; }
-.aceleracao-menu-item { padding: 0.8rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; cursor: pointer; }
-.aceleracao-menu-item:hover { background-color: var(--primary-color); }
-.aceleracao-menu-item.active { background-color: var(--accent-color); color: var(--primary-color); font-weight: 600; }
-.aceleracao-content { flex-grow: 1; }
-.aceleracao-module-content { display: none; }
-.aceleracao-module-content.active { display: block; }
+.aceleracao-sidebar { flex: 0 0 250px; /* ... etc. */ }
+.aceleracao-menu h2 { /* ... etc. */ }
+/* (Continue para todas as classes) */
 
-/* NOVOS ESTILOS PARA CONFIGURAÇÕES */
+/* --- NOVOS ESTILOS PARA CONFIGURAÇÕES (ADICIONE NO FINAL) --- */
 .settings-group { margin-bottom: 2rem; }
 .settings-group label { display: block; font-weight: 600; margin-bottom: 0.75rem; }
 .theme-switcher { display: flex; gap: 0.5rem; border: 1px solid var(--border-color); border-radius: 8px; padding: 4px; width: fit-content; }
-.btn-theme { padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; background-color: transparent; color: var(--text-color-muted); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+.btn-theme { padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; background-color: transparent; color: var(--text-color-muted); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease; }
 .btn-theme.active { background-color: var(--accent-color); color: var(--primary-color); }
 body[data-theme="light"] .btn-theme.active { color: #fff; }
