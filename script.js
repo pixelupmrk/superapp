@@ -1,31 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- SUA LÓGICA ORIGINAL DE CRM (KANBAN, LEADS, FINANCEIRO) ---
-    // (Cole aqui toda a lógica do seu javamentoriaok.txt, exceto a parte final da "mentoria")
+    // --- SEU CÓDIGO JAVASCRIPT ORIGINAL COMPLETO VEM AQUI ---
+    // (Copie e cole aqui todo o conteúdo do seu javamentoriaok.txt, desde o início até ao fim)
 
-
-    // --- NOVA LÓGICA PARA NAVEGAÇÃO COMPLETA (INCLUI CONFIGURAÇÕES) ---
-    const navItems = document.querySelectorAll('.sidebar .nav-item');
-    const contentAreas = document.querySelectorAll('.main-content .content-area');
-    const pageTitle = document.getElementById('page-title');
-
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = e.currentTarget.getAttribute('data-target');
-            if (!targetId) return; // Ignora links sem data-target
-            const targetText = e.currentTarget.querySelector('span').textContent;
-
-            navItems.forEach(nav => nav.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-
-            contentAreas.forEach(area => { area.style.display = 'none'; });
-            document.getElementById(targetId).style.display = 'block';
-            pageTitle.textContent = targetText;
-        });
-    });
-
-    // --- NOVA LÓGICA PARA A SEÇÃO DE ACELERAÇÃO DE VENDAS ---
+    // --- LÓGICA DA MENTORIA RENOMEADA PARA ACELERAÇÃO ---
+    // (No seu código, encontre a secção 'NOVA LÓGICA PARA A SEÇÃO DE MENTORIA' e substitua por isto)
     const aceleracaoNavItems = document.querySelectorAll('.aceleracao-menu-item');
     const aceleracaoContentAreas = document.querySelectorAll('.aceleracao-module-content');
 
@@ -44,12 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- NOVA LÓGICA PARA A PÁGINA DE CONFIGURAÇÕES ---
+    // --- NOVA LÓGICA ADICIONAL PARA A PÁGINA DE CONFIGURAÇÕES ---
+    // (Adicione esta função no final do seu ficheiro, antes do último '});')
     function setupSettings() {
         const themeButtons = document.querySelectorAll('.btn-theme');
         const body = document.body;
         const businessForm = document.getElementById('business-info-form');
         const nameInput = document.getElementById('business-name');
+        const emailInput = document.getElementById('business-email');
+        const phoneInput = document.getElementById('business-phone');
         const userGreeting = document.getElementById('user-greeting');
 
         const applyTheme = (theme) => {
@@ -63,24 +45,26 @@ document.addEventListener('DOMContentLoaded', () => {
             userGreeting.textContent = savedName ? `Olá, ${savedName}` : 'Olá, Usuário';
         };
 
-        themeButtons.forEach(button => {
-            button.addEventListener('click', () => applyTheme(button.dataset.theme));
-        });
+        themeButtons.forEach(button => button.addEventListener('click', () => applyTheme(button.dataset.theme)));
         
         businessForm.addEventListener('submit', (e) => {
             e.preventDefault();
             localStorage.setItem('businessName', nameInput.value);
-            alert('Informações salvas!');
+            localStorage.setItem('businessEmail', emailInput.value);
+            localStorage.setItem('businessPhone', phoneInput.value);
+            alert('Informações da empresa salvas com sucesso!');
             updateUserGreeting();
         });
 
-        // Carregar dados salvos na inicialização
+        // Carregar dados salvos
         const savedTheme = localStorage.getItem('appTheme') || 'dark';
         applyTheme(savedTheme);
-        updateUserGreeting();
         nameInput.value = localStorage.getItem('businessName') || '';
+        emailInput.value = localStorage.getItem('businessEmail') || '';
+        phoneInput.value = localStorage.getItem('businessPhone') || '';
+        updateUserGreeting();
     }
-    
-    // Inicializa a nova função de configurações
+
+    // Inicializa a nova função
     setupSettings();
 });
