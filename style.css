@@ -9,7 +9,7 @@ body[data-theme="light"] {
     --background-color: #f0f2f5; --primary-color: #ffffff; --secondary-color: #e9ecef; --accent-color: #007bff; --text-color: #212529; --text-color-muted: #6c757d; --border-color: #dee2e6;
 }
 
-/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 :root {
     --background-color: #0d1117;
@@ -717,7 +717,7 @@ body {
     outline: none;
     border-color: #ffc107;
     box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
-} */
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
 .app-container { display: flex; }
