@@ -1,53 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- SEU CÓDIGO JAVASCRIPT ORIGINAL COMPLETO VEM AQUI ---
-    const leads = [];
-    let nextLeadId = 0;
-    let statusChart;
-    let caixa = [];
-    let estoque = [];
-    let currentEstoqueDescricao = null;
-
-    // Lógica para a navegação da sidebar (ATUALIZADA PARA INCLUIR CONFIGURAÇÕES)
-    const navItems = document.querySelectorAll('.sidebar .nav-item');
-    const contentAreas = document.querySelectorAll('.main-content .content-area');
-    const pageTitle = document.getElementById('page-title');
-
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = e.currentTarget.getAttribute('data-target');
-            if (!targetId) return;
-            const targetText = e.currentTarget.querySelector('span').textContent;
-
-            navItems.forEach(nav => nav.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-
-            contentAreas.forEach(area => {
-                area.style.display = 'none';
-                area.classList.remove('active');
-            });
-            const targetArea = document.getElementById(targetId);
-            if (targetArea) {
-                targetArea.style.display = 'block';
-                targetArea.classList.add('active');
-                pageTitle.textContent = targetText;
-            }
-
-            if (targetId === 'dashboard-section') updateDashboard();
-            else if (targetId === 'crm-list-section') renderLeadsTable();
-            else if (targetId === 'finance-section') {
-                updateCaixa();
-                renderCaixaTable();
-                updateEstoque();
-                renderEstoqueTable();
-            }
-        });
-    });
-    
-    // (O resto do seu código JS original vem aqui... Kanban, Leads, Financeiro, etc.)
-
-    // document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
 
     const leads = [];
     let nextLeadId = 0;
@@ -745,6 +698,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+    const leads = [];
+    let nextLeadId = 0;
+    let statusChart;
+    let caixa = [];
+    let estoque = [];
+    let currentEstoqueDescricao = null;
+
+    // Lógica para a navegação da sidebar (ATUALIZADA PARA INCLUIR CONFIGURAÇÕES)
+    const navItems = document.querySelectorAll('.sidebar .nav-item');
+    const contentAreas = document.querySelectorAll('.main-content .content-area');
+    const pageTitle = document.getElementById('page-title');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('data-target');
+            if (!targetId) return;
+            const targetText = e.currentTarget.querySelector('span').textContent;
+
+            navItems.forEach(nav => nav.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+
+            contentAreas.forEach(area => {
+                area.style.display = 'none';
+                area.classList.remove('active');
+            });
+            const targetArea = document.getElementById(targetId);
+            if (targetArea) {
+                targetArea.style.display = 'block';
+                targetArea.classList.add('active');
+                pageTitle.textContent = targetText;
+            }
+
+            if (targetId === 'dashboard-section') updateDashboard();
+            else if (targetId === 'crm-list-section') renderLeadsTable();
+            else if (targetId === 'finance-section') {
+                updateCaixa();
+                renderCaixaTable();
+                updateEstoque();
+                renderEstoqueTable();
+            }
+        });
+    });
+    
+    // (O resto do seu código JS original vem aqui... Kanban, Leads, Financeiro, etc.)
+
+    // --- LÓGICA DA MENTORIA RENOMEADA PARA ACELERAÇÃO ---
     const aceleracaoNavItems = document.querySelectorAll('.aceleracao-menu-item');
     const aceleracaoContentAreas = document.querySelectorAll('.aceleracao-module-content');
 
