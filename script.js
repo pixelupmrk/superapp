@@ -34,6 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const userNameInput = document.getElementById('setting-user-name');
     const companyNameInput = document.getElementById('setting-company-name');
     const userNameDisplay = document.querySelector('.user-profile span');
+    
+    // --- Seletores do Chatbot ---
+    const chatbotForm = document.getElementById('chatbot-form');
+    const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotMessages = document.getElementById('chatbot-messages');
 
     let draggedItem = null;
     let currentLeadId = null;
@@ -598,6 +603,64 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
+    });
+
+    // --- LÓGICA DO CHATBOT AI ---
+    function generateBotResponse(userInput) {
+        const input = userInput.toLowerCase().trim();
+
+        // Respostas baseadas em palavras-chave
+        if (input.includes('olá') || input.includes('oi') || input.includes('bom dia')) {
+            return 'Olá! Pronto para acelerar suas vendas hoje? Como posso te ajudar?';
+        }
+        if (input.includes('crm') || input.includes('lead')) {
+            return 'O CRM é essencial para não perder nenhuma venda! Você pode adicionar um novo lead na seção "CRM / Kanban" e ver todos na "Lista de Leads". Eles são organizados nas colunas "Novo", "Em Progresso" e "Fechado".';
+        }
+        if (input.includes('pitch') || input.includes('vender') || input.includes('venda')) {
+            return 'Um bom pitch de vendas precisa ser rápido e direto. O Módulo 7 do Acelerador de Vendas ensina a focar em: quem você ajuda, que problema resolve, e qual o seu diferencial.';
+        }
+        if (input.includes('conteúdo') || input.includes('ideia') || input.includes('post')) {
+            return 'Para ter ideias de conteúdo, pense nos problemas da sua persona. O Módulo 4 sugere a estrutura: Gancho (chamar atenção), Valor (entregar a dica) e CTA (chamada para ação). Experimente um vídeo de "1 Dica em 1 Minuto"!';
+        }
+        if (input.includes('copy') || input.includes('texto') || input.includes('chatgpt')) {
+            return 'Para criar textos que vendem (copywriting), o Módulo 5 é perfeito! Ele sugere usar a IA com prompts específicos, definindo o tema, objetivo, público e tom de voz.';
+        }
+         if (input.includes('funil de vendas') || input.includes('etapas')) {
+            return 'O Módulo 6 explica como montar seu funil no CRM. As etapas clássicas são: Novo Lead, Primeiro Contato, Diagnóstico, Proposta Enviada e Fechamento.';
+        }
+        if (input.includes('obrigado') || input.includes('valeu')) {
+            return 'De nada! Se precisar de mais alguma coisa, é só chamar.';
+        }
+
+        // Resposta padrão
+        return 'Não entendi bem sua pergunta. Tente perguntar sobre CRM, leads, ideias de conteúdo, funil de vendas ou pitch de vendas.';
+    }
+
+    function addMessageToChat(message, sender) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+        
+        const paragraph = document.createElement('p');
+        paragraph.innerHTML = message; // Usamos innerHTML para renderizar possíveis tags de formatação
+        messageElement.appendChild(paragraph);
+
+        chatbotMessages.appendChild(messageElement);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight; // Rola para a última mensagem
+    }
+
+    chatbotForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const userInput = chatbotInput.value;
+        if (!userInput) return;
+
+        addMessageToChat(userInput, 'user');
+        chatbotInput.value = '';
+
+        // Simula o bot "pensando"
+        setTimeout(() => {
+            const botResponse = generateBotResponse(userInput);
+            addMessageToChat(botResponse, 'bot');
+        }, 1000);
     });
 
     // --- INICIALIZAÇÃO ---
