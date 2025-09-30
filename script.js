@@ -599,24 +599,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function getGeminiResponse(prompt) {
-        // A CHAVE DE API ESTÁ DIRETAMENTE NO CÓDIGO CONFORME SOLICITADO
         const apiKey = "AIzaSyDSLlNgmXKWZnrZSw5qP2sbOYhMnsUZcGE";
         
-        // CORREÇÃO FINAL: URL da API do Google Gemini, usando a versão 'v1beta' e o nome de modelo correto 'gemini-1.0-pro'
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${apiKey}`;
+        // CORREÇÃO FINAL E ASSERTIVA: URL da API do Google Gemini, usando a versão 'v1beta' e o nome de modelo mais recente 'gemini-1.5-flash-latest'
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
         try {
             const response = await fetch(apiUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }]
+                    contents: [{ parts: [{ text: prompt }] }]
                 })
             });
 
@@ -645,8 +638,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const sendButton = chatbotForm.querySelector('button');
         sendButton.disabled = true;
 
-        // Respostas rápidas primeiro
         const lowerInput = userInput.toLowerCase().trim();
+        // Respostas rápidas não precisam da IA
         if (lowerInput.includes('olá') || lowerInput.includes('oi')) {
             addMessageToChat('Olá! Pronto para acelerar suas vendas hoje? Como posso te ajudar?', 'bot-message');
             sendButton.disabled = false;
@@ -683,7 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chatbotForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const userInput = chatbotInput.value;
-        if (!userInput) return;
+        if (!userInput.trim()) return;
 
         addMessageToChat(userInput, 'user-message');
         chatbotInput.value = '';
