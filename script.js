@@ -130,7 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- LÓGICAS DO CRM, FINANCEIRO, ESTOQUE, ETC. ---
-    // (O restante do código permanece o mesmo)
     if (kanbanBoard) {
         kanbanBoard.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('kanban-card')) {
@@ -603,8 +602,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // A CHAVE DE API ESTÁ DIRETAMENTE NO CÓDIGO CONFORME SOLICITADO
         const apiKey = "AIzaSyDSLlNgmXKWZnrZSw5qP2sbOYhMnsUZcGE";
         
-        // URL da API do Google Gemini, versão estável v1
-        const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
+        // CORREÇÃO: URL da API do Google Gemini, usando a versão 'v1beta' correta
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
 
         try {
             const response = await fetch(apiUrl, {
