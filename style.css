@@ -259,8 +259,7 @@ body {
 #estoque-form select,
 #add-custo-form input,
 #setting-user-name,
-#setting-company-name,
-#setting-gemini-key {
+#setting-company-name {
     width: 100%;
     padding: 0.75rem 1rem;
     background-color: var(--primary-color);
@@ -285,8 +284,7 @@ body {
 #estoque-form select:focus,
 #add-custo-form input:focus,
 #setting-user-name:focus,
-#setting-company-name:focus,
-#setting-gemini-key:focus {
+#setting-company-name:focus {
     outline: none;
     border-color: var(--accent-color);
     box-shadow: 0 0 10px var(--border-glow);
@@ -802,7 +800,7 @@ body.light-theme .btn-export {
     border-radius: 20px;
     max-width: 75%;
     line-height: 1.5;
-    white-space: pre-wrap; /* Garante que quebras de linha na resposta da IA sejam exibidas */
+    white-space: pre-wrap;
 }
 
 .user-message {
@@ -820,13 +818,9 @@ body.light-theme .btn-export {
 }
 
 .bot-thinking {
-    background-color: var(--secondary-color);
     color: var(--text-color-muted);
-    align-self: flex-start;
-    border-bottom-left-radius: 5px;
     font-style: italic;
 }
-
 
 .chatbot-form {
     display: flex;
@@ -871,4 +865,9 @@ body.light-theme .btn-export {
 
 .chatbot-form button:hover {
     box-shadow: 0 0 15px var(--border-glow);
+}
+
+.chatbot-form button:disabled {
+    cursor: not-allowed;
+    background-color: var(--secondary-color);
 }
