@@ -585,10 +585,10 @@ document.addEventListener('DOMContentLoaded', () => {
         XLSX.writeFile(workbook, "estoque_e_custos.xlsx");
     });
     
-    // --- LÓGICA DO CHATBOT (VERSÃO FINAL SEM IA EXTERNA) ---
+    // --- LÓGICA DO CHATBOT AI (COM IA GENERATIVA) ---
     function addMessageToChat(message, type) {
         const messageElement = document.createElement('div');
-        messageElement.className = type;
+        messageElement.className = type; // e.g., "user-message" or "bot-message"
         
         const paragraph = document.createElement('p');
         paragraph.innerText = message;
@@ -598,80 +598,97 @@ document.addEventListener('DOMContentLoaded', () => {
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
 
-    function generateBotResponse(userInput) {
-        const input = userInput.toLowerCase().trim();
+    async function getGeminiResponse(prompt) {
+        // A CHAVE DE API ESTÁ DIRETAMENTE NO CÓDIGO CONFORME SOLICITADO
+        const apiKey = "AIzaSyDSLlNgmXKWZnrZSw5qP2sbOYhMnsUZcGE";
+        
+        // CORREÇÃO FINAL E ASSERTIVA: URL da API do Google Gemini, usando a versão 'v1beta' e o nome de modelo correto 'gemini-1.5-flash-latest'
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
-        // Módulo 1: Fundamentos
-        if (input.includes('persona') || input.includes('cliente ideal')) {
-            return "Para definir sua Persona (cliente ideal), você deve responder a perguntas como: qual a profissão, quais suas dores e desejos, e quais redes sociais ela usa. Isso está no Módulo 1.";
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }]
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Erro da API Gemini:", errorData);
+                return `Ocorreu um erro ao contatar a IA (Status: ${response.status}). Verifique se sua chave de API é válida e está habilitada.`;
+            }
+
+            const data = await response.json();
+            
+            if (data.candidates && data.candidates.length > 0 && data.candidates[0].content.parts.length > 0) {
+                 return data.candidates[0].content.parts[0].text;
+            } else {
+                console.warn("Resposta da IA bloqueada ou vazia:", data);
+                return "Não consigo responder a essa pergunta. A IA pode ter bloqueado o conteúdo por segurança. Tente reformular.";
+            }
+           
+        } catch (error) {
+            console.error("Erro de conexão com a API Gemini:", error);
+            return "Não consegui me conectar ao servidor da IA. Verifique sua conexão com a internet.";
         }
-        if (input.includes('proposta de valor') || input.includes('diferencial')) {
-            return "Sua Proposta de Valor responde 'por que o cliente deve comprar de você'. A fórmula é: 'Eu ajudo [persona] a [solução] através de [diferencial]'. Veja mais no Módulo 1.";
+    }
+
+    async function handleBotLogic(userInput) {
+        const sendButton = chatbotForm.querySelector('button');
+        sendButton.disabled = true;
+
+        const lowerInput = userInput.toLowerCase().trim();
+        // Respostas rápidas não precisam da IA
+        if (lowerInput.includes('olá') || lowerInput.includes('oi')) {
+            addMessageToChat('Olá! Pronto para acelerar suas vendas hoje? Como posso te ajudar?', 'bot-message');
+            sendButton.disabled = false;
+            return;
+        }
+        if (lowerInput.includes('crm') || lowerInput.includes('lead')) {
+            addMessageToChat('O CRM é essencial para não perder nenhuma venda! Você pode adicionar um novo lead na seção "CRM / Kanban" e ver todos na "Lista de Leads".', 'bot-message');
+            sendButton.disabled = false;
+            return;
+        }
+        if (lowerInput.includes('obrigado')) {
+             addMessageToChat('De nada! Se precisar de mais alguma coisa, é só chamar.', 'bot-message');
+             sendButton.disabled = false;
+             return;
         }
 
-        // Módulo 2: Algoritmo
-        if (input.includes('algoritmo') || input.includes('meta') || input.includes('facebook') || input.includes('instagram')) {
-            return "O algoritmo da Meta (Facebook/Instagram) prioriza conteúdos com interação rápida (curtidas, comentários, salvamentos). Por isso, um bom 'gancho' nos primeiros segundos é crucial. Isso é explicado no Módulo 2.";
-        }
-        if (input.includes('gancho') || input.includes('chamar atenção')) {
-            return "Um 'gancho' é uma frase de impacto no início do seu vídeo ou post para fazer a pessoa parar de rolar o feed. Exemplo: 'Você está cometendo este erro no seu...'. O Módulo 2 foca nisso.";
-        }
-
-        // Módulo 3: Cronograma
-        if (input.includes('cronograma') || input.includes('horário') || input.includes('quando postar')) {
-            return "O ideal é postar quando seu público está mais ativo, geralmente entre 11h-13h ou 18h-20h. O Módulo 3 sugere um cronograma semanal, como: Segunda (Educativo), Terça (Prova Social), Quarta (Reels).";
-        }
-
-        // Módulo 4: Conteúdo
-        if (input.includes('vídeo') || input.includes('conectar') || input.includes('canva') || input.includes('capcut')) {
-            return "Para criar conteúdo que conecta (Módulo 4), use a estrutura: Gancho, Valor e CTA (Chamada para Ação). Ferramentas como CapCut (vídeos) e Canva (design) são essenciais para manter uma identidade visual profissional.";
-        }
-
-        // Módulo 5: Copywriting
-        if (input.includes('copywriting') || input.includes('copy') || input.includes('texto') || input.includes('chatgpt')) {
-            return "Copywriting é a arte de escrever textos persuasivos. O Módulo 5 ensina a usar o ChatGPT para isso, com fórmulas como AIDA (Atenção, Interesse, Desejo, Ação) e criando 'prompts' inteligentes.";
-        }
-
-        // Módulo 6: CRM
-        if (input.includes('crm') || input.includes('funil de vendas')) {
-            return "CRM é a ferramenta para organizar seus clientes. O Módulo 6 ensina a criar um funil de vendas com etapas como: Contato Inicial, Apresentação, Proposta Enviada e Cliente Fechado. Isso ajuda a não perder nenhuma venda!";
-        }
-
-        // Módulo 7: Vendas
-        if (input.includes('pitch') || input.includes('venda') || input.includes('gatilho mental')) {
-            return "Um bom Pitch de Vendas é rápido e direto, explicando quem você ajuda e qual problema resolve. O Módulo 7 também fala sobre gatilhos mentais (escassez, autoridade, prova social) para criar confiança no cliente.";
+        // Se não for uma resposta rápida, chama a IA
+        addMessageToChat("Pensando...", 'bot-message bot-thinking');
+        const prompt = `Você é um assistente de marketing digital e vendas para um pequeno empresário. Seja direto, prestativo e use uma linguagem informal. O usuário pediu: "${userInput}"`;
+        const aiResponse = await getGeminiResponse(prompt);
+        
+        const thinkingMessage = chatbotMessages.querySelector('.bot-thinking');
+        if (thinkingMessage) {
+            thinkingMessage.remove();
         }
         
-        // Módulo 8: Humanização
-        if (input.includes('conexão') || input.includes('humanização') || input.includes('stories')) {
-            return "Para criar uma conexão real, seja autêntico! O Módulo 8 sugere mostrar os bastidores e sua rotina nos Stories. Pessoas se conectam com pessoas, não com marcas perfeitas.";
-        }
-        
-        // Respostas Gerais
-        if (input.includes('olá') || input.includes('oi')) {
-            return 'Olá! Sou seu assistente de conteúdo. Em que posso ajudar?';
-        }
-        if (input.includes('obrigado')) {
-            return 'De nada! Se precisar de mais alguma coisa, é só perguntar.';
+        if (aiResponse) {
+             addMessageToChat(aiResponse, 'bot-message');
         }
 
-        // Resposta Padrão
-        return 'Não encontrei uma resposta para isso. Tente perguntar sobre um tópico específico do Acelerador de Vendas, como "persona", "copywriting", "funil de vendas", etc.';
+        sendButton.disabled = false;
     }
 
     chatbotForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const userInput = chatbotInput.value;
-        if (!userInput) return;
+        if (!userInput.trim()) return;
 
         addMessageToChat(userInput, 'user-message');
         chatbotInput.value = '';
         
-        const botResponse = generateBotResponse(userInput);
-        
-        setTimeout(() => {
-             addMessageToChat(botResponse, 'bot-message');
-        }, 500); // Pequeno delay para simular "pensamento"
+        handleBotLogic(userInput);
     });
 
     // --- INICIALIZAÇÃO ---
