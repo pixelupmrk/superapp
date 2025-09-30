@@ -25,13 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeCustoModalBtn = document.getElementById('close-custo-modal');
     const importEstoqueFile = document.getElementById('import-estoque-file');
     const exportEstoqueBtn = document.getElementById('export-estoque-btn');
+    const acceleratorNavItems = document.querySelectorAll('.sales-accelerator-menu-item');
+    const acceleratorContentAreas = document.querySelectorAll('.sales-accelerator-module-content');
     
     // --- Seletores de Configurações ---
     const themeToggleButton = document.getElementById('theme-toggle-btn');
     const saveSettingsButton = document.getElementById('save-settings-btn');
     const userNameInput = document.getElementById('setting-user-name');
     const companyNameInput = document.getElementById('setting-company-name');
-    const geminiKeyInput = document.getElementById('setting-gemini-key');
     const userNameDisplay = document.querySelector('.user-profile span');
     
     // --- Seletores do Chatbot ---
@@ -60,24 +61,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const savedTheme = localStorage.getItem('appTheme') || 'dark';
         const savedUserName = localStorage.getItem('userName') || 'Usuário';
         const savedCompanyName = localStorage.getItem('companyName') || '';
-        const savedGeminiKey = localStorage.getItem('geminiApiKey') || '';
 
         applyTheme(savedTheme);
         
         userNameInput.value = savedUserName === 'Usuário' ? '' : savedUserName;
         userNameDisplay.textContent = `Olá, ${savedUserName}`;
         companyNameInput.value = savedCompanyName;
-        geminiKeyInput.value = savedGeminiKey;
     }
 
     saveSettingsButton.addEventListener('click', () => {
         const newUserName = userNameInput.value.trim() || 'Usuário';
         const newCompanyName = companyNameInput.value.trim();
-        const newGeminiKey = geminiKeyInput.value.trim();
 
         localStorage.setItem('userName', newUserName);
         localStorage.setItem('companyName', newCompanyName);
-        localStorage.setItem('geminiApiKey', newGeminiKey);
 
         userNameDisplay.textContent = `Olá, ${newUserName}`;
         alert('Configurações salvas com sucesso!');
@@ -114,6 +111,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateEstoque();
                 renderEstoqueTable();
             }
+        });
+    });
+    
+    acceleratorNavItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('data-content');
+            acceleratorNavItems.forEach(nav => nav.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            acceleratorContentAreas.forEach(area => {
+                area.classList.remove('active');
+                if (area.id === targetId) {
+                    area.classList.add('active');
+                }
+            });
         });
     });
 
@@ -572,82 +584,11 @@ document.addEventListener('DOMContentLoaded', () => {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Estoque");
         XLSX.writeFile(workbook, "estoque_e_custos.xlsx");
     });
-    
-    // --- LÓGICA DINÂMICA DO ACELERADOR DE VENDAS ---
-    async function loadSalesAccelerator() {
-        try {
-            const response = await fetch('data.json');
-            if (!response.ok) {
-                throw new Error('Não foi possível carregar os dados do acelerador de vendas.');
-            }
-            const data = await response.json();
-            const modules = data.aceleracao_vendas;
-
-            const menuList = document.getElementById('sales-accelerator-menu-list');
-            const contentArea = document.getElementById('sales-accelerator-content');
-
-            if (!menuList || !contentArea) return;
-
-            menuList.innerHTML = '';
-            contentArea.innerHTML = '';
-
-            modules.forEach((module, index) => {
-                // Cria item do menu
-                const menuItem = document.createElement('li');
-                menuItem.className = `sales-accelerator-menu-item ${index === 0 ? 'active' : ''}`;
-                menuItem.dataset.content = module.moduleId;
-                menuItem.textContent = module.title;
-                menuList.appendChild(menuItem);
-
-                // Cria conteúdo do módulo
-                const moduleContent = document.createElement('section');
-                moduleContent.id = module.moduleId;
-                moduleContent.className = `sales-accelerator-module-content ${index === 0 ? 'active' : ''}`;
-                
-                let lessonsHtml = `<h2>${module.title}</h2><p>${module.description}</p>`;
-                module.lessons.forEach(lesson => {
-                    lessonsHtml += `
-                        <div class="section">
-                            <h3>${lesson.title}</h3>
-                            <p>${lesson.content}</p>
-                        </div>
-                    `;
-                });
-                moduleContent.innerHTML = lessonsHtml;
-                contentArea.appendChild(moduleContent);
-            });
-
-            // Adiciona os event listeners aos itens recém-criados
-            document.querySelectorAll('.sales-accelerator-menu-item').forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetId = e.currentTarget.dataset.content;
-
-                    document.querySelectorAll('.sales-accelerator-menu-item').forEach(nav => nav.classList.remove('active'));
-                    e.currentTarget.classList.add('active');
-
-                    document.querySelectorAll('.sales-accelerator-module-content').forEach(area => {
-                        area.classList.remove('active');
-                        if (area.id === targetId) {
-                            area.classList.add('active');
-                        }
-                    });
-                });
-            });
-
-        } catch (error) {
-            console.error('Erro ao carregar Acelerador de Vendas:', error);
-            const contentArea = document.getElementById('sales-accelerator-content');
-            if(contentArea) {
-                 contentArea.innerHTML = `<p>Ocorreu um erro ao carregar o conteúdo. Verifique o console para mais detalhes.</p>`;
-            }
-        }
-    }
 
     // --- LÓGICA DO CHATBOT AI (COM IA GENERATIVA) ---
     function addMessageToChat(message, type) {
         const messageElement = document.createElement('div');
-        messageElement.className = `message ${type}`;
+        messageElement.className = type; // e.g., "user-message" or "bot-message"
         
         const paragraph = document.createElement('p');
         paragraph.innerText = message;
@@ -658,10 +599,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function getGeminiResponse(prompt) {
-        const apiKey = localStorage.getItem('geminiApiKey');
-        if (!apiKey) {
-            return "Por favor, insira sua Chave de API do Gemini na página de Configurações para que eu possa gerar conteúdo.";
-        }
+        // A CHAVE DE API ESTÁ DIRETAMENTE NO CÓDIGO CONFORME SOLICITADO
+        const apiKey = "AIzaSyDSLlNgmXKWZnrZSw5qP2sbOYhMnsUZcGE";
         
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
 
@@ -683,35 +622,30 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Erro da API Gemini:", errorData);
-                return `Ocorreu um erro ao contatar a IA (Status: ${response.status}). Verifique se sua chave de API está correta e habilitada.`;
+                return `Ocorreu um erro ao contatar a IA (Status: ${response.status}). Verifique se sua chave de API é válida e está habilitada.`;
             }
 
             const data = await response.json();
-            if (data.candidates && data.candidates.length > 0) {
+            
+            if (data.candidates && data.candidates.length > 0 && data.candidates[0].content.parts.length > 0) {
                  return data.candidates[0].content.parts[0].text;
             } else {
-                return "A IA não retornou uma resposta válida. Tente novamente.";
+                // Resposta de segurança ou conteúdo bloqueado
+                console.warn("Resposta da IA bloqueada ou vazia:", data);
+                return "Não consigo responder a essa pergunta. Tente reformular ou fazer outra pergunta.";
             }
            
         } catch (error) {
             console.error("Erro de conexão com a API Gemini:", error);
-            return "Não consegui me conectar ao servidor da IA. Verifique sua conexão com a internet e se há bloqueios de CORS no console do navegador (F12).";
+            return "Não consegui me conectar ao servidor da IA. Verifique sua conexão com a internet.";
         }
     }
 
     async function generateBotResponse(userInput) {
         const input = userInput.toLowerCase().trim();
+        const sendButton = chatbotForm.querySelector('button');
 
-        if (input.includes('olá') || input.includes('oi')) {
-            return 'Olá! Pronto para acelerar suas vendas hoje? Como posso te ajudar?';
-        }
-        if (input.includes('crm') || input.includes('lead')) {
-            return 'O CRM é essencial para não perder nenhuma venda! Você pode adicionar um novo lead na seção "CRM / Kanban" e ver todos na "Lista de Leads".';
-        }
-        if (input.includes('obrigado')) {
-            return 'De nada! Se precisar de mais alguma coisa, é só chamar.';
-        }
-
+        sendButton.disabled = true;
         addMessageToChat("Pensando...", 'bot-message bot-thinking');
         
         const prompt = `Você é um assistente de marketing digital e vendas para um pequeno empresário. Seja direto, prestativo e use uma linguagem informal. O usuário pediu: "${userInput}"`;
@@ -723,6 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
             thinkingMessage.remove();
         }
 
+        sendButton.disabled = false;
         return aiResponse;
     }
 
@@ -734,19 +669,30 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessageToChat(userInput, 'user-message');
         chatbotInput.value = '';
         
-        chatbotForm.querySelector('button').disabled = true;
+        // Respostas rápidas primeiro
+        const lowerInput = userInput.toLowerCase().trim();
+        if (lowerInput.includes('olá') || lowerInput.includes('oi')) {
+            addMessageToChat('Olá! Pronto para acelerar suas vendas hoje? Como posso te ajudar?', 'bot-message');
+            return;
+        }
+        if (lowerInput.includes('crm') || lowerInput.includes('lead')) {
+            addMessageToChat('O CRM é essencial para não perder nenhuma venda! Você pode adicionar um novo lead na seção "CRM / Kanban" e ver todos na "Lista de Leads".', 'bot-message');
+            return;
+        }
+        if (lowerInput.includes('obrigado')) {
+             addMessageToChat('De nada! Se precisar de mais alguma coisa, é só chamar.', 'bot-message');
+             return;
+        }
 
+        // Se não for uma resposta rápida, chama a IA
         const botResponse = await generateBotResponse(userInput);
         
         if (botResponse) {
              addMessageToChat(botResponse, 'bot-message');
         }
-        
-        chatbotForm.querySelector('button').disabled = false;
     });
 
     // --- INICIALIZAÇÃO ---
     loadSettings();
     updateDashboard();
-    loadSalesAccelerator();
 });
