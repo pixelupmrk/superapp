@@ -118,7 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- LÓGICAS DO CRM, FINANCEIRO, ESTOQUE, ETC. ---
-    // (O código para as outras seções continua o mesmo)
     if (kanbanBoard) {
         kanbanBoard.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('kanban-card')) {
@@ -587,6 +586,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const menuList = document.getElementById('sales-accelerator-menu-list');
             const contentArea = document.getElementById('sales-accelerator-content');
 
+            if (!menuList || !contentArea) return;
+
             menuList.innerHTML = '';
             contentArea.innerHTML = '';
 
@@ -636,14 +637,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Erro ao carregar Acelerador de Vendas:', error);
-            document.getElementById('sales-accelerator-content').innerHTML = `<p>Ocorreu um erro ao carregar o conteúdo. Verifique o console para mais detalhes.</p>`;
+            const contentArea = document.getElementById('sales-accelerator-content');
+            if(contentArea) {
+                 contentArea.innerHTML = `<p>Ocorreu um erro ao carregar o conteúdo. Verifique o console para mais detalhes.</p>`;
+            }
         }
     }
 
     // --- LÓGICA DO CHATBOT AI (COM IA GENERATIVA) ---
     function addMessageToChat(message, type) {
         const messageElement = document.createElement('div');
-        messageElement.classList.add(type);
+        messageElement.className = `message ${type}`;
         
         const paragraph = document.createElement('p');
         paragraph.innerText = message;
@@ -659,7 +663,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return "Por favor, insira sua Chave de API do Gemini na página de Configurações para que eu possa gerar conteúdo.";
         }
         
-        // A URL da API do Google Gemini
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
 
         try {
@@ -680,14 +683,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Erro da API Gemini:", errorData);
-                return `Ocorreu um erro ao contatar a IA (Status: ${response.status}). Verifique se sua chave de API está correta e habilitada para uso.`;
+                return `Ocorreu um erro ao contatar a IA (Status: ${response.status}). Verifique se sua chave de API está correta e habilitada.`;
             }
 
             const data = await response.json();
-            return data.candidates[0].content.parts[0].text;
+            if (data.candidates && data.candidates.length > 0) {
+                 return data.candidates[0].content.parts[0].text;
+            } else {
+                return "A IA não retornou uma resposta válida. Tente novamente.";
+            }
+           
         } catch (error) {
             console.error("Erro de conexão com a API Gemini:", error);
-            return "Não consegui me conectar ao servidor da IA. Verifique sua conexão com a internet.";
+            return "Não consegui me conectar ao servidor da IA. Verifique sua conexão com a internet e se há bloqueios de CORS no console do navegador (F12).";
         }
     }
 
@@ -726,15 +734,19 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessageToChat(userInput, 'user-message');
         chatbotInput.value = '';
         
+        chatbotForm.querySelector('button').disabled = true;
+
         const botResponse = await generateBotResponse(userInput);
         
         if (botResponse) {
              addMessageToChat(botResponse, 'bot-message');
         }
+        
+        chatbotForm.querySelector('button').disabled = false;
     });
 
     // --- INICIALIZAÇÃO ---
     loadSettings();
     updateDashboard();
-    loadSalesAccelerator(); // Carrega o conteúdo dinâmico
+    loadSalesAccelerator();
 });
