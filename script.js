@@ -597,7 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
 
-    async function getGeminiResponse(prompt) {
+    async function getAiResponse(prompt) {
         // Este é o endpoint da nossa função na Vercel
         const apiUrl = '/api/gemini'; 
 
@@ -638,7 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Se não for uma resposta rápida, chama a IA via Vercel
         addMessageToChat("Pensando...", 'bot-message bot-thinking');
         const prompt = `Você é um assistente de marketing digital e vendas. Responda de forma direta e prestativa. O usuário pediu: "${userInput}"`;
-        const aiResponse = await getGeminiResponse(prompt);
+        const aiResponse = await getAiResponse(prompt);
         
         const thinkingMessage = chatbotMessages.querySelector('.bot-thinking');
         if (thinkingMessage) {
