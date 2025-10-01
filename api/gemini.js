@@ -1,12 +1,12 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   // Garante que a requisição seja do tipo POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido' });
   }
 
-  // Pega a chave de API das variáveis de ambiente da Vercel (com o nome correto)
+  // Pega a chave de API das variáveis de ambiente da Vercel
   const apiKey = process.env.GEMINI_API_KEY;
   const { prompt } = req.body;
 
@@ -34,4 +34,4 @@ export default async function handler(req, res) {
     console.error('Erro ao chamar a API Gemini:', error);
     return res.status(500).json({ error: 'Falha ao se comunicar com a IA.' });
   }
-}
+};
