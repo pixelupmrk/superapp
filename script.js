@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- LÓGICAS DO CRM, FINANCEIRO, ESTOQUE, ETC. ---
-    // (O restante do seu código permanece o mesmo)
+    // (O restante do código permanece o mesmo, sem alterações)
     if (kanbanBoard) {
         kanbanBoard.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('kanban-card')) {
@@ -586,60 +586,70 @@ document.addEventListener('DOMContentLoaded', () => {
         XLSX.writeFile(workbook, "estoque_e_custos.xlsx");
     });
     
-    // --- LÓGICA DO CHATBOT (VERSÃO COM RESPOSTAS LOCAIS INTELIGENTES) ---
+    // --- LÓGICA DO CHATBOT (VERSÃO FINAL COM IA VIA VERCEL) ---
     function addMessageToChat(message, type) {
         const messageElement = document.createElement('div');
         messageElement.className = type;
-        
         const paragraph = document.createElement('p');
         paragraph.innerText = message;
-        
         messageElement.appendChild(paragraph);
         chatbotMessages.appendChild(messageElement);
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
 
-    function generateBotResponse(userInput) {
-        const input = userInput.toLowerCase().trim();
+    async function getGeminiResponse(prompt) {
+        // Este é o endpoint da nossa função na Vercel
+        const apiUrl = '/api/gemini'; 
 
-        if (input.includes('persona') || input.includes('cliente ideal')) {
-            return "Para definir sua Persona (Módulo 1), responda: Qual a profissão, dores, desejos do seu cliente e quais redes sociais ele usa? Isso ajuda a direcionar toda a sua comunicação.";
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Erro da função Vercel:", errorData);
+                return `Ocorreu um erro no servidor (Status: ${response.status}). Verifique o log da sua função na Vercel.`;
+            }
+
+            const data = await response.json();
+            return data.text;
+           
+        } catch (error) {
+            console.error("Erro de conexão com a função Vercel:", error);
+            return "Não consegui me conectar ao servidor. Verifique o deploy na Vercel.";
         }
-        if (input.includes('proposta de valor') || input.includes('diferencial')) {
-            return "Sua Proposta de Valor (Módulo 1) responde 'por que o cliente deve comprar de você'. A fórmula é: 'Eu ajudo [seu cliente] a [resolver um problema] através de [seu diferencial]'.";
-        }
-        if (input.includes('algoritmo') || input.includes('meta') || input.includes('facebook') || input.includes('instagram')) {
-            return "O algoritmo da Meta (Módulo 2) prioriza conteúdos com interação rápida (curtidas, comentários, salvamentos). Por isso, um bom 'gancho' nos primeiros segundos é crucial para prender a atenção.";
-        }
-        if (input.includes('gancho') || input.includes('chamar atenção')) {
-            return "Um 'gancho' (Módulo 2) é uma frase de impacto no início do seu conteúdo. Exemplo: 'Você está cometendo este erro no seu marketing?'. O objetivo é fazer a pessoa parar de rolar o feed.";
-        }
-        if (input.includes('cronograma') || input.includes('horário') || input.includes('quando postar')) {
-            return "Para postagens (Módulo 3), a consistência é mais importante que a quantidade. Poste quando seu público está mais ativo (geralmente almoço e noite). Um exemplo de cronograma é: Segunda (Educativo), Quarta (Reels), Sexta (Oferta).";
-        }
-        if (input.includes('vídeo') || input.includes('conectar') || input.includes('canva') || input.includes('capcut')) {
-            return "Para criar conteúdo que conecta (Módulo 4), use a estrutura: Gancho (chama atenção), Valor (entrega a dica) e CTA (Chamada para Ação). Use apps como CapCut para vídeos e Canva para design profissional.";
-        }
-        if (input.includes('copywriting') || input.includes('copy') || input.includes('texto') || input.includes('chatgpt')) {
-            return "Copywriting (Módulo 5) é a escrita persuasiva. Para usar o ChatGPT, seja específico. Em vez de 'crie um post', peça: 'Crie uma legenda para Instagram usando a fórmula AIDA sobre a importância do meu produto para [sua persona]'.";
-        }
-        if (input.includes('crm') || input.includes('funil de vendas')) {
-            return "CRM (Módulo 6) é a ferramenta para organizar seus clientes e não perder vendas. Um funil de vendas simples tem as etapas: Contato Inicial, Apresentação, Proposta Enviada e Cliente Fechado.";
-        }
-        if (input.includes('pitch') || input.includes('venda') || input.includes('gatilho mental')) {
-            return "Um Pitch de Vendas (Módulo 7) é sua apresentação rápida. Inclua quem você ajuda, o problema que resolve e seu diferencial. Use também gatilhos mentais (escassez, prova social) para gerar confiança.";
-        }
-        if (input.includes('conexão') || input.includes('humanização') || input.includes('stories')) {
-            return "Para criar uma conexão real (Módulo 8), seja autêntico! Mostre sua rotina e bastidores nos Stories. Pessoas se conectam com pessoas, não com marcas perfeitas. Fale como se estivesse conversando com um amigo.";
-        }
-        if (input.includes('olá') || input.includes('oi')) {
-            return 'Olá! Sou seu assistente de conteúdo. Em que posso ajudar?';
-        }
-        if (input.includes('obrigado')) {
-            return 'De nada! Se precisar de mais alguma coisa, é só perguntar.';
+    }
+
+    async function handleBotLogic(userInput) {
+        const sendButton = chatbotForm.querySelector('button');
+        sendButton.disabled = true;
+
+        const lowerInput = userInput.toLowerCase().trim();
+        // Respostas rápidas
+        if (lowerInput.includes('olá') || lowerInput.includes('oi')) {
+            addMessageToChat('Olá! Como posso ajudar com suas estratégias de marketing hoje?', 'bot-message');
+            sendButton.disabled = false;
+            return;
         }
 
-        return 'Não encontrei uma resposta para isso. Tente perguntar sobre um tópico específico do Acelerador de Vendas, como "persona", "copywriting", "funil de vendas", etc.';
+        // Se não for uma resposta rápida, chama a IA via Vercel
+        addMessageToChat("Pensando...", 'bot-message bot-thinking');
+        const prompt = `Você é um assistente de marketing digital e vendas. Responda de forma direta e prestativa. O usuário pediu: "${userInput}"`;
+        const aiResponse = await getGeminiResponse(prompt);
+        
+        const thinkingMessage = chatbotMessages.querySelector('.bot-thinking');
+        if (thinkingMessage) {
+            thinkingMessage.remove();
+        }
+        
+        if (aiResponse) {
+             addMessageToChat(aiResponse, 'bot-message');
+        }
+
+        sendButton.disabled = false;
     }
 
     chatbotForm.addEventListener('submit', (e) => {
@@ -650,11 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessageToChat(userInput, 'user-message');
         chatbotInput.value = '';
         
-        const botResponse = generateBotResponse(userInput);
-        
-        setTimeout(() => {
-             addMessageToChat(botResponse, 'bot-message');
-        }, 300); // Pequeno delay para simular "pensamento"
+        handleBotLogic(userInput);
     });
 
     // --- INICIALIZAÇÃO ---
