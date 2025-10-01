@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- LÓGICAS DO CRM, FINANCEIRO, ESTOQUE, ETC. ---
-    // (O restante do seu código permanece o mesmo, sem alterações)
+    // (O restante do seu código permanece o mesmo)
     if (kanbanBoard) {
         kanbanBoard.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('kanban-card')) {
