@@ -585,10 +585,10 @@ document.addEventListener('DOMContentLoaded', () => {
         XLSX.writeFile(workbook, "estoque_e_custos.xlsx");
     });
     
-    // --- LÓGICA DO CHATBOT AI (COM IA GENERATIVA) ---
+    // --- LÓGICA DO CHATBOT (VERSÃO COM RESPOSTAS LOCAIS INTELIGENTES) ---
     function addMessageToChat(message, type) {
         const messageElement = document.createElement('div');
-        messageElement.className = type; // e.g., "user-message" or "bot-message"
+        messageElement.className = type;
         
         const paragraph = document.createElement('p');
         paragraph.innerText = message;
@@ -598,86 +598,47 @@ document.addEventListener('DOMContentLoaded', () => {
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
 
-    async function getGeminiResponse(prompt) {
-        // A CHAVE DE API ESTÁ DIRETAMENTE NO CÓDIGO CONFORME SOLICITADO
-        const apiKey = "AIzaSyDSLlNgmXKWZnrZSw5qP2sbOYhMnsUZcGE";
-        
-        // CORREÇÃO FINAL E ASSERTIVA: URL da API do Google Gemini, usando a versão 'v1beta' e o nome de modelo correto 'gemini-1.5-flash-latest'
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+    function generateBotResponse(userInput) {
+        const input = userInput.toLowerCase().trim();
 
-        try {
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }]
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Erro da API Gemini:", errorData);
-                return `Ocorreu um erro ao contatar a IA (Status: ${response.status}). Verifique se sua chave de API é válida e está habilitada.`;
-            }
-
-            const data = await response.json();
-            
-            if (data.candidates && data.candidates.length > 0 && data.candidates[0].content.parts.length > 0) {
-                 return data.candidates[0].content.parts[0].text;
-            } else {
-                console.warn("Resposta da IA bloqueada ou vazia:", data);
-                return "Não consigo responder a essa pergunta. A IA pode ter bloqueado o conteúdo por segurança. Tente reformular.";
-            }
-           
-        } catch (error) {
-            console.error("Erro de conexão com a API Gemini:", error);
-            return "Não consegui me conectar ao servidor da IA. Verifique sua conexão com a internet.";
+        if (input.includes('persona') || input.includes('cliente ideal')) {
+            return "Para definir sua Persona (Módulo 1), responda: Qual a profissão, dores, desejos do seu cliente e quais redes sociais ele usa? Isso ajuda a direcionar toda a sua comunicação.";
         }
-    }
-
-    async function handleBotLogic(userInput) {
-        const sendButton = chatbotForm.querySelector('button');
-        sendButton.disabled = true;
-
-        const lowerInput = userInput.toLowerCase().trim();
-        // Respostas rápidas não precisam da IA
-        if (lowerInput.includes('olá') || lowerInput.includes('oi')) {
-            addMessageToChat('Olá! Pronto para acelerar suas vendas hoje? Como posso te ajudar?', 'bot-message');
-            sendButton.disabled = false;
-            return;
+        if (input.includes('proposta de valor') || input.includes('diferencial')) {
+            return "Sua Proposta de Valor (Módulo 1) responde 'por que o cliente deve comprar de você'. A fórmula é: 'Eu ajudo [seu cliente] a [resolver um problema] através de [seu diferencial]'.";
         }
-        if (lowerInput.includes('crm') || lowerInput.includes('lead')) {
-            addMessageToChat('O CRM é essencial para não perder nenhuma venda! Você pode adicionar um novo lead na seção "CRM / Kanban" e ver todos na "Lista de Leads".', 'bot-message');
-            sendButton.disabled = false;
-            return;
+        if (input.includes('algoritmo') || input.includes('meta') || input.includes('facebook') || input.includes('instagram')) {
+            return "O algoritmo da Meta (Módulo 2) prioriza conteúdos com interação rápida (curtidas, comentários, salvamentos). Por isso, um bom 'gancho' nos primeiros segundos é crucial para prender a atenção.";
         }
-        if (lowerInput.includes('obrigado')) {
-             addMessageToChat('De nada! Se precisar de mais alguma coisa, é só chamar.', 'bot-message');
-             sendButton.disabled = false;
-             return;
+        if (input.includes('gancho') || input.includes('chamar atenção')) {
+            return "Um 'gancho' (Módulo 2) é uma frase de impacto no início do seu conteúdo. Exemplo: 'Você está cometendo este erro no seu marketing?'. O objetivo é fazer a pessoa parar de rolar o feed.";
+        }
+        if (input.includes('cronograma') || input.includes('horário') || input.includes('quando postar')) {
+            return "Para postagens (Módulo 3), a consistência é mais importante que a quantidade. Poste quando seu público está mais ativo (geralmente almoço e noite). Um exemplo de cronograma é: Segunda (Educativo), Quarta (Reels), Sexta (Oferta).";
+        }
+        if (input.includes('vídeo') || input.includes('conectar') || input.includes('canva') || input.includes('capcut')) {
+            return "Para criar conteúdo que conecta (Módulo 4), use a estrutura: Gancho (chama atenção), Valor (entrega a dica) e CTA (Chamada para Ação). Use apps como CapCut para vídeos e Canva para design profissional.";
+        }
+        if (input.includes('copywriting') || input.includes('copy') || input.includes('texto') || input.includes('chatgpt')) {
+            return "Copywriting (Módulo 5) é a escrita persuasiva. Para usar o ChatGPT, seja específico. Em vez de 'crie um post', peça: 'Crie uma legenda para Instagram usando a fórmula AIDA sobre a importância do meu produto para [sua persona]'.";
+        }
+        if (input.includes('crm') || input.includes('funil de vendas')) {
+            return "CRM (Módulo 6) é a ferramenta para organizar seus clientes e não perder vendas. Um funil de vendas simples tem as etapas: Contato Inicial, Apresentação, Proposta Enviada e Cliente Fechado.";
+        }
+        if (input.includes('pitch') || input.includes('venda') || input.includes('gatilho mental')) {
+            return "Um Pitch de Vendas (Módulo 7) é sua apresentação rápida. Inclua quem você ajuda, o problema que resolve e seu diferencial. Use também gatilhos mentais (escassez, prova social) para gerar confiança.";
+        }
+        if (input.includes('conexão') || input.includes('humanização') || input.includes('stories')) {
+            return "Para criar uma conexão real (Módulo 8), seja autêntico! Mostre sua rotina e bastidores nos Stories. Pessoas se conectam com pessoas, não com marcas perfeitas. Fale como se estivesse conversando com um amigo.";
+        }
+        if (input.includes('olá') || input.includes('oi')) {
+            return 'Olá! Sou seu assistente de conteúdo. Em que posso ajudar?';
+        }
+        if (input.includes('obrigado')) {
+            return 'De nada! Se precisar de mais alguma coisa, é só perguntar.';
         }
 
-        // Se não for uma resposta rápida, chama a IA
-        addMessageToChat("Pensando...", 'bot-message bot-thinking');
-        const prompt = `Você é um assistente de marketing digital e vendas para um pequeno empresário. Seja direto, prestativo e use uma linguagem informal. O usuário pediu: "${userInput}"`;
-        const aiResponse = await getGeminiResponse(prompt);
-        
-        const thinkingMessage = chatbotMessages.querySelector('.bot-thinking');
-        if (thinkingMessage) {
-            thinkingMessage.remove();
-        }
-        
-        if (aiResponse) {
-             addMessageToChat(aiResponse, 'bot-message');
-        }
-
-        sendButton.disabled = false;
+        return 'Não encontrei uma resposta para isso. Tente perguntar sobre um tópico específico do Acelerador de Vendas, como "persona", "copywriting", "funil de vendas", etc.';
     }
 
     chatbotForm.addEventListener('submit', (e) => {
@@ -688,7 +649,11 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessageToChat(userInput, 'user-message');
         chatbotInput.value = '';
         
-        handleBotLogic(userInput);
+        const botResponse = generateBotResponse(userInput);
+        
+        setTimeout(() => {
+             addMessageToChat(botResponse, 'bot-message');
+        }, 300); // Pequeno delay para simular "pensamento"
     });
 
     // --- INICIALIZAÇÃO ---
