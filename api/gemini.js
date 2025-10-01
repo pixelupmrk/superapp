@@ -19,8 +19,8 @@ module.exports = async (req, res) => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // CORREÇÃO FINAL E ASSERTIVA: Usando o modelo mais recente e estável 'gemini-2.5-flash-'.
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-" });
+    // CORREÇÃO FINAL E ASSERTIVA: Usando o modelo mais recente e estável 'gemini-1.5-flash-latest'.
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
     
     const result = await model.generateContent(prompt);
     const response = await result.response;
