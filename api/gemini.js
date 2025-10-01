@@ -19,8 +19,8 @@ module.exports = async (req, res) => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // CORREÇÃO FINAL: Usando o modelo 'gemini-pro' que é o padrão e mais estável para a versão da API.
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // CORREÇÃO FINAL: Usando o modelo EXATO que você pediu: "gemini-2.5-flash"
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -30,6 +30,9 @@ module.exports = async (req, res) => {
 
   } catch (error) {
     console.error('Erro ao chamar a API Gemini:', error);
-    return res.status(500).json({ error: 'Falha ao se comunicar com a IA.', details: error.message });
+    return res.status(500).json({ 
+      error: 'Falha ao se comunicar com a IA.',
+      details: error.message 
+    });
   }
 };
