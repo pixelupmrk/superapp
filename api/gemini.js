@@ -5,12 +5,14 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Método não permitido' });
   }
 
+  // Pega a chave E o nome do modelo das variáveis de ambiente da Vercel
   const apiKey = process.env.GEMINI_API_KEY;
+  const modelName = process.env.GEMINI_MODEL_NAME;
   const { prompt } = req.body;
 
-  if (!apiKey) {
-    console.error("ERRO: Variável de ambiente GEMINI_API_KEY não encontrada na Vercel.");
-    return res.status(500).json({ error: 'Chave de API não configurada no servidor.' });
+  if (!apiKey || !modelName) {
+    console.error("ERRO: Uma ou mais variáveis de ambiente (GEMINI_API_KEY, GEMINI_MODEL_NAME) não foram encontradas na Vercel.");
+    return res.status(500).json({ error: 'Configuração de API ou modelo incompleta no servidor.' });
   }
 
   if (!prompt) {
@@ -19,8 +21,8 @@ module.exports = async (req, res) => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // CORREÇÃO FINAL E ASSERTIVA: Usando o modelo mais recente e estável 'gemini-1.5-flash-latest'.
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+    // CORREÇÃO FINAL: Usa o nome do modelo que VOCÊ configurou na Vercel.
+    const model = genAI.getGenerativeModel({ model: modelName });
     
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -30,6 +32,6 @@ module.exports = async (req, res) => {
 
   } catch (error) {
     console.error('Erro ao chamar a API Gemini:', error);
-    return res.status(500).json({ error: 'Falha ao se comunicar com a IA.' });
+    return res.status(500).json({ error: 'Falha ao se comunicar com a IA.', details: error.message });
   }
 };
