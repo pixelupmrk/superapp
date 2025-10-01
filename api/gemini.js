@@ -1,12 +1,10 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 module.exports = async (req, res) => {
-  // Garante que a requisição seja do tipo POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido' });
   }
 
-  // Pega a chave de API das variáveis de ambiente da Vercel
   const apiKey = process.env.GEMINI_API_KEY;
   const { prompt } = req.body;
 
@@ -21,22 +19,17 @@ module.exports = async (req, res) => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // CORREÇÃO FINAL: Usando o modelo mais recente e estável 'gemini-1.5-flash-latest'.
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+    // CORREÇÃO FINAL: Usando o modelo 'gemini-pro' que é o padrão e mais estável para a versão da API.
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
     
-    // Retorna a resposta da IA
     return res.status(200).json({ text });
 
   } catch (error) {
     console.error('Erro ao chamar a API Gemini:', error);
-    // Adiciona o erro original na resposta para facilitar a depuração, se necessário
-    return res.status(500).json({ 
-      error: 'Falha ao se comunicar com a IA.',
-      details: error.message 
-    });
+    return res.status(500).json({ error: 'Falha ao se comunicar com a IA.', details: error.message });
   }
 };
