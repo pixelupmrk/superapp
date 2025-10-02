@@ -48,27 +48,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LÓGICA DO BOTÃO SAIR ---
-    if (logoutButton) {
-        logoutButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            firebase.auth().signOut().then(() => {
-                window.location.href = 'login.html';
-            }).catch((error) => {
-                console.error("Erro ao sair:", error);
-            });
-        });
-    }
+    // --- LÓGICA DO BOTÃO SAIR (MOVIDA PARA O SCRIPT PRINCIPAL) ---
+    // A lógica do logout será controlada pelo script.js para garantir que tudo carregue primeiro.
 
     // --- PROTEÇÃO DE PÁGINAS ---
     firebase.auth().onAuthStateChanged((user) => {
         const isLoginPage = window.location.pathname.includes('login.html');
         
         if (user && isLoginPage) {
-            // Se o usuário está logado E está na página de login, manda para o app
             window.location.replace('index.html');
         } else if (!user && !isLoginPage) {
-            // Se o usuário NÃO está logado E NÃO está na página de login, manda para o login
             window.location.replace('login.html');
         }
     });
