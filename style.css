@@ -870,4 +870,68 @@ body.light-theme .btn-export {
 .chatbot-form button:disabled {
     cursor: not-allowed;
     background-color: var(--secondary-color);
+}/* ... (todo o seu código do style.css continua aqui) ... */
+
+/* --- ESTILOS PARA A PÁGINA DE LOGIN --- */
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    background-color: var(--primary-color);
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+.logo-login {
+    max-width: 150px;
+    margin-bottom: 2rem;
+}
+
+.login-container h2 {
+    margin-bottom: 2rem;
+    color: var(--text-color);
+}
+
+#login-form input {
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: var(--background-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.btn-login:hover {
+    box-shadow: 0 0 15px var(--border-glow);
+}
+
+.error-message {
+    color: #e57373;
+    margin-top: 1rem;
+    height: 20px;
+    font-size: 0.9rem;
 }
