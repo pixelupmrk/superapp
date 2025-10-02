@@ -136,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- LÓGICAS DO CRM, FINANCEIRO, ESTOQUE, ETC. ---
+    // (O restante do seu código permanece o mesmo, sem alterações)
     if (kanbanBoard) {
         kanbanBoard.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('kanban-card')) {
@@ -591,53 +592,39 @@ document.addEventListener('DOMContentLoaded', () => {
         XLSX.writeFile(workbook, "estoque_e_custos.xlsx");
     });
     
-    // --- LÓGICA DO CHATBOT AI (COM IA GENERATIVA) ---
+    // --- LÓGICA DO CHATBOT ---
     function addMessageToChat(message, type) {
         const messageElement = document.createElement('div');
-        messageElement.className = type; // e.g., "user-message" or "bot-message"
-        
+        messageElement.className = type;
         const paragraph = document.createElement('p');
         paragraph.innerText = message;
-        
         messageElement.appendChild(paragraph);
         chatbotMessages.appendChild(messageElement);
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
 
-    async function getGeminiResponse(prompt) {
-        // A CHAVE DE API ESTÁ DIRETAMENTE NO CÓDIGO CONFORME SOLICITADO
-        const apiKey = "AIzaSyDSLlNgmXKWZnrZSw5qP2sbOYhMnsUZcGE";
-        
-        // CORREÇÃO FINAL E ASSERTIVA: URL da API do Google Gemini, usando a versão 'v1beta' e o nome de modelo mais recente 'gemini-1.5-flash-latest'
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+    async function getAiResponse(prompt) {
+        const apiUrl = '/api/gemini'; 
 
         try {
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
+                body: JSON.stringify({ prompt: prompt })
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                console.error("Erro da API Gemini:", errorData);
-                return `Ocorreu um erro ao contatar a IA (Status: ${response.status}). Verifique se sua chave de API é válida e está habilitada.`;
+                console.error("Erro da função Vercel:", errorData);
+                return `Ocorreu um erro no servidor (Status: ${response.status}). Verifique o log da sua função na Vercel.`;
             }
 
             const data = await response.json();
-            
-            if (data.candidates && data.candidates.length > 0 && data.candidates[0].content.parts.length > 0) {
-                 return data.candidates[0].content.parts[0].text;
-            } else {
-                console.warn("Resposta da IA bloqueada ou vazia:", data);
-                return "Não consigo responder a essa pergunta. A IA pode ter bloqueado o conteúdo por segurança. Tente reformular.";
-            }
+            return data.text;
            
         } catch (error) {
-            console.error("Erro de conexão com a API Gemini:", error);
-            return "Não consegui me conectar ao servidor da IA. Verifique sua conexão com a internet.";
+            console.error("Erro de conexão com a função Vercel:", error);
+            return "Não consegui me conectar ao servidor. Verifique o deploy na Vercel.";
         }
     }
 
@@ -645,28 +632,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const sendButton = chatbotForm.querySelector('button');
         sendButton.disabled = true;
 
-        const lowerInput = userInput.toLowerCase().trim();
-        // Respostas rápidas não precisam da IA
-        if (lowerInput.includes('olá') || lowerInput.includes('oi')) {
-            addMessageToChat('Olá! Pronto para acelerar suas vendas hoje? Como posso te ajudar?', 'bot-message');
-            sendButton.disabled = false;
-            return;
-        }
-        if (lowerInput.includes('crm') || lowerInput.includes('lead')) {
-            addMessageToChat('O CRM é essencial para não perder nenhuma venda! Você pode adicionar um novo lead na seção "CRM / Kanban" e ver todos na "Lista de Leads".', 'bot-message');
-            sendButton.disabled = false;
-            return;
-        }
-        if (lowerInput.includes('obrigado')) {
-             addMessageToChat('De nada! Se precisar de mais alguma coisa, é só chamar.', 'bot-message');
-             sendButton.disabled = false;
-             return;
-        }
-
-        // Se não for uma resposta rápida, chama a IA
         addMessageToChat("Pensando...", 'bot-message bot-thinking');
-        const prompt = `Você é um assistente de marketing digital e vendas para um pequeno empresário. Seja direto, prestativo e use uma linguagem informal. O usuário pediu: "${userInput}"`;
-        const aiResponse = await getGeminiResponse(prompt);
+        const prompt = `Você é um assistente de marketing digital e vendas. Responda de forma direta e prestativa. O usuário pediu: "${userInput}"`;
+        const aiResponse = await getAiResponse(prompt);
         
         const thinkingMessage = chatbotMessages.querySelector('.bot-thinking');
         if (thinkingMessage) {
