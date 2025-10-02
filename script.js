@@ -136,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- LÓGICAS DO CRM, FINANCEIRO, ESTOQUE, ETC. ---
-    // (O restante do seu código permanece o mesmo, sem alterações)
     if (kanbanBoard) {
         kanbanBoard.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('kanban-card')) {
@@ -592,18 +591,20 @@ document.addEventListener('DOMContentLoaded', () => {
         XLSX.writeFile(workbook, "estoque_e_custos.xlsx");
     });
     
-    // --- LÓGICA DO CHATBOT ---
+    // --- LÓGICA DO CHATBOT AI (COM IA GENERATIVA) ---
     function addMessageToChat(message, type) {
         const messageElement = document.createElement('div');
-        messageElement.className = type;
+        messageElement.className = type; // e.g., "user-message" or "bot-message"
+        
         const paragraph = document.createElement('p');
         paragraph.innerText = message;
+        
         messageElement.appendChild(paragraph);
         chatbotMessages.appendChild(messageElement);
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
 
-    async function getAiResponse(prompt) {
+    async function getGeminiResponse(prompt) {
         const apiUrl = '/api/gemini'; 
 
         try {
@@ -632,9 +633,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const sendButton = chatbotForm.querySelector('button');
         sendButton.disabled = true;
 
+        const lowerInput = userInput.toLowerCase().trim();
+        // Respostas rápidas não precisam da IA
+        if (lowerInput.includes('olá') || lowerInput.includes('oi')) {
+            addMessageToChat('Olá! Pronto para acelerar suas vendas hoje? Como posso te ajudar?', 'bot-message');
+            sendButton.disabled = false;
+            return;
+        }
+        if (lowerInput.includes('crm') || lowerInput.includes('lead')) {
+            addMessageToChat('O CRM é essencial para não perder nenhuma venda! Você pode adicionar um novo lead na seção "CRM / Kanban" e ver todos na "Lista de Leads".', 'bot-message');
+            sendButton.disabled = false;
+            return;
+        }
+        if (lowerInput.includes('obrigado')) {
+             addMessageToChat('De nada! Se precisar de mais alguma coisa, é só chamar.', 'bot-message');
+             sendButton.disabled = false;
+             return;
+        }
+
+        // Se não for uma resposta rápida, chama a IA
         addMessageToChat("Pensando...", 'bot-message bot-thinking');
-        const prompt = `Você é um assistente de marketing digital e vendas. Responda de forma direta e prestativa. O usuário pediu: "${userInput}"`;
-        const aiResponse = await getAiResponse(prompt);
+        const prompt = `Você é um assistente de marketing digital e vendas para um pequeno empresário. Seja direto, prestativo e use uma linguagem informal. O usuário pediu: "${userInput}"`;
+        const aiResponse = await getGeminiResponse(prompt);
         
         const thinkingMessage = chatbotMessages.querySelector('.bot-thinking');
         if (thinkingMessage) {
@@ -663,3 +683,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     updateDashboard();
 });
+
+}
+
+{
+type: uploaded file
+fileName: pixelupmrk/superapp/superapp-41fd2990b3c81c3c9529bbd7bb20c5e649311169/logo.jpg
