@@ -1,31 +1,12 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// SUAS CREDENCIAIS DO FIREBASE JÁ ESTÃO AQUI DENTRO
 const firebaseConfig = {
-  apiKey: "AIzaSyA5H7sBUCdgNueLXvdv_sxPTUHT6n38Z9k",
-  authDomain: "superapp-d0368.firebaseapp.com",
-  projectId: "superapp-d0368",
-  storageBucket: "superapp-d0368.firebasestorage.app",
-  messagingSenderId: "469594170619",
-  appId: "1:469594170619:web:145a2e1ee3fc807d0bbc5e",
-  measurementId: "G-ZZTHW2QHR4"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);//
-const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "SEU_AUTH_DOMAIN",
-    projectId: "SEU_PROJECT_ID",
-    storageBucket: "SEU_STORAGE_BUCKET",
-    messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-    appId: "SEU_APP_ID"
+    apiKey: "AIzaSyA5H7sBUCdgNueLXvdv_sxPTUHT6n38Z9k",
+    authDomain: "superapp-d0368.firebaseapp.com",
+    projectId: "superapp-d0368",
+    storageBucket: "superapp-d0368.appspot.com",
+    messagingSenderId: "469594170619",
+    appId: "1:469594170619:web:145a2e1ee3fc807d0bbc5e",
+    measurementId: "G-ZZTHW2QHR4"
 };
 
 // ======================================================
