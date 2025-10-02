@@ -505,6 +505,43 @@ body.light-theme #delete-lead-btn {
     transition: background-color 0.3s ease;
 }
 
+.exercise-section {
+    border-color: #ffc107;
+}
+
+.anotacoes-aluno {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--primary-color);
+    transition: border-color 0.3s ease;
+}
+
+.anotacoes-aluno label {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.anotacoes-aluno textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--primary-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 120px;
+    transition: all 0.3s ease;
+}
+
+.anotacoes-aluno textarea:focus {
+    outline: none;
+    border-color: #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
 /* --- ESTILOS PARA O CHATBOT AI --- */
 .chatbot-container {
     display: flex;
