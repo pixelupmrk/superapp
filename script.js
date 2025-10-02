@@ -663,8 +663,3 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     updateDashboard();
 });
-}
-
-{
-type: uploaded file
-fileName: pixelupmrk/superapp/superapp-9bfae3decdc01fb38f5e65aaf2520ffbc533633b/logo.jpg
