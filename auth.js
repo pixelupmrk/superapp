@@ -1,12 +1,4 @@
-FileInputStream serviceAccount =
-new FileInputStream("path/to/serviceAccountKey.json");
-
-FirebaseOptions options = new FirebaseOptions.Builder()
-  .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-  .build();
-
-FirebaseApp.initializeApp(options);
-
+// ATENÇÃO: COLE A SUA CONFIGURAÇÃO DO FIREBASE AQUI DENTRO
 const firebaseConfig = {
     apiKey: "SUA_API_KEY",
     authDomain: "SEU_AUTH_DOMAIN",
