@@ -667,18 +667,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 {
 type: uploaded file
-fileName: pixelupmrk/superapp/superapp-41fd2990b3c81c3c9529bbd7bb20c5e649311169/vercel.json
-fullContent:
-{
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/api/wa/:path*", "destination": "https://pixelup-wa-server.pixelupmrkt.repl.co/api/wa/:path*" },
-    { "source": "/api/:path*",    "destination": "https://pixelup-wa-server.pixelupmrkt.repl.co/:path*" }
-  ]
-}
-
-}
-
-{
-type: uploaded file
-fileName: image_fa9132.png
+fileName: pixelupmrk/superapp/superapp-9bfae3decdc01fb38f5e65aaf2520ffbc533633b/logo.jpg
