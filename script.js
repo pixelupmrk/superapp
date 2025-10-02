@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // A única alteração é adicionar o event listener para o logout no final do arquivo.
+    // O resto do seu código permanece o mesmo.
 
     let leads = [];
     let nextLeadId = 0;
@@ -92,17 +94,23 @@ document.addEventListener('DOMContentLoaded', () => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const targetId = e.currentTarget.getAttribute('data-target');
+            if(!targetId) return; // Ignora o botão de sair
+
             const targetText = e.currentTarget.querySelector('span').textContent;
             navItems.forEach(nav => nav.classList.remove('active'));
             e.currentTarget.classList.add('active');
+
             contentAreas.forEach(area => {
                 area.style.display = 'none';
             });
+            
             const targetArea = document.getElementById(targetId);
             if(targetArea) {
                  targetArea.style.display = 'block';
             }
+            
             pageTitle.textContent = targetText;
+
             if (targetId === 'dashboard-section') updateDashboard();
             else if (targetId === 'crm-list-section') renderLeadsTable();
             else if (targetId === 'finance-section') {
