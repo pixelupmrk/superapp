@@ -592,20 +592,18 @@ document.addEventListener('DOMContentLoaded', () => {
         XLSX.writeFile(workbook, "estoque_e_custos.xlsx");
     });
     
-    // --- LÓGICA DO CHATBOT AI (COM IA GENERATIVA) ---
+    // --- LÓGICA DO CHATBOT ---
     function addMessageToChat(message, type) {
         const messageElement = document.createElement('div');
-        messageElement.className = type; // e.g., "user-message" or "bot-message"
-        
+        messageElement.className = type;
         const paragraph = document.createElement('p');
         paragraph.innerText = message;
-        
         messageElement.appendChild(paragraph);
         chatbotMessages.appendChild(messageElement);
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
 
-    async function getGeminiResponse(prompt) {
+    async function getAiResponse(prompt) {
         const apiUrl = '/api/gemini'; 
 
         try {
@@ -634,18 +632,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const sendButton = chatbotForm.querySelector('button');
         sendButton.disabled = true;
 
-        const lowerInput = userInput.toLowerCase().trim();
-        // Respostas rápidas
-        if (lowerInput.includes('olá') || lowerInput.includes('oi')) {
-            addMessageToChat('Olá! Como posso ajudar com suas estratégias de marketing hoje?', 'bot-message');
-            sendButton.disabled = false;
-            return;
-        }
-
-        // Se não for uma resposta rápida, chama a IA via Vercel
         addMessageToChat("Pensando...", 'bot-message bot-thinking');
         const prompt = `Você é um assistente de marketing digital e vendas. Responda de forma direta e prestativa. O usuário pediu: "${userInput}"`;
-        const aiResponse = await getGeminiResponse(prompt);
+        const aiResponse = await getAiResponse(prompt);
         
         const thinkingMessage = chatbotMessages.querySelector('.bot-thinking');
         if (thinkingMessage) {
