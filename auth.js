@@ -1,4 +1,24 @@
-// ATENÇÃO: COLE A SUA CONFIGURAÇÃO DO FIREBASE AQUI DENTRO
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyA5H7sBUCdgNueLXvdv_sxPTUHT6n38Z9k",
+  authDomain: "superapp-d0368.firebaseapp.com",
+  projectId: "superapp-d0368",
+  storageBucket: "superapp-d0368.firebasestorage.app",
+  messagingSenderId: "469594170619",
+  appId: "1:469594170619:web:145a2e1ee3fc807d0bbc5e",
+  measurementId: "G-ZZTHW2QHR4"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);//
 const firebaseConfig = {
     apiKey: "SUA_API_KEY",
     authDomain: "SEU_AUTH_DOMAIN",
@@ -8,7 +28,10 @@ const firebaseConfig = {
     appId: "SEU_APP_ID"
 };
 
-// Não precisa mexer abaixo desta linha
+// ======================================================
+// NÃO PRECISA MEXER ABAIXO DESTA LINHA
+// ======================================================
+
 // Inicializa o Firebase apenas uma vez
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
