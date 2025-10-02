@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Super App PixelUp</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <img src="logo.png" alt="Logo PixelUp" class="logo-login">
+        <h2>Acesse o Super App</h2>
+        <form id="login-form">
+            <input type="email" id="login-email" placeholder="Seu e-mail" required>
+            <input type="password" id="login-password" placeholder="Sua senha" required>
+            <button type="submit" class="btn-login">Entrar</button>
+        </form>
+        <p id="login-error-message" class="error-message"></p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    
+    <script>
+        // ATENÇÃO: SUBSTITUA PELO SEU CÓDIGO DO FIREBASE AQUI
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_AUTH_DOMAIN",
+            projectId: "SEU_PROJECT_ID",
+            storageBucket: "SEU_STORAGE_BUCKET",
+            messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        // Não precisa mexer abaixo desta linha
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    </script>
+    
+    <script src="auth.js"></script>
+</body>
+</html>
