@@ -65,10 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const isLoginPage = window.location.pathname.includes('login.html');
         
         if (user && isLoginPage) {
-            // Se o usuário está logado E está na página de login, manda para o app
             window.location.replace('index.html');
         } else if (!user && !isLoginPage) {
-            // Se o usuário NÃO está logado E NÃO está na página de login, manda para o login
             window.location.replace('login.html');
         }
     });
