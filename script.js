@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let statusChart;
     let caixa = [];
     let estoque = [];
+    let nextCaixaId = 0;
+    let nextEstoqueId = 0;
     let currentEstoqueDescricao = null;
 
     // --- Seletores de Elementos ---
@@ -18,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteLeadBtn = document.getElementById('delete-lead-btn');
     const caixaForm = document.getElementById('caixa-form');
     const financeTabs = document.querySelectorAll('.finance-tab');
+    const financeContentAreas = document.querySelectorAll('.finance-content');
     const estoqueForm = document.getElementById('estoque-form');
     const estoqueSearch = document.getElementById('estoque-search');
     const addCustoModal = document.getElementById('add-custo-modal');
@@ -118,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (targetId === 'finance-section') {
                 updateCaixa();
                 renderCaixaTable();
-                updateEstoque();
                 renderEstoqueTable();
             }
         });
@@ -139,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- LÓGICAS DO CRM, FINANCEIRO, ESTOQUE, ETC. ---
+    // --- LÓGICAS DO CRM ---
     if (kanbanBoard) {
         kanbanBoard.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('kanban-card')) {
@@ -175,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderKanbanCards() {
+        if(!document.querySelector('.kanban-cards-list')) return;
         document.querySelectorAll('.kanban-cards-list').forEach(list => list.innerHTML = '');
         leads.forEach(lead => {
             const newCard = createKanbanCard(lead);
@@ -257,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = editButton.closest('tr');
             currentLeadId = parseInt(row.getAttribute('data-id'));
             const lead = leads.find(l => l.id === currentLeadId);
-            if (lead) {
+            if (lead && editModal) {
                 document.getElementById('edit-lead-name').value = lead.nome || '';
                 document.getElementById('edit-lead-email').value = lead.email || '';
                 document.getElementById('edit-lead-whatsapp').value = lead.whatsapp || '';
@@ -296,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderLeadsTable();
                     updateDashboard();
                 }
-                editModal.style.display = 'none';
+                if (editModal) editModal.style.display = 'none';
             }
         });
     }
@@ -318,11 +321,121 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderKanbanCards();
                 renderLeadsTable();
                 updateDashboard();
-                editModal.style.display = 'none';
+                if (editModal) editModal.style.display = 'none';
             }
         });
     }
 
+    // --- LÓGICA DO FINANCEIRO ---
+    financeTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('data-tab');
+            financeTabs.forEach(t => t.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            
+            financeContentAreas.forEach(area => {
+                area.classList.remove('active');
+                if (area.id === `${targetId}-tab-content`) {
+                    area.classList.add('active');
+                    area.style.display = 'block';
+                } else {
+                    area.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    function formatCurrency(value) {
+        return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function updateCaixa() {
+        const totalEntradas = caixa.filter(item => item.tipo === 'entrada').reduce((sum, item) => sum + item.valor, 0);
+        const totalSaidas = caixa.filter(item => item.tipo === 'saida').reduce((sum, item) => sum + item.valor, 0);
+        const saldoAtual = totalEntradas - totalSaidas;
+
+        document.getElementById('total-entradas').textContent = formatCurrency(totalEntradas);
+        document.getElementById('total-saidas').textContent = formatCurrency(totalSaidas);
+        document.getElementById('caixa-atual').textContent = formatCurrency(saldoAtual);
+    }
+
+    function renderCaixaTable() {
+        const tableBody = document.querySelector('#caixa-table tbody');
+        if(!tableBody) return;
+        tableBody.innerHTML = '';
+        caixa.forEach(item => {
+            const row = document.createElement('tr');
+            row.classList.add(item.tipo === 'entrada' ? 'entrada-row' : 'saida-row');
+            row.innerHTML = `
+                <td>${new Date(item.data).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</td>
+                <td>${item.descricao}</td>
+                <td>${item.tipo === 'entrada' ? formatCurrency(item.valor) : '-'}</td>
+                <td>${item.tipo === 'saida' ? formatCurrency(item.valor) : '-'}</td>
+                <td>${item.observacoes}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+    
+    if(caixaForm) {
+        caixaForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newMovimentacao = {
+                id: nextCaixaId++,
+                data: document.getElementById('caixa-data').value,
+                descricao: document.getElementById('caixa-descricao').value,
+                valor: parseFloat(document.getElementById('caixa-valor').value),
+                tipo: document.getElementById('caixa-tipo').value,
+                observacoes: document.getElementById('caixa-observacoes').value,
+            };
+            caixa.push(newMovimentacao);
+            updateCaixa();
+            renderCaixaTable();
+            caixaForm.reset();
+        });
+    }
+
+    function renderEstoqueTable() {
+        const tableBody = document.querySelector('#estoque-table tbody');
+        if(!tableBody) return;
+        tableBody.innerHTML = '';
+        estoque.forEach(item => {
+            const lucro = item.venda - item.compra;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.produto}</td>
+                <td>${item.descricao}</td>
+                <td>${formatCurrency(item.compra)}</td>
+                <td>-</td> <td>${formatCurrency(item.venda)}</td>
+                <td>${formatCurrency(lucro)}</td>
+                <td>
+                    <button class="btn-edit-table"><i class="ph-fill ph-note-pencil"></i></button>
+                    <button class="btn-delete-table"><i class="ph-fill ph-trash"></i></button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    if(estoqueForm) {
+        estoqueForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newProduto = {
+                id: nextEstoqueId++,
+                produto: document.getElementById('estoque-produto').value,
+                descricao: document.getElementById('estoque-descricao').value,
+                compra: parseFloat(document.getElementById('estoque-compra').value),
+                venda: parseFloat(document.getElementById('estoque-venda').value),
+                custos: []
+            };
+            estoque.push(newProduto);
+            renderEstoqueTable();
+            estoqueForm.reset();
+        });
+    }
+
+    // --- LÓGICA DO DASHBOARD ---
     function updateDashboard() {
         if(!document.getElementById('total-leads')) return;
 
@@ -344,9 +457,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (statusChart) {
             statusChart.destroy();
         }
-        const isLightTheme = document.body.classList.contains('light-theme');
-        const legendColor = isLightTheme ? '#212529' : '#cdd6f4';
-
         statusChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
@@ -355,6 +465,56 @@ document.addEventListener('DOMContentLoaded', () => {
                     data: [novo, progresso, fechado],
                     backgroundColor: ['#00f7ff', '#ffc107', '#28a745'],
                 }]
+            }
+        });
+    }
+
+    // --- LÓGICA DO CHATBOT AI ---
+    function addMessageToChat(sender, message, isThinking = false) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+        if (isThinking) {
+            messageElement.classList.add('bot-thinking');
+            messageElement.textContent = message;
+        } else {
+            messageElement.innerHTML = `<p>${message}</p>`;
+        }
+        chatbotMessages.appendChild(messageElement);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    if(chatbotForm) {
+        chatbotForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userMessage = chatbotInput.value.trim();
+            if (!userMessage) return;
+
+            addMessageToChat('user', userMessage);
+            chatbotInput.value = '';
+
+            addMessageToChat('bot', 'Digitando...', true);
+
+            try {
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: userMessage })
+                });
+
+                document.querySelector('.bot-thinking')?.remove();
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Falha na comunicação com a API.');
+                }
+
+                const data = await response.json();
+                addMessageToChat('bot', data.text);
+
+            } catch (error) {
+                console.error("Erro no Chatbot:", error);
+                document.querySelector('.bot-thinking')?.remove();
+                addMessageToChat('bot', `Desculpe, ocorreu um erro: ${error.message}`);
             }
         });
     }
