@@ -53,9 +53,11 @@ body {
     transition: background-color 0.3s ease;
 }
 
-.sidebar-header .logo {
-    max-width: 120px;
+.sidebar-header h2 {
+    color: var(--accent-color);
+    text-align: center;
     margin-bottom: 3rem;
+    font-size: 1.6rem;
 }
 
 .sidebar-nav {
