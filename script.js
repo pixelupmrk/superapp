@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageTitle = document.getElementById('page-title');
     const kanbanBoard = document.getElementById('kanban-board');
     const leadForm = document.getElementById('lead-form');
-    const editModal = document.getElementById('edit-lead-modal');
-    const editForm = document.getElementById('edit-lead-form');
+    const editLeadModal = document.getElementById('edit-lead-modal');
+    const editLeadForm = document.getElementById('edit-lead-form');
     const deleteLeadBtn = document.getElementById('delete-lead-btn');
     const caixaForm = document.getElementById('caixa-form');
     const financeTabs = document.querySelectorAll('.finance-tab');
@@ -31,6 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const acceleratorNavItems = document.querySelectorAll('.sales-accelerator-menu-item');
     const acceleratorContentAreas = document.querySelectorAll('.sales-accelerator-module-content');
     
+    // --- Novos Seletores para Edição de Produto ---
+    const editProdutoModal = document.getElementById('edit-produto-modal');
+    const editProdutoForm = document.getElementById('edit-produto-form');
+    const closeEditProdutoModalBtn = document.getElementById('close-edit-produto-modal');
+
     // --- Seletores de Configurações ---
     const themeToggleButton = document.getElementById('theme-toggle-btn');
     const saveSettingsButton = document.getElementById('save-settings-btn');
@@ -255,38 +260,67 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.addEventListener('click', (e) => {
-        const editLeadBtn = e.target.closest('.btn-edit-table');
-        const deleteLeadBtn = e.target.closest('.btn-delete-table');
+        const editBtn = e.target.closest('.btn-edit-table');
+        const deleteBtn = e.target.closest('.btn-delete-table');
         const addCustoBtn = e.target.closest('.btn-custo-table');
 
-        if (editLeadBtn) {
-            const row = editLeadBtn.closest('tr');
-            currentLeadId = parseInt(row.getAttribute('data-id'));
-            const lead = leads.find(l => l.id === currentLeadId);
-            if (lead && editModal) {
-                document.getElementById('edit-lead-name').value = lead.nome || '';
-                document.getElementById('edit-lead-email').value = lead.email || '';
-                document.getElementById('edit-lead-whatsapp').value = lead.whatsapp || '';
-                document.getElementById('edit-lead-status').value = lead.status || '';
-                document.getElementById('edit-lead-attendant').value = lead.atendente || '';
-                document.getElementById('edit-lead-origem').value = lead.origem || '';
-                document.getElementById('edit-lead-date').value = lead.data || '';
-                document.getElementById('edit-lead-qualification').value = lead.qualificacao || '';
-                document.getElementById('edit-lead-notes').value = lead.notas || '';
-                editModal.style.display = 'flex';
+        if (editBtn) {
+            const row = editBtn.closest('tr');
+            const rowId = parseInt(row.getAttribute('data-id'));
+
+            // Verifica se o botão clicado pertence à tabela de leads
+            if (editBtn.closest('#leads-table')) {
+                currentLeadId = rowId;
+                const lead = leads.find(l => l.id === currentLeadId);
+                if (lead && editLeadModal) {
+                    document.getElementById('edit-lead-name').value = lead.nome || '';
+                    document.getElementById('edit-lead-email').value = lead.email || '';
+                    document.getElementById('edit-lead-whatsapp').value = lead.whatsapp || '';
+                    document.getElementById('edit-lead-status').value = lead.status || '';
+                    document.getElementById('edit-lead-attendant').value = lead.atendente || '';
+                    document.getElementById('edit-lead-origem').value = lead.origem || '';
+                    document.getElementById('edit-lead-date').value = lead.data || '';
+                    document.getElementById('edit-lead-qualification').value = lead.qualificacao || '';
+                    document.getElementById('edit-lead-notes').value = lead.notas || '';
+                    editLeadModal.style.display = 'flex';
+                }
+            } 
+            // Se não, pertence à tabela de estoque
+            else if (editBtn.closest('#estoque-table')) {
+                currentEstoqueId = rowId;
+                const produto = estoque.find(p => p.id === currentEstoqueId);
+                if (produto && editProdutoModal) {
+                    document.getElementById('edit-produto-id').value = produto.id;
+                    document.getElementById('edit-produto-nome').value = produto.produto;
+                    document.getElementById('edit-produto-descricao').value = produto.descricao;
+                    document.getElementById('edit-produto-compra').value = produto.compra;
+                    document.getElementById('edit-produto-venda').value = produto.venda;
+                    editProdutoModal.style.display = 'flex';
+                }
             }
         }
         
-        if (deleteLeadBtn) {
-            const row = deleteLeadBtn.closest('tr');
-            const leadId = parseInt(row.getAttribute('data-id'));
-            if (confirm('Tem certeza que deseja excluir este lead?')) {
-                const leadIndex = leads.findIndex(l => l.id === leadId);
-                if (leadIndex > -1) {
-                    leads.splice(leadIndex, 1);
-                    renderKanbanCards();
-                    renderLeadsTable();
-                    updateDashboard();
+        if (deleteBtn) {
+            const row = deleteBtn.closest('tr');
+            const rowId = parseInt(row.getAttribute('data-id'));
+            
+            if (deleteBtn.closest('#leads-table')) {
+                if (confirm('Tem certeza que deseja excluir este lead?')) {
+                    const leadIndex = leads.findIndex(l => l.id === rowId);
+                    if (leadIndex > -1) {
+                        leads.splice(leadIndex, 1);
+                        renderKanbanCards();
+                        renderLeadsTable();
+                        updateDashboard();
+                    }
+                }
+            } else if (deleteBtn.closest('#estoque-table')) {
+                if (confirm('Tem certeza que deseja excluir este produto?')) {
+                    const produtoIndex = estoque.findIndex(p => p.id === rowId);
+                    if (produtoIndex > -1) {
+                        estoque.splice(produtoIndex, 1);
+                        renderEstoqueTable();
+                    }
                 }
             }
         }
@@ -312,13 +346,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderLeadsTable();
                     updateDashboard();
                 }
-                if (editModal) editModal.style.display = 'none';
+                if (editLeadModal) editLeadModal.style.display = 'none';
             }
         });
     }
 
-    if(editForm) {
-        editForm.addEventListener('submit', (e) => {
+    if(editLeadForm) {
+        editLeadForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const lead = leads.find(l => l.id === currentLeadId);
             if (lead) {
@@ -334,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderKanbanCards();
                 renderLeadsTable();
                 updateDashboard();
-                if (editModal) editModal.style.display = 'none';
+                if (editLeadModal) editLeadModal.style.display = 'none';
             }
         });
     }
@@ -477,6 +511,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (editProdutoForm) {
+        editProdutoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const produtoId = parseInt(document.getElementById('edit-produto-id').value);
+            const produto = estoque.find(p => p.id === produtoId);
+            if (produto) {
+                produto.produto = document.getElementById('edit-produto-nome').value;
+                produto.descricao = document.getElementById('edit-produto-descricao').value;
+                produto.compra = parseFloat(document.getElementById('edit-produto-compra').value);
+                produto.venda = parseFloat(document.getElementById('edit-produto-venda').value);
+                renderEstoqueTable();
+            }
+            editProdutoModal.style.display = 'none';
+        });
+    }
+
+    if (closeEditProdutoModalBtn) {
+        closeEditProdutoModalBtn.addEventListener('click', () => {
+            editProdutoModal.style.display = 'none';
+        });
+    }
+
     // --- LÓGICA DO DASHBOARD ---
     function updateDashboard() {
         if(!document.getElementById('total-leads')) return;
@@ -513,6 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- LÓGICA DO CHATBOT AI ---
     function addMessageToChat(sender, message, isThinking = false) {
+        if(!chatbotMessages) return;
         const messageElement = document.createElement('div');
         messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
         if (isThinking) {
