@@ -592,18 +592,20 @@ document.addEventListener('DOMContentLoaded', () => {
         XLSX.writeFile(workbook, "estoque_e_custos.xlsx");
     });
     
-    // --- LÓGICA DO CHATBOT ---
+    // --- LÓGICA DO CHATBOT AI (COM IA GENERATIVA) ---
     function addMessageToChat(message, type) {
         const messageElement = document.createElement('div');
-        messageElement.className = type;
+        messageElement.className = type; // e.g., "user-message" or "bot-message"
+        
         const paragraph = document.createElement('p');
         paragraph.innerText = message;
+        
         messageElement.appendChild(paragraph);
         chatbotMessages.appendChild(messageElement);
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
 
-    async function getAiResponse(prompt) {
+    async function getGeminiResponse(prompt) {
         const apiUrl = '/api/gemini'; 
 
         try {
@@ -632,9 +634,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const sendButton = chatbotForm.querySelector('button');
         sendButton.disabled = true;
 
+        const lowerInput = userInput.toLowerCase().trim();
+        // Respostas rápidas
+        if (lowerInput.includes('olá') || lowerInput.includes('oi')) {
+            addMessageToChat('Olá! Como posso ajudar com suas estratégias de marketing hoje?', 'bot-message');
+            sendButton.disabled = false;
+            return;
+        }
+
+        // Se não for uma resposta rápida, chama a IA via Vercel
         addMessageToChat("Pensando...", 'bot-message bot-thinking');
         const prompt = `Você é um assistente de marketing digital e vendas. Responda de forma direta e prestativa. O usuário pediu: "${userInput}"`;
-        const aiResponse = await getAiResponse(prompt);
+        const aiResponse = await getGeminiResponse(prompt);
         
         const thinkingMessage = chatbotMessages.querySelector('.bot-thinking');
         if (thinkingMessage) {
@@ -663,3 +674,23 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     updateDashboard();
 });
+
+}
+
+{
+type: uploaded file
+fileName: pixelupmrk/superapp/superapp-main/vercel.json
+fullContent:
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/api/wa/:path*", "destination": "https://pixelup-wa-server.pixelupmrkt.repl.co/api/wa/:path*" },
+    { "source": "/api/:path*",    "destination": "https://pixelup-wa-server.pixelupmrkt.repl.co/:path*" }
+  ]
+}
+
+}
+
+{
+type: uploaded file
+fileName: image_fa9132.png
