@@ -354,3 +354,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 datasets: [{
                     data: [novo, progresso, fechado],
                     backgroundColor: ['#00f7ff', '#ffc107', '#28a745'],
+                }]
+            }
+        });
+    }
+
+    // --- CARREGAMENTO INICIAL ---
+    loadSettings();
+    updateDashboard();
+    renderKanbanCards();
+    renderLeadsTable();
+});
