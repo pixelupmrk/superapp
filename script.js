@@ -136,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- LÓGICAS DO CRM, FINANCEIRO, ESTOQUE, ETC. ---
-    // (O restante do seu código permanece o mesmo, sem alterações)
     if (kanbanBoard) {
         kanbanBoard.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('kanban-card')) {
@@ -679,18 +678,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 {
 type: uploaded file
-fileName: pixelupmrk/superapp/superapp-main/vercel.json
-fullContent:
-{
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/api/wa/:path*", "destination": "https://pixelup-wa-server.pixelupmrkt.repl.co/api/wa/:path*" },
-    { "source": "/api/:path*",    "destination": "https://pixelup-wa-server.pixelupmrkt.repl.co/:path*" }
-  ]
-}
-
-}
-
-{
-type: uploaded file
-fileName: image_fa9132.png
+fileName: pixelupmrk/superapp/superapp-main/logo.jpg
