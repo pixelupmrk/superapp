@@ -5,6 +5,7 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Método não permitido' });
   }
 
+  // A chave de API será lida das configurações da Vercel
   const apiKey = process.env.GEMINI_API_KEY;
   const { prompt } = req.body;
 
@@ -19,8 +20,8 @@ module.exports = async (req, res) => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // CORREÇÃO FINAL: Usando o modelo EXATO que você pediu: "gemini-2.5-flash"
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    // CORREÇÃO: Usando o modelo correto "gemini-1.5-flash".
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
     const result = await model.generateContent(prompt);
     const response = await result.response;
