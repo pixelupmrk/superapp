@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let estoque = [];
     let nextCaixaId = 0;
     let nextEstoqueId = 0;
-    let currentEstoqueDescricao = null;
+    let currentEstoqueId = null;
 
     // --- Seletores de Elementos ---
     const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
@@ -222,8 +222,10 @@ document.addEventListener('DOMContentLoaded', () => {
             <td>${lead.qualificacao || ''}</td>
             <td>${lead.status || ''}</td>
             <td>
-                <button class="btn-edit-table"><i class="ph-fill ph-note-pencil"></i></button>
-                <button class="btn-delete-table"><i class="ph-fill ph-trash"></i></button>
+                <div class="table-actions">
+                    <button class="btn-edit-table"><i class="ph-fill ph-note-pencil"></i></button>
+                    <button class="btn-delete-table"><i class="ph-fill ph-trash"></i></button>
+                </div>
             </td>
         `;
         return row;
@@ -253,11 +255,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.addEventListener('click', (e) => {
-        const editButton = e.target.closest('.btn-edit-table');
-        const deleteButton = e.target.closest('.btn-delete-table');
+        const editLeadBtn = e.target.closest('.btn-edit-table');
+        const deleteLeadBtn = e.target.closest('.btn-delete-table');
+        const addCustoBtn = e.target.closest('.btn-custo-table');
 
-        if (editButton) {
-            const row = editButton.closest('tr');
+        if (editLeadBtn) {
+            const row = editLeadBtn.closest('tr');
             currentLeadId = parseInt(row.getAttribute('data-id'));
             const lead = leads.find(l => l.id === currentLeadId);
             if (lead && editModal) {
@@ -274,8 +277,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        if (deleteButton) {
-            const row = deleteButton.closest('tr');
+        if (deleteLeadBtn) {
+            const row = deleteLeadBtn.closest('tr');
             const leadId = parseInt(row.getAttribute('data-id'));
             if (confirm('Tem certeza que deseja excluir este lead?')) {
                 const leadIndex = leads.findIndex(l => l.id === leadId);
@@ -285,6 +288,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderLeadsTable();
                     updateDashboard();
                 }
+            }
+        }
+
+        if (addCustoBtn) {
+            const row = addCustoBtn.closest('tr');
+            currentEstoqueId = parseInt(row.getAttribute('data-id'));
+            const produto = estoque.find(p => p.id === currentEstoqueId);
+            if (produto) {
+                document.getElementById('add-custo-descricao-produto').value = produto.produto;
+                if(addCustoModal) addCustoModal.style.display = 'flex';
             }
         }
     });
@@ -401,17 +414,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if(!tableBody) return;
         tableBody.innerHTML = '';
         estoque.forEach(item => {
-            const lucro = item.venda - item.compra;
+            const totalCustos = item.custos.reduce((sum, custo) => sum + custo.valor, 0);
+            const lucro = item.venda - (item.compra + totalCustos);
             const row = document.createElement('tr');
+            row.setAttribute('data-id', item.id);
             row.innerHTML = `
                 <td>${item.produto}</td>
                 <td>${item.descricao}</td>
                 <td>${formatCurrency(item.compra)}</td>
-                <td>-</td> <td>${formatCurrency(item.venda)}</td>
+                <td>${formatCurrency(totalCustos)}</td>
+                <td>${formatCurrency(item.venda)}</td>
                 <td>${formatCurrency(lucro)}</td>
                 <td>
-                    <button class="btn-edit-table"><i class="ph-fill ph-note-pencil"></i></button>
-                    <button class="btn-delete-table"><i class="ph-fill ph-trash"></i></button>
+                    <div class="table-actions">
+                        <button class="btn-custo-table" title="Adicionar Custo"><i class="ph-fill ph-currency-dollar-simple"></i></button>
+                        <button class="btn-edit-table" title="Editar Produto"><i class="ph-fill ph-note-pencil"></i></button>
+                        <button class="btn-delete-table" title="Excluir Produto"><i class="ph-fill ph-trash"></i></button>
+                    </div>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -432,6 +451,29 @@ document.addEventListener('DOMContentLoaded', () => {
             estoque.push(newProduto);
             renderEstoqueTable();
             estoqueForm.reset();
+        });
+    }
+
+    if(addCustoForm) {
+        addCustoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const produto = estoque.find(p => p.id === currentEstoqueId);
+            if (produto) {
+                const novoCusto = {
+                    descricao: document.getElementById('custo-descricao-custo').value,
+                    valor: parseFloat(document.getElementById('custo-valor').value)
+                };
+                produto.custos.push(novoCusto);
+                renderEstoqueTable();
+            }
+            addCustoModal.style.display = 'none';
+            addCustoForm.reset();
+        });
+    }
+
+    if(closeCustoModalBtn) {
+        closeCustoModalBtn.addEventListener('click', () => {
+            addCustoModal.style.display = 'none';
         });
     }
 
