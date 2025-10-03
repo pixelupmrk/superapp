@@ -510,7 +510,7 @@
                             <option value="fechado">Fechado</option>
                         </select>
                     </div>
-                    <input type="text" id="edit-lead-attendant" placeholder="Atendente (quem atende)">
+                    <input type="text" id="edit-lead-attendant" placeholder="Atendente">
                     <input type="text" id="edit-lead-origem" placeholder="Origem">
                     <input type="date" id="edit-lead-date" placeholder="dd/mm/aaaa">
                     <div class="select-group">
@@ -530,6 +530,26 @@
             </form>
         </div>
     </div>
+    
+    <div class="modal-overlay" id="edit-produto-modal">
+        <div class="modal-content">
+            <h2>Editar Produto</h2>
+            <form id="edit-produto-form">
+                <input type="hidden" id="edit-produto-id">
+                <div class="input-grid">
+                    <input type="text" id="edit-produto-nome" placeholder="Nome do Produto" required>
+                    <input type="text" id="edit-produto-descricao" placeholder="Descrição" required>
+                    <input type="number" id="edit-produto-compra" placeholder="Valor de Compra (R$)" required step="0.01">
+                    <input type="number" id="edit-produto-venda" placeholder="Valor de Venda (R$)" required step="0.01">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="close-edit-produto-modal">Cancelar</button>
+                    <button type="submit" class="btn-save">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <div class="modal-overlay" id="add-custo-modal">
         <div class="modal-content">
