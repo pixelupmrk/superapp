@@ -31,19 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const acceleratorNavItems = document.querySelectorAll('.sales-accelerator-menu-item');
     const acceleratorContentAreas = document.querySelectorAll('.sales-accelerator-module-content');
     
-    // --- Novos Seletores para Edição de Produto ---
     const editProdutoModal = document.getElementById('edit-produto-modal');
     const editProdutoForm = document.getElementById('edit-produto-form');
     const closeEditProdutoModalBtn = document.getElementById('close-edit-produto-modal');
 
-    // --- Seletores de Configurações ---
     const themeToggleButton = document.getElementById('theme-toggle-btn');
     const saveSettingsButton = document.getElementById('save-settings-btn');
     const userNameInput = document.getElementById('setting-user-name');
     const companyNameInput = document.getElementById('setting-company-name');
     const userNameDisplay = document.querySelector('.user-profile span');
     
-    // --- Seletores do Chatbot ---
     const chatbotForm = document.getElementById('chatbot-form');
     const chatbotInput = document.getElementById('chatbot-input');
     const chatbotMessages = document.getElementById('chatbot-messages');
@@ -104,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const targetId = e.currentTarget.getAttribute('data-target');
-            if(!targetId) return; // Ignora o botão de sair
+            if(!targetId) return;
 
             const targetText = e.currentTarget.querySelector('span').textContent;
             navItems.forEach(nav => nav.classList.remove('active'));
@@ -268,7 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = editBtn.closest('tr');
             const rowId = parseInt(row.getAttribute('data-id'));
 
-            // Verifica se o botão clicado pertence à tabela de leads
             if (editBtn.closest('#leads-table')) {
                 currentLeadId = rowId;
                 const lead = leads.find(l => l.id === currentLeadId);
@@ -285,7 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     editLeadModal.style.display = 'flex';
                 }
             } 
-            // Se não, pertence à tabela de estoque
             else if (editBtn.closest('#estoque-table')) {
                 currentEstoqueId = rowId;
                 const produto = estoque.find(p => p.id === currentEstoqueId);
@@ -530,6 +525,73 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeEditProdutoModalBtn) {
         closeEditProdutoModalBtn.addEventListener('click', () => {
             editProdutoModal.style.display = 'none';
+        });
+    }
+    
+    // --- LÓGICA DE IMPORTAR E EXPORTAR ESTOQUE ---
+    if(exportEstoqueBtn) {
+        exportEstoqueBtn.addEventListener('click', () => {
+            if (estoque.length === 0) {
+                alert("Não há produtos no estoque para exportar.");
+                return;
+            }
+
+            const dataToExport = estoque.map(item => {
+                const totalCustos = item.custos.reduce((sum, custo) => sum + custo.valor, 0);
+                const lucro = item.venda - (item.compra + totalCustos);
+                return {
+                    'Produto': item.produto,
+                    'Descrição': item.descricao,
+                    'Valor de Compra': item.compra,
+                    'Custos Adicionais': totalCustos,
+                    'Valor de Venda': item.venda,
+                    'Lucro': lucro
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Estoque");
+            XLSX.writeFile(workbook, "estoque_produtos.xlsx");
+        });
+    }
+
+    if(importEstoqueFile) {
+        importEstoqueFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = new Uint8Array(event.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const json = XLSX.utils.sheet_to_json(worksheet);
+
+                    json.forEach(row => {
+                        const newProduto = {
+                            id: nextEstoqueId++,
+                            produto: row['Produto'] || 'Sem nome',
+                            descricao: row['Descrição'] || '',
+                            compra: parseFloat(row['Valor de Compra']) || 0,
+                            venda: parseFloat(row['Valor de Venda']) || 0,
+                            custos: []
+                        };
+                        estoque.push(newProduto);
+                    });
+                    renderEstoqueTable();
+                    alert(`${json.length} produtos importados com sucesso!`);
+                } catch (error) {
+                    console.error("Erro ao importar arquivo:", error);
+                    alert("Ocorreu um erro ao importar o arquivo. Verifique se o formato está correto.");
+                } finally {
+                    // Limpa o valor do input para permitir selecionar o mesmo arquivo novamente
+                    e.target.value = '';
+                }
+            };
+            reader.readAsArrayBuffer(file);
         });
     }
 
