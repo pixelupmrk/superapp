@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const editLeadModal = document.getElementById('edit-lead-modal');
     const editLeadForm = document.getElementById('edit-lead-form');
     const deleteLeadBtn = document.getElementById('delete-lead-btn');
+    const exportLeadsBtn = document.getElementById('export-excel-btn'); // Novo seletor
     const caixaForm = document.getElementById('caixa-form');
     const financeTabs = document.querySelectorAll('.finance-tab');
     const financeContentAreas = document.querySelectorAll('.finance-content');
@@ -253,6 +254,32 @@ document.addEventListener('DOMContentLoaded', () => {
             renderLeadsTable();
             updateDashboard();
             leadForm.reset();
+        });
+    }
+
+    if (exportLeadsBtn) {
+        exportLeadsBtn.addEventListener('click', () => {
+            if (leads.length === 0) {
+                alert("Não há leads para exportar.");
+                return;
+            }
+
+            const dataToExport = leads.map(lead => ({
+                'Nome': lead.nome,
+                'Email': lead.email,
+                'WhatsApp': lead.whatsapp,
+                'Status': lead.status,
+                'Qualificação': lead.qualificacao,
+                'Origem': lead.origem,
+                'Atendente': lead.atendente,
+                'Data': lead.data,
+                'Notas': lead.notas
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
+            XLSX.writeFile(workbook, "lista_de_leads.xlsx");
         });
     }
 
@@ -528,7 +555,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // --- LÓGICA DE IMPORTAR E EXPORTAR ESTOQUE ---
     if(exportEstoqueBtn) {
         exportEstoqueBtn.addEventListener('click', () => {
             if (estoque.length === 0) {
@@ -587,7 +613,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error("Erro ao importar arquivo:", error);
                     alert("Ocorreu um erro ao importar o arquivo. Verifique se o formato está correto.");
                 } finally {
-                    // Limpa o valor do input para permitir selecionar o mesmo arquivo novamente
                     e.target.value = '';
                 }
             };
