@@ -526,6 +526,26 @@ textarea {
 .btn-custo-table:hover { color: #28a745; }
 
 
+/* --- ESTILOS PARA ACELERADOR DE VENDAS --- */
+.sales-accelerator-container { display: flex; gap: 2rem; }
+.sales-accelerator-sidebar { flex: 0 0 250px; background-color: var(--secondary-color); padding: 1.5rem; border-radius: 12px; }
+.sales-accelerator-menu h2 { color: var(--accent-color); margin-bottom: 1.5rem; }
+.sales-accelerator-menu ul { list-style: none; padding: 0; }
+.sales-accelerator-menu-item { padding: 0.8rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
+.sales-accelerator-menu-item:hover { background-color: var(--primary-color); }
+.sales-accelerator-menu-item.active { background-color: var(--accent-color); color: var(--primary-color); font-weight: 600; }
+.sales-accelerator-content { flex-grow: 1; }
+.sales-accelerator-module-content { display: none; }
+.sales-accelerator-module-content.active { display: block; }
+.sales-accelerator-content h2 { margin-bottom: 1.5rem; }
+.sales-accelerator-content .section { background-color: var(--secondary-color); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid var(--accent-color); }
+.sales-accelerator-content .section h3 { margin-bottom: 1rem; }
+.exercise-section { border-color: #ffc107; }
+.anotacoes-aluno label { display: block; margin-bottom: 0.75rem; font-weight: 600; }
+.anotacoes-aluno textarea { width: 100%; resize: vertical; min-height: 120px; }
+.anotacoes-aluno textarea:focus { border-color: #ffc107; box-shadow: 0 0 10px rgba(255, 193, 7, 0.5); }
+
+
 /* --- ESTILOS PARA O CHATBOT AI --- */
 .chatbot-container {
     display: flex;
