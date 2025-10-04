@@ -7,10 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let estoque = [];
     
     let statusChart;
+    let draggedItem = null;
 
+    // --- Seletores de Elementos ---
     const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
     const contentAreas = document.querySelectorAll('.main-content .content-area');
     const pageTitle = document.getElementById('page-title');
+    const kanbanBoard = document.getElementById('kanban-board');
     const leadForm = document.getElementById('lead-form');
     const editLeadModal = document.getElementById('edit-lead-modal');
     const editLeadForm = document.getElementById('edit-lead-form');
@@ -25,6 +28,199 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportEstoqueBtn = document.getElementById('export-estoque-btn');
     const editProdutoModal = document.getElementById('edit-produto-modal');
     const editProdutoForm = document.getElementById('edit-produto-form');
+    const acceleratorNavItems = document.querySelectorAll('.sales-accelerator-menu-item');
+    const acceleratorContentAreas = document.querySelectorAll('.sales-accelerator-module-content');
+    const themeToggleButton = document.getElementById('theme-toggle-btn');
+    const userNameDisplay = document.querySelector('.user-profile span');
+    
+    // --- PONTO DE ENTRADA PRINCIPAL ---
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            userId = user.uid;
+            userNameDisplay.textContent = `Olá, ${user.displayName || user.email.split('@')[0]}`;
+            loadAllData();
+            loadSettings(); // Carrega as configurações de tema, etc.
+        }
+    });
+
+    // --- FUNÇÕES DE CARREGAMENTO DE DADOS ---
+    async function loadAllData() {
+        if (!userId) return;
+        try {
+            document.body.style.cursor = 'wait';
+            await Promise.all([loadLeads(), loadCaixa(), loadEstoque()]);
+            renderAll();
+        } catch (error) {
+            console.error("Erro fatal ao carregar dados:", error);
+        } finally {
+            document.body.style.cursor = 'default';
+        }
+    }
+
+    async function loadLeads() {
+        const snapshot = await db.collection('users').doc(userId).collection('leads').get();
+        leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+    async function loadCaixa() {
+        const snapshot = await db.collection('users').doc(userId).collection('caixa').get();
+        caixa = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+    async function loadEstoque() {
+        const snapshot = await db.collection('users').doc(userId).collection('estoque').get();
+        estoque = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    }
+
+    // --- FUNÇÃO GERAL PARA RENDERIZAR TUDO ---
+    function renderAll() {
+        renderKanbanCards();
+        renderLeadsTable();
+        updateDashboard();
+        renderCaixaTable();
+        updateCaixa();
+        renderEstoqueTable();
+    }
+
+    // --- LÓGICA DE NAVEGAÇÃO E UI ---
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('data-target');
+            if(!targetId) return;
+            navItems.forEach(nav => nav.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            contentAreas.forEach(area => area.classList.remove('active'));
+            const targetArea = document.getElementById(targetId);
+            if (targetArea) {
+                targetArea.classList.add('active');
+                pageTitle.textContent = e.currentTarget.querySelector('span').textContent;
+            }
+        });
+    });
+
+    financeTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('data-tab') + '-tab-content';
+            financeTabs.forEach(t => t.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            financeContentAreas.forEach(area => {
+                area.classList.remove('active');
+                if (area.id === targetId) {
+                    area.classList.add('active');
+                }
+            });
+        });
+    });
+    
+    acceleratorNavItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('data-content');
+            acceleratorNavItems.forEach(nav => nav.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            acceleratorContentAreas.forEach(area => {
+                area.classList.remove('active');
+                if (area.id === targetId) {
+                    area.classList.add('active');
+                }
+            });
+        });
+    });
+
+    // --- LÓGICA DE CONFIGURAÇÕES (TEMA) ---
+    function applyTheme(theme) {
+        if (theme === 'light') {
+            document.body.classList.add('light-theme');
+            if(themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Escuro';
+        } else {
+            document.body.classList.remove('light-theme');
+            if(themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Claro';
+        }
+    }
+
+    function loadSettings() {
+        const savedTheme = localStorage.getItem('appTheme') || 'dark';
+        applyTheme(savedTheme);
+    }
+    
+    if(themeToggleButton) {
+        themeToggleButton.addEventListener('click', () => {
+            const isLight = document.body.classList.contains('light-theme');
+            const newTheme = isLight ? 'dark' : 'light';
+            localStorage.setItem('appTheme', newTheme);
+            applyTheme(newTheme);
+        });
+    }
+
+    // --- LÓGICA DE DADOS (CRIAR, ATUALIZAR, EXCLUIR) ---
+    if(leadForm) { /* ...código para adicionar lead... */ }
+    if(caixaForm) { /* ...código para adicionar caixa... */ }
+    if(estoqueForm) { /* ...código para adicionar estoque... */ }
+    if(editLeadForm) { /* ...código para editar lead... */ }
+    if(editProdutoForm) { /* ...código para editar produto... */ }
+    if(addCustoForm) { /* ...código para adicionar custo... */ }
+
+    document.addEventListener('click', async (e) => { /* ...código para abrir modais e deletar... */ });
+    
+    // --- LÓGICA DE IMPORTAR/EXPORTAR ---
+    if (exportLeadsBtn) { /* ...código para exportar leads... */ }
+    if (exportEstoqueBtn) { /* ...código para exportar estoque... */ }
+    if(importEstoqueFile) { /* ...código para importar estoque... */ }
+
+    // --- LÓGICA DO KANBAN DRAG & DROP ---
+    if (kanbanBoard) { /* ...código de drag and drop... */ }
+    
+    // --- FUNÇÕES DE RENDERIZAÇÃO ---
+    function renderLeadsTable() { /* ...código... */ }
+    function createLeadTableRow(lead) { /* ...código... */ }
+    function renderKanbanCards() { /* ...código... */ }
+    function createKanbanCard(lead) { /* ...código... */ }
+    function updateCaixa() { /* ...código... */ }
+    function renderCaixaTable() { /* ...código... */ }
+    function renderEstoqueTable() { /* ...código... */ }
+    function updateDashboard() { /* ...código... */ }
+    function updateStatusChart(novo, progresso, fechado) { /* ...código... */ }
+    
+    // --- FUNÇÕES UTILITÁRIAS ---
+    function formatCurrency(value) { return (typeof value === 'number' ? value : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+});
+
+
+// ==================================================================
+// CÓDIGO COMPLETO PARA SUBSTITUIÇÃO (inclui todas as funções)
+// ==================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const db = firebase.firestore();
+    let userId = null;
+
+    let leads = [];
+    let caixa = [];
+    let estoque = [];
+    
+    let statusChart;
+    let draggedItem = null;
+
+    const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+    const contentAreas = document.querySelectorAll('.main-content .content-area');
+    const pageTitle = document.getElementById('page-title');
+    const kanbanBoard = document.getElementById('kanban-board');
+    const leadForm = document.getElementById('lead-form');
+    const editLeadModal = document.getElementById('edit-lead-modal');
+    const editLeadForm = document.getElementById('edit-lead-form');
+    const exportLeadsBtn = document.getElementById('export-excel-btn');
+    const caixaForm = document.getElementById('caixa-form');
+    const financeTabs = document.querySelectorAll('.finance-tab');
+    const financeContentAreas = document.querySelectorAll('.finance-content');
+    const estoqueForm = document.getElementById('estoque-form');
+    const addCustoModal = document.getElementById('add-custo-modal');
+    const addCustoForm = document.getElementById('add-custo-form');
+    const importEstoqueFile = document.getElementById('import-estoque-file');
+    const exportEstoqueBtn = document.getElementById('export-estoque-btn');
+    const editProdutoModal = document.getElementById('edit-produto-modal');
+    const editProdutoForm = document.getElementById('edit-produto-form');
+    const acceleratorNavItems = document.querySelectorAll('.sales-accelerator-menu-item');
+    const acceleratorContentAreas = document.querySelectorAll('.sales-accelerator-module-content');
+    const themeToggleButton = document.getElementById('theme-toggle-btn');
     const userNameDisplay = document.querySelector('.user-profile span');
 
     firebase.auth().onAuthStateChanged(user => {
@@ -32,6 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             userId = user.uid;
             userNameDisplay.textContent = `Olá, ${user.displayName || user.email.split('@')[0]}`;
             loadAllData();
+            loadSettings();
         }
     });
 
@@ -52,12 +249,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const snapshot = await db.collection('users').doc(userId).collection('leads').get();
         leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     }
-
     async function loadCaixa() {
         const snapshot = await db.collection('users').doc(userId).collection('caixa').get();
         caixa = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     }
-
     async function loadEstoque() {
         const snapshot = await db.collection('users').doc(userId).collection('estoque').get();
         estoque = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -77,12 +272,9 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const targetId = e.currentTarget.getAttribute('data-target');
             if(!targetId) return;
-
             navItems.forEach(nav => nav.classList.remove('active'));
             e.currentTarget.classList.add('active');
-
             contentAreas.forEach(area => area.classList.remove('active'));
-            
             const targetArea = document.getElementById(targetId);
             if (targetArea) {
                 targetArea.classList.add('active');
@@ -106,6 +298,45 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    acceleratorNavItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('data-content');
+            acceleratorNavItems.forEach(nav => nav.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            acceleratorContentAreas.forEach(area => {
+                area.classList.remove('active');
+                if (area.id === targetId) {
+                    area.classList.add('active');
+                }
+            });
+        });
+    });
+    
+    function applyTheme(theme) {
+        if (theme === 'light') {
+            document.body.classList.add('light-theme');
+            if(themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Escuro';
+        } else {
+            document.body.classList.remove('light-theme');
+            if(themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Claro';
+        }
+    }
+
+    function loadSettings() {
+        const savedTheme = localStorage.getItem('appTheme') || 'dark';
+        applyTheme(savedTheme);
+    }
+    
+    if(themeToggleButton) {
+        themeToggleButton.addEventListener('click', () => {
+            const isLight = document.body.classList.contains('light-theme');
+            const newTheme = isLight ? 'dark' : 'light';
+            localStorage.setItem('appTheme', newTheme);
+            applyTheme(newTheme);
+        });
+    }
+
     if(leadForm) {
         leadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -115,11 +346,8 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await db.collection('users').doc(userId).collection('leads').add(newLead);
                 leadForm.reset();
-                await loadLeads();
-                renderAll();
-            } catch (error) {
-                console.error("Erro ao adicionar lead:", error); alert("Falha ao salvar o lead: " + error.message);
-            }
+                await loadLeads(); renderAll();
+            } catch (error) { console.error("Erro ao adicionar lead:", error); alert("Falha ao salvar o lead: " + error.message); }
         });
     }
 
@@ -132,11 +360,8 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await db.collection('users').doc(userId).collection('caixa').add(newMovimentacao);
                 caixaForm.reset();
-                await loadCaixa();
-                renderAll();
-            } catch (error) {
-                console.error("Erro detalhado ao adicionar movimentação de caixa:", error); alert("Falha ao salvar no caixa: " + error.message);
-            }
+                await loadCaixa(); renderAll();
+            } catch (error) { console.error("Erro ao adicionar movimentação de caixa:", error); alert("Falha ao salvar no caixa: " + error.message); }
         });
     }
     
@@ -149,11 +374,8 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await db.collection('users').doc(userId).collection('estoque').add(newProduto);
                 estoqueForm.reset();
-                await loadEstoque();
-                renderAll();
-            } catch (error) {
-                console.error("Erro ao adicionar produto:", error); alert("Falha ao salvar produto: " + error.message);
-            }
+                await loadEstoque(); renderAll();
+            } catch (error) { console.error("Erro ao adicionar produto:", error); alert("Falha ao salvar produto: " + error.message); }
         });
     }
     
@@ -161,7 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
         importEstoqueFile.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file || !userId) return;
-
             const reader = new FileReader();
             reader.onload = async (event) => {
                 try {
@@ -170,41 +391,87 @@ document.addEventListener('DOMContentLoaded', () => {
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     const json = XLSX.utils.sheet_to_json(worksheet);
-
                     const batch = db.batch();
                     json.forEach(row => {
                         const newProduto = {
-                            produto: row['Produto'] || 'Sem nome',
-                            descricao: row['Descrição'] || '',
-                            compra: parseFloat(row['Valor de Compra']) || 0,
-                            venda: parseFloat(row['Valor de Venda']) || 0,
-                            custos: []
+                            produto: row['Produto'] || 'Sem nome', descricao: row['Descrição'] || '', compra: parseFloat(row['Valor de Compra']) || 0, venda: parseFloat(row['Valor de Venda']) || 0, custos: []
                         };
                         const docRef = db.collection('users').doc(userId).collection('estoque').doc();
                         batch.set(docRef, newProduto);
                     });
                     await batch.commit();
-                    
-                    await loadEstoque();
-                    renderAll();
+                    await loadEstoque(); renderAll();
                     alert(`${json.length} produtos importados com sucesso!`);
-                } catch (error) {
-                    console.error("Erro ao importar arquivo:", error);
-                    alert("Ocorreu um erro ao importar o arquivo: " + error.message);
-                } finally {
-                    e.target.value = '';
-                }
+                } catch (error) { console.error("Erro ao importar arquivo:", error); alert("Ocorreu um erro ao importar o arquivo: " + error.message); } 
+                finally { e.target.value = ''; }
             };
             reader.readAsArrayBuffer(file);
         });
     }
 
+    if (exportLeadsBtn) {
+        exportLeadsBtn.addEventListener('click', () => {
+            if (leads.length === 0) { alert("Não há leads para exportar."); return; }
+            const dataToExport = leads.map(lead => ({
+                'Nome': lead.nome, 'Email': lead.email, 'WhatsApp': lead.whatsapp, 'Status': lead.status, 'Qualificação': lead.qualificacao, 'Origem': lead.origem, 'Atendente': lead.atendente, 'Data': lead.data, 'Notas': lead.notas
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
+            XLSX.writeFile(workbook, "lista_de_leads.xlsx");
+        });
+    }
+
+    if(exportEstoqueBtn) {
+        exportEstoqueBtn.addEventListener('click', () => {
+            if (estoque.length === 0) { alert("Não há produtos no estoque para exportar."); return; }
+            const dataToExport = estoque.map(item => {
+                const totalCustos = (item.custos || []).reduce((sum, custo) => sum + custo.valor, 0);
+                const lucro = item.venda - (item.compra + totalCustos);
+                return { 'Produto': item.produto, 'Descrição': item.descricao, 'Valor de Compra': item.compra, 'Custos Adicionais': totalCustos, 'Valor de Venda': item.venda, 'Lucro': lucro };
+            });
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Estoque");
+            XLSX.writeFile(workbook, "estoque_produtos.xlsx");
+        });
+    }
+
+    if (kanbanBoard) {
+        kanbanBoard.addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('kanban-card')) {
+                draggedItem = e.target;
+                setTimeout(() => { if(draggedItem) draggedItem.style.opacity = '0.5'; }, 0);
+            }
+        });
+        kanbanBoard.addEventListener('dragend', (e) => {
+            if (draggedItem) {
+                draggedItem.style.opacity = '1';
+                draggedItem = null;
+            }
+        });
+        kanbanBoard.addEventListener('dragover', (e) => e.preventDefault() );
+        kanbanBoard.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            const column = e.target.closest('.kanban-column');
+            if (column && draggedItem) {
+                const list = column.querySelector('.kanban-cards-list');
+                list.appendChild(draggedItem);
+                const docId = draggedItem.getAttribute('data-id');
+                const newStatus = column.getAttribute('data-status');
+                try {
+                    await db.collection('users').doc(userId).collection('leads').doc(docId).update({ status: newStatus });
+                    await loadLeads();
+                    renderAll();
+                } catch (error) {
+                    console.error("Erro ao atualizar status do lead:", error);
+                }
+            }
+        });
+    }
 
     document.addEventListener('click', async (e) => {
-        if (e.target.matches('[data-close]')) {
-            e.target.closest('.modal-overlay').classList.remove('active');
-        }
-        
+        if (e.target.matches('[data-close]')) { e.target.closest('.modal-overlay').classList.remove('active'); }
         const editBtn = e.target.closest('.btn-edit-table');
         const deleteBtn = e.target.closest('.btn-delete-table');
         const addCustoBtn = e.target.closest('.btn-custo-table');
@@ -212,7 +479,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (editBtn) {
             const row = editBtn.closest('tr');
             const docId = row.getAttribute('data-id');
-
             if (editBtn.closest('#leads-table')) {
                 const lead = leads.find(l => l.id === docId);
                 if (lead) {
@@ -244,18 +510,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (deleteBtn) {
             const row = deleteBtn.closest('tr');
             const docId = row.getAttribute('data-id');
-            
             if (deleteBtn.closest('#leads-table')) {
                 if (confirm('Tem certeza que deseja excluir este lead?')) {
                     await db.collection('users').doc(userId).collection('leads').doc(docId).delete();
-                    await loadLeads();
-                    renderAll();
+                    await loadLeads(); renderAll();
                 }
             } else if (deleteBtn.closest('#estoque-table')) {
                 if (confirm('Tem certeza que deseja excluir este produto?')) {
                     await db.collection('users').doc(userId).collection('estoque').doc(docId).delete();
-                    await loadEstoque();
-                    renderAll();
+                    await loadEstoque(); renderAll();
                 }
             }
         }
@@ -277,8 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             await db.collection('users').doc(userId).collection('leads').doc(leadId).update(updatedLead);
             editLeadModal.classList.remove('active');
-            await loadLeads();
-            renderAll();
+            await loadLeads(); renderAll();
         });
     }
     
@@ -291,8 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             await db.collection('users').doc(userId).collection('estoque').doc(produtoId).update(updatedProduto);
             editProdutoModal.classList.remove('active');
-            await loadEstoque();
-            renderAll();
+            await loadEstoque(); renderAll();
         });
     }
 
@@ -307,12 +568,10 @@ document.addEventListener('DOMContentLoaded', () => {
             await produtoRef.update({ custos: firebase.firestore.FieldValue.arrayUnion(novoCusto) });
             addCustoModal.classList.remove('active');
             addCustoForm.reset();
-            await loadEstoque();
-            renderAll();
+            await loadEstoque(); renderAll();
         });
     }
     
-    // Funções de renderização, formatação e outras...
     function renderLeadsTable() { const tableBody = document.querySelector('#leads-table tbody'); if (!tableBody) return; tableBody.innerHTML = ''; leads.forEach(lead => tableBody.appendChild(createLeadTableRow(lead))); }
     function createLeadTableRow(lead) { const row = document.createElement('tr'); row.setAttribute('data-id', lead.id); row.innerHTML = `<td>${lead.nome||''}</td><td><a href="https://wa.me/${lead.whatsapp||''}" target="_blank">${lead.whatsapp||''}</a></td><td>${lead.origem||''}</td><td>${lead.qualificacao||''}</td><td>${lead.status||''}</td><td><div class="table-actions"><button class="btn-edit-table" title="Editar Lead"><i class="ph-fill ph-note-pencil"></i></button><button class="btn-delete-table" title="Excluir Lead"><i class="ph-fill ph-trash"></i></button></div></td>`; return row; }
     function renderKanbanCards() { const lists = document.querySelectorAll('.kanban-cards-list'); if(!lists.length) return; lists.forEach(list => list.innerHTML = ''); leads.forEach(lead => { const targetColumn = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`); if (targetColumn) { targetColumn.appendChild(createKanbanCard(lead)); } }); }
