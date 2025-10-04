@@ -32,14 +32,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const acceleratorContentAreas = document.querySelectorAll('.sales-accelerator-module-content');
     const themeToggleButton = document.getElementById('theme-toggle-btn');
     const userNameDisplay = document.querySelector('.user-profile span');
-    
+    const chatbotForm = document.getElementById('chatbot-form');
+    const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotMessages = document.getElementById('chatbot-messages');
+
     // --- PONTO DE ENTRADA PRINCIPAL ---
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
             userId = user.uid;
             userNameDisplay.textContent = `Olá, ${user.displayName || user.email.split('@')[0]}`;
             loadAllData();
-            loadSettings(); // Carrega as configurações de tema, etc.
+            loadSettings();
         }
     });
 
@@ -111,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
-    
+
     acceleratorNavItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
@@ -126,8 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
-
-    // --- LÓGICA DE CONFIGURAÇÕES (TEMA) ---
+    
     function applyTheme(theme) {
         if (theme === 'light') {
             document.body.classList.add('light-theme');
@@ -153,190 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DE DADOS (CRIAR, ATUALIZAR, EXCLUIR) ---
-    if(leadForm) { /* ...código para adicionar lead... */ }
-    if(caixaForm) { /* ...código para adicionar caixa... */ }
-    if(estoqueForm) { /* ...código para adicionar estoque... */ }
-    if(editLeadForm) { /* ...código para editar lead... */ }
-    if(editProdutoForm) { /* ...código para editar produto... */ }
-    if(addCustoForm) { /* ...código para adicionar custo... */ }
-
-    document.addEventListener('click', async (e) => { /* ...código para abrir modais e deletar... */ });
-    
-    // --- LÓGICA DE IMPORTAR/EXPORTAR ---
-    if (exportLeadsBtn) { /* ...código para exportar leads... */ }
-    if (exportEstoqueBtn) { /* ...código para exportar estoque... */ }
-    if(importEstoqueFile) { /* ...código para importar estoque... */ }
-
-    // --- LÓGICA DO KANBAN DRAG & DROP ---
-    if (kanbanBoard) { /* ...código de drag and drop... */ }
-    
-    // --- FUNÇÕES DE RENDERIZAÇÃO ---
-    function renderLeadsTable() { /* ...código... */ }
-    function createLeadTableRow(lead) { /* ...código... */ }
-    function renderKanbanCards() { /* ...código... */ }
-    function createKanbanCard(lead) { /* ...código... */ }
-    function updateCaixa() { /* ...código... */ }
-    function renderCaixaTable() { /* ...código... */ }
-    function renderEstoqueTable() { /* ...código... */ }
-    function updateDashboard() { /* ...código... */ }
-    function updateStatusChart(novo, progresso, fechado) { /* ...código... */ }
-    
-    // --- FUNÇÕES UTILITÁRIAS ---
-    function formatCurrency(value) { return (typeof value === 'number' ? value : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
-});
-
-
-// ==================================================================
-// CÓDIGO COMPLETO PARA SUBSTITUIÇÃO (inclui todas as funções)
-// ==================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const db = firebase.firestore();
-    let userId = null;
-
-    let leads = [];
-    let caixa = [];
-    let estoque = [];
-    
-    let statusChart;
-    let draggedItem = null;
-
-    const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
-    const contentAreas = document.querySelectorAll('.main-content .content-area');
-    const pageTitle = document.getElementById('page-title');
-    const kanbanBoard = document.getElementById('kanban-board');
-    const leadForm = document.getElementById('lead-form');
-    const editLeadModal = document.getElementById('edit-lead-modal');
-    const editLeadForm = document.getElementById('edit-lead-form');
-    const exportLeadsBtn = document.getElementById('export-excel-btn');
-    const caixaForm = document.getElementById('caixa-form');
-    const financeTabs = document.querySelectorAll('.finance-tab');
-    const financeContentAreas = document.querySelectorAll('.finance-content');
-    const estoqueForm = document.getElementById('estoque-form');
-    const addCustoModal = document.getElementById('add-custo-modal');
-    const addCustoForm = document.getElementById('add-custo-form');
-    const importEstoqueFile = document.getElementById('import-estoque-file');
-    const exportEstoqueBtn = document.getElementById('export-estoque-btn');
-    const editProdutoModal = document.getElementById('edit-produto-modal');
-    const editProdutoForm = document.getElementById('edit-produto-form');
-    const acceleratorNavItems = document.querySelectorAll('.sales-accelerator-menu-item');
-    const acceleratorContentAreas = document.querySelectorAll('.sales-accelerator-module-content');
-    const themeToggleButton = document.getElementById('theme-toggle-btn');
-    const userNameDisplay = document.querySelector('.user-profile span');
-
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            userId = user.uid;
-            userNameDisplay.textContent = `Olá, ${user.displayName || user.email.split('@')[0]}`;
-            loadAllData();
-            loadSettings();
-        }
-    });
-
-    async function loadAllData() {
-        if (!userId) return;
-        try {
-            document.body.style.cursor = 'wait';
-            await Promise.all([loadLeads(), loadCaixa(), loadEstoque()]);
-            renderAll();
-        } catch (error) {
-            console.error("Erro fatal ao carregar dados:", error);
-        } finally {
-            document.body.style.cursor = 'default';
-        }
-    }
-
-    async function loadLeads() {
-        const snapshot = await db.collection('users').doc(userId).collection('leads').get();
-        leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
-    async function loadCaixa() {
-        const snapshot = await db.collection('users').doc(userId).collection('caixa').get();
-        caixa = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
-    async function loadEstoque() {
-        const snapshot = await db.collection('users').doc(userId).collection('estoque').get();
-        estoque = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
-
-    function renderAll() {
-        renderKanbanCards();
-        renderLeadsTable();
-        updateDashboard();
-        renderCaixaTable();
-        updateCaixa();
-        renderEstoqueTable();
-    }
-
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = e.currentTarget.getAttribute('data-target');
-            if(!targetId) return;
-            navItems.forEach(nav => nav.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-            contentAreas.forEach(area => area.classList.remove('active'));
-            const targetArea = document.getElementById(targetId);
-            if (targetArea) {
-                targetArea.classList.add('active');
-                pageTitle.textContent = e.currentTarget.querySelector('span').textContent;
-            }
-        });
-    });
-
-    financeTabs.forEach(tab => {
-        tab.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = e.currentTarget.getAttribute('data-tab') + '-tab-content';
-            financeTabs.forEach(t => t.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-            financeContentAreas.forEach(area => {
-                area.classList.remove('active');
-                if (area.id === targetId) {
-                    area.classList.add('active');
-                }
-            });
-        });
-    });
-
-    acceleratorNavItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = e.currentTarget.getAttribute('data-content');
-            acceleratorNavItems.forEach(nav => nav.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-            acceleratorContentAreas.forEach(area => {
-                area.classList.remove('active');
-                if (area.id === targetId) {
-                    area.classList.add('active');
-                }
-            });
-        });
-    });
-    
-    function applyTheme(theme) {
-        if (theme === 'light') {
-            document.body.classList.add('light-theme');
-            if(themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Escuro';
-        } else {
-            document.body.classList.remove('light-theme');
-            if(themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Claro';
-        }
-    }
-
-    function loadSettings() {
-        const savedTheme = localStorage.getItem('appTheme') || 'dark';
-        applyTheme(savedTheme);
-    }
-    
-    if(themeToggleButton) {
-        themeToggleButton.addEventListener('click', () => {
-            const isLight = document.body.classList.contains('light-theme');
-            const newTheme = isLight ? 'dark' : 'light';
-            localStorage.setItem('appTheme', newTheme);
-            applyTheme(newTheme);
-        });
-    }
-
     if(leadForm) {
         leadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -572,6 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // --- FUNÇÕES DE RENDERIZAÇÃO ---
     function renderLeadsTable() { const tableBody = document.querySelector('#leads-table tbody'); if (!tableBody) return; tableBody.innerHTML = ''; leads.forEach(lead => tableBody.appendChild(createLeadTableRow(lead))); }
     function createLeadTableRow(lead) { const row = document.createElement('tr'); row.setAttribute('data-id', lead.id); row.innerHTML = `<td>${lead.nome||''}</td><td><a href="https://wa.me/${lead.whatsapp||''}" target="_blank">${lead.whatsapp||''}</a></td><td>${lead.origem||''}</td><td>${lead.qualificacao||''}</td><td>${lead.status||''}</td><td><div class="table-actions"><button class="btn-edit-table" title="Editar Lead"><i class="ph-fill ph-note-pencil"></i></button><button class="btn-delete-table" title="Excluir Lead"><i class="ph-fill ph-trash"></i></button></div></td>`; return row; }
     function renderKanbanCards() { const lists = document.querySelectorAll('.kanban-cards-list'); if(!lists.length) return; lists.forEach(list => list.innerHTML = ''); leads.forEach(lead => { const targetColumn = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`); if (targetColumn) { targetColumn.appendChild(createKanbanCard(lead)); } }); }
@@ -582,4 +401,51 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateDashboard() { if(!document.getElementById('total-leads')) return; const totalLeads = leads.length; const leadsNovo = leads.filter(l => l.status === 'novo').length; const leadsProgresso = leads.filter(l => l.status === 'progresso').length; const leadsFechado = leads.filter(l => l.status === 'fechado').length; document.getElementById('total-leads').textContent = totalLeads; document.getElementById('leads-novo').textContent = leadsNovo; document.getElementById('leads-progresso').textContent = leadsProgresso; document.getElementById('leads-fechado').textContent = leadsFechado; updateStatusChart(leadsNovo, leadsProgresso, leadsFechado); }
     function updateStatusChart(novo, progresso, fechado) { const ctx = document.getElementById('statusChart'); if (!ctx) return; if (statusChart) { statusChart.destroy(); } statusChart = new Chart(ctx.getContext('2d'), { type: 'doughnut', data: { labels: ['Novo', 'Em Progresso', 'Fechado'], datasets: [{ data: [novo, progresso, fechado], backgroundColor: ['#00f7ff', '#ffc107', '#28a745'] }] } }); }
     function formatCurrency(value) { return (typeof value === 'number' ? value : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+    
+    // --- LÓGICA DO CHATBOT ---
+    if(chatbotForm) {
+        chatbotForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userMessage = chatbotInput.value.trim();
+            if (!userMessage) return;
+
+            addMessageToChat('user', userMessage);
+            chatbotInput.value = '';
+            addMessageToChat('bot', 'Digitando...', true);
+
+            try {
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: userMessage })
+                });
+                document.querySelector('.bot-thinking')?.remove();
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Falha na comunicação com a API.');
+                }
+                const data = await response.json();
+                addMessageToChat('bot', data.text);
+            } catch (error) {
+                console.error("Erro no Chatbot:", error);
+                document.querySelector('.bot-thinking')?.remove();
+                addMessageToChat('bot', `Desculpe, ocorreu um erro: ${error.message}`);
+            }
+        });
+    }
+
+    function addMessageToChat(sender, message, isThinking = false) {
+        const chatbotMessages = document.getElementById('chatbot-messages');
+        if(!chatbotMessages) return;
+        const messageElement = document.createElement('div');
+        messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+        if (isThinking) {
+            messageElement.classList.add('bot-thinking');
+            messageElement.textContent = message;
+        } else {
+            messageElement.innerHTML = `<p>${message}</p>`;
+        }
+        chatbotMessages.appendChild(messageElement);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
 });
