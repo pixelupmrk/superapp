@@ -115,6 +115,7 @@ body {
 }
 
 .content-area {
+    display: none; /* Todas as áreas começam escondidas */
     background-color: var(--primary-color);
     padding: 2rem;
     border-radius: 12px;
@@ -122,9 +123,10 @@ body {
     transition: background-color 0.3s ease;
 }
 
-.content-area:not(.active) {
-    display: none;
+.content-area.active {
+    display: block; /* Apenas a área ativa é mostrada */
 }
+
 
 /* --- Componentes Gerais (Botões, etc) --- */
 .btn-export, .btn-import {
@@ -284,22 +286,7 @@ body {
     margin-bottom: 1rem;
 }
 
-#lead-form input,
-#lead-form select,
-#lead-form textarea,
-#edit-lead-form input,
-#edit-lead-form select,
-#edit-lead-form textarea,
-#caixa-form input,
-#caixa-form select,
-#caixa-form textarea,
-#estoque-form input,
-#estoque-form select,
-#add-custo-form input,
-#setting-user-name,
-#setting-company-name,
-#login-email, 
-#login-password {
+input, select, textarea {
     width: 100%;
     padding: 0.75rem 1rem;
     background-color: var(--primary-color);
@@ -309,24 +296,10 @@ body {
     font-size: 1rem;
     appearance: none;
     transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
 }
 
-#lead-form input:focus,
-#lead-form select:focus,
-#lead-form textarea:focus,
-#edit-lead-form input:focus,
-#edit-lead-form select:focus,
-#edit-lead-form textarea:focus,
-#caixa-form input:focus,
-#caixa-form select:focus,
-#caixa-form textarea:focus,
-#estoque-form input:focus,
-#estoque-form select:focus,
-#add-custo-form input:focus,
-#setting-user-name:focus,
-#setting-company-name:focus,
-#login-email:focus, 
-#login-password:focus {
+input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--accent-color);
     box-shadow: 0 0 10px var(--border-glow);
@@ -346,7 +319,7 @@ body {
     color: var(--text-color-muted);
 }
 
-#lead-form textarea, #edit-lead-form textarea, #caixa-form textarea {
+textarea {
     min-height: 100px;
     resize: vertical;
     margin-bottom: 1rem;
@@ -378,11 +351,16 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.75);
-    display: none; /* Inicia oculto */
+    display: none; 
     justify-content: center;
     align-items: center;
     z-index: 1000;
 }
+
+.modal-overlay.active {
+    display: flex;
+}
+
 
 .modal-content {
     background-color: var(--secondary-color);
@@ -433,23 +411,6 @@ body {
     color: var(--text-color);
 }
 
-#delete-lead-btn {
-    background-color: #d9534f;
-    color: white;
-    border: none;
-    font-weight: 600;
-}
-body.light-theme #delete-lead-btn {
-    color: white;
-}
-
-
-#delete-lead-btn:hover {
-    background-color: #c9302c;
-    box-shadow: 0 0 10px #d9534f;
-}
-
-
 /* --- ESTILOS PARA FINANCEIRO --- */
 .finance-nav {
     display: flex;
@@ -471,8 +432,12 @@ body.light-theme #delete-lead-btn {
     border-bottom-color: var(--accent-color);
 }
 
-.finance-content:not(.active) {
+.finance-content {
     display: none;
+}
+
+.finance-content.active {
+    display: block;
 }
 
 .caixa-stats {
@@ -500,12 +465,6 @@ body.light-theme #delete-lead-btn {
 
 #estoque-search {
     width: 100%;
-    padding: 0.75rem 1rem;
-    background-color: var(--primary-color);
-    border: 1px solid var(--secondary-color);
-    border-radius: 8px;
-    color: var(--text-color);
-    font-size: 1rem;
 }
 
 .buttons-container {
@@ -567,137 +526,6 @@ body.light-theme #delete-lead-btn {
 .btn-custo-table:hover { color: #28a745; }
 
 
-/* --- ESTILOS PARA A SEÇÃO ACELERADOR DE VENDAS --- */
-.sales-accelerator-container {
-    display: flex;
-    gap: 2rem;
-}
-
-.sales-accelerator-sidebar {
-    flex: 0 0 250px;
-    background-color: var(--secondary-color);
-    padding: 1.5rem;
-    border-radius: 12px;
-    transition: background-color 0.3s ease;
-}
-
-.sales-accelerator-menu h2 {
-    color: var(--accent-color);
-    margin-bottom: 1.5rem;
-}
-
-.sales-accelerator-menu ul {
-    list-style: none;
-    padding: 0;
-}
-
-.sales-accelerator-menu-item {
-    padding: 0.8rem 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.sales-accelerator-menu-item:hover {
-    background-color: var(--primary-color);
-}
-
-.sales-accelerator-menu-item.active {
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    font-weight: 600;
-}
-
-.sales-accelerator-content {
-    flex-grow: 1;
-}
-
-.sales-accelerator-module-content {
-    display: none;
-}
-
-.sales-accelerator-module-content.active {
-    display: block;
-}
-
-.sales-accelerator-content h2 {
-    margin-bottom: 1.5rem;
-}
-
-.sales-accelerator-content .section {
-    background-color: var(--secondary-color);
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-    border-left: 4px solid var(--accent-color);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.sales-accelerator-content .section h3 {
-    margin-bottom: 1rem;
-}
-
-.sales-accelerator-content ul {
-    padding-left: 20px;
-    margin-top: 0.5rem;
-}
-
-.sales-accelerator-content table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-}
-
-.sales-accelerator-content th, .sales-accelerator-content td {
-    padding: 0.8rem;
-    border: 1px solid var(--primary-color);
-    text-align: left;
-    transition: border-color 0.3s ease;
-}
-
-.sales-accelerator-content th {
-    background-color: var(--primary-color);
-    transition: background-color 0.3s ease;
-}
-
-.exercise-section {
-    border-color: #ffc107;
-}
-
-.anotacoes-aluno {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--primary-color);
-    transition: border-color 0.3s ease;
-}
-
-.anotacoes-aluno label {
-    display: block;
-    margin-bottom: 0.75rem;
-    font-weight: 600;
-    color: var(--text-color);
-}
-
-.anotacoes-aluno textarea {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background-color: var(--primary-color);
-    border: 1px solid var(--secondary-color);
-    border-radius: 8px;
-    color: var(--text-color);
-    font-size: 1rem;
-    resize: vertical;
-    min-height: 120px;
-    transition: all 0.3s ease;
-}
-
-.anotacoes-aluno textarea:focus {
-    outline: none;
-    border-color: #ffc107;
-    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
-}
-
 /* --- ESTILOS PARA O CHATBOT AI --- */
 .chatbot-container {
     display: flex;
@@ -756,19 +584,6 @@ body.light-theme #delete-lead-btn {
 
 #chatbot-input {
     flex-grow: 1;
-    background-color: var(--primary-color);
-    border: 1px solid var(--secondary-color);
-    border-radius: 25px;
-    padding: 0.75rem 1.25rem;
-    color: var(--text-color);
-    font-size: 1rem;
-    outline: none;
-    transition: all 0.3s ease;
-}
-
-#chatbot-input:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 10px var(--border-glow);
 }
 
 .chatbot-form button {
@@ -809,14 +624,13 @@ body.light-theme #delete-lead-btn {
     max-width: 400px;
 }
 
-/* Regra antiga da logo removida e substituída */
 .login-container h2 {
     color: var(--accent-color);
     margin-bottom: 2rem;
 }
 
 .login-container h2:last-of-type {
-    color: var(--text-color); /* Mantém o "Acesse o Super App" com a cor normal */
+    color: var(--text-color); 
 }
 
 .btn-login {
