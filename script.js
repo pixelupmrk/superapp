@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
             userId = user.uid;
-            loadSettings(); // Carrega nome e tema
+            loadSettings();
             loadAllData();
         }
     });
@@ -101,8 +101,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    financeTabs.forEach(tab => { /* ...código da aba financeira... */ });
-    acceleratorNavItems.forEach(item => { /* ...código do acelerador... */ });
+    financeTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('data-tab') + '-tab-content';
+            financeTabs.forEach(t => t.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            financeContentAreas.forEach(area => {
+                area.classList.remove('active');
+                if (area.id === targetId) {
+                    area.classList.add('active');
+                }
+            });
+        });
+    });
+
+    acceleratorNavItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('data-content');
+            acceleratorNavItems.forEach(nav => nav.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            acceleratorContentAreas.forEach(area => {
+                area.classList.remove('active');
+                if (area.id === targetId) {
+                    area.classList.add('active');
+                }
+            });
+        });
+    });
     
     // --- LÓGICA DE CONFIGURAÇÕES (TEMA, NOME) ---
     function applyTheme(theme) {
@@ -148,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Configurações salvas com sucesso!');
         });
     }
-
+    
     // --- LÓGICA DE PESQUISA DO ESTOQUE ---
     if (estoqueSearch) {
         estoqueSearch.addEventListener('input', (e) => {
@@ -165,204 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-    
-    // As demais funções (adicionar, editar, deletar, kanban, exportar, etc.)
-    // foram omitidas aqui para simplificar, mas estão no código completo abaixo.
-});
 
-
-// ==================================================================
-// CÓDIGO COMPLETO PARA SUBSTITUIÇÃO (inclui todas as funções)
-// ==================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const db = firebase.firestore();
-    let userId = null;
-
-    let leads = [];
-    let caixa = [];
-    let estoque = [];
-    
-    let statusChart;
-    let draggedItem = null;
-
-    const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
-    const contentAreas = document.querySelectorAll('.main-content .content-area');
-    const pageTitle = document.getElementById('page-title');
-    const kanbanBoard = document.getElementById('kanban-board');
-    const leadForm = document.getElementById('lead-form');
-    const editLeadModal = document.getElementById('edit-lead-modal');
-    const editLeadForm = document.getElementById('edit-lead-form');
-    const exportLeadsBtn = document.getElementById('export-excel-btn');
-    const caixaForm = document.getElementById('caixa-form');
-    const financeTabs = document.querySelectorAll('.finance-tab');
-    const financeContentAreas = document.querySelectorAll('.finance-content');
-    const estoqueForm = document.getElementById('estoque-form');
-    const estoqueSearch = document.getElementById('estoque-search');
-    const addCustoModal = document.getElementById('add-custo-modal');
-    const addCustoForm = document.getElementById('add-custo-form');
-    const importEstoqueFile = document.getElementById('import-estoque-file');
-    const exportEstoqueBtn = document.getElementById('export-estoque-btn');
-    const editProdutoModal = document.getElementById('edit-produto-modal');
-    const editProdutoForm = document.getElementById('edit-produto-form');
-    const acceleratorNavItems = document.querySelectorAll('.sales-accelerator-menu-item');
-    const acceleratorContentAreas = document.querySelectorAll('.sales-accelerator-module-content');
-    const themeToggleButton = document.getElementById('theme-toggle-btn');
-    const saveSettingsButton = document.getElementById('save-settings-btn');
-    const userNameInput = document.getElementById('setting-user-name');
-    const companyNameInput = document.getElementById('setting-company-name');
-    const userNameDisplay = document.querySelector('.user-profile span');
-    const chatbotForm = document.getElementById('chatbot-form');
-    const chatbotInput = document.getElementById('chatbot-input');
-
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            userId = user.uid;
-            loadSettings();
-            loadAllData();
-        }
-    });
-
-    async function loadAllData() {
-        if (!userId) return;
-        try {
-            document.body.style.cursor = 'wait';
-            await Promise.all([loadLeads(), loadCaixa(), loadEstoque()]);
-            renderAll();
-        } catch (error) {
-            console.error("Erro fatal ao carregar dados:", error);
-        } finally {
-            document.body.style.cursor = 'default';
-        }
-    }
-
-    async function loadLeads() {
-        const snapshot = await db.collection('users').doc(userId).collection('leads').get();
-        leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
-    async function loadCaixa() {
-        const snapshot = await db.collection('users').doc(userId).collection('caixa').get();
-        caixa = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
-    async function loadEstoque() {
-        const snapshot = await db.collection('users').doc(userId).collection('estoque').get();
-        estoque = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
-
-    function renderAll() {
-        renderKanbanCards();
-        renderLeadsTable();
-        updateDashboard();
-        renderCaixaTable();
-        updateCaixa();
-        renderEstoqueTable();
-    }
-
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = e.currentTarget.getAttribute('data-target');
-            if(!targetId) return;
-            navItems.forEach(nav => nav.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-            contentAreas.forEach(area => area.classList.remove('active'));
-            const targetArea = document.getElementById(targetId);
-            if (targetArea) {
-                targetArea.classList.add('active');
-                pageTitle.textContent = e.currentTarget.querySelector('span').textContent;
-            }
-        });
-    });
-
-    financeTabs.forEach(tab => {
-        tab.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = e.currentTarget.getAttribute('data-tab') + '-tab-content';
-            financeTabs.forEach(t => t.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-            financeContentAreas.forEach(area => {
-                area.classList.remove('active');
-                if (area.id === targetId) {
-                    area.classList.add('active');
-                }
-            });
-        });
-    });
-
-    acceleratorNavItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = e.currentTarget.getAttribute('data-content');
-            acceleratorNavItems.forEach(nav => nav.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-            acceleratorContentAreas.forEach(area => {
-                area.classList.remove('active');
-                if (area.id === targetId) {
-                    area.classList.add('active');
-                }
-            });
-        });
-    });
-    
-    function applyTheme(theme) {
-        if (theme === 'light') {
-            document.body.classList.add('light-theme');
-            if(themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Escuro';
-        } else {
-            document.body.classList.remove('light-theme');
-            if(themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Claro';
-        }
-    }
-
-    function loadSettings() {
-        const savedTheme = localStorage.getItem('appTheme') || 'dark';
-        const savedUserName = localStorage.getItem('userName') || (firebase.auth().currentUser?.email.split('@')[0] || 'Usuário');
-        const savedCompanyName = localStorage.getItem('companyName') || '';
-
-        applyTheme(savedTheme);
-        userNameDisplay.textContent = `Olá, ${savedUserName}`;
-        
-        if (userNameInput) userNameInput.value = savedUserName === 'Usuário' ? '' : savedUserName;
-        if (companyNameInput) companyNameInput.value = savedCompanyName;
-    }
-    
-    if(themeToggleButton) {
-        themeToggleButton.addEventListener('click', () => {
-            const isLight = document.body.classList.contains('light-theme');
-            const newTheme = isLight ? 'dark' : 'light';
-            localStorage.setItem('appTheme', newTheme);
-            applyTheme(newTheme);
-        });
-    }
-
-    if(saveSettingsButton) {
-        saveSettingsButton.addEventListener('click', () => {
-            const newUserName = userNameInput.value.trim() || 'Usuário';
-            const newCompanyName = companyNameInput.value.trim();
-
-            localStorage.setItem('userName', newUserName);
-            localStorage.setItem('companyName', newCompanyName);
-
-            userNameDisplay.textContent = `Olá, ${newUserName}`;
-            alert('Configurações salvas com sucesso!');
-        });
-    }
-
-    if (estoqueSearch) {
-        estoqueSearch.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#estoque-table tbody tr');
-            rows.forEach(row => {
-                const produtoText = row.children[0].textContent.toLowerCase();
-                const descricaoText = row.children[1].textContent.toLowerCase();
-                if (produtoText.includes(searchTerm) || descricaoText.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    }
-
+    // --- LÓGICA DE DADOS (CRIAR, ATUALIZAR, EXCLUIR) ---
     if(leadForm) {
         leadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -598,6 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // --- FUNÇÕES DE RENDERIZAÇÃO ---
     function renderLeadsTable() { const tableBody = document.querySelector('#leads-table tbody'); if (!tableBody) return; tableBody.innerHTML = ''; leads.forEach(lead => tableBody.appendChild(createLeadTableRow(lead))); }
     function createLeadTableRow(lead) { const row = document.createElement('tr'); row.setAttribute('data-id', lead.id); row.innerHTML = `<td>${lead.nome||''}</td><td><a href="https://wa.me/${lead.whatsapp||''}" target="_blank">${lead.whatsapp||''}</a></td><td>${lead.origem||''}</td><td>${lead.qualificacao||''}</td><td>${lead.status||''}</td><td><div class="table-actions"><button class="btn-edit-table" title="Editar Lead"><i class="ph-fill ph-note-pencil"></i></button><button class="btn-delete-table" title="Excluir Lead"><i class="ph-fill ph-trash"></i></button></div></td>`; return row; }
     function renderKanbanCards() { const lists = document.querySelectorAll('.kanban-cards-list'); if(!lists.length) return; lists.forEach(list => list.innerHTML = ''); leads.forEach(lead => { const targetColumn = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`); if (targetColumn) { targetColumn.appendChild(createKanbanCard(lead)); } }); }
@@ -609,6 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateStatusChart(novo, progresso, fechado) { const ctx = document.getElementById('statusChart'); if (!ctx) return; if (statusChart) { statusChart.destroy(); } statusChart = new Chart(ctx.getContext('2d'), { type: 'doughnut', data: { labels: ['Novo', 'Em Progresso', 'Fechado'], datasets: [{ data: [novo, progresso, fechado], backgroundColor: ['#00f7ff', '#ffc107', '#28a745'] }] } }); }
     function formatCurrency(value) { return (typeof value === 'number' ? value : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
     
+    // --- LÓGICA DO CHATBOT ---
     if(chatbotForm) {
         chatbotForm.addEventListener('submit', async (e) => {
             e.preventDefault();
