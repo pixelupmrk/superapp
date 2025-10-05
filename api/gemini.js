@@ -1,5 +1,3 @@
-// Arquivo: api/gemini.js (VERSÃO COM MEMÓRIA)
-
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 module.exports = async (req, res) => {
@@ -8,7 +6,7 @@ module.exports = async (req, res) => {
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
-  // Agora esperamos receber 'history' e 'prompt'
+  // Espera receber o histórico da conversa e a nova pergunta (prompt)
   const { history, prompt } = req.body;
 
   if (!apiKey) {
@@ -22,11 +20,12 @@ module.exports = async (req, res) => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
+    // Usando o modelo "gemini-1.5-flash" conforme solicitado
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
-    // Inicia um chat com o histórico recebido
+    // Inicia um chat com o histórico recebido para dar memória ao bot
     const chat = model.startChat({
-      history: history || [], // Usa o histórico se ele existir
+      history: history || [], 
     });
 
     // Envia a nova mensagem (prompt) dentro do contexto do chat
