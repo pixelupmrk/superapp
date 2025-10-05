@@ -531,3 +531,144 @@ document.addEventListener('DOMContentLoaded', () => {
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
 });
+// Arquivo: script.js (VERSÃO COM HISTÓRICO DE CHAT)
+
+document.addEventListener('DOMContentLoaded', () => {
+    const db = firebase.firestore();
+    let userId = null;
+
+    // ... (todo o código anterior de leads, caixa, etc. continua igual) ...
+    let leads = [];
+    let caixa = [];
+    let estoque = [];
+    let statusChart;
+    let draggedItem = null;
+    const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+    const contentAreas = document.querySelectorAll('.main-content .content-area');
+    const pageTitle = document.getElementById('page-title');
+    const chatbotForm = document.getElementById('chatbot-form');
+    const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotMessages = document.getElementById('chatbot-messages');
+
+    // --- PONTO DE ENTRADA PRINCIPAL ---
+    firebase.auth().onAuthStateChanged(async user => {
+        if (user) {
+            userId = user.uid;
+            await loadSettings();
+            loadAllData();
+            loadChatHistory(); // NOVO: Carrega o histórico do chat ao entrar
+        }
+    });
+
+    // --- FUNÇÃO PARA SALVAR MENSAGEM NO HISTÓRICO ---
+    async function saveMessageToHistory(sender, text) {
+        if (!userId) return;
+        try {
+            await db.collection('users').doc(userId).collection('chatbotHistory').add({
+                sender: sender, // 'user' ou 'bot'
+                text: text,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (error) {
+            console.error("Erro ao salvar mensagem no histórico:", error);
+        }
+    }
+
+    // --- FUNÇÃO PARA CARREGAR O HISTÓRICO DO CHAT ---
+    async function loadChatHistory() {
+        if (!userId || !chatbotMessages) return;
+        
+        // Limpa as mensagens iniciais
+        chatbotMessages.innerHTML = '';
+
+        const snapshot = await db.collection('users').doc(userId).collection('chatbotHistory').orderBy('timestamp', 'asc').get();
+        
+        if (snapshot.empty) {
+            addMessageToChat('bot', 'Olá! Eu sou seu assistente de vendas. Como posso ajudar?');
+        } else {
+            snapshot.docs.forEach(doc => {
+                const message = doc.data();
+                addMessageToChat(message.sender, message.text);
+            });
+        }
+    }
+    
+    // --- LÓGICA DO CHATBOT ATUALIZADA ---
+    if(chatbotForm) {
+        chatbotForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userMessage = chatbotInput.value.trim();
+            if (!userMessage) return;
+
+            addMessageToChat('user', userMessage);
+            await saveMessageToHistory('user', userMessage); // Salva a mensagem do usuário
+            chatbotInput.value = '';
+            addMessageToChat('bot', 'Digitando...', true);
+
+            // Prepara o histórico para enviar à IA
+            const historyForAI = [];
+            const messageElements = chatbotMessages.querySelectorAll('.user-message, .bot-message');
+            messageElements.forEach(el => {
+                if (!el.classList.contains('bot-thinking')) {
+                    const role = el.classList.contains('user-message') ? 'user' : 'model';
+                    const text = el.querySelector('p')?.textContent || '';
+                    if (text) {
+                        historyForAI.push({ role, parts: [{ text }] });
+                    }
+                }
+            });
+            // Remove a última mensagem (a que o usuário acabou de digitar) pois ela será enviada como o prompt principal
+            historyForAI.pop();
+
+            try {
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // Envia o histórico junto com a nova pergunta
+                    body: JSON.stringify({ history: historyForAI, prompt: userMessage })
+                });
+
+                document.querySelector('.bot-thinking')?.remove();
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Falha na comunicação com a API.');
+                }
+                const data = await response.json();
+                addMessageToChat('bot', data.text);
+                await saveMessageToHistory('bot', data.text); // Salva a resposta do bot
+
+            } catch (error) {
+                console.error("Erro no Chatbot:", error);
+                document.querySelector('.bot-thinking')?.remove();
+                const errorMessage = `Desculpe, ocorreu um erro: ${error.message}`;
+                addMessageToChat('bot', errorMessage);
+                await saveMessageToHistory('bot', errorMessage);
+            }
+        });
+    }
+
+    function addMessageToChat(sender, message, isThinking = false) {
+        if(!chatbotMessages) return;
+        const messageElement = document.createElement('div');
+        messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+        if (isThinking) {
+            messageElement.classList.add('bot-thinking');
+            messageElement.textContent = message;
+        } else {
+            // Usamos textContent para segurança, evitando injeção de HTML
+            const p = document.createElement('p');
+            p.textContent = message;
+            messageElement.appendChild(p);
+        }
+        chatbotMessages.appendChild(messageElement);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    // =======================================================================
+    // COLE TODO O RESTANTE DO SEU CÓDIGO ANTERIOR AQUI
+    // (A partir de 'async function loadAllData() { ... }' até o final)
+    // =======================================================================
+
+    // ... (código de loadAllData, renderAll, navegação, configurações, etc.)
+});
