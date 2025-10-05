@@ -1,3 +1,5 @@
+// Arquivo: api/gemini.js (VERSÃO COM MEMÓRIA)
+
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 module.exports = async (req, res) => {
@@ -6,7 +8,8 @@ module.exports = async (req, res) => {
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
-  const { prompt } = req.body;
+  // Agora esperamos receber 'history' e 'prompt'
+  const { history, prompt } = req.body;
 
   if (!apiKey) {
     console.error("ERRO: Variável de ambiente GEMINI_API_KEY não encontrada na Vercel.");
@@ -19,10 +22,15 @@ module.exports = async (req, res) => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // CORREÇÃO: Usando o modelo exato que você pediu: "gemini-2.5-flash"
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
-    const result = await model.generateContent(prompt);
+    // Inicia um chat com o histórico recebido
+    const chat = model.startChat({
+      history: history || [], // Usa o histórico se ele existir
+    });
+
+    // Envia a nova mensagem (prompt) dentro do contexto do chat
+    const result = await chat.sendMessage(prompt);
     const response = await result.response;
     const text = response.text();
     
