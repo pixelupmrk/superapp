@@ -38,17 +38,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const userNameDisplay = document.querySelector('.user-profile span');
     const chatbotForm = document.getElementById('chatbot-form');
     const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotMessages = document.getElementById('chatbot-messages');
 
-    // --- PONTO DE ENTRADA PRINCIPAL ---
+    // --- FUNÇÃO DE PONTO DE ENTRADA ---
     firebase.auth().onAuthStateChanged(async user => {
         if (user) {
             userId = user.uid;
-            await loadSettings(); // Espera as configurações serem carregadas
-            loadAllData();
+            await loadSettings(); // Carrega configurações primeiro
+            loadAllData();      // Depois carrega o resto dos dados
+            loadChatHistory();  // E o histórico do chat
         }
     });
 
     // --- FUNÇÕES DE CARREGAMENTO DE DADOS ---
+    async function loadSettings() {
+        const savedTheme = localStorage.getItem(`appTheme_${userId}`) || 'dark';
+        applyTheme(savedTheme);
+        if (!userId) return;
+        try {
+            const userDocRef = db.collection('users').doc(userId);
+            const doc = await userDocRef.get();
+            let userName = firebase.auth().currentUser?.email.split('@')[0] || 'Usuário';
+            let companyName = '';
+            if (doc.exists && doc.data().settings) {
+                const settings = doc.data().settings;
+                userName = settings.userName || userName;
+                companyName = settings.companyName || '';
+            }
+            if(userNameDisplay) userNameDisplay.textContent = `Olá, ${userName}`;
+            if (userNameInput) userNameInput.value = userName === 'Usuário' ? '' : userName;
+            if (companyNameInput) companyNameInput.value = companyName;
+        } catch (error) {
+            console.error("Erro ao carregar configurações do Firestore:", error);
+        }
+    }
+
     async function loadAllData() {
         if (!userId) return;
         try {
@@ -75,6 +99,21 @@ document.addEventListener('DOMContentLoaded', () => {
         estoque = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     }
 
+    async function loadChatHistory() {
+        if (!userId || !chatbotMessages) return;
+        chatbotMessages.innerHTML = '';
+        const snapshot = await db.collection('users').doc(userId).collection('chatbotHistory').orderBy('timestamp', 'asc').get();
+        if (snapshot.empty) {
+            addMessageToChat('bot', 'Olá! Eu sou seu assistente de vendas. Como posso ajudar?');
+        } else {
+            snapshot.docs.forEach(doc => {
+                const message = doc.data();
+                addMessageToChat(message.sender, message.text);
+            });
+        }
+    }
+
+    // --- FUNÇÕES DE RENDERIZAÇÃO E UI ---
     function renderAll() {
         renderKanbanCards();
         renderLeadsTable();
@@ -83,8 +122,119 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCaixa();
         renderEstoqueTable();
     }
+    
+    function applyTheme(theme) {
+        if (theme === 'light') {
+            document.body.classList.add('light-theme');
+            if(themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Escuro';
+        } else {
+            document.body.classList.remove('light-theme');
+            if(themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Claro';
+        }
+    }
+    
+    function addMessageToChat(sender, message, isThinking = false) {
+        if(!chatbotMessages) return;
+        const messageElement = document.createElement('div');
+        messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+        if (isThinking) {
+            messageElement.classList.add('bot-thinking');
+            messageElement.textContent = message;
+        } else {
+            const p = document.createElement('p');
+            p.textContent = message;
+            messageElement.appendChild(p);
+        }
+        chatbotMessages.appendChild(messageElement);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
 
-    // --- LÓGICA DE NAVEGAÇÃO E UI ---
+    async function saveMessageToHistory(sender, text) {
+        if (!userId) return;
+        try {
+            await db.collection('users').doc(userId).collection('chatbotHistory').add({
+                sender: sender, text: text, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        } catch (error) { console.error("Erro ao salvar mensagem no histórico:", error); }
+    }
+
+    // --- EVENT LISTENERS ---
+    if(saveSettingsButton) {
+        saveSettingsButton.addEventListener('click', async () => {
+            if (!userId) { return alert('Erro: Usuário não autenticado.'); }
+            const newUserName = userNameInput.value.trim() || 'Usuário';
+            const newCompanyName = companyNameInput.value.trim();
+            const settings = { userName: newUserName, companyName: newCompanyName };
+            try {
+                const userDocRef = db.collection('users').doc(userId);
+                await userDocRef.set({ settings }, { merge: true });
+                if(userNameDisplay) userNameDisplay.textContent = `Olá, ${newUserName}`;
+                alert('Configurações salvas com sucesso!');
+            } catch (error) {
+                console.error("Erro ao salvar configurações:", error);
+                alert('Falha ao salvar. Tente novamente.');
+            }
+        });
+    }
+
+    if(themeToggleButton) {
+        themeToggleButton.addEventListener('click', () => {
+            const isLight = document.body.classList.contains('light-theme');
+            const newTheme = isLight ? 'dark' : 'light';
+            localStorage.setItem(`appTheme_${userId}`, newTheme);
+            applyTheme(newTheme);
+        });
+    }
+
+    if(chatbotForm) {
+        chatbotForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userMessage = chatbotInput.value.trim();
+            if (!userMessage) return;
+
+            addMessageToChat('user', userMessage);
+            await saveMessageToHistory('user', userMessage);
+            chatbotInput.value = '';
+            addMessageToChat('bot', 'Digitando...', true);
+
+            const historyForAI = [];
+            const messageElements = chatbotMessages.querySelectorAll('.user-message, .bot-message');
+            messageElements.forEach(el => {
+                if (!el.classList.contains('bot-thinking')) {
+                    const role = el.classList.contains('user-message') ? 'user' : 'model';
+                    const text = el.querySelector('p')?.textContent || '';
+                    if (text) { historyForAI.push({ role, parts: [{ text }] }); }
+                }
+            });
+            historyForAI.pop(); // Remove a última mensagem do usuário do histórico, pois ela vai como prompt
+
+            try {
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ history: historyForAI, prompt: userMessage })
+                });
+                document.querySelector('.bot-thinking')?.remove();
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Falha na comunicação com a API.');
+                }
+                const data = await response.json();
+                addMessageToChat('bot', data.text);
+                await saveMessageToHistory('bot', data.text);
+            } catch (error) {
+                console.error("Erro no Chatbot:", error);
+                document.querySelector('.bot-thinking')?.remove();
+                const errorMessage = `Desculpe, ocorreu um erro: ${error.message}`;
+                addMessageToChat('bot', errorMessage);
+                await saveMessageToHistory('bot', errorMessage);
+            }
+        });
+    }
+
+    // --- RESTO DO CÓDIGO ---
+    // (Todas as outras funções e event listeners que você já tinha)
+    
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
@@ -96,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetArea = document.getElementById(targetId);
             if (targetArea) {
                 targetArea.classList.add('active');
-                pageTitle.textContent = e.currentTarget.querySelector('span').textContent;
+                if(pageTitle) pageTitle.textContent = e.currentTarget.querySelector('span').textContent;
             }
         });
     });
@@ -109,9 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.currentTarget.classList.add('active');
             financeContentAreas.forEach(area => {
                 area.classList.remove('active');
-                if (area.id === targetId) {
-                    area.classList.add('active');
-                }
+                if (area.id === targetId) area.classList.add('active');
             });
         });
     });
@@ -124,119 +272,21 @@ document.addEventListener('DOMContentLoaded', () => {
             e.currentTarget.classList.add('active');
             acceleratorContentAreas.forEach(area => {
                 area.classList.remove('active');
-                if (area.id === targetId) {
-                    area.classList.add('active');
-                }
+                if (area.id === targetId) area.classList.add('active');
             });
         });
     });
     
-    // --- LÓGICA DE CONFIGURAÇÕES (TEMA, NOME) ---
-    function applyTheme(theme) {
-        if (theme === 'light') {
-            document.body.classList.add('light-theme');
-            if(themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Escuro';
-        } else {
-            document.body.classList.remove('light-theme');
-            if(themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Claro';
-        }
-    }
-
-    // FUNÇÃO DE CARREGAR CONFIGURAÇÕES ATUALIZADA
-    async function loadSettings() {
-        // Carrega o tema do localStorage (isso pode continuar sendo local)
-        const savedTheme = localStorage.getItem(`appTheme_${userId}`) || 'dark';
-        applyTheme(savedTheme);
-
-        if (!userId) return;
-
-        try {
-            // Tenta carregar as configurações do Firestore
-            const userDocRef = db.collection('users').doc(userId);
-            const doc = await userDocRef.get();
-
-            let userName = firebase.auth().currentUser?.email.split('@')[0] || 'Usuário';
-            let companyName = '';
-
-            if (doc.exists && doc.data().settings) {
-                const settings = doc.data().settings;
-                userName = settings.userName || userName;
-                companyName = settings.companyName || '';
-            }
-            
-            // Atualiza a UI
-            userNameDisplay.textContent = `Olá, ${userName}`;
-            if (userNameInput) userNameInput.value = userName === 'Usuário' ? '' : userName;
-            if (companyNameInput) companyNameInput.value = companyName;
-
-        } catch (error) {
-            console.error("Erro ao carregar configurações do Firestore:", error);
-            // Se falhar, usa um fallback
-            const defaultUserName = firebase.auth().currentUser?.email.split('@')[0] || 'Usuário';
-            userNameDisplay.textContent = `Olá, ${defaultUserName}`;
-        }
-    }
-    
-    if(themeToggleButton) {
-        themeToggleButton.addEventListener('click', () => {
-            const isLight = document.body.classList.contains('light-theme');
-            const newTheme = isLight ? 'dark' : 'light';
-            // Salva o tema associado ao userId para não misturar entre usuários
-            localStorage.setItem(`appTheme_${userId}`, newTheme);
-            applyTheme(newTheme);
-        });
-    }
-
-    // BOTÃO DE SALVAR CONFIGURAÇÕES ATUALIZADO
-    if(saveSettingsButton) {
-        saveSettingsButton.addEventListener('click', async () => {
-            if (!userId) {
-                alert('Erro: Usuário não autenticado.');
-                return;
-            }
-
-            const newUserName = userNameInput.value.trim() || 'Usuário';
-            const newCompanyName = companyNameInput.value.trim();
-            
-            const settings = {
-                userName: newUserName,
-                companyName: newCompanyName
-            };
-
-            try {
-                // Salva (ou atualiza) as configurações no documento do usuário no Firestore
-                const userDocRef = db.collection('users').doc(userId);
-                await userDocRef.set({ settings: settings }, { merge: true });
-
-                // Atualiza a UI
-                userNameDisplay.textContent = `Olá, ${newUserName}`;
-                alert('Configurações salvas com sucesso!');
-
-            } catch (error) {
-                console.error("Erro ao salvar configurações no Firestore:", error);
-                alert('Falha ao salvar as configurações. Tente novamente.');
-            }
-        });
-    }
-    
-    // --- LÓGICA DE PESQUISA DO ESTOQUE ---
     if (estoqueSearch) {
         estoqueSearch.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#estoque-table tbody tr');
-            rows.forEach(row => {
-                const produtoText = row.children[0].textContent.toLowerCase();
-                const descricaoText = row.children[1].textContent.toLowerCase();
-                if (produtoText.includes(searchTerm) || descricaoText.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+            document.querySelectorAll('#estoque-table tbody tr').forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                row.style.display = rowText.includes(searchTerm) ? '' : 'none';
             });
         });
     }
 
-    // --- LÓGICA DE DADOS (CRIAR, ATUALIZAR, EXCLUIR) ---
     if(leadForm) {
         leadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -472,203 +522,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // --- FUNÇÕES DE RENDERIZAÇÃO ---
     function renderLeadsTable() { const tableBody = document.querySelector('#leads-table tbody'); if (!tableBody) return; tableBody.innerHTML = ''; leads.forEach(lead => tableBody.appendChild(createLeadTableRow(lead))); }
     function createLeadTableRow(lead) { const row = document.createElement('tr'); row.setAttribute('data-id', lead.id); row.innerHTML = `<td>${lead.nome||''}</td><td><a href="https://wa.me/${lead.whatsapp||''}" target="_blank">${lead.whatsapp||''}</a></td><td>${lead.origem||''}</td><td>${lead.qualificacao||''}</td><td>${lead.status||''}</td><td><div class="table-actions"><button class="btn-edit-table" title="Editar Lead"><i class="ph-fill ph-note-pencil"></i></button><button class="btn-delete-table" title="Excluir Lead"><i class="ph-fill ph-trash"></i></button></div></td>`; return row; }
     function renderKanbanCards() { const lists = document.querySelectorAll('.kanban-cards-list'); if(!lists.length) return; lists.forEach(list => list.innerHTML = ''); leads.forEach(lead => { const targetColumn = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`); if (targetColumn) { targetColumn.appendChild(createKanbanCard(lead)); } }); }
     function createKanbanCard(lead) { const newCard = document.createElement('div'); newCard.classList.add('kanban-card'); newCard.draggable = true; newCard.setAttribute('data-id', lead.id); newCard.innerHTML = `<strong>${lead.nome||''}</strong><br><small>WhatsApp: <a href="https://wa.me/${lead.whatsapp||''}" target="_blank">${lead.whatsapp||''}</a></small><br><small>Origem: ${lead.origem||''}</small><br><small>Qualificação: ${lead.qualificacao||''}</small>`; return newCard; }
-    function updateCaixa() { const totalEntradas = caixa.filter(item => item.tipo === 'entrada').reduce((sum, item) => sum + item.valor, 0); const totalSaidas = caixa.filter(item => item.tipo === 'saida').reduce((sum, item) => sum + item.valor, 0); const saldoAtual = totalEntradas - totalSaidas; document.getElementById('total-entradas').textContent = formatCurrency(totalEntradas); document.getElementById('total-saidas').textContent = formatCurrency(totalSaidas); document.getElementById('caixa-atual').textContent = formatCurrency(saldoAtual); }
+    function updateCaixa() { const totalEntradas = caixa.filter(item => item.tipo === 'entrada').reduce((sum, item) => sum + item.valor, 0); const totalSaidas = caixa.filter(item => item.tipo === 'saida').reduce((sum, item) => sum + item.valor, 0); const saldoAtual = totalEntradas - totalSaidas; if(document.getElementById('total-entradas')) document.getElementById('total-entradas').textContent = formatCurrency(totalEntradas); if(document.getElementById('total-saidas')) document.getElementById('total-saidas').textContent = formatCurrency(totalSaidas); if(document.getElementById('caixa-atual')) document.getElementById('caixa-atual').textContent = formatCurrency(saldoAtual); }
     function renderCaixaTable() { const tableBody = document.querySelector('#caixa-table tbody'); if(!tableBody) return; tableBody.innerHTML = ''; caixa.forEach(item => { const row = document.createElement('tr'); row.classList.add(item.tipo === 'entrada' ? 'entrada-row' : 'saida-row'); row.innerHTML = `<td>${new Date(item.data).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</td><td>${item.descricao}</td><td>${item.tipo === 'entrada' ? formatCurrency(item.valor) : '-'}</td><td>${item.tipo === 'saida' ? formatCurrency(item.valor) : '-'}</td><td>${item.observacoes}</td>`; tableBody.appendChild(row); }); }
     function renderEstoqueTable() { const tableBody = document.querySelector('#estoque-table tbody'); if(!tableBody) return; tableBody.innerHTML = ''; estoque.forEach(item => { const totalCustos = (item.custos || []).reduce((sum, custo) => sum + custo.valor, 0); const lucro = item.venda - (item.compra + totalCustos); const row = document.createElement('tr'); row.setAttribute('data-id', item.id); row.innerHTML = `<td>${item.produto}</td><td>${item.descricao}</td><td>${formatCurrency(item.compra)}</td><td>${formatCurrency(totalCustos)}</td><td>${formatCurrency(item.venda)}</td><td>${formatCurrency(lucro)}</td><td><div class="table-actions"><button class="btn-custo-table" title="Adicionar Custo"><i class="ph-fill ph-currency-dollar-simple"></i></button><button class="btn-edit-table" title="Editar Produto"><i class="ph-fill ph-note-pencil"></i></button><button class="btn-delete-table" title="Excluir Produto"><i class="ph-fill ph-trash"></i></button></div></td>`; tableBody.appendChild(row); }); }
     function updateDashboard() { if(!document.getElementById('total-leads')) return; const totalLeads = leads.length; const leadsNovo = leads.filter(l => l.status === 'novo').length; const leadsProgresso = leads.filter(l => l.status === 'progresso').length; const leadsFechado = leads.filter(l => l.status === 'fechado').length; document.getElementById('total-leads').textContent = totalLeads; document.getElementById('leads-novo').textContent = leadsNovo; document.getElementById('leads-progresso').textContent = leadsProgresso; document.getElementById('leads-fechado').textContent = leadsFechado; updateStatusChart(leadsNovo, leadsProgresso, leadsFechado); }
     function updateStatusChart(novo, progresso, fechado) { const ctx = document.getElementById('statusChart'); if (!ctx) return; if (statusChart) { statusChart.destroy(); } statusChart = new Chart(ctx.getContext('2d'), { type: 'doughnut', data: { labels: ['Novo', 'Em Progresso', 'Fechado'], datasets: [{ data: [novo, progresso, fechado], backgroundColor: ['#00f7ff', '#ffc107', '#28a745'] }] } }); }
     function formatCurrency(value) { return (typeof value === 'number' ? value : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
-    
-    // --- LÓGICA DO CHATBOT ---
-    if(chatbotForm) {
-        chatbotForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const userMessage = chatbotInput.value.trim();
-            if (!userMessage) return;
-
-            addMessageToChat('user', userMessage);
-            chatbotInput.value = '';
-            addMessageToChat('bot', 'Digitando...', true);
-
-            try {
-                const response = await fetch('/api/gemini', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: userMessage })
-                });
-                document.querySelector('.bot-thinking')?.remove();
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Falha na comunicação com a API.');
-                }
-                const data = await response.json();
-                addMessageToChat('bot', data.text);
-            } catch (error) {
-                console.error("Erro no Chatbot:", error);
-                document.querySelector('.bot-thinking')?.remove();
-                addMessageToChat('bot', `Desculpe, ocorreu um erro: ${error.message}`);
-            }
-        });
-    }
-
-    function addMessageToChat(sender, message, isThinking = false) {
-        const chatbotMessages = document.getElementById('chatbot-messages');
-        if(!chatbotMessages) return;
-        const messageElement = document.createElement('div');
-        messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
-        if (isThinking) {
-            messageElement.classList.add('bot-thinking');
-            messageElement.textContent = message;
-        } else {
-            messageElement.innerHTML = `<p>${message}</p>`;
-        }
-        chatbotMessages.appendChild(messageElement);
-        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-    }
-});
-// Arquivo: script.js (VERSÃO COM HISTÓRICO DE CHAT)
-
-document.addEventListener('DOMContentLoaded', () => {
-    const db = firebase.firestore();
-    let userId = null;
-
-    // ... (todo o código anterior de leads, caixa, etc. continua igual) ...
-    let leads = [];
-    let caixa = [];
-    let estoque = [];
-    let statusChart;
-    let draggedItem = null;
-    const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
-    const contentAreas = document.querySelectorAll('.main-content .content-area');
-    const pageTitle = document.getElementById('page-title');
-    const chatbotForm = document.getElementById('chatbot-form');
-    const chatbotInput = document.getElementById('chatbot-input');
-    const chatbotMessages = document.getElementById('chatbot-messages');
-
-    // --- PONTO DE ENTRADA PRINCIPAL ---
-    firebase.auth().onAuthStateChanged(async user => {
-        if (user) {
-            userId = user.uid;
-            await loadSettings();
-            loadAllData();
-            loadChatHistory(); // NOVO: Carrega o histórico do chat ao entrar
-        }
-    });
-
-    // --- FUNÇÃO PARA SALVAR MENSAGEM NO HISTÓRICO ---
-    async function saveMessageToHistory(sender, text) {
-        if (!userId) return;
-        try {
-            await db.collection('users').doc(userId).collection('chatbotHistory').add({
-                sender: sender, // 'user' ou 'bot'
-                text: text,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        } catch (error) {
-            console.error("Erro ao salvar mensagem no histórico:", error);
-        }
-    }
-
-    // --- FUNÇÃO PARA CARREGAR O HISTÓRICO DO CHAT ---
-    async function loadChatHistory() {
-        if (!userId || !chatbotMessages) return;
-        
-        // Limpa as mensagens iniciais
-        chatbotMessages.innerHTML = '';
-
-        const snapshot = await db.collection('users').doc(userId).collection('chatbotHistory').orderBy('timestamp', 'asc').get();
-        
-        if (snapshot.empty) {
-            addMessageToChat('bot', 'Olá! Eu sou seu assistente de vendas. Como posso ajudar?');
-        } else {
-            snapshot.docs.forEach(doc => {
-                const message = doc.data();
-                addMessageToChat(message.sender, message.text);
-            });
-        }
-    }
-    
-    // --- LÓGICA DO CHATBOT ATUALIZADA ---
-    if(chatbotForm) {
-        chatbotForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const userMessage = chatbotInput.value.trim();
-            if (!userMessage) return;
-
-            addMessageToChat('user', userMessage);
-            await saveMessageToHistory('user', userMessage); // Salva a mensagem do usuário
-            chatbotInput.value = '';
-            addMessageToChat('bot', 'Digitando...', true);
-
-            // Prepara o histórico para enviar à IA
-            const historyForAI = [];
-            const messageElements = chatbotMessages.querySelectorAll('.user-message, .bot-message');
-            messageElements.forEach(el => {
-                if (!el.classList.contains('bot-thinking')) {
-                    const role = el.classList.contains('user-message') ? 'user' : 'model';
-                    const text = el.querySelector('p')?.textContent || '';
-                    if (text) {
-                        historyForAI.push({ role, parts: [{ text }] });
-                    }
-                }
-            });
-            // Remove a última mensagem (a que o usuário acabou de digitar) pois ela será enviada como o prompt principal
-            historyForAI.pop();
-
-            try {
-                const response = await fetch('/api/gemini', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    // Envia o histórico junto com a nova pergunta
-                    body: JSON.stringify({ history: historyForAI, prompt: userMessage })
-                });
-
-                document.querySelector('.bot-thinking')?.remove();
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Falha na comunicação com a API.');
-                }
-                const data = await response.json();
-                addMessageToChat('bot', data.text);
-                await saveMessageToHistory('bot', data.text); // Salva a resposta do bot
-
-            } catch (error) {
-                console.error("Erro no Chatbot:", error);
-                document.querySelector('.bot-thinking')?.remove();
-                const errorMessage = `Desculpe, ocorreu um erro: ${error.message}`;
-                addMessageToChat('bot', errorMessage);
-                await saveMessageToHistory('bot', errorMessage);
-            }
-        });
-    }
-
-    function addMessageToChat(sender, message, isThinking = false) {
-        if(!chatbotMessages) return;
-        const messageElement = document.createElement('div');
-        messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
-        if (isThinking) {
-            messageElement.classList.add('bot-thinking');
-            messageElement.textContent = message;
-        } else {
-            // Usamos textContent para segurança, evitando injeção de HTML
-            const p = document.createElement('p');
-            p.textContent = message;
-            messageElement.appendChild(p);
-        }
-        chatbotMessages.appendChild(messageElement);
-        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-    }
-
-    // =======================================================================
-    // COLE TODO O RESTANTE DO SEU CÓDIGO ANTERIOR AQUI
-    // (A partir de 'async function loadAllData() { ... }' até o final)
-    // =======================================================================
-
-    // ... (código de loadAllData, renderAll, navegação, configurações, etc.)
 });
