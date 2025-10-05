@@ -20,8 +20,8 @@ module.exports = async (req, res) => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Usando o modelo "gemini-1.5-flash" conforme solicitado
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Usando o modelo "gemini-2.5-flash" conforme solicitado para o teste
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     
     // Inicia um chat com o histórico recebido para dar memória ao bot
     const chat = model.startChat({
