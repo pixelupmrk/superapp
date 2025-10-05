@@ -40,10 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatbotInput = document.getElementById('chatbot-input');
 
     // --- PONTO DE ENTRADA PRINCIPAL ---
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged(async user => {
         if (user) {
             userId = user.uid;
-            loadSettings();
+            await loadSettings(); // Espera as configurações serem carregadas
             loadAllData();
         }
     });
@@ -142,37 +142,80 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function loadSettings() {
-        const savedTheme = localStorage.getItem('appTheme') || 'dark';
-        const savedUserName = localStorage.getItem('userName') || (firebase.auth().currentUser?.email.split('@')[0] || 'Usuário');
-        const savedCompanyName = localStorage.getItem('companyName') || '';
-
+    // FUNÇÃO DE CARREGAR CONFIGURAÇÕES ATUALIZADA
+    async function loadSettings() {
+        // Carrega o tema do localStorage (isso pode continuar sendo local)
+        const savedTheme = localStorage.getItem(`appTheme_${userId}`) || 'dark';
         applyTheme(savedTheme);
-        userNameDisplay.textContent = `Olá, ${savedUserName}`;
-        
-        if (userNameInput) userNameInput.value = savedUserName === 'Usuário' ? '' : savedUserName;
-        if (companyNameInput) companyNameInput.value = savedCompanyName;
+
+        if (!userId) return;
+
+        try {
+            // Tenta carregar as configurações do Firestore
+            const userDocRef = db.collection('users').doc(userId);
+            const doc = await userDocRef.get();
+
+            let userName = firebase.auth().currentUser?.email.split('@')[0] || 'Usuário';
+            let companyName = '';
+
+            if (doc.exists && doc.data().settings) {
+                const settings = doc.data().settings;
+                userName = settings.userName || userName;
+                companyName = settings.companyName || '';
+            }
+            
+            // Atualiza a UI
+            userNameDisplay.textContent = `Olá, ${userName}`;
+            if (userNameInput) userNameInput.value = userName === 'Usuário' ? '' : userName;
+            if (companyNameInput) companyNameInput.value = companyName;
+
+        } catch (error) {
+            console.error("Erro ao carregar configurações do Firestore:", error);
+            // Se falhar, usa um fallback
+            const defaultUserName = firebase.auth().currentUser?.email.split('@')[0] || 'Usuário';
+            userNameDisplay.textContent = `Olá, ${defaultUserName}`;
+        }
     }
     
     if(themeToggleButton) {
         themeToggleButton.addEventListener('click', () => {
             const isLight = document.body.classList.contains('light-theme');
             const newTheme = isLight ? 'dark' : 'light';
-            localStorage.setItem('appTheme', newTheme);
+            // Salva o tema associado ao userId para não misturar entre usuários
+            localStorage.setItem(`appTheme_${userId}`, newTheme);
             applyTheme(newTheme);
         });
     }
 
+    // BOTÃO DE SALVAR CONFIGURAÇÕES ATUALIZADO
     if(saveSettingsButton) {
-        saveSettingsButton.addEventListener('click', () => {
+        saveSettingsButton.addEventListener('click', async () => {
+            if (!userId) {
+                alert('Erro: Usuário não autenticado.');
+                return;
+            }
+
             const newUserName = userNameInput.value.trim() || 'Usuário';
             const newCompanyName = companyNameInput.value.trim();
+            
+            const settings = {
+                userName: newUserName,
+                companyName: newCompanyName
+            };
 
-            localStorage.setItem('userName', newUserName);
-            localStorage.setItem('companyName', newCompanyName);
+            try {
+                // Salva (ou atualiza) as configurações no documento do usuário no Firestore
+                const userDocRef = db.collection('users').doc(userId);
+                await userDocRef.set({ settings: settings }, { merge: true });
 
-            userNameDisplay.textContent = `Olá, ${newUserName}`;
-            alert('Configurações salvas com sucesso!');
+                // Atualiza a UI
+                userNameDisplay.textContent = `Olá, ${newUserName}`;
+                alert('Configurações salvas com sucesso!');
+
+            } catch (error) {
+                console.error("Erro ao salvar configurações no Firestore:", error);
+                alert('Falha ao salvar as configurações. Tente novamente.');
+            }
         });
     }
     
