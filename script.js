@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let caixa = [];
     let estoque = [];
     let currentEstoqueDescricao = null;
+    let chatHistory = []; // Variável para guardar o histórico do chat
 
     // --- Seletores de Elementos ---
     const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
@@ -42,6 +43,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let draggedItem = null;
     let currentLeadId = null;
+    let db; // Variável para a instância do Firestore
+
+    // --- INICIALIZAÇÃO DO FIREBASE E DADOS DO USUÁRIO ---
+    function initializeApp() {
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                db = firebase.firestore();
+                loadChatHistory(user.uid);
+                loadSettings();
+                // Carregar outros dados do Firestore se necessário...
+            }
+        });
+    }
 
     // --- LÓGICA DE CONFIGURAÇÕES ---
     function applyTheme(theme) {
@@ -175,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderKanbanCards() {
+        if (!document.querySelectorAll('.kanban-cards-list').length) return;
         document.querySelectorAll('.kanban-cards-list').forEach(list => list.innerHTML = '');
         leads.forEach(lead => {
             const newCard = createKanbanCard(lead);
@@ -267,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('edit-lead-date').value = lead.data || '';
                 document.getElementById('edit-lead-qualification').value = lead.qualificacao || '';
                 document.getElementById('edit-lead-notes').value = lead.notas || '';
-                editModal.style.display = 'flex';
+                if(editModal) editModal.style.display = 'flex';
             }
         }
         
@@ -296,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderLeadsTable();
                     updateDashboard();
                 }
-                editModal.style.display = 'none';
+                if(editModal) editModal.style.display = 'none';
             }
         });
     }
@@ -318,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderKanbanCards();
                 renderLeadsTable();
                 updateDashboard();
-                editModal.style.display = 'none';
+                if(editModal) editModal.style.display = 'none';
             }
         });
     }
@@ -429,16 +444,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    financeTabs.forEach(tab => {
-        tab.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetTabId = e.target.getAttribute('data-tab') + '-tab-content';
-            financeTabs.forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.finance-content').forEach(c => c.style.display = 'none');
-            e.target.classList.add('active');
-            document.getElementById(targetTabId).style.display = 'block';
+    if(financeTabs) {
+        financeTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetTabId = e.target.getAttribute('data-tab') + '-tab-content';
+                financeTabs.forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.finance-content').forEach(c => c.style.display = 'none');
+                e.target.classList.add('active');
+                const targetContent = document.getElementById(targetTabId);
+                if (targetContent) targetContent.style.display = 'block';
+            });
         });
-    });
+    }
     
     // --- LÓGICA DE ESTOQUE E CUSTOS ---
     if(estoqueForm) {
@@ -470,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tableBody = document.querySelector('#estoque-table tbody');
         if(!tableBody) return;
         tableBody.innerHTML = '';
-        const searchTerm = estoqueSearch.value.toLowerCase();
+        const searchTerm = estoqueSearch ? estoqueSearch.value.toLowerCase() : '';
         const filteredEstoque = estoque.filter(p => p.produto.toLowerCase().includes(searchTerm) || p.descricao.toLowerCase().includes(searchTerm));
         
         filteredEstoque.forEach(produto => {
@@ -499,7 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const deleteProdutoBtn = e.target.closest('.btn-delete-produto');
         if (addCustoBtn) {
             currentEstoqueDescricao = addCustoBtn.getAttribute('data-descricao');
-            addCustoModal.style.display = 'flex';
+            if(addCustoModal) addCustoModal.style.display = 'flex';
         }
         if (deleteProdutoBtn) {
             const row = deleteProdutoBtn.closest('tr');
@@ -517,8 +535,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if(closeCustoModalBtn) {
         closeCustoModalBtn.addEventListener('click', () => {
-            addCustoModal.style.display = 'none';
-            addCustoForm.reset();
+            if(addCustoModal) addCustoModal.style.display = 'none';
+            if(addCustoForm) addCustoForm.reset();
         });
     }
 
@@ -534,7 +552,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 produto.custos.push(novoCusto);
                 updateEstoque();
                 renderEstoqueTable();
-                addCustoModal.style.display = 'none';
+                if(addCustoModal) addCustoModal.style.display = 'none';
                 addCustoForm.reset();
             }
         });
@@ -622,75 +640,112 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- LÓGICA DO CHATBOT ---
+    function addMessageToChat(message, type) {
+        if (!chatbotMessages) return;
+        const messageElement = document.createElement('div');
+        messageElement.className = `${type}-message`; // Correção: user-message ou bot-message
+        const paragraph = document.createElement('p');
+        paragraph.innerText = message;
+        messageElement.appendChild(paragraph);
+        chatbotMessages.appendChild(messageElement);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    async function getAiResponse(prompt, history) {
+        const apiUrl = '/api/gemini';
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt, history: history }) // Envia o histórico
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Erro da função Vercel:", errorData);
+                return `Ocorreu um erro no servidor (Status: ${response.status}).`;
+            }
+            const data = await response.json();
+            return data.text;
+        } catch (error) {
+            console.error("Erro de conexão com a função Vercel:", error);
+            return "Não consegui me conectar ao servidor.";
+        }
+    }
+
+    async function handleBotLogic(userInput) {
+        const user = firebase.auth().currentUser;
+        if (!user) return;
+        
+        const sendButton = chatbotForm.querySelector('button');
+        sendButton.disabled = true;
+
+        // Adiciona a mensagem do usuário ao histórico local
+        chatHistory.push({ role: "user", parts: [{ text: userInput }] });
+
+        const thinkingMessage = addMessageToChat("Pensando...", 'bot-message bot-thinking');
+        const prompt = `Você é um assistente de marketing digital e vendas. Responda de forma direta e prestativa. O usuário pediu: "${userInput}"`;
+        
+        // Passa o histórico para a API
+        const aiResponse = await getAiResponse(prompt, chatHistory);
+        
+        const thinkingElement = chatbotMessages.querySelector('.bot-thinking');
+        if (thinkingElement) {
+            thinkingElement.parentElement.remove();
+        }
+        
+        if (aiResponse) {
+            addMessageToChat(aiResponse, 'bot-message');
+            // Adiciona a resposta do bot ao histórico local
+            chatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
+            saveChatHistory(user.uid, chatHistory); // Salva no Firestore
+        }
+
+        sendButton.disabled = false;
+        chatbotInput.focus();
+    }
+
     if(chatbotForm) {
-        function addMessageToChat(message, type) {
-            const messageElement = document.createElement('div');
-            messageElement.className = type;
-            const paragraph = document.createElement('p');
-            paragraph.innerText = message;
-            messageElement.appendChild(paragraph);
-            chatbotMessages.appendChild(messageElement);
-            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-        }
-
-        async function getAiResponse(prompt) {
-            const apiUrl = '/api/gemini'; 
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: prompt })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error("Erro da função Vercel:", errorData);
-                    return `Ocorreu um erro no servidor (Status: ${response.status}). Verifique o log da sua função na Vercel.`;
-                }
-
-                const data = await response.json();
-                return data.text;
-               
-            } catch (error) {
-                console.error("Erro de conexão com a função Vercel:", error);
-                return "Não consegui me conectar ao servidor. Verifique o deploy na Vercel.";
-            }
-        }
-
-        async function handleBotLogic(userInput) {
-            const sendButton = chatbotForm.querySelector('button');
-            sendButton.disabled = true;
-
-            addMessageToChat("Pensando...", 'bot-message bot-thinking');
-            const prompt = `Você é um assistente de marketing digital e vendas. Responda de forma direta e prestativa. O usuário pediu: "${userInput}"`;
-            const aiResponse = await getAiResponse(prompt);
-            
-            const thinkingMessage = chatbotMessages.querySelector('.bot-thinking');
-            if (thinkingMessage) {
-                thinkingMessage.remove();
-            }
-            
-            if (aiResponse) {
-                 addMessageToChat(aiResponse, 'bot-message');
-            }
-
-            sendButton.disabled = false;
-        }
-
         chatbotForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const userInput = chatbotInput.value;
             if (!userInput.trim()) return;
-
-            addMessageToChat(userInput, 'user-message');
+            addMessageToChat(userInput, 'user');
             chatbotInput.value = '';
-            
             handleBotLogic(userInput);
         });
     }
 
-    // --- INICIALIZAÇÃO ---
-    loadSettings();
+    // --- FUNÇÕES DE PERSISTÊNCIA (FIRESTORE) PARA O CHATBOT ---
+    async function saveChatHistory(userId, history) {
+        if (!db) return;
+        try {
+            await db.collection('chatHistories').doc(userId).set({ history: history });
+        } catch (error) {
+            console.error("Erro ao salvar o histórico do chat:", error);
+        }
+    }
+
+    async function loadChatHistory(userId) {
+        if (!db || !chatbotMessages) return;
+        try {
+            const doc = await db.collection('chatHistories').doc(userId).get();
+            if (doc.exists) {
+                chatHistory = doc.data().history || [];
+                chatbotMessages.innerHTML = ''; // Limpa o chat antes de carregar
+                chatHistory.forEach(message => {
+                    addMessageToChat(message.parts[0].text, message.role === 'user' ? 'user' : 'bot');
+                });
+            } else {
+                 // Adiciona a mensagem inicial apenas se não houver histórico
+                addMessageToChat("Olá! Eu sou seu assistente de vendas. Como posso ajudar?", 'bot-message');
+            }
+        } catch (error) {
+            console.error("Erro ao carregar o histórico do chat:", error);
+        }
+    }
+
+
+    // --- INICIALIZAÇÃO GERAL ---
+    initializeApp();
     updateDashboard();
 });
