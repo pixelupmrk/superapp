@@ -1,58 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
-        {
-            "moduleId": "MD01", "title": "Módulo 1: Conectando com o Cliente Ideal", "description": "Aprenda a usar o CRM do super app para construir a persona do seu cliente, otimizando seu funil de vendas desde o início.",
-            "lessons": [
-                { "lessonId": "L01.01", "title": "Questionário para Definição de Persona", "type": "text", "content": "Antes de qualquer estratégia, é essencial saber com quem você está falando. O questionário irá ajudar a identificar o perfil do seu cliente ideal. Use o CRM para registrar as respostas e começar a segmentar seus leads.\n\nPerguntas do Questionário:\n1. Nome fictício da persona:\n2. Idade aproximada:\n3. Profissão ou ocupação:\n4. Quais são suas dores e dificuldades?\n5. Quais são seus desejos ou objetivos?\n6. Onde essa pessoa busca informação?\n7. Quais redes sociais essa pessoa usa com frequência?\n8. Que tipo de conteúdo ela consome?" },
-                { "lessonId": "L01.02", "title": "Proposta de Valor e Posicionamento", "type": "video", "content": "Com base na persona, vamos definir a proposta de valor do seu serviço. A proposta responde: 'Eu ajudo [persona] a [solução] através de [diferencial do seu serviço].'\n\nExemplo: Ajudo [vendedores autônomos] a [acelerar vendas] usando [o super app com CRM e automação]." },
-                { "lessonId": "L01.03", "title": "Exercício Prático: Configurando o CRM", "type": "interactive", "description": "Este exercício prático irá guiá-lo a configurar o CRM do seu super app para a sua persona. Você irá criar as primeiras tags e campos para começar a registrar as informações." }
-            ]
-        },
-        {
-            "moduleId": "MD02", "title": "Módulo 2: O Algoritmo da Meta (Facebook & Instagram)", "description": "Entenda como o algoritmo da Meta funciona e aprenda a criar ganchos e conteúdos que direcionam tráfego para o seu super app.",
-            "lessons": [
-                { "lessonId": "L02.01", "title": "Como o Algoritmo Funciona", "type": "text", "content": "O algoritmo da Meta analisa o comportamento dos usuários para decidir o que mostrar. Ele prioriza conteúdos que geram interação rápida. Quanto mais relevante for o seu conteúdo para o público, mais ele será entregue." },
-                { "lessonId": "L02.04", "title": "Desafio Prático: Criação de Gancho", "type": "interactive", "description": "Crie três ganchos diferentes para o seu super app, focando nas dores da sua persona. Exemplo: 'Você quer vender mais, mas não sabe por onde começar? O super app resolve isso!'" }
-            ]
-        },
-        {
-            "moduleId": "MD03", "title": "Módulo 3: Cronograma de Postagens Estratégico", "description": "Planeje a sua rotina de conteúdo nas redes sociais com um calendário que aumenta o seu alcance e consistência.",
-            "lessons": [
-                { "lessonId": "L03.01", "title": "Melhores Horários e Dias para Postagem", "type": "text", "content": "O ideal é postar quando seu público está mais ativo (geralmente entre 11h e 13h ou 18h e 20h, de terça a quinta). Use as métricas do Instagram para ver quando seus seguidores estão online." },
-                { "lessonId": "L03.02", "title": "Frequência Ideal e Consistência", "type": "text", "content": "Mais importante que a quantidade, é a consistência. A frequência ideal varia por nicho. A mentoria sugere: Estética e beleza (4 a 5 posts por semana); B2B (3 posts bem elaborados por semana); Varejo (diária)." }
-            ]
-        },
-        {
-            "moduleId": "MD04", "title": "Módulo 4: Conteúdo que Conecta", "description": "Aprenda a gravar e editar vídeos que engajam, utilizando ferramentas como CapCut e Canva para fortalecer a identidade visual da sua marca.",
-            "lessons": [
-                { "lessonId": "L04.01", "title": "Estrutura de Vídeos que Engajam", "type": "text", "content": "Um vídeo precisa seguir uma estrutura estratégica: Gancho (1º segundo), Valor (dica ou solução) e CTA (chamada para ação). Exemplo: 'Você quer mais clientes? Então evite esse erro aqui...'" }
-            ]
-        },
-        {
-            "moduleId": "MD05", "title": "Módulo 5: Copywriting com ChatGPT", "description": "Utilize o ChatGPT para criar textos persuasivos para suas redes sociais e anúncios, usando fórmulas de copy que realmente convertem.",
-            "lessons": [
-                { "lessonId": "L05.01", "title": "Como Criar Textos Persuasivos com IA", "type": "text", "content": "O ChatGPT é uma ferramenta poderosa para gerar textos que vendem. A chave está em saber o que pedir e como direcionar a IA com clareza. Use as fórmulas de copy para montar seus prompts." }
-            ]
-        },
-        {
-            "moduleId": "MD06", "title": "Módulo 6: Implementação de CRM", "description": "Organize o relacionamento com seus leads e clientes, e aprenda a fazer remarketing segmentado para vender mais.",
-            "lessons": [
-                { "lessonId": "L06.01", "title": "O que é CRM e Por que sua Empresa Precisa", "type": "text", "content": "CRM (Customer Relationship Management) é uma ferramenta que organiza o relacionamento com seus leads e clientes, acompanhando-os desde o primeiro contato até o fechamento da venda." }
-            ]
-        },
-        {
-            "moduleId": "MD07", "title": "Módulo 7: Processo Comercial e Técnicas de Venda", "description": "Domine o processo comercial com técnicas de rapport, gatilhos mentais e um pitch de vendas que realmente gera interesse.",
-            "lessons": [
-                { "lessonId": "L07.01", "title": "Como Montar um Pitch Comercial", "type": "text", "content": "O pitch é a sua 'apresentação relâmpago'. Ele precisa ser claro e direto. Inclua: Quem você ajuda, o problema que resolve e o diferencial do seu serviço. Exemplo: 'Nós ajudamos negócios locais a atrair clientes todos os dias usando vídeos e tráfego pago.'" }
-            ]
-        },
-        {
-            "moduleId": "MD08", "title": "Módulo 8: Conexão com a Audiência e Humanização", "description": "Construa uma audiência leal ao ser autêntico, mostrar os bastidores e interagir de forma genuína com o seu público.",
-            "lessons": [
-                { "lessonId": "L08.01", "title": "Gerando Conexão Real (sem Forçar)", "type": "text", "content": "Pessoas se conectam com pessoas. Mostrar sua rotina e bastidores cria empatia. Seja autêntico, não perfeito. Use a câmera frontal e fale como se fosse para um amigo." }
-            ]
-        }
+        { "moduleId": "MD01", "title": "Módulo 1: Conectando com o Cliente Ideal", "lessons": [ { "lessonId": "L01.01", "title": "Questionário para Definição de Persona", "type": "text", "content": "Antes de qualquer estratégia, é essencial saber com quem você está falando. O questionário irá ajudar a identificar o perfil do seu cliente ideal. Use o CRM para registrar as respostas e começar a segmentar seus leads.\n\nPerguntas do Questionário:\n1. Nome fictício da persona:\n2. Idade aproximada:\n3. Profissão ou ocupação:\n4. Quais são suas dores e dificuldades?\n5. Quais são seus desejos ou objetivos?\n6. Onde essa pessoa busca informação?\n7. Quais redes sociais essa pessoa usa com frequência?\n8. Que tipo de conteúdo ela consome?" }, { "lessonId": "L01.02", "title": "Proposta de Valor e Posicionamento", "type": "video", "content": "Com base na persona, vamos definir a proposta de valor do seu serviço. A proposta responde: 'Eu ajudo [persona] a [solução] através de [diferencial do seu serviço].'\n\nExemplo: Ajudo [vendedores autônomos] a [acelerar vendas] usando [o super app com CRM e automação]." }, { "lessonId": "L01.03", "title": "Exercício Prático: Configurando o CRM", "type": "interactive", "description": "Este exercício prático irá guiá-lo a configurar o CRM do seu super app para a sua persona. Você irá criar as primeiras tags e campos para começar a registrar as informações." } ] },
+        { "moduleId": "MD02", "title": "Módulo 2: O Algoritmo da Meta (Facebook & Instagram)", "lessons": [ { "lessonId": "L02.01", "title": "Como o Algoritmo Funciona", "type": "text", "content": "O algoritmo da Meta analisa o comportamento dos usuários para decidir o que mostrar. Ele prioriza conteúdos que geram interação rápida. Quanto mais relevante for o seu conteúdo para o público, mais ele será entregue." }, { "lessonId": "L02.04", "title": "Desafio Prático: Criação de Gancho", "type": "interactive", "description": "Crie três ganchos diferentes para o seu super app, focando nas dores da sua persona. Exemplo: 'Você quer vender mais, mas não sabe por onde começar? O super app resolve isso!'" } ] },
+        { "moduleId": "MD03", "title": "Módulo 3: Cronograma de Postagens Estratégico", "lessons": [ { "lessonId": "L03.01", "title": "Melhores Horários e Dias para Postagem", "type": "text", "content": "O ideal é postar quando seu público está mais ativo (geralmente entre 11h e 13h ou 18h e 20h, de terça a quinta). Use as métricas do Instagram para ver quando seus seguidores estão online." }, { "lessonId": "L03.02", "title": "Frequência Ideal e Consistência", "type": "text", "content": "Mais importante que a quantidade, é a consistência. A frequência ideal varia por nicho. A mentoria sugere: Estética e beleza (4 a 5 posts por semana); B2B (3 posts bem elaborados por semana); Varejo (diária)." } ] },
+        { "moduleId": "MD04", "title": "Módulo 4: Conteúdo que Conecta", "lessons": [ { "lessonId": "L04.01", "title": "Estrutura de Vídeos que Engajam", "type": "text", "content": "Um vídeo precisa seguir uma estrutura estratégica: Gancho (1º segundo), Valor (dica ou solução) e CTA (chamada para ação). Exemplo: 'Você quer mais clientes? Então evite esse erro aqui...'" } ] },
+        { "moduleId": "MD05", "title": "Módulo 5: Copywriting com ChatGPT", "lessons": [ { "lessonId": "L05.01", "title": "Como Criar Textos Persuasivos com IA", "type": "text", "content": "O ChatGPT é uma ferramenta poderosa para gerar textos que vendem. A chave está em saber o que pedir e como direcionar a IA com clareza. Use as fórmulas de copy para montar seus prompts." } ] },
+        { "moduleId": "MD06", "title": "Módulo 6: Implementação de CRM", "lessons": [ { "lessonId": "L06.01", "title": "O que é CRM e Por que sua Empresa Precisa", "type": "text", "content": "CRM (Customer Relationship Management) é uma ferramenta que organiza o relacionamento com seus leads e clientes, acompanhando-os desde o primeiro contato até o fechamento da venda." } ] },
+        { "moduleId": "MD07", "title": "Módulo 7: Processo Comercial e Técnicas de Venda", "lessons": [ { "lessonId": "L07.01", "title": "Como Montar um Pitch Comercial", "type": "text", "content": "O pitch é a sua 'apresentação relâmpago'. Ele precisa ser claro e direto. Inclua: Quem você ajuda, o problema que resolve e o diferencial do seu serviço. Exemplo: 'Nós ajudamos negócios locais a atrair clientes todos os dias usando vídeos e tráfego pago.'" } ] },
+        { "moduleId": "MD08", "title": "Módulo 8: Conexão com a Audiência e Humanização", "lessons": [ { "lessonId": "L08.01", "title": "Gerando Conexão Real (sem Forçar)", "type": "text", "content": "Pessoas se conectam com pessoas. Mostrar sua rotina e bastidores cria empatia. Seja autêntico, não perfeito. Use a câmera frontal e fale como se fosse para um amigo." } ] }
     ];
 
     let leads = [], caixa = [], estoque = [], chatHistory = [];
@@ -62,7 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function main() {
         firebase.auth().onAuthStateChanged(async (user) => {
-            if (user && document.getElementById('app-container')) {
+            if (user && !document.body.hasAttribute('data-initialized')) {
+                document.body.setAttribute('data-initialized', 'true');
                 db = firebase.firestore();
                 await loadAllUserData(user.uid);
                 setupEventListeners(user.uid);
@@ -85,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 applySettings(data.settings);
                 loadMentoriaNotes(data.mentoriaNotes);
             } else {
-                applySettings(); // Aplica configurações padrão se não houver dados
+                applySettings();
             }
             renderMentoria();
             updateAllUI();
