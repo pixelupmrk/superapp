@@ -122,7 +122,7 @@ th { background-color: var(--secondary-color); }
 .sales-accelerator-container { display: flex; gap: 2rem; }
 .sales-accelerator-sidebar { flex: 0 0 280px; }
 .sales-accelerator-menu h2 { margin-bottom: 1rem; color: var(--accent-color); }
-.sales-accelerator-menu ul { list-style: none; }
+.sales-accelerator-menu ul { list-style: none; padding: 0; }
 .sales-accelerator-menu-item { padding: 0.75rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
 .sales-accelerator-menu-item:hover { background-color: var(--secondary-color); }
 .sales-accelerator-menu-item.active { background-color: var(--accent-color); color: var(--primary-color); font-weight: 600; }
@@ -131,6 +131,9 @@ th { background-color: var(--secondary-color); }
 .mentoria-lesson h3 { color: var(--accent-color); margin-bottom: 0.75rem; }
 .mentoria-lesson p { white-space: pre-wrap; line-height: 1.6; } /* pre-wrap para manter as quebras de linha */
 .anotacoes-aluno { margin-top: 1.5rem; }
+.mentoria-module-content { display: none; }
+.mentoria-module-content.active { display: block; }
+
 
 /* --- Chatbot --- */
 .chatbot-container { display: flex; flex-direction: column; height: 70vh; background-color: var(--background-color); border-radius: 12px; overflow: hidden; border: 1px solid var(--secondary-color); }
