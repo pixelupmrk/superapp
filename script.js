@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- DADOS COMPLETOS DA MENTORIA (JÁ INCLUÍDOS) ---
+    // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
         {
             "moduleId": "MD01",
@@ -86,16 +86,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
-    // --- VARIÁVEIS GLOBAIS ---
     let leads = [], caixa = [], estoque = [], chatHistory = [];
     let nextLeadId = 0, currentLeadId = null, draggedItem = null, currentProductId = null;
     let statusChart;
     let db;
 
-    // --- INICIALIZAÇÃO ---
     async function main() {
         firebase.auth().onAuthStateChanged(async (user) => {
-            if (user) {
+            if (user && document.getElementById('app-container')) { // Garante que o script só rode na página principal
                 db = firebase.firestore();
                 await loadAllUserData(user.uid);
                 setupEventListeners(user.uid);
@@ -104,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     main();
 
-    // --- LÓGICA DE CARREGAMENTO E SALVAMENTO ---
     async function loadAllUserData(userId) {
         try {
             const doc = await db.collection('userData').doc(userId).get();
@@ -139,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error(`Erro ao salvar dados:`, error); }
     }
 
-    // --- LÓGICA DE ATUALIZAÇÃO DA UI ---
     function updateAllUI() {
         renderKanbanCards();
         renderLeadsTable();
@@ -151,16 +147,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function applySettings(settings = {}) {
-        const theme = settings ? settings.theme || 'dark' : 'dark';
-        const userName = settings ? settings.userName || 'Usuário' : 'Usuário';
+        const theme = settings.theme || 'dark';
+        const userName = settings.userName || 'Usuário';
         document.body.className = theme === 'light' ? 'light-theme' : '';
         document.getElementById('theme-toggle-btn').textContent = theme === 'light' ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro';
         document.querySelector('.user-profile span').textContent = `Olá, ${userName}`;
         document.getElementById('setting-user-name').value = userName;
-        document.getElementById('setting-company-name').value = settings ? settings.companyName || '' : '';
+        document.getElementById('setting-company-name').value = settings.companyName || '';
     }
 
-    // --- EVENT LISTENERS ---
     function setupEventListeners(userId) {
         document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => { item.addEventListener('click', e => { e.preventDefault(); const targetId = e.currentTarget.getAttribute('data-target'); if (!targetId) return; document.querySelectorAll('.sidebar-nav .nav-item').forEach(nav => nav.classList.remove('active')); e.currentTarget.classList.add('active'); document.querySelectorAll('.main-content .content-area').forEach(area => area.style.display = 'none'); document.getElementById(targetId).style.display = 'block'; document.getElementById('page-title').textContent = e.currentTarget.querySelector('span').textContent; }); });
         document.getElementById('theme-toggle-btn')?.addEventListener('click', () => { document.body.classList.toggle('light-theme'); const isLight = document.body.classList.contains('light-theme'); document.getElementById('theme-toggle-btn').textContent = isLight ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro'; saveUserData(userId); });
@@ -187,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', () => { document.getElementById(btn.dataset.target).style.display = 'none'; }); });
     }
 
-    // --- FUNÇÕES ESPECÍFICAS ---
     function openEditModal(leadId) { currentLeadId = leadId; const lead = leads.find(l => l.id === leadId); if(lead) { document.getElementById('edit-lead-name').value = lead.nome; document.getElementById('edit-lead-email').value = lead.email; document.getElementById('edit-lead-whatsapp').value = lead.whatsapp; document.getElementById('edit-lead-status').value = lead.status; document.getElementById('edit-lead-attendant').value = lead.atendente; document.getElementById('edit-lead-origem').value = lead.origem; document.getElementById('edit-lead-date').value = lead.data; document.getElementById('edit-lead-qualification').value = lead.qualificacao; document.getElementById('edit-lead-notes').value = lead.notas; document.getElementById('edit-lead-modal').style.display = 'flex'; } }
     function openCustosModal(productId) { currentProductId = productId; const produto = estoque.find(p => p.id === productId); if (produto) { document.getElementById('custos-modal-title').textContent = `Custos de: ${produto.produto}`; renderCustosList(produto); document.getElementById('custos-modal').style.display = 'flex'; } }
     function renderCustosList(produto) { const listContainer = document.getElementById('custos-list'); if (!produto.custos || produto.custos.length === 0) { listContainer.innerHTML = '<p>Nenhum custo adicionado.</p>'; return; } listContainer.innerHTML = produto.custos.map(custo => `<div class="custo-item"><span>${custo.descricao}</span><span>R$ ${custo.valor.toFixed(2)}</span></div>`).join(''); }
