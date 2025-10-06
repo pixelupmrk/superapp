@@ -10,7 +10,7 @@
 </head>
 <body>
 
-    <div class="app-container">
+    <div id="app-container" class="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>Super App PixelUp</h2>
@@ -85,7 +85,7 @@
                     </div>
                 </div>
                 <div class="dashboard-charts">
-                    <div class="chart-card">
+                    <div class="card">
                         <h3>Status dos Leads</h3>
                         <div class="chart-container">
                             <canvas id="statusChart"></canvas>
@@ -138,6 +138,9 @@
                     <h2>Lista de Leads</h2>
                 </div>
                 <div class="card">
+                    <div class="estoque-actions" style="margin-bottom: 1rem;">
+                        <button class="btn-save" id="export-leads-btn">Exportar CSV</button>
+                    </div>
                     <div class="table-container">
                         <table id="leads-table">
                             <thead>
@@ -168,15 +171,15 @@
 
                 <div class="finance-content active" id="caixa-tab-content">
                     <div class="dashboard-stats caixa-stats">
-                        <div class="stat-card entrada-card">
+                        <div class="stat-card">
                             <h3>Total de Entradas</h3>
                             <p id="total-entradas">R$ 0,00</p>
                         </div>
-                        <div class="stat-card saida-card">
+                        <div class="stat-card">
                             <h3>Total de Saídas</h3>
                             <p id="total-saidas">R$ 0,00</p>
                         </div>
-                        <div class="stat-card saldo-card">
+                        <div class="stat-card">
                             <h3>Saldo Atual</h3>
                             <p id="caixa-atual">R$ 0,00</p>
                         </div>
@@ -336,8 +339,7 @@
         <div class="modal-content">
             <span class="close-modal" data-target="custos-modal">&times;</span>
             <h2 id="custos-modal-title">Custos do Produto</h2>
-            <div id="custos-list">
-                </div>
+            <div id="custos-list"></div>
             <form id="add-custo-form">
                 <h3>Adicionar Novo Custo</h3>
                 <div class="input-grid">
