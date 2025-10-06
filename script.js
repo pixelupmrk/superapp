@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let draggedItem = null;
     let statusChart;
     let db; // Instância do Firestore
-    const MENTORIA_NOTES_KEY = 'mentoriaNotes';
 
     // --- SELETORES DE ELEMENTOS ---
     const pageTitle = document.getElementById('page-title');
@@ -21,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
             db = firebase.firestore();
-            loadAllUserData(user.uid);
             setupEventListeners(user.uid);
+            loadAllUserData(user.uid);
         }
     });
 
@@ -39,28 +38,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 chatHistory = data.chatHistory || [];
                 nextLeadId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 0;
                 applySettings(data.settings);
+                loadMentoriaNotes(data.mentoriaNotes);
             }
-            loadMentoriaNotes(); // Carrega notas da mentoria do localStorage
-            updateAllUI();
+            updateAllUI(); // Atualiza toda a interface após carregar os dados
         } catch (error) {
             console.error("Erro ao carregar dados:", error);
         }
     }
 
-    async function saveData(userId, dataType) {
+    async function saveUserData(userId) {
         if (!db) return;
         try {
-            const dataToSave = {};
-            dataToSave[dataType] = window[dataType]; // 'window[dataType]' acessa a variável global (leads, caixa, etc.)
-            await db.collection('userData').doc(userId).set(dataToSave, { merge: true });
+            const mentoriaNotes = getMentoriaNotes();
+            const dataToSave = {
+                leads,
+                caixa,
+                estoque,
+                chatHistory,
+                mentoriaNotes,
+                settings: {
+                    theme: document.body.classList.contains('light-theme') ? 'light' : 'dark',
+                    userName: document.getElementById('setting-user-name').value || 'Usuário',
+                    companyName: document.getElementById('setting-company-name').value
+                }
+            };
+            await db.collection('userData').doc(userId).set(dataToSave);
         } catch (error) {
-            console.error(`Erro ao salvar ${dataType}:`, error);
+            console.error(`Erro ao salvar dados:`, error);
         }
     }
 
     // --- ATUALIZAÇÃO DA INTERFACE ---
     function updateAllUI() {
-        // Renderiza tudo que depende dos dados
         renderKanbanCards();
         renderLeadsTable();
         updateDashboard();
@@ -104,20 +113,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Configurações
-        document.getElementById('save-settings-btn').addEventListener('click', async () => {
-            const settings = {
-                theme: document.body.classList.contains('light-theme') ? 'light' : 'dark',
-                userName: document.getElementById('setting-user-name').value || 'Usuário',
-                companyName: document.getElementById('setting-company-name').value
-            };
-            await db.collection('userData').doc(userId).set({ settings }, { merge: true });
-            applySettings(settings);
+        document.getElementById('save-settings-btn').addEventListener('click', () => {
+            saveUserData(userId);
             alert('Configurações salvas!');
         });
 
         document.getElementById('theme-toggle-btn').addEventListener('click', () => {
              document.body.classList.toggle('light-theme');
-             document.getElementById('save-settings-btn').click(); // Salva ao mudar
+             saveUserData(userId);
         });
 
         // --- CRM ---
@@ -138,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     status: 'novo'
                 };
                 leads.push(newLead);
-                saveData(userId, 'leads');
+                saveUserData(userId);
                 renderKanbanCards();
                 renderLeadsTable();
                 updateDashboard();
@@ -172,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const lead = leads.find(l => l.id === leadId);
                     if (lead) {
                         lead.status = newStatus;
-                        saveData(userId, 'leads');
+                        saveUserData(userId);
                         updateDashboard();
                         renderLeadsTable();
                     }
@@ -193,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (confirm('Tem certeza?')) {
                     const leadId = parseInt(e.target.closest('tr').dataset.id);
                     leads = leads.filter(l => l.id !== leadId);
-                    saveData(userId, 'leads');
+                    saveUserData(userId);
                     renderLeadsTable();
                     renderKanbanCards();
                     updateDashboard();
@@ -216,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 leads[leadIndex].data = document.getElementById('edit-lead-date').value;
                 leads[leadIndex].qualificacao = document.getElementById('edit-lead-qualification').value;
                 leads[leadIndex].notas = document.getElementById('edit-lead-notes').value;
-                saveData(userId, 'leads');
+                saveUserData(userId);
                 renderKanbanCards();
                 renderLeadsTable();
                 updateDashboard();
@@ -227,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('delete-lead-btn').addEventListener('click', () => {
             if (confirm('Tem certeza que deseja excluir este lead?')) {
                 leads = leads.filter(l => l.id !== currentLeadId);
-                saveData(userId, 'leads');
+                saveUserData(userId);
                 renderLeadsTable();
                 renderKanbanCards();
                 updateDashboard();
@@ -251,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tipo: document.getElementById('caixa-tipo').value,
                 observacoes: document.getElementById('caixa-observacoes').value
             });
-            saveData(userId, 'caixa');
+            saveUserData(userId);
             renderCaixaTable();
             updateCaixa();
             e.target.reset();
@@ -277,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 venda: parseFloat(document.getElementById('estoque-venda').value),
                 custos: []
             });
-            saveData(userId, 'estoque');
+            saveUserData(userId);
             renderEstoqueTable();
             updateEstoque();
             e.target.reset();
@@ -296,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.querySelectorAll('.mentoria-notas').forEach(textarea => {
-            textarea.addEventListener('keyup', saveMentoriaNotes);
+            textarea.addEventListener('keyup', () => saveUserData(userId));
         });
 
         // --- CHATBOT ---
@@ -318,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: userInput, history: chatHistory })
                 });
-                document.querySelector('.bot-thinking').parentElement.remove();
+                document.querySelector('.bot-thinking')?.parentElement.remove();
                 
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.details || `Status: ${response.status}`);
@@ -331,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelector('.bot-thinking')?.parentElement.remove();
                 addMessageToChat("Ocorreu um erro ao conectar com a IA.", 'bot-message');
             }
-            saveData(userId, 'chatHistory');
+            saveUserData(userId);
         });
     }
 
@@ -481,20 +484,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Funções para salvar/carregar notas da mentoria no localStorage
-    function saveMentoriaNotes() {
+    // Funções para salvar/carregar notas da mentoria no Firestore
+    function getMentoriaNotes() {
         const notes = {};
         document.querySelectorAll('.mentoria-notas').forEach(textarea => {
             notes[textarea.id] = textarea.value;
         });
-        localStorage.setItem(MENTORIA_NOTES_KEY, JSON.stringify(notes));
+        return notes;
     }
 
-    function loadMentoriaNotes() {
-        const savedNotes = JSON.parse(localStorage.getItem(MENTORIA_NOTES_KEY) || '{}');
-        for (const id in savedNotes) {
+    function loadMentoriaNotes(notes = {}) {
+        for (const id in notes) {
             const textarea = document.getElementById(id);
-            if (textarea) textarea.value = savedNotes[id];
+            if (textarea) textarea.value = notes[id];
         }
     }
 });
