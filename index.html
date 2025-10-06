@@ -331,6 +331,23 @@
             </form>
         </div>
     </div>
+
+    <div class="modal-overlay" id="custos-modal">
+        <div class="modal-content">
+            <span class="close-modal" data-target="custos-modal">&times;</span>
+            <h2 id="custos-modal-title">Custos do Produto</h2>
+            <div id="custos-list">
+                </div>
+            <form id="add-custo-form">
+                <h3>Adicionar Novo Custo</h3>
+                <div class="input-grid">
+                    <input type="text" id="custo-descricao" placeholder="Descrição do Custo" required>
+                    <input type="number" id="custo-valor" placeholder="Valor (R$)" step="0.01" required>
+                </div>
+                <button type="submit" class="btn-save">Adicionar Custo</button>
+            </form>
+        </div>
+    </div>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
