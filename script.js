@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- DADOS DA MENTORIA (CONTEÚDO COMPLETO) ---
+    // --- DADOS DA MENTORIA (CONTEÚDO CORRETO E COMPLETO) ---
     const mentoriaData = [
         {
             "moduleId": "MD01",
