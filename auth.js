@@ -13,7 +13,6 @@ const firebaseConfig = {
 // NÃO PRECISA MEXER ABAIXO DESTA LINHA
 // ======================================================
 
-// Inicializa o Firebase apenas uma vez
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
@@ -21,9 +20,16 @@ if (!firebase.apps.length) {
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const logoutButton = document.getElementById('logout-btn');
+    const appContainer = document.getElementById('app-container');
 
     // --- LÓGICA DA PÁGINA DE LOGIN ---
     if (loginForm) {
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                window.location.replace('index.html');
+            }
+        });
+
         const loginEmail = document.getElementById('login-email');
         const loginPassword = document.getElementById('login-password');
         const loginErrorMessage = document.getElementById('login-error-message');
@@ -48,26 +54,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LÓGICA DO BOTÃO SAIR ---
-    if (logoutButton) {
-        logoutButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            firebase.auth().signOut().then(() => {
-                window.location.href = 'login.html';
-            }).catch((error) => {
-                console.error("Erro ao sair:", error);
-            });
+    // --- LÓGICA DO BOTÃO SAIR E PROTEÇÃO DA PÁGINA PRINCIPAL ---
+    if (appContainer) { // Roda apenas na index.html
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.replace('login.html');
+            }
         });
-    }
 
-    // --- PROTEÇÃO DE PÁGINAS ---
-    firebase.auth().onAuthStateChanged((user) => {
-        const isLoginPage = window.location.pathname.includes('login.html');
-        
-        if (user && isLoginPage) {
-            window.location.replace('index.html');
-        } else if (!user && !isLoginPage) {
-            window.location.replace('login.html');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                firebase.auth().signOut().then(() => {
+                    window.location.href = 'login.html';
+                }).catch((error) => {
+                    console.error("Erro ao sair:", error);
+                });
+            });
         }
-    });
+    }
 });
