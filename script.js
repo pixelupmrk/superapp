@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- DADOS COMPLETOS DA MENTORIA ---
+    // --- DADOS COMPLETOS DA MENTORIA (JÁ INCLUÍDOS) ---
     const mentoriaData = [
         {
             "moduleId": "MD01",
@@ -113,13 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 leads = data.leads || [];
                 caixa = data.caixa || [];
                 estoque = data.estoque || [];
-                // Garante que cada produto no estoque tenha um 'id' único para o modal de custos
-                estoque.forEach((item, index) => {
-                    if (!item.id) {
-                        item.id = `prod_${Date.now()}_${index}`;
-                    }
-                });
-
+                estoque.forEach((item, index) => { if (!item.id) item.id = `prod_${Date.now()}_${index}`; });
                 chatHistory = data.chatHistory || [];
                 nextLeadId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 0;
                 applySettings(data.settings);
@@ -144,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await db.collection('userData').doc(userId).set(dataToSave);
         } catch (error) { console.error(`Erro ao salvar dados:`, error); }
     }
-    
+
     // --- LÓGICA DE ATUALIZAÇÃO DA UI ---
     function updateAllUI() {
         renderKanbanCards();
@@ -168,158 +162,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- EVENT LISTENERS ---
     function setupEventListeners(userId) {
-        // Navegação da Sidebar
-        document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
-            item.addEventListener('click', e => {
-                e.preventDefault();
-                const targetId = e.currentTarget.getAttribute('data-target');
-                if (!targetId) return;
-                document.querySelectorAll('.sidebar-nav .nav-item').forEach(nav => nav.classList.remove('active'));
-                e.currentTarget.classList.add('active');
-                document.querySelectorAll('.main-content .content-area').forEach(area => area.style.display = 'none');
-                document.getElementById(targetId).style.display = 'block';
-                document.getElementById('page-title').textContent = e.currentTarget.querySelector('span').textContent;
-            });
-        });
-
-        // Botão de Tema
-        document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
-            document.body.classList.toggle('light-theme');
-            const isLight = document.body.classList.contains('light-theme');
-            document.getElementById('theme-toggle-btn').textContent = isLight ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro';
-            saveUserData(userId);
-        });
-        
-        // Botão Salvar Configurações
-        document.getElementById('save-settings-btn')?.addEventListener('click', () => {
-            saveUserData(userId);
-            alert('Configurações salvas!');
-        });
-
-        // Formulário Novo Lead
-        document.getElementById('lead-form')?.addEventListener('submit', e => {
-            e.preventDefault();
-            const newLead = {
-                id: nextLeadId++, status: 'novo',
-                nome: document.getElementById('lead-name').value, email: document.getElementById('lead-email').value,
-                whatsapp: document.getElementById('lead-whatsapp').value, atendente: document.getElementById('lead-attendant').value,
-                origem: document.getElementById('lead-origin').value, data: document.getElementById('lead-date').value,
-                qualificacao: document.getElementById('lead-qualification').value, notas: document.getElementById('lead-notes').value
-            };
-            leads.push(newLead);
-            saveUserData(userId);
-            updateAllUI();
-            e.target.reset();
-        });
-
-        // Kanban Board
+        document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => { item.addEventListener('click', e => { e.preventDefault(); const targetId = e.currentTarget.getAttribute('data-target'); if (!targetId) return; document.querySelectorAll('.sidebar-nav .nav-item').forEach(nav => nav.classList.remove('active')); e.currentTarget.classList.add('active'); document.querySelectorAll('.main-content .content-area').forEach(area => area.style.display = 'none'); document.getElementById(targetId).style.display = 'block'; document.getElementById('page-title').textContent = e.currentTarget.querySelector('span').textContent; }); });
+        document.getElementById('theme-toggle-btn')?.addEventListener('click', () => { document.body.classList.toggle('light-theme'); const isLight = document.body.classList.contains('light-theme'); document.getElementById('theme-toggle-btn').textContent = isLight ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro'; saveUserData(userId); });
+        document.getElementById('save-settings-btn')?.addEventListener('click', () => { saveUserData(userId); alert('Configurações salvas!'); });
+        document.getElementById('lead-form')?.addEventListener('submit', e => { e.preventDefault(); leads.push({ id: nextLeadId++, status: 'novo', nome: document.getElementById('lead-name').value, email: document.getElementById('lead-email').value, whatsapp: document.getElementById('lead-whatsapp').value, atendente: document.getElementById('lead-attendant').value, origem: document.getElementById('lead-origin').value, data: document.getElementById('lead-date').value, qualificacao: document.getElementById('lead-qualification').value, notas: document.getElementById('lead-notes').value }); saveUserData(userId); updateAllUI(); e.target.reset(); });
         const kanbanBoard = document.getElementById('kanban-board');
         if (kanbanBoard) {
             kanbanBoard.addEventListener('dragstart', e => { if (e.target.classList.contains('kanban-card')) { draggedItem = e.target; } });
             kanbanBoard.addEventListener('dragend', () => { draggedItem = null; });
             kanbanBoard.addEventListener('dragover', e => e.preventDefault());
-            kanbanBoard.addEventListener('drop', e => {
-                e.preventDefault();
-                const column = e.target.closest('.kanban-column');
-                if (column && draggedItem) {
-                    const lead = leads.find(l => l.id == draggedItem.dataset.id);
-                    if (lead) {
-                        lead.status = column.dataset.status;
-                        saveUserData(userId);
-                        renderKanbanCards(); updateDashboard();
-                    }
-                }
-            });
-            kanbanBoard.addEventListener('click', e => {
-                if (e.target.tagName === 'A') { e.stopPropagation(); return; }
-                const card = e.target.closest('.kanban-card');
-                if (card) openEditModal(parseInt(card.dataset.id));
-            });
+            kanbanBoard.addEventListener('drop', e => { e.preventDefault(); const column = e.target.closest('.kanban-column'); if (column && draggedItem) { const lead = leads.find(l => l.id == draggedItem.dataset.id); if (lead) { lead.status = column.dataset.status; saveUserData(userId); renderKanbanCards(); updateDashboard(); } } });
+            kanbanBoard.addEventListener('click', e => { if (e.target.tagName === 'A') { e.stopPropagation(); return; } const card = e.target.closest('.kanban-card'); if (card) openEditModal(parseInt(card.dataset.id)); });
         }
-        
-        // Tabela de Leads
-        document.getElementById('leads-table')?.addEventListener('click', e => {
-            if (e.target.tagName === 'A') { e.stopPropagation(); return; }
-            if (e.target.closest('.btn-edit-table')) openEditModal(parseInt(e.target.closest('tr').dataset.id));
-            if (e.target.closest('.btn-delete-table')) { if (confirm('Tem certeza?')) { leads = leads.filter(l => l.id != parseInt(e.target.closest('tr').dataset.id)); saveUserData(userId); updateAllUI(); } }
-        });
-
-        // Formulário Edição de Lead
-        document.getElementById('edit-lead-form')?.addEventListener('submit', e => {
-            e.preventDefault();
-            const lead = leads.find(l => l.id === currentLeadId);
-            if(lead) {
-                lead.nome = document.getElementById('edit-lead-name').value; lead.email = document.getElementById('edit-lead-email').value;
-                lead.whatsapp = document.getElementById('edit-lead-whatsapp').value; lead.status = document.getElementById('edit-lead-status').value;
-                lead.atendente = document.getElementById('edit-lead-attendant').value; lead.origem = document.getElementById('edit-lead-origem').value;
-                lead.data = document.getElementById('edit-lead-date').value; lead.qualificacao = document.getElementById('edit-lead-qualification').value;
-                lead.notas = document.getElementById('edit-lead-notes').value;
-                saveUserData(userId);
-                updateAllUI();
-                document.getElementById('edit-lead-modal').style.display = 'none';
-            }
-        });
+        document.getElementById('leads-table')?.addEventListener('click', e => { if (e.target.tagName === 'A') { e.stopPropagation(); return; } if (e.target.closest('.btn-edit-table')) openEditModal(parseInt(e.target.closest('tr').dataset.id)); if (e.target.closest('.btn-delete-table')) { if (confirm('Tem certeza?')) { leads = leads.filter(l => l.id != parseInt(e.target.closest('tr').dataset.id)); saveUserData(userId); updateAllUI(); } } });
+        document.getElementById('edit-lead-form')?.addEventListener('submit', e => { e.preventDefault(); const lead = leads.find(l => l.id === currentLeadId); if(lead) { lead.nome = document.getElementById('edit-lead-name').value; lead.email = document.getElementById('edit-lead-email').value; lead.whatsapp = document.getElementById('edit-lead-whatsapp').value; lead.status = document.getElementById('edit-lead-status').value; lead.atendente = document.getElementById('edit-lead-attendant').value; lead.origem = document.getElementById('edit-lead-origem').value; lead.data = document.getElementById('edit-lead-date').value; lead.qualificacao = document.getElementById('edit-lead-qualification').value; lead.notas = document.getElementById('edit-lead-notes').value; saveUserData(userId); updateAllUI(); document.getElementById('edit-lead-modal').style.display = 'none'; } });
         document.getElementById('delete-lead-btn')?.addEventListener('click', () => { if (confirm('Tem certeza?')) { leads = leads.filter(l => l.id !== currentLeadId); saveUserData(userId); updateAllUI(); document.getElementById('edit-lead-modal').style.display = 'none'; } });
-
-        // Seção Financeiro
         document.getElementById('caixa-form')?.addEventListener('submit', e => { e.preventDefault(); caixa.push({ data: document.getElementById('caixa-data').value, descricao: document.getElementById('caixa-descricao').value, valor: parseFloat(document.getElementById('caixa-valor').value), tipo: document.getElementById('caixa-tipo').value, observacoes: document.getElementById('caixa-observacoes').value }); saveUserData(userId); renderCaixaTable(); updateCaixa(); e.target.reset(); });
         document.querySelectorAll('.finance-tab').forEach(tab => { tab.addEventListener('click', e => { e.preventDefault(); document.querySelectorAll('.finance-tab, .finance-content').forEach(el => el.classList.remove('active')); e.target.classList.add('active'); document.getElementById(e.target.dataset.tab + '-tab-content').classList.add('active'); }); });
-        
-        // Seção Estoque
-        document.getElementById('estoque-form')?.addEventListener('submit', e => {
-            e.preventDefault();
-            const newProduct = {
-                id: `prod_${Date.now()}`,
-                produto: document.getElementById('estoque-produto').value,
-                descricao: document.getElementById('estoque-descricao').value,
-                compra: parseFloat(document.getElementById('estoque-compra').value),
-                venda: parseFloat(document.getElementById('estoque-venda').value),
-                custos: []
-            };
-            estoque.push(newProduct);
-            saveUserData(userId);
-            renderEstoqueTable();
-            e.target.reset();
-        });
+        document.getElementById('estoque-form')?.addEventListener('submit', e => { e.preventDefault(); const newProduct = { id: `prod_${Date.now()}`, produto: document.getElementById('estoque-produto').value, descricao: document.getElementById('estoque-descricao').value, compra: parseFloat(document.getElementById('estoque-compra').value), venda: parseFloat(document.getElementById('estoque-venda').value), custos: [] }; estoque.push(newProduct); saveUserData(userId); renderEstoqueTable(); e.target.reset(); });
         document.getElementById('estoque-search')?.addEventListener('input', renderEstoqueTable);
         document.getElementById('estoque-table')?.addEventListener('click', e => { if (e.target.closest('.btn-custo')) { const productId = e.target.closest('tr').dataset.id; openCustosModal(productId); } });
-        document.getElementById('add-custo-form')?.addEventListener('submit', e => {
-            e.preventDefault();
-            const produto = estoque.find(p => p.id === currentProductId);
-            if (produto) {
-                const descricao = document.getElementById('custo-descricao').value;
-                const valor = parseFloat(document.getElementById('custo-valor').value);
-                if (!produto.custos) produto.custos = [];
-                produto.custos.push({ descricao, valor });
-                saveUserData(userId);
-                renderCustosList(produto);
-                renderEstoqueTable();
-                e.target.reset();
-            }
-        });
-
-        // Chatbot
-        document.getElementById('chatbot-form')?.addEventListener('submit', async e => {
-            e.preventDefault();
-            const chatbotInput = document.getElementById('chatbot-input');
-            const userInput = chatbotInput.value.trim();
-            if (!userInput) return;
-            addMessageToChat(userInput, 'user-message');
-            chatHistory.push({ role: "user", parts: [{ text: userInput }] });
-            chatbotInput.value = '';
-            addMessageToChat("Pensando...", 'bot-message bot-thinking');
-            try {
-                const response = await fetch('/api/gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: userInput, history: chatHistory }) });
-                document.querySelector('.bot-thinking')?.remove();
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.details || 'Erro desconhecido');
-                addMessageToChat(data.text, 'bot-message');
-                chatHistory.push({ role: "model", parts: [{ text: data.text }] });
-            } catch (error) { document.querySelector('.bot-thinking')?.remove(); addMessageToChat(`Erro: ${error.message}`, 'bot-message'); }
-            saveUserData(userId);
-        });
-        
-        // Fechar Modais
+        document.getElementById('add-custo-form')?.addEventListener('submit', e => { e.preventDefault(); const produto = estoque.find(p => p.id === currentProductId); if (produto) { const descricao = document.getElementById('custo-descricao').value; const valor = parseFloat(document.getElementById('custo-valor').value); if (!produto.custos) produto.custos = []; produto.custos.push({ descricao, valor }); saveUserData(userId); renderCustosList(produto); renderEstoqueTable(); e.target.reset(); } });
+        document.getElementById('chatbot-form')?.addEventListener('submit', async e => { e.preventDefault(); const chatbotInput = document.getElementById('chatbot-input'); const userInput = chatbotInput.value.trim(); if (!userInput) return; addMessageToChat(userInput, 'user-message'); chatHistory.push({ role: "user", parts: [{ text: userInput }] }); chatbotInput.value = ''; addMessageToChat("Pensando...", 'bot-message bot-thinking'); try { const response = await fetch('/api/gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: userInput, history: chatHistory }) }); document.querySelector('.bot-thinking')?.remove(); const data = await response.json(); if (!response.ok) throw new Error(data.details || 'Erro desconhecido'); addMessageToChat(data.text, 'bot-message'); chatHistory.push({ role: "model", parts: [{ text: data.text }] }); } catch (error) { document.querySelector('.bot-thinking')?.remove(); addMessageToChat(`Erro: ${error.message}`, 'bot-message'); } saveUserData(userId); });
         document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', () => { document.getElementById(btn.dataset.target).style.display = 'none'; }); });
     }
 
