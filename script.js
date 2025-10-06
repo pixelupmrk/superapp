@@ -1,279 +1,374 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Variáveis globais para os dados
+    // --- VARIÁVEIS GLOBAIS ---
     let leads = [];
     let caixa = [];
     let estoque = [];
     let chatHistory = [];
-    let nextLeadId = 0; // Será gerenciado pelo Firestore agora
-    let statusChart;
-    let currentEstoqueDescricao = null;
-    let draggedItem = null;
+    let nextLeadId = 0;
     let currentLeadId = null;
+    let draggedItem = null;
+    let statusChart;
     let db; // Instância do Firestore
+    const MENTORIA_NOTES_KEY = 'mentoriaNotes';
 
-    // --- Seletores de Elementos ---
-    const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
-    const contentAreas = document.querySelectorAll('.main-content .content-area');
+    // --- SELETORES DE ELEMENTOS ---
     const pageTitle = document.getElementById('page-title');
-    const kanbanBoard = document.getElementById('kanban-board');
-    const leadForm = document.getElementById('lead-form');
-    const editModal = document.getElementById('edit-lead-modal');
-    const editForm = document.getElementById('edit-lead-form');
-    const caixaForm = document.getElementById('caixa-form');
-    const financeTabs = document.querySelectorAll('.finance-tab');
-    const estoqueForm = document.getElementById('estoque-form');
-    const estoqueSearch = document.getElementById('estoque-search');
-    const addCustoModal = document.getElementById('add-custo-modal');
-    const addCustoForm = document.getElementById('add-custo-form');
-    const importEstoqueFile = document.getElementById('import-estoque-file');
-    const exportEstoqueBtn = document.getElementById('export-estoque-btn');
-    const exportLeadsBtn = document.getElementById('export-excel-btn');
-    const themeToggleButton = document.getElementById('theme-toggle-btn');
-    const saveSettingsButton = document.getElementById('save-settings-btn');
-    const userNameInput = document.getElementById('setting-user-name');
-    const companyNameInput = document.getElementById('setting-company-name');
+    const contentAreas = document.querySelectorAll('.main-content .content-area');
+    const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
     const userNameDisplay = document.querySelector('.user-profile span');
-    const chatbotForm = document.getElementById('chatbot-form');
-    const chatbotInput = document.getElementById('chatbot-input');
-    const chatbotMessages = document.getElementById('chatbot-messages');
-
+    
     // --- INICIALIZAÇÃO E AUTENTICAÇÃO ---
-    function initializeApp() {
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                db = firebase.firestore();
-                loadAllUserData(user.uid); // Carrega TODOS os dados do usuário
-            }
-        });
-    }
-
-    // --- PERSISTÊNCIA DE DADOS (FIRESTORE) ---
-
-    // Função central para SALVAR todos os dados
-    async function saveAllUserData(userId) {
-        if (!db || !userId) return;
-        try {
-            const userData = {
-                leads: leads,
-                caixa: caixa,
-                estoque: estoque,
-                chatHistory: chatHistory,
-                settings: {
-                    theme: document.body.classList.contains('light-theme') ? 'light' : 'dark',
-                    userName: userNameInput.value.trim() || 'Usuário',
-                    companyName: companyNameInput.value.trim()
-                }
-            };
-            await db.collection('userData').doc(userId).set(userData, { merge: true });
-        } catch (error) {
-            console.error("Erro ao salvar dados do usuário:", error);
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            db = firebase.firestore();
+            loadAllUserData(user.uid);
+            setupEventListeners(user.uid);
         }
-    }
+    });
 
-    // Função central para CARREGAR todos os dados
+    // --- CARREGAMENTO E SALVAMENTO DE DADOS (FIRESTORE) ---
     async function loadAllUserData(userId) {
-        if (!db || !userId) return;
+        if (!db) return;
         try {
             const doc = await db.collection('userData').doc(userId).get();
             if (doc.exists) {
                 const data = doc.data();
-                
-                // Carrega Leads, Caixa e Estoque
                 leads = data.leads || [];
                 caixa = data.caixa || [];
                 estoque = data.estoque || [];
-                
-                // Carrega Histórico do Chat
                 chatHistory = data.chatHistory || [];
-                renderChatHistory();
-
-                // Carrega Configurações
-                applySettings(data.settings);
-                
-                // Recalcula o próximo ID de lead
                 nextLeadId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 0;
-
-            } else {
-                 // Se não houver dados, exibe a mensagem inicial do bot
-                addMessageToChat("Olá! Eu sou seu assistente de vendas. Como posso ajudar?", 'bot-message');
+                applySettings(data.settings);
             }
-            // Atualiza a interface com os dados carregados
+            loadMentoriaNotes(); // Carrega notas da mentoria do localStorage
             updateAllUI();
         } catch (error) {
-            console.error("Erro ao carregar dados do usuário:", error);
+            console.error("Erro ao carregar dados:", error);
         }
     }
-    
-    // Função para atualizar toda a interface
+
+    async function saveData(userId, dataType) {
+        if (!db) return;
+        try {
+            const dataToSave = {};
+            dataToSave[dataType] = window[dataType]; // 'window[dataType]' acessa a variável global (leads, caixa, etc.)
+            await db.collection('userData').doc(userId).set(dataToSave, { merge: true });
+        } catch (error) {
+            console.error(`Erro ao salvar ${dataType}:`, error);
+        }
+    }
+
+    // --- ATUALIZAÇÃO DA INTERFACE ---
     function updateAllUI() {
-        updateDashboard();
+        // Renderiza tudo que depende dos dados
         renderKanbanCards();
         renderLeadsTable();
-        updateCaixa();
+        updateDashboard();
         renderCaixaTable();
-        updateEstoque();
+        updateCaixa();
         renderEstoqueTable();
-    }
-    
-    // --- LÓGICA DE CONFIGURAÇÕES ---
-    function applySettings(settings) {
-        const defaultSettings = { theme: 'dark', userName: 'Usuário', companyName: '' };
-        const s = { ...defaultSettings, ...settings };
-
-        if (s.theme === 'light') {
-            document.body.classList.add('light-theme');
-            if (themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Escuro';
-        } else {
-            document.body.classList.remove('light-theme');
-            if (themeToggleButton) themeToggleButton.textContent = 'Mudar para Tema Claro';
-        }
-
-        if (userNameInput) userNameInput.value = s.userName === 'Usuário' ? '' : s.userName;
-        if (userNameDisplay) userNameDisplay.textContent = `Olá, ${s.userName}`;
-        if (companyNameInput) companyNameInput.value = s.companyName;
+        updateEstoque();
+        renderChatHistory();
     }
 
-    if (saveSettingsButton) {
-        saveSettingsButton.addEventListener('click', () => {
-            const user = firebase.auth().currentUser;
-            if (user) {
-                saveAllUserData(user.uid);
-                applySettings({ // Aplica imediatamente na tela
-                    theme: document.body.classList.contains('light-theme') ? 'light' : 'dark',
-                    userName: userNameInput.value.trim() || 'Usuário',
-                    companyName: companyNameInput.value.trim()
-                });
-                alert('Configurações salvas com sucesso!');
-            }
+    // --- CONFIGURAÇÕES ---
+    function applySettings(settings = {}) {
+        const theme = settings.theme || 'dark';
+        const userName = settings.userName || 'Usuário';
+        const companyName = settings.companyName || '';
+
+        document.body.className = theme === 'light' ? 'light-theme' : '';
+        document.getElementById('theme-toggle-btn').textContent = theme === 'light' ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro';
+        
+        if(userNameDisplay) userNameDisplay.textContent = `Olá, ${userName}`;
+        document.getElementById('setting-user-name').value = userName;
+        document.getElementById('setting-company-name').value = companyName;
+    }
+
+    // --- SETUP DE TODOS OS EVENT LISTENERS ---
+    function setupEventListeners(userId) {
+        // Navegação principal
+        navItems.forEach(item => {
+            item.addEventListener('click', e => {
+                e.preventDefault();
+                const targetId = e.currentTarget.getAttribute('data-target');
+                if (!targetId) return;
+
+                navItems.forEach(nav => nav.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+
+                contentAreas.forEach(area => area.style.display = 'none');
+                document.getElementById(targetId).style.display = 'block';
+                if(pageTitle) pageTitle.textContent = e.currentTarget.querySelector('span').textContent;
+            });
         });
-    }
 
-    if (themeToggleButton) {
-        themeToggleButton.addEventListener('click', () => {
-            document.body.classList.toggle('light-theme');
-            const user = firebase.auth().currentUser;
-            if (user) {
-                saveAllUserData(user.uid); // Salva a mudança de tema
-            }
-        });
-    }
-
-    // --- NAVEGAÇÃO ---
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = e.currentTarget.getAttribute('data-target');
-            if (!targetId) return;
-
-            navItems.forEach(nav => nav.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-
-            contentAreas.forEach(area => area.style.display = 'none');
-            const targetArea = document.getElementById(targetId);
-            if (targetArea) targetArea.style.display = 'block';
-
-            if (pageTitle) pageTitle.textContent = e.currentTarget.querySelector('span').textContent;
-            if (targetId === 'dashboard-section') updateStatusChart();
-        });
-    });
-    
-    // --- LÓGICA DO CRM (LEADS) ---
-    if (leadForm) {
-        leadForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const user = firebase.auth().currentUser;
-            if (!user) return;
-
-            const newLead = {
-                id: nextLeadId++,
-                nome: document.getElementById('lead-name').value,
-                email: document.getElementById('lead-email').value,
-                whatsapp: document.getElementById('lead-whatsapp').value,
-                atendente: document.getElementById('lead-attendant').value,
-                origem: document.getElementById('lead-origin').value,
-                data: document.getElementById('lead-date').value,
-                qualificacao: document.getElementById('lead-qualification').value,
-                notas: document.getElementById('lead-notes').value,
-                status: 'novo'
+        // Configurações
+        document.getElementById('save-settings-btn').addEventListener('click', async () => {
+            const settings = {
+                theme: document.body.classList.contains('light-theme') ? 'light' : 'dark',
+                userName: document.getElementById('setting-user-name').value || 'Usuário',
+                companyName: document.getElementById('setting-company-name').value
             };
-            leads.push(newLead);
-            updateAllUI();
-            saveAllUserData(user.uid);
-            leadForm.reset();
+            await db.collection('userData').doc(userId).set({ settings }, { merge: true });
+            applySettings(settings);
+            alert('Configurações salvas!');
         });
-    }
-    
-    if (editForm) {
-        editForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const user = firebase.auth().currentUser;
-            const leadIndex = leads.findIndex(l => l.id === currentLeadId);
-            if (leadIndex > -1 && user) {
-                leads[leadIndex] = {
-                    ...leads[leadIndex],
-                    nome: document.getElementById('edit-lead-name').value,
-                    email: document.getElementById('edit-lead-email').value,
-                    whatsapp: document.getElementById('edit-lead-whatsapp').value,
-                    status: document.getElementById('edit-lead-status').value,
-                    atendente: document.getElementById('edit-lead-attendant').value,
-                    origem: document.getElementById('edit-lead-origem').value,
-                    data: document.getElementById('edit-lead-date').value,
-                    qualificacao: document.getElementById('edit-lead-qualification').value,
-                    notas: document.getElementById('edit-lead-notes').value,
-                };
-                updateAllUI();
-                saveAllUserData(user.uid);
-                if (editModal) editModal.style.display = 'none';
-            }
-        });
-    }
-    
-    document.body.addEventListener('click', (e) => {
-        // Editar Lead (da tabela)
-        const editButton = e.target.closest('.btn-edit-table');
-        if (editButton) {
-            const row = editButton.closest('tr');
-            currentLeadId = parseInt(row.getAttribute('data-id'));
-            const lead = leads.find(l => l.id === currentLeadId);
-            if (lead && editForm) {
-                document.getElementById('edit-lead-name').value = lead.nome || '';
-                document.getElementById('edit-lead-email').value = lead.email || '';
-                document.getElementById('edit-lead-whatsapp').value = lead.whatsapp || '';
-                document.getElementById('edit-lead-status').value = lead.status || '';
-                document.getElementById('edit-lead-attendant').value = lead.atendente || '';
-                document.getElementById('edit-lead-origem').value = lead.origem || '';
-                document.getElementById('edit-lead-date').value = lead.data || '';
-                document.getElementById('edit-lead-qualification').value = lead.qualificacao || '';
-                document.getElementById('edit-lead-notes').value = lead.notas || '';
-                if(editModal) editModal.style.display = 'flex';
-            }
-        }
 
-        // Deletar Lead (da tabela)
-        const deleteButton = e.target.closest('.btn-delete-table');
-        if (deleteButton) {
-            const user = firebase.auth().currentUser;
-            if (confirm('Tem certeza que deseja excluir este lead?')) {
-                const row = deleteButton.closest('tr');
-                const leadId = parseInt(row.getAttribute('data-id'));
-                leads = leads.filter(l => l.id !== leadId);
-                updateAllUI();
-                if (user) saveAllUserData(user.uid);
-            }
+        document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+             document.body.classList.toggle('light-theme');
+             document.getElementById('save-settings-btn').click(); // Salva ao mudar
+        });
+
+        // --- CRM ---
+        const leadForm = document.getElementById('lead-form');
+        if (leadForm) {
+            leadForm.addEventListener('submit', e => {
+                e.preventDefault();
+                const newLead = {
+                    id: nextLeadId++,
+                    nome: document.getElementById('lead-name').value,
+                    email: document.getElementById('lead-email').value,
+                    whatsapp: document.getElementById('lead-whatsapp').value,
+                    atendente: document.getElementById('lead-attendant').value,
+                    origem: document.getElementById('lead-origin').value,
+                    data: document.getElementById('lead-date').value,
+                    qualificacao: document.getElementById('lead-qualification').value,
+                    notas: document.getElementById('lead-notes').value,
+                    status: 'novo'
+                };
+                leads.push(newLead);
+                saveData(userId, 'leads');
+                renderKanbanCards();
+                renderLeadsTable();
+                updateDashboard();
+                leadForm.reset();
+            });
         }
-    });
+        
+        // --- KANBAN ---
+        const kanbanBoard = document.getElementById('kanban-board');
+        if (kanbanBoard) {
+            kanbanBoard.addEventListener('dragstart', e => {
+                if (e.target.classList.contains('kanban-card')) {
+                    draggedItem = e.target;
+                    setTimeout(() => draggedItem.style.display = 'none', 0);
+                }
+            });
+            kanbanBoard.addEventListener('dragend', () => {
+                if(draggedItem) {
+                    draggedItem.style.display = 'block';
+                    draggedItem = null;
+                }
+            });
+            kanbanBoard.addEventListener('dragover', e => e.preventDefault());
+            kanbanBoard.addEventListener('drop', e => {
+                e.preventDefault();
+                const column = e.target.closest('.kanban-column');
+                if (column && draggedItem) {
+                    column.querySelector('.kanban-cards-list').appendChild(draggedItem);
+                    const leadId = parseInt(draggedItem.getAttribute('data-id'));
+                    const newStatus = column.getAttribute('data-status');
+                    const lead = leads.find(l => l.id === leadId);
+                    if (lead) {
+                        lead.status = newStatus;
+                        saveData(userId, 'leads');
+                        updateDashboard();
+                        renderLeadsTable();
+                    }
+                }
+            });
+            kanbanBoard.addEventListener('click', e => {
+                const card = e.target.closest('.kanban-card');
+                if (card) openEditModal(parseInt(card.dataset.id));
+            });
+        }
+        
+        // Tabela de Leads
+        document.getElementById('leads-table')?.addEventListener('click', e => {
+            if (e.target.closest('.btn-edit-table')) {
+                openEditModal(parseInt(e.target.closest('tr').dataset.id));
+            }
+            if (e.target.closest('.btn-delete-table')) {
+                if (confirm('Tem certeza?')) {
+                    const leadId = parseInt(e.target.closest('tr').dataset.id);
+                    leads = leads.filter(l => l.id !== leadId);
+                    saveData(userId, 'leads');
+                    renderLeadsTable();
+                    renderKanbanCards();
+                    updateDashboard();
+                }
+            }
+        });
+        
+        // --- MODAL DE EDIÇÃO DE LEAD ---
+        const editModal = document.getElementById('edit-lead-modal');
+        document.getElementById('edit-lead-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const leadIndex = leads.findIndex(l => l.id === currentLeadId);
+            if (leadIndex > -1) {
+                leads[leadIndex].nome = document.getElementById('edit-lead-name').value;
+                leads[leadIndex].email = document.getElementById('edit-lead-email').value;
+                leads[leadIndex].whatsapp = document.getElementById('edit-lead-whatsapp').value;
+                leads[leadIndex].status = document.getElementById('edit-lead-status').value;
+                leads[leadIndex].atendente = document.getElementById('edit-lead-attendant').value;
+                leads[leadIndex].origem = document.getElementById('edit-lead-origem').value;
+                leads[leadIndex].data = document.getElementById('edit-lead-date').value;
+                leads[leadIndex].qualificacao = document.getElementById('edit-lead-qualification').value;
+                leads[leadIndex].notas = document.getElementById('edit-lead-notes').value;
+                saveData(userId, 'leads');
+                renderKanbanCards();
+                renderLeadsTable();
+                updateDashboard();
+                editModal.style.display = 'none';
+            }
+        });
+
+        document.getElementById('delete-lead-btn').addEventListener('click', () => {
+            if (confirm('Tem certeza que deseja excluir este lead?')) {
+                leads = leads.filter(l => l.id !== currentLeadId);
+                saveData(userId, 'leads');
+                renderLeadsTable();
+                renderKanbanCards();
+                updateDashboard();
+                editModal.style.display = 'none';
+            }
+        });
+
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById(btn.dataset.target).style.display = 'none';
+            });
+        });
+
+        // --- FINANCEIRO ---
+        document.getElementById('caixa-form')?.addEventListener('submit', e => {
+            e.preventDefault();
+            caixa.push({
+                data: document.getElementById('caixa-data').value,
+                descricao: document.getElementById('caixa-descricao').value,
+                valor: parseFloat(document.getElementById('caixa-valor').value),
+                tipo: document.getElementById('caixa-tipo').value,
+                observacoes: document.getElementById('caixa-observacoes').value
+            });
+            saveData(userId, 'caixa');
+            renderCaixaTable();
+            updateCaixa();
+            e.target.reset();
+        });
+        
+        document.querySelectorAll('.finance-tab').forEach(tab => {
+            tab.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelectorAll('.finance-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                document.querySelectorAll('.finance-content').forEach(c => c.style.display = 'none');
+                document.getElementById(e.target.dataset.tab + '-tab-content').style.display = 'block';
+            });
+        });
+        
+        // --- ESTOQUE ---
+        document.getElementById('estoque-form')?.addEventListener('submit', e => {
+            e.preventDefault();
+            estoque.push({
+                produto: document.getElementById('estoque-produto').value,
+                descricao: document.getElementById('estoque-descricao').value.toUpperCase(),
+                compra: parseFloat(document.getElementById('estoque-compra').value),
+                venda: parseFloat(document.getElementById('estoque-venda').value),
+                custos: []
+            });
+            saveData(userId, 'estoque');
+            renderEstoqueTable();
+            updateEstoque();
+            e.target.reset();
+        });
+        
+        document.getElementById('estoque-search')?.addEventListener('input', renderEstoqueTable);
+
+        // --- ACELERADOR DE VENDAS (MENTORIA) ---
+        document.querySelectorAll('.sales-accelerator-menu-item').forEach(item => {
+            item.addEventListener('click', e => {
+                document.querySelectorAll('.sales-accelerator-menu-item').forEach(i => i.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                document.querySelectorAll('.sales-accelerator-module-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(e.currentTarget.dataset.content).classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.mentoria-notas').forEach(textarea => {
+            textarea.addEventListener('keyup', saveMentoriaNotes);
+        });
+
+        // --- CHATBOT ---
+        document.getElementById('chatbot-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const chatbotInput = document.getElementById('chatbot-input');
+            const userInput = chatbotInput.value.trim();
+            if (!userInput) return;
+
+            addMessageToChat(userInput, 'user-message');
+            chatHistory.push({ role: "user", parts: [{ text: userInput }] });
+            chatbotInput.value = '';
+
+            addMessageToChat("Pensando...", 'bot-message bot-thinking');
+            
+            try {
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: userInput, history: chatHistory })
+                });
+                document.querySelector('.bot-thinking').parentElement.remove();
+                
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.details || `Status: ${response.status}`);
+
+                addMessageToChat(data.text, 'bot-message');
+                chatHistory.push({ role: "model", parts: [{ text: data.text }] });
+                
+            } catch (error) {
+                console.error("Erro do chatbot:", error);
+                document.querySelector('.bot-thinking')?.parentElement.remove();
+                addMessageToChat("Ocorreu um erro ao conectar com a IA.", 'bot-message');
+            }
+            saveData(userId, 'chatHistory');
+        });
+    }
+
+    // --- FUNÇÕES AUXILIARES E DE RENDERIZAÇÃO ---
+
+    function openEditModal(leadId) {
+        currentLeadId = leadId;
+        const lead = leads.find(l => l.id === leadId);
+        const modal = document.getElementById('edit-lead-modal');
+        if (lead && modal) {
+            document.getElementById('edit-lead-name').value = lead.nome || '';
+            document.getElementById('edit-lead-email').value = lead.email || '';
+            document.getElementById('edit-lead-whatsapp').value = lead.whatsapp || '';
+            document.getElementById('edit-lead-status').value = lead.status || '';
+            document.getElementById('edit-lead-attendant').value = lead.atendente || '';
+            document.getElementById('edit-lead-origem').value = lead.origem || '';
+            document.getElementById('edit-lead-date').value = lead.data || '';
+            document.getElementById('edit-lead-qualification').value = lead.qualificacao || '';
+            document.getElementById('edit-lead-notes').value = lead.notas || '';
+            modal.style.display = 'flex';
+        }
+    }
 
     function renderKanbanCards() {
-        if (!kanbanBoard) return;
-        kanbanBoard.querySelectorAll('.kanban-cards-list').forEach(list => list.innerHTML = '');
+        const listContainers = document.querySelectorAll('.kanban-cards-list');
+        if(!listContainers.length) return;
+        listContainers.forEach(list => list.innerHTML = '');
         leads.forEach(lead => {
-            const card = document.createElement('div');
-            card.className = 'kanban-card';
-            card.draggable = true;
-            card.dataset.id = lead.id;
-            card.innerHTML = `<strong>${lead.nome}</strong><p>${lead.whatsapp}</p>`;
-            const column = kanbanBoard.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`);
-            if (column) column.appendChild(card);
+            const column = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`);
+            if (column) {
+                const card = document.createElement('div');
+                card.className = 'kanban-card';
+                card.draggable = true;
+                card.dataset.id = lead.id;
+                card.innerHTML = `<strong>${lead.nome}</strong><p>${lead.whatsapp}</p><small>${lead.origem}</small>`;
+                column.appendChild(card);
+            }
         });
     }
 
@@ -285,11 +380,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = tableBody.insertRow();
             row.dataset.id = lead.id;
             row.innerHTML = `
-                <td>${lead.nome || ''}</td>
-                <td><a href="https://wa.me/${lead.whatsapp || ''}" target="_blank">${lead.whatsapp || ''}</a></td>
-                <td>${lead.origem || ''}</td>
-                <td>${lead.qualificacao || ''}</td>
-                <td>${lead.status || ''}</td>
+                <td>${lead.nome}</td> <td>${lead.whatsapp}</td> <td>${lead.origem}</td>
+                <td>${lead.qualificacao}</td> <td>${lead.status}</td>
                 <td>
                     <button class="btn-edit-table"><i class="ph-fill ph-note-pencil"></i></button>
                     <button class="btn-delete-table"><i class="ph-fill ph-trash"></i></button>
@@ -300,14 +392,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateDashboard() {
         if (!document.getElementById('total-leads')) return;
+        const leadsNovo = leads.filter(l => l.status === 'novo').length;
+        const leadsProgresso = leads.filter(l => l.status === 'progresso').length;
+        const leadsFechado = leads.filter(l => l.status === 'fechado').length;
         document.getElementById('total-leads').textContent = leads.length;
-        document.getElementById('leads-novo').textContent = leads.filter(l => l.status === 'novo').length;
-        document.getElementById('leads-progresso').textContent = leads.filter(l => l.status === 'progresso').length;
-        document.getElementById('leads-fechado').textContent = leads.filter(l => l.status === 'fechado').length;
-        updateStatusChart();
-    }
-    
-    function updateStatusChart() {
+        document.getElementById('leads-novo').textContent = leadsNovo;
+        document.getElementById('leads-progresso').textContent = leadsProgresso;
+        document.getElementById('leads-fechado').textContent = leadsFechado;
+        
         const ctx = document.getElementById('statusChart')?.getContext('2d');
         if (!ctx) return;
         if (statusChart) statusChart.destroy();
@@ -315,47 +407,10 @@ document.addEventListener('DOMContentLoaded', () => {
             type: 'doughnut',
             data: {
                 labels: ['Novo', 'Em Progresso', 'Fechado'],
-                datasets: [{
-                    data: [
-                        leads.filter(l => l.status === 'novo').length,
-                        leads.filter(l => l.status === 'progresso').length,
-                        leads.filter(l => l.status === 'fechado').length
-                    ],
-                    backgroundColor: ['#00f7ff', '#ffc107', '#28a745']
-                }]
+                datasets: [{ data: [leadsNovo, leadsProgresso, leadsFechado], backgroundColor: ['#00f7ff', '#ffc107', '#28a745'] }]
             },
             options: { responsive: true, maintainAspectRatio: false }
         });
-    }
-
-    // --- LÓGICA FINANCEIRO ---
-    if (caixaForm) {
-        caixaForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const user = firebase.auth().currentUser;
-            if (user) {
-                caixa.push({
-                    data: document.getElementById('caixa-data').value,
-                    descricao: document.getElementById('caixa-descricao').value,
-                    valor: parseFloat(document.getElementById('caixa-valor').value),
-                    tipo: document.getElementById('caixa-tipo').value,
-                    observacoes: document.getElementById('caixa-observacoes').value
-                });
-                updateCaixa();
-                renderCaixaTable();
-                saveAllUserData(user.uid);
-                caixaForm.reset();
-            }
-        });
-    }
-
-    function updateCaixa() {
-        if (!document.getElementById('total-entradas')) return;
-        const totalEntradas = caixa.filter(m => m.tipo === 'entrada').reduce((sum, m) => sum + m.valor, 0);
-        const totalSaidas = caixa.filter(m => m.tipo === 'saida').reduce((sum, m) => sum + m.valor, 0);
-        document.getElementById('total-entradas').textContent = `R$ ${totalEntradas.toFixed(2)}`;
-        document.getElementById('total-saidas').textContent = `R$ ${totalSaidas.toFixed(2)}`;
-        document.getElementById('caixa-atual').textContent = `R$ ${(totalEntradas - totalSaidas).toFixed(2)}`;
     }
 
     function renderCaixaTable() {
@@ -365,8 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
         caixa.forEach(mov => {
             const row = tableBody.insertRow();
             row.innerHTML = `
-                <td>${mov.data}</td>
-                <td>${mov.descricao}</td>
+                <td>${mov.data}</td> <td>${mov.descricao}</td>
                 <td class="entrada">${mov.tipo === 'entrada' ? `R$ ${mov.valor.toFixed(2)}` : ''}</td>
                 <td class="saida">${mov.tipo === 'saida' ? `R$ ${mov.valor.toFixed(2)}` : ''}</td>
                 <td>${mov.observacoes}</td>
@@ -374,121 +428,73 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LÓGICA ESTOQUE ---
-    if (estoqueForm) {
-        estoqueForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const user = firebase.auth().currentUser;
-            if (user) {
-                estoque.push({
-                    produto: document.getElementById('estoque-produto').value,
-                    descricao: document.getElementById('estoque-descricao').value.toUpperCase(),
-                    compra: parseFloat(document.getElementById('estoque-compra').value),
-                    venda: parseFloat(document.getElementById('estoque-venda').value),
-                    custos: [],
-                });
-                updateEstoque();
-                renderEstoqueTable();
-                saveAllUserData(user.uid);
-                estoqueForm.reset();
-            }
-        });
-    }
-
-    function updateEstoque() {
-        estoque.forEach(produto => {
-            produto.totalCustos = produto.custos.reduce((sum, custo) => sum + custo.valor, 0);
-            produto.lucro = produto.venda - (produto.compra + produto.totalCustos);
-        });
+    function updateCaixa() {
+        if(!document.getElementById('total-entradas')) return;
+        const entradas = caixa.filter(m => m.tipo === 'entrada').reduce((acc, m) => acc + m.valor, 0);
+        const saidas = caixa.filter(m => m.tipo === 'saida').reduce((acc, m) => acc + m.valor, 0);
+        document.getElementById('total-entradas').textContent = `R$ ${entradas.toFixed(2)}`;
+        document.getElementById('total-saidas').textContent = `R$ ${saidas.toFixed(2)}`;
+        document.getElementById('caixa-atual').textContent = `R$ ${(entradas - saidas).toFixed(2)}`;
     }
 
     function renderEstoqueTable() {
         const tableBody = document.querySelector('#estoque-table tbody');
         if (!tableBody) return;
-        tableBody.innerHTML = '';
-        const searchTerm = estoqueSearch ? estoqueSearch.value.toLowerCase() : '';
+        const searchTerm = document.getElementById('estoque-search').value.toLowerCase();
         const filteredEstoque = estoque.filter(p => p.produto.toLowerCase().includes(searchTerm) || p.descricao.toLowerCase().includes(searchTerm));
+        tableBody.innerHTML = '';
         filteredEstoque.forEach(produto => {
+            const totalCustos = (produto.custos || []).reduce((acc, c) => acc + c.valor, 0);
+            const lucro = produto.venda - produto.compra - totalCustos;
             const row = tableBody.insertRow();
             row.dataset.descricao = produto.descricao;
             row.innerHTML = `
-                <td>${produto.produto}</td>
-                <td>${produto.descricao}</td>
-                <td>R$ ${produto.compra.toFixed(2)}</td>
-                <td>R$ ${produto.totalCustos.toFixed(2)}</td>
-                <td>R$ ${produto.venda.toFixed(2)}</td>
-                <td>R$ ${produto.lucro.toFixed(2)}</td>
-                <td><button class="btn-delete-produto"><i class="ph-fill ph-trash"></i></button></td>
+                <td>${produto.produto}</td> <td>${produto.descricao}</td>
+                <td>R$ ${produto.compra.toFixed(2)}</td> <td>R$ ${totalCustos.toFixed(2)}</td>
+                <td>R$ ${produto.venda.toFixed(2)}</td> <td>R$ ${lucro.toFixed(2)}</td> <td>Ações</td>
             `;
         });
     }
 
-    // --- LÓGICA DO CHATBOT ---
+    function updateEstoque() { /* A lógica já está em renderEstoqueTable */ }
+
     function addMessageToChat(message, type) {
+        const chatbotMessages = document.getElementById('chatbot-messages');
         if (!chatbotMessages) return;
         const messageElement = document.createElement('div');
-        messageElement.className = `${type}`;
-        if(type !== 'user-message' && type !== 'bot-message') { // Compatibilidade
-            messageElement.className = `${type}-message`;
-        }
+        messageElement.className = type;
         messageElement.innerHTML = `<p>${message}</p>`;
         chatbotMessages.appendChild(messageElement);
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
-    
+
     function renderChatHistory() {
+        const chatbotMessages = document.getElementById('chatbot-messages');
         if (!chatbotMessages) return;
         chatbotMessages.innerHTML = '';
-        chatHistory.forEach(msg => {
-            addMessageToChat(msg.parts[0].text, msg.role === 'user' ? 'user-message' : 'bot-message');
+        if (chatHistory.length === 0) {
+             addMessageToChat("Olá! Eu sou seu assistente de vendas. Como posso ajudar?", 'bot-message');
+        } else {
+            chatHistory.forEach(msg => {
+                addMessageToChat(msg.parts[0].text, msg.role === 'user' ? 'user-message' : 'bot-message');
+            });
+        }
+    }
+    
+    // Funções para salvar/carregar notas da mentoria no localStorage
+    function saveMentoriaNotes() {
+        const notes = {};
+        document.querySelectorAll('.mentoria-notas').forEach(textarea => {
+            notes[textarea.id] = textarea.value;
         });
+        localStorage.setItem(MENTORIA_NOTES_KEY, JSON.stringify(notes));
     }
 
-    if (chatbotForm) {
-        chatbotForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const userInput = chatbotInput.value.trim();
-            const user = firebase.auth().currentUser;
-            if (!userInput || !user) return;
-
-            addMessageToChat(userInput, 'user-message');
-            chatHistory.push({ role: "user", parts: [{ text: userInput }] });
-            chatbotInput.value = '';
-
-            const sendButton = chatbotForm.querySelector('button');
-            sendButton.disabled = true;
-            addMessageToChat("Pensando...", 'bot-message bot-thinking');
-
-            const apiUrl = '/api/gemini';
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: userInput, history: chatHistory })
-                });
-
-                const thinkingMsg = chatbotMessages.querySelector('.bot-thinking');
-                if (thinkingMsg) thinkingMsg.remove();
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    addMessageToChat(`Ocorreu um erro no servidor (Status: ${response.status}).`, 'bot-message');
-                } else {
-                    const data = await response.json();
-                    addMessageToChat(data.text, 'bot-message');
-                    chatHistory.push({ role: "model", parts: [{ text: data.text }] });
-                }
-            } catch (error) {
-                const thinkingMsg = chatbotMessages.querySelector('.bot-thinking');
-                if (thinkingMsg) thinkingMsg.remove();
-                addMessageToChat("Não consegui me conectar ao servidor.", 'bot-message');
-            } finally {
-                sendButton.disabled = false;
-                saveAllUserData(user.uid); // Salva o histórico do chat
-            }
-        });
+    function loadMentoriaNotes() {
+        const savedNotes = JSON.parse(localStorage.getItem(MENTORIA_NOTES_KEY) || '{}');
+        for (const id in savedNotes) {
+            const textarea = document.getElementById(id);
+            if (textarea) textarea.value = savedNotes[id];
+        }
     }
-
-    // --- INICIALIZAÇÃO GERAL ---
-    initializeApp();
 });
