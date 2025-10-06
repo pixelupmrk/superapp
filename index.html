@@ -172,7 +172,7 @@
                 </div>
 
                 <div class="finance-content active" id="caixa-tab-content">
-                    <div class="caixa-stats">
+                    <div class="dashboard-stats caixa-stats">
                         <div class="stat-card entrada-card">
                             <h3>Total de Entradas</h3>
                             <p id="total-entradas">R$ 0,00</p>
@@ -246,16 +246,6 @@
                             <div class="search-container">
                                 <input type="text" id="estoque-search" placeholder="Pesquisar por produto ou descrição...">
                             </div>
-                            <div class="buttons-container">
-                                <label for="import-estoque-file" class="btn-import">
-                                    <i class="ph-fill ph-file-arrow-down"></i> Importar
-                                </label>
-                                <input type="file" id="import-estoque-file" accept=".xlsx, .xls, .csv">
-                                
-                                <button class="btn-export" id="export-estoque-btn">
-                                    <i class="ph-fill ph-file-arrow-up"></i> Exportar
-                                </button>
-                            </div>
                         </div>
                         <div class="table-container">
                             <table id="estoque-table">
@@ -263,9 +253,9 @@
                                     <tr>
                                         <th>Produto</th>
                                         <th>Descrição</th>
-                                        <th>Valor de Compra</th>
+                                        <th>V. Compra</th>
                                         <th>Custos</th>
-                                        <th>Valor de Venda</th>
+                                        <th>V. Venda</th>
                                         <th>Lucro</th>
                                         <th>Ações</th>
                                     </tr>
@@ -280,110 +270,18 @@
             <div class="content-area" id="sales-accelerator-section">
                 <div class="sales-accelerator-container">
                     <aside class="sales-accelerator-sidebar">
-                        <nav class="sales-accelerator-menu">
-                            <h2>Módulos</h2>
-                            <ul>
-                                <li class="sales-accelerator-menu-item active" data-content="modulo1">Módulo 1: Fundamentos do Negócio</li>
-                                <li class="sales-accelerator-menu-item" data-content="modulo2">Módulo 2: O Algoritmo do Meta</li>
-                                <li class="sales-accelerator-menu-item" data-content="modulo3">Módulo 3: Cronograma de Postagens</li>
-                                <li class="sales-accelerator-menu-item" data-content="modulo4">Módulo 4: Conteúdo que Conecta</li>
-                                <li class="sales-accelerator-menu-item" data-content="modulo5">Módulo 5: Copywriting com ChatGPT</li>
-                                <li class="sales-accelerator-menu-item" data-content="modulo6">Módulo 6: Implementação de CRM</li>
-                                <li class="sales-accelerator-menu-item" data-content="modulo7">Módulo 7: Processo Comercial</li>
-                                <li class="sales-accelerator-menu-item" data-content="modulo8">Módulo 8: Conexão e Humanização</li>
-                            </ul>
-                        </nav>
+                        <nav class="sales-accelerator-menu" id="mentoria-menu">
+                            </nav>
                     </aside>
-                    <main class="sales-accelerator-content">
-                        <section id="modulo1" class="sales-accelerator-module-content active">
-                            <h2>Módulo 1: Fundamentos do Negócio e Posicionamento</h2>
-                             <div class="section exercise-section">
-                                <h3>🚀 Exercício Prático: Defina sua Base</h3>
-                                <div class="anotacoes-aluno">
-                                    <label for="aluno-notas-mod1">Minhas Anotações</label>
-                                    <textarea class="mentoria-notas" id="aluno-notas-mod1" rows="6" placeholder="Quem é a sua persona (cliente ideal)?..."></textarea>
-                                </div>
-                            </div>
-                        </section>
-                        <section id="modulo2" class="sales-accelerator-module-content">
-                            <h2>Módulo 2: O Algoritmo do Meta (Facebook & Instagram)</h2>
-                            <div class="section exercise-section">
-                                <h3>🚀 Exercício Prático: Crie 3 Ganchos</h3>
-                                <div class="anotacoes-aluno">
-                                    <label for="aluno-notas-mod2">Meus Ganchos</label>
-                                    <textarea class="mentoria-notas" id="aluno-notas-mod2" rows="5" placeholder="1. Ex: Você está cometendo este erro no seu..."></textarea>
-                                </div>
-                            </div>
-                        </section>
-                        <section id="modulo3" class="sales-accelerator-module-content">
-                             <h2>Módulo 3: Cronograma de Postagens Estratégico</h2>
-                             <div class="section exercise-section">
-                                 <h3>🚀 Exercício Prático: Monte seu Cronograma</h3>
-                                 <div class="anotacoes-aluno">
-                                     <label for="aluno-notas-mod3">Meu Cronograma</label>
-                                     <textarea class="mentoria-notas" id="aluno-notas-mod3" rows="6" placeholder="Segunda:&#10;Terça:&#10;Quarta:&#10;Quinta:&#10;Sexta:"></textarea>
-                                 </div>
-                             </div>
-                        </section>
-                         <section id="modulo4" class="sales-accelerator-module-content">
-                            <h2>Módulo 4: Conteúdo que Conecta</h2>
-                             <div class="section exercise-section">
-                                 <h3>🚀 Exercício Prático: Desafio "1 Dica, 1 Minuto"</h3>
-                                 <div class="anotacoes-aluno">
-                                     <label for="aluno-notas-mod4">Minhas Anotações e Ideias de Roteiro</label>
-                                     <textarea class="mentoria-notas" id="aluno-notas-mod4" rows="6" placeholder="Anote aqui suas ideias de gancho..."></textarea>
-                                 </div>
-                             </div>
-                        </section>
-                        <section id="modulo5" class="sales-accelerator-module-content">
-                            <h2>Módulo 5: Copywriting com ChatGPT</h2>
-                            <div class="section exercise-section">
-                                <h3>🚀 Exercício Prático: Crie seu Prompt Base</h3>
-                                <div class="anotacoes-aluno">
-                                    <label for="aluno-notas-mod5">Meu Prompt Base</label>
-                                    <textarea class="mentoria-notas" id="aluno-notas-mod5" rows="8" placeholder="Tema: (Ex: Importância do tráfego pago)..."></textarea>
-                                </div>
-                            </div>
-                        </section>
-                        <section id="modulo6" class="sales-accelerator-module-content">
-                            <h2>Módulo 6: Implementação de CRM</h2>
-                             <div class="section exercise-section">
-                                 <h3>🚀 Exercício Prático: Defina seu Funil</h3>
-                                 <div class="anotacoes-aluno">
-                                     <label for="aluno-notas-mod6">Etapas do Meu Funil de Vendas</label>
-                                     <textarea class="mentoria-notas" id="aluno-notas-mod6" rows="7" placeholder="Coluna 1:&#10;Coluna 2:&#10;Coluna 3:&#10;Coluna 4:&#10;Coluna 5:"></textarea>
-                                 </div>
-                             </div>
-                        </section>
-                         <section id="modulo7" class="sales-accelerator-module-content">
-                            <h2>Módulo 7: Processo Comercial e Técnicas de Venda</h2>
-                             <div class="section exercise-section">
-                                 <h3>🚀 Exercício Prático: Construa seu Pitch</h3>
-                                 <div class="anotacoes-aluno">
-                                     <label for="aluno-notas-mod7">Meu Pitch de Vendas</label>
-                                     <textarea class="mentoria-notas" id="aluno-notas-mod7" rows="6" placeholder="Nós ajudamos [QUEM VOCÊ AJUDA] a [PROBLEMA QUE RESOLVE]..."></textarea>
-                                 </div>
-                             </div>
-                        </section>
-                        <section id="modulo8" class="sales-accelerator-module-content">
-                            <h2>Módulo 8: Conexão com a Audiência e Humanização</h2>
-                            <div class="section exercise-section">
-                                <h3>🚀 Exercício Prático: Planeje seus Stories</h3>
-                                <div class="anotacoes-aluno">
-                                    <label for="aluno-notas-mod8">Minhas Ideias de Stories</label>
-                                    <textarea class="mentoria-notas" id="aluno-notas-mod8" rows="5" placeholder="1. Mostrar um erro e o que aprendi com ele..."></textarea>
-                                 </div>
-                             </div>
-                        </section>
-                    </main>
+                    <main class="sales-accelerator-content" id="mentoria-content">
+                        </main>
                 </div>
             </div>
             
             <div class="content-area" id="chatbot-section">
                 <h2>Chatbot AI - Assistente de Vendas</h2>
                 <div class="chatbot-container">
-                    <div id="chatbot-messages" class="chatbot-messages">
-                         </div>
+                    <div id="chatbot-messages" class="chatbot-messages"></div>
                     <form id="chatbot-form" class="chatbot-form">
                         <input type="text" id="chatbot-input" placeholder="Digite sua pergunta..." autocomplete="off">
                         <button type="submit"><i class="ph-fill ph-paper-plane-right"></i></button>
@@ -402,10 +300,7 @@
                 </div>
                 <div class="card">
                     <h3>Aparência</h3>
-                    <div class="theme-switcher-container">
-                        <p>Alterne entre os temas claro e escuro para uma melhor visualização.</p>
-                        <button class="btn-save" id="theme-toggle-btn">Mudar para Tema Claro</button>
-                    </div>
+                    <button class="btn-save" id="theme-toggle-btn">Mudar para Tema Claro</button>
                 </div>
                 <div class="card">
                      <button class="btn-save" id="save-settings-btn">Salvar Configurações</button>
@@ -423,24 +318,20 @@
                     <input type="text" id="edit-lead-name" placeholder="Nome">
                     <input type="email" id="edit-lead-email" placeholder="E-mail">
                     <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
-                    <div class="select-group">
-                        <select id="edit-lead-status">
-                            <option value="novo">Novo</option>
-                            <option value="progresso">Em Progresso</option>
-                            <option value="fechado">Fechado</option>
-                        </select>
-                    </div>
+                    <select id="edit-lead-status">
+                        <option value="novo">Novo</option>
+                        <option value="progresso">Em Progresso</option>
+                        <option value="fechado">Fechado</option>
+                    </select>
                     <input type="text" id="edit-lead-attendant" placeholder="Atendente">
                     <input type="text" id="edit-lead-origem" placeholder="Origem">
                     <input type="date" id="edit-lead-date" placeholder="dd/mm/aaaa">
-                    <div class="select-group">
-                        <select id="edit-lead-qualification">
-                            <option value="">Qualificação</option>
-                            <option value="quente">Lead Quente</option>
-                            <option value="morno">Lead Morno</option>
-                            <option value="frio">Lead Frio</option>
-                        </select>
-                    </div>
+                    <select id="edit-lead-qualification">
+                        <option value="">Qualificação</option>
+                        <option value="quente">Lead Quente</option>
+                        <option value="morno">Lead Morno</option>
+                        <option value="frio">Lead Frio</option>
+                    </select>
                 </div>
                 <textarea id="edit-lead-notes" placeholder="Notas"></textarea>
                 <div class="modal-actions">
