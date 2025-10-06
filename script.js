@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let draggedItem = null;
     let statusChart;
     let db; // Instância do Firestore
+    let isDataLoaded = false; // <<< NOVO: Trava de segurança para o salvamento
 
     // --- SELETORES DE ELEMENTOS ---
     const pageTitle = document.getElementById('page-title');
@@ -41,13 +42,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadMentoriaNotes(data.mentoriaNotes);
             }
             updateAllUI(); // Atualiza toda a interface após carregar os dados
+            isDataLoaded = true; // <<< NOVO: Libera o salvamento após o carregamento
         } catch (error) {
             console.error("Erro ao carregar dados:", error);
         }
     }
 
     async function saveUserData(userId) {
-        if (!db) return;
+        if (!db || !isDataLoaded) return; // <<< NOVO: Verifica se os dados foram carregados
         try {
             const mentoriaNotes = getMentoriaNotes();
             const dataToSave = {
@@ -155,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             kanbanBoard.addEventListener('dragstart', e => {
                 if (e.target.classList.contains('kanban-card')) {
                     draggedItem = e.target;
-                    setTimeout(() => draggedItem.style.display = 'none', 0);
+                    setTimeout(() => { if (draggedItem) draggedItem.style.display = 'none'; }, 0);
                 }
             });
             kanbanBoard.addEventListener('dragend', () => {
@@ -387,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${lead.qualificacao}</td> <td>${lead.status}</td>
                 <td>
                     <button class="btn-edit-table"><i class="ph-fill ph-note-pencil"></i></button>
-                    <button class="btn-delete-table"><i class="ph-fill ph-trash"></i></button>
+                    <button class.btn-delete-table"><i class="ph-fill ph-trash"></i></button>
                 </td>
             `;
         });
