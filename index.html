@@ -105,14 +105,12 @@
                             <input type="text" id="lead-attendant" placeholder="Atendente (quem atende)">
                             <input type="text" id="lead-origin" placeholder="Origem">
                             <input type="date" id="lead-date" placeholder="dd/mm/aaaa">
-                            <div class="select-group">
-                                <select id="lead-qualification">
-                                    <option value="">Qualificação</option>
-                                    <option value="quente">Lead Quente</option>
-                                    <option value="morno">Lead Morno</option>
-                                    <option value="frio">Lead Frio</option>
-                                </select>
-                            </div>
+                            <select id="lead-qualification">
+                                <option value="">Qualificação</option>
+                                <option value="quente">Lead Quente</option>
+                                <option value="morno">Lead Morno</option>
+                                <option value="frio">Lead Frio</option>
+                            </select>
                         </div>
                         <textarea id="lead-notes" placeholder="Notas"></textarea>
                         <button type="submit" class="btn-save">Salvar</button>
@@ -138,9 +136,6 @@
             <div class="content-area" id="crm-list-section">
                 <div class="list-header">
                     <h2>Lista de Leads</h2>
-                    <button class="btn-export" id="export-excel-btn">
-                        <i class="ph-fill ph-file-excel"></i> Exportar para Excel
-                    </button>
                 </div>
                 <div class="card">
                     <div class="table-container">
@@ -194,13 +189,11 @@
                                 <input type="date" id="caixa-data" required>
                                 <input type="text" id="caixa-descricao" placeholder="Descrição" required>
                                 <input type="number" id="caixa-valor" placeholder="Valor (R$)" required step="0.01">
-                                <div class="select-group">
-                                    <select id="caixa-tipo" required>
-                                        <option value="">Tipo</option>
-                                        <option value="entrada">Entrada</option>
-                                        <option value="saida">Saída</option>
-                                    </select>
-                                </div>
+                                <select id="caixa-tipo" required>
+                                    <option value="">Tipo</option>
+                                    <option value="entrada">Entrada</option>
+                                    <option value="saida">Saída</option>
+                                </select>
                             </div>
                             <textarea id="caixa-observacoes" placeholder="Observações"></textarea>
                             <button type="submit" class="btn-save">Adicionar</button>
@@ -243,9 +236,7 @@
                     <div class="card">
                         <h3>Estoque de Produtos</h3>
                         <div class="estoque-actions">
-                            <div class="search-container">
-                                <input type="text" id="estoque-search" placeholder="Pesquisar por produto ou descrição...">
-                            </div>
+                            <input type="text" id="estoque-search" placeholder="Pesquisar por produto ou descrição...">
                         </div>
                         <div class="table-container">
                             <table id="estoque-table">
@@ -270,16 +261,13 @@
             <div class="content-area" id="sales-accelerator-section">
                 <div class="sales-accelerator-container">
                     <aside class="sales-accelerator-sidebar">
-                        <nav class="sales-accelerator-menu" id="mentoria-menu">
-                        </nav>
+                        <nav class="sales-accelerator-menu" id="mentoria-menu"></nav>
                     </aside>
-                    <main class="sales-accelerator-content" id="mentoria-content">
-                    </main>
+                    <main class="sales-accelerator-content" id="mentoria-content"></main>
                 </div>
             </div>
             
             <div class="content-area" id="chatbot-section">
-                <h2>Chatbot AI - Assistente de Vendas</h2>
                 <div class="chatbot-container">
                     <div id="chatbot-messages" class="chatbot-messages"></div>
                     <form id="chatbot-form" class="chatbot-form">
@@ -325,7 +313,7 @@
                     </select>
                     <input type="text" id="edit-lead-attendant" placeholder="Atendente">
                     <input type="text" id="edit-lead-origem" placeholder="Origem">
-                    <input type="date" id="edit-lead-date" placeholder="dd/mm/aaaa">
+                    <input type="date" id="edit-lead-date">
                     <select id="edit-lead-qualification">
                         <option value="">Qualificação</option>
                         <option value="quente">Lead Quente</option>
