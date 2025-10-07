@@ -110,7 +110,7 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
 
 @media (max-width: 768px) {
     .sidebar { left: -100%; }
-    .sidebar.show { left: 0; }
+    .app-container.sidebar-visible .sidebar { left: 0; }
     .main-content { margin-left: 0; padding: 1rem; }
     .menu-toggle { display: block; }
     .main-header { gap: 1rem; }
