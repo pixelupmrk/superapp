@@ -96,8 +96,41 @@
                         <div class="stat-card"> <h3>Total de Saídas</h3> <p id="total-saidas">R$ 0,00</p> </div>
                         <div class="stat-card"> <h3>Saldo Atual</h3> <p id="caixa-atual">R$ 0,00</p> </div>
                     </div>
+                    <div class="card">
+                        <h3>Adicionar Movimentação</h3>
+                        <form id="caixa-form">
+                            <div class="input-grid">
+                                <input type="date" id="caixa-data" required>
+                                <input type="text" id="caixa-descricao" placeholder="Descrição" required>
+                                <input type="number" id="caixa-valor" placeholder="Valor (R$)" step="0.01" required>
+                                <select id="caixa-tipo" required> <option value="">Tipo</option> <option value="entrada">Entrada</option> <option value="saida">Saída</option> </select>
+                            </div>
+                            <button type="submit" class="btn-save">Adicionar</button>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <h3>Histórico de Movimentações</h3>
+                        <div class="table-container">
+                            <table id="caixa-table">
+                                <thead> <tr> <th>Data</th> <th>Descrição</th> <th>Entrada</th> <th>Saída</th> </tr> </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 <div class="finance-content" id="custos-tab-content">
+                    <div class="card">
+                        <h3>Adicionar Novo Produto</h3>
+                        <form id="estoque-form">
+                            <div class="input-grid">
+                                <input type="text" id="estoque-produto" placeholder="Produto" required>
+                                <input type="text" id="estoque-descricao" placeholder="Descrição">
+                                <input type="number" id="estoque-compra" placeholder="Valor de Compra (R$)" step="0.01" required>
+                                <input type="number" id="estoque-venda" placeholder="Valor de Venda (R$)" step="0.01" required>
+                            </div>
+                            <button type="submit" class="btn-save">Adicionar Produto</button>
+                        </form>
+                    </div>
                     <div class="card">
                         <h3>Estoque de Produtos</h3>
                         <div class="estoque-actions">
