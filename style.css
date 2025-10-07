@@ -15,7 +15,7 @@ body.light-theme {
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); }
 .app-container { display: flex; }
-.sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-color); border-right: 1px solid var(--secondary-color); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; transition: left 0.3s ease-in-out; }
+.sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-color); border-right: 1px solid var(--secondary-color); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; transition: left 0.3s ease-in-out; z-index: 1001; }
 .sidebar-header h2, .login-container h2:first-of-type { font-family: 'Orbitron', sans-serif; color: var(--accent-color); text-align: center; margin-bottom: 3rem; font-size: 1.8rem; text-shadow: 0 0 5px var(--accent-color), 0 0 10px rgba(0, 247, 255, 0.5); }
 .sidebar-nav { flex-grow: 1; }
 .nav-item { display: flex; align-items: center; padding: 0.9rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; text-decoration: none; color: var(--text-color-muted); transition: all 0.3s ease; }
@@ -94,7 +94,7 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
 .menu-toggle { display: none; font-size: 2rem; cursor: pointer; color: var(--accent-color); }
 
 @media (max-width: 768px) {
-    .sidebar { left: -100%; z-index: 1000; }
+    .sidebar { left: -100%; }
     .sidebar.show { left: 0; }
     .main-content { margin-left: 0; padding: 1rem; }
     .menu-toggle { display: block; }
