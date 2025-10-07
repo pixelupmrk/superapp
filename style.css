@@ -109,34 +109,13 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
 .menu-toggle { display: none; font-size: 2rem; cursor: pointer; color: var(--accent-color); }
 
 @media (max-width: 768px) {
-    .sidebar {
-        left: -100%;
-    }
-    .sidebar.show {
-        left: 0;
-    }
-    .main-content {
-        margin-left: 0;
-        padding: 1rem;
-    }
-    .menu-toggle {
-        display: block;
-    }
-    .main-header {
-        gap: 1rem;
-    }
-    .dashboard-stats, .kanban-board, .input-grid {
-        grid-template-columns: 1fr;
-    }
-    .sales-accelerator-container {
-        flex-direction: column;
-    }
-    .sales-accelerator-sidebar {
-        flex: 0 0 auto;
-        width: 100%;
-    }
-    .modal-content {
-        width: 95%;
-        padding: 1.5rem;
-    }
+    .sidebar { left: -100%; }
+    .sidebar.show { left: 0; }
+    .main-content { margin-left: 0; padding: 1rem; }
+    .menu-toggle { display: block; }
+    .main-header { gap: 1rem; }
+    .dashboard-stats, .kanban-board, .input-grid { grid-template-columns: 1fr; }
+    .sales-accelerator-container { flex-direction: column; }
+    .sales-accelerator-sidebar { flex: 0 0 auto; width: 100%; }
+    .modal-content { width: 95%; padding: 1.5rem; }
 }
