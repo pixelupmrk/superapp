@@ -83,23 +83,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupEventListeners(userId) {
         const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.querySelector('.sidebar');
-        
-        if (menuToggle && sidebar) {
+        const appContainer = document.getElementById('app-container');
+
+        if (menuToggle && appContainer) {
             menuToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('show');
+                appContainer.classList.toggle('sidebar-visible');
             });
         }
         
         document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
             item.addEventListener('click', e => {
-                // Se a tela for de celular, esconde a sidebar após o clique
                 if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('show');
+                    appContainer.classList.remove('sidebar-visible');
                 }
 
-                // Se for o botão de logout, não previne o comportamento padrão do auth.js
-                if(e.currentTarget.id === 'logout-btn') {
+                if (e.currentTarget.id === 'logout-btn') {
                     return; 
                 }
                 
