@@ -22,10 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
+            // Se o usuário está logado e na página de login, redireciona para o app
             if (isLoginPage) {
                 window.location.replace('index.html');
             }
         } else {
+            // Se o usuário não está logado e NÃO está na página de login, redireciona para o login
             if (!isLoginPage) {
                 window.location.replace('login.html');
             }
@@ -39,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             const loginErrorMessage = document.getElementById('login-error-message');
+            loginErrorMessage.textContent = ''; // Limpa a mensagem de erro
 
             firebase.auth().signInWithEmailAndPassword(email, password)
                 .catch((error) => {
@@ -46,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         loginErrorMessage.textContent = 'E-mail ou senha inválidos.';
                     } else {
                         loginErrorMessage.textContent = 'Ocorreu um erro ao tentar fazer login.';
+                        console.error("Erro de login:", error);
                     }
                 });
         });
