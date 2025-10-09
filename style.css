@@ -16,7 +16,7 @@ body.light-theme {
 body { font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); }
 .app-container { display: flex; }
 .sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-color); border-right: 1px solid var(--secondary-color); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; transition: left 0.3s ease-in-out; z-index: 1001; }
-.sidebar-header h2 { font-family: 'Orbitron', sans-serif; color: var(--accent-color); text-align: center; margin-bottom: 3rem; font-size: 1.8rem; text-shadow: 0 0 5px var(--accent-color), 0 0 10px rgba(0, 247, 255, 0.5); }
+.sidebar-header h2, .login-container h2:first-of-type { font-family: 'Orbitron', sans-serif; color: var(--accent-color); text-align: center; margin-bottom: 3rem; font-size: 1.8rem; text-shadow: 0 0 5px var(--accent-color), 0 0 10px rgba(0, 247, 255, 0.5); }
 .nav-item { display: flex; align-items: center; padding: 0.9rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; text-decoration: none; color: var(--text-color-muted); transition: all 0.3s ease; }
 .nav-item:hover { background-color: var(--secondary-color); color: var(--text-color); }
 .nav-item.active { background-color: var(--accent-color); color: #000; font-weight: 600; box-shadow: 0 0 15px var(--accent-color); }
@@ -29,10 +29,19 @@ body { font-family: 'Inter', sans-serif; background-color: var(--background-colo
 .btn-delete, .btn-delete-item { background: var(--delete-color); color: #ffffff; }
 .card { background-color: var(--primary-color); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid var(--secondary-color); box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
 input, select, textarea { width: 100%; padding: 0.75rem 1rem; background-color: var(--secondary-color); border: 1px solid var(--secondary-color); border-radius: 8px; color: var(--text-color); font-size: 1rem; }
+
+/* --- TELA DE LOGIN (CORRIGIDA) --- */
+.login-page { display: flex; justify-content: center; align-items: center; height: 100vh; }
+.login-container { width: 100%; max-width: 400px; padding: 3rem; }
+.login-container .input-grid { gap: 1rem; }
+.login-container input, .login-container .btn-login { font-size: 1rem; padding: 1rem; margin-bottom: 0; }
+
+/* --- DASHBOARD (CARD MENOR - CORRIGIDO) --- */
 .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
 .stat-card { background-color: var(--primary-color); padding: 1.5rem; border-radius: 12px; text-align: center; }
 .stat-card h3 { font-size: 1rem; color: var(--text-color-muted); margin-bottom: 0.5rem; }
 .stat-card p { font-size: 2.2rem; font-weight: bold; }
+
 .kanban-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
 .kanban-column { background-color: var(--primary-color); padding: 1rem; border-radius: 12px; }
 .kanban-cards-list { min-height: 400px; }
