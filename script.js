@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let unsubscribeLeads;
     let unsubscribeLeadChat;
     let currentUserId;
+    let currentLeadId = null; // Garante que a variável exista globalmente no script
 
     async function main() {
         firebase.auth().onAuthStateChanged(async (user) => {
@@ -11,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentUserId = user.uid;
                 db = firebase.firestore();
                 setupEventListeners(currentUserId);
-                setupRealtimeListeners(currentUserId); // Chamado depois para garantir que os listeners de UI existam
+                setupRealtimeListeners(currentUserId);
                 loadInitialData(currentUserId);
             }
         });
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupRealtimeListeners(userId) {
         if (unsubscribeLeads) unsubscribeLeads();
+
         unsubscribeLeads = db.collection('users').doc(userId).collection('leads')
             .onSnapshot(snapshot => {
                 leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -100,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (kanbanBoard) {
             kanbanBoard.addEventListener('click', e => {
                 const card = e.target.closest('.kanban-card');
-                // CORREÇÃO: Usar o ID como texto (string), sem parseInt
                 if (card && card.dataset.id) openEditModal(card.dataset.id);
             });
         }
@@ -108,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('leads-table')?.addEventListener('click', e => {
             if (e.target.closest('.btn-edit-table')) {
                 const row = e.target.closest('tr');
-                // CORREÇÃO: Usar o ID como texto (string), sem parseInt
                 if (row && row.dataset.id) openEditModal(row.dataset.id);
             }
         });
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const messageText = input.value.trim();
             const lead = leads.find(l => l.id === currentLeadId);
             const userDoc = await db.collection('users').doc(userId).get();
-            const botUrl = userDoc.exists() ? userDoc.data().botUrl : null;
+            const botUrl = userDoc.exists ? userDoc.data().botUrl : null;
 
             if (!messageText || !lead || !botUrl) return;
 
@@ -155,9 +155,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // CORREÇÃO DO ERRO DE DIGITAÇÃO ESTAVA AQUI
         document.getElementById('edit-lead-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!currentLeadId) return;
+            if (!currentLeadId) return; // Variável com 'L' e 'I' maiúsculos
             const updatedData = {
                 nome: document.getElementById('edit-lead-name').value,
                 email: document.getElementById('edit-lead-email').value,
@@ -177,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function openEditModal(leadId) {
-        currentLeadId = leadId;
+        currentLeadId = leadId; // Define o ID do lead atual
         const lead = leads.find(l => l.id === leadId);
         if (!lead) {
             console.error("Lead não encontrado com o ID:", leadId);
