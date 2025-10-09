@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
         { "moduleId": "MD01", "title": "Módulo 1: Conectando com o Cliente Ideal", "exercisePrompt": "Exercício Módulo 1:\n\n1. Descreva sua persona (cliente ideal).\n2. Qual é a principal dor que seu serviço resolve?\n3. Escreva sua Proposta de Valor.", "lessons": [ { "lessonId": "L01.01", "title": "Questionário para Definição de Persona", "content": "Antes de qualquer estratégia, é essencial saber com quem você está falando. O questionário irá ajudar a identificar o perfil do seu cliente ideal. Use o CRM para registrar as respostas e começar a segmentar seus leads.\n\nPerguntas do Questionário:\n1. Nome fictício da persona:\n2. Idade aproximada:\n3. Profissão ou ocupação:\n4. Quais são suas dores e dificuldades?\n5. Quais são seus desejos ou objetivos?\n6. Onde essa pessoa busca informação?\n7. Quais redes sociais essa pessoa usa com frequência?\n8. Que tipo de conteúdo ela consome?" }, { "lessonId": "L01.02", "title": "Proposta de Valor e Posicionamento", "content": "Com base na persona, vamos definir a proposta de valor do seu serviço. A proposta responde: 'Eu ajudo [persona] a [solução] através de [diferencial do seu serviço].'\n\nExemplo: Ajudo [vendedores autônomos] a [acelerar vendas] usando [o super app com CRM e automação]." } ] },
         { "moduleId": "MD02", "title": "Módulo 2: O Algoritmo da Meta", "exercisePrompt": "Exercício Módulo 2:\n\n1. Crie 3 ganchos para um vídeo sobre seu serviço.\n2. Liste 2 tipos de conteúdo que geram mais salvamentos.", "lessons": [ { "lessonId": "L02.01", "title": "Como o Algoritmo Funciona", "content": "O algoritmo da Meta analisa o comportamento dos usuários para decidir o que mostrar. Ele prioriza conteúdos que geram interação rápida. Quanto mais relevante for o seu conteúdo para o público, mais ele será entregue." }, { "lessonId": "L02.03", "title": "Comece com um Gancho Forte", "content": "O primeiro segundo do seu conteúdo precisa chamar a atenção imediatamente. Depois do gancho, entregue valor real e finalize com uma chamada para ação (CTA). Exemplo de ganchos: 'Você está postando, mas ninguém engaja? Isso aqui é pra você.'" } ] },
@@ -15,6 +14,28 @@ document.addEventListener('DOMContentLoaded', () => {
     let nextLeadId = 0, currentLeadId = null, draggedItem = null, currentProductId = null;
     let statusChart;
     let db;
+
+    const BOT_PROMPT_TEMPLATE = `
+    Você é um assistente virtual para [NOME_DO_NEGOCIO]. Seu ramo é [RAMO_DO_NEGOCIO].
+    Seus principais serviços são: [SERVICOS_OFRECIDOS].
+    
+    Sua função é fazer o pré-atendimento de novos clientes via WhatsApp. Seu objetivo é extrair 4 informações: NOME do cliente, ASSUNTO (o serviço que ele deseja), ORÇAMENTO (quanto ele planeja investir) e PRAZO.
+    
+    Siga estas regras estritamente:
+    1. Seja sempre cordial e prestativo.
+    2. Faça uma pergunta de cada vez para não confundir o cliente.
+    3. [INSTRUCOES_ESPECIAIS]
+    4. Quando você tiver todas as 4 informações, finalize a conversa agradecendo e dizendo que um especialista entrará em contato em breve.
+    5. Após finalizar, sua resposta DEVE SER APENAS um objeto JSON válido, sem nenhum texto adicional antes ou depois. O JSON deve ter a seguinte estrutura:
+       {
+         "finalizado": true,
+         "nome": "Nome do Cliente",
+         "assunto": "Assunto ou serviço desejado",
+         "orcamento": "Valor ou faixa de orçamento",
+         "prazo": "Prazo desejado"
+       }
+    6. Se você ainda não tem todas as informações, apenas continue a conversa normalmente. NÃO retorne um JSON.
+    `;
 
     async function main() {
         firebase.auth().onAuthStateChanged(async (user) => {
@@ -41,6 +62,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 nextLeadId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 0;
                 applySettings(data.settings);
                 loadMentoriaNotes(data.mentoriaNotes);
+
+                if (data.botConfig) {
+                    document.getElementById('bot-config-negocio').value = data.botConfig.negocio || '';
+                    document.getElementById('bot-config-servicos').value = data.botConfig.servicos || '';
+                    document.getElementById('bot-config-instrucoes').value = data.botConfig.instrucoes || '';
+                }
+                
+                if (data.botUrl) {
+                    const frame = document.getElementById('bot-qr-frame');
+                    const placeholder = document.getElementById('bot-url-placeholder');
+                    frame.src = data.botUrl;
+                    frame.style.display = 'block';
+                    placeholder.style.display = 'none';
+                }
             } else {
                 applySettings();
             }
@@ -49,23 +84,47 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error("Erro ao carregar dados:", error); }
     }
 
-    async function saveUserData(userId) {
+    async function saveUserData(userId, showSuccessAlert = false) {
         try {
+            const negocio = document.getElementById('bot-config-negocio').value;
+            const servicos = document.getElementById('bot-config-servicos').value;
+            const instrucoes = document.getElementById('bot-config-instrucoes').value;
+
+            let botPrompt = '';
+            if (negocio && servicos) {
+                botPrompt = BOT_PROMPT_TEMPLATE
+                    .replace('[NOME_DO_NEGOCIO]', negocio.split(',')[0].trim())
+                    .replace('[RAMO_DO_NEGOCIO]', negocio)
+                    .replace('[SERVICOS_OFRECIDOS]', servicos)
+                    .replace('[INSTRUCOES_ESPECIAIS]', instrucoes || 'Siga o fluxo normal da conversa.');
+            }
+
             const dataToSave = {
                 leads, caixa, estoque, chatHistory,
                 mentoriaNotes: getMentoriaNotes(),
                 settings: {
                     theme: document.body.classList.contains('light-theme') ? 'light' : 'dark',
                     userName: document.getElementById('setting-user-name').value || 'Usuário',
-                }
+                },
+                botConfig: {
+                    negocio,
+                    servicos,
+                    instrucoes
+                },
+                botPrompt,
+                botUrl: "https://superapp-whatsapp-bot.onrender.com/" // Link de exemplo
             };
-            await db.collection('userData').doc(userId).set(dataToSave);
+            
+            await db.collection('userData').doc(userId).set(dataToSave, { merge: true });
+            if (showSuccessAlert) {
+                alert('Configurações salvas com sucesso!');
+            }
         } catch (error) {
-            console.error("ERRO CRÍTICO AO SALVAR DADOS NO FIRESTORE:", error);
-            alert("Atenção: Não foi possível salvar os dados. Verifique o console de erros (F12) para mais detalhes. O problema pode ser relacionado às regras de segurança do Firestore.");
+            console.error("ERRO CRÍTICO AO SALVAR DADOS:", error);
+            alert("Atenção: Não foi possível salvar os dados. Verifique o console de erros (F12).");
         }
     }
-
+    
     function updateAllUI() {
         renderKanbanCards();
         renderLeadsTable();
@@ -113,10 +172,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.getElementById('theme-toggle-btn')?.addEventListener('click', () => { document.body.classList.toggle('light-theme'); const isLight = document.body.classList.contains('light-theme'); document.getElementById('theme-toggle-btn').textContent = isLight ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro'; saveUserData(userId); });
+
+        document.getElementById('save-bot-config-btn')?.addEventListener('click', async () => {
+            await saveUserData(userId, true);
+            const doc = await db.collection('userData').doc(userId).get();
+            if (doc.exists && doc.data().botUrl) {
+                 const frame = document.getElementById('bot-qr-frame');
+                 const placeholder = document.getElementById('bot-url-placeholder');
+                 frame.src = doc.data().botUrl;
+                 frame.style.display = 'block';
+                 placeholder.style.display = 'none';
+            }
+        });
         
-        document.getElementById('save-settings-btn')?.addEventListener('click', async () => {
-            await saveUserData(userId);
-            alert('Configurações salvas!');
+        document.getElementById('save-settings-btn')?.addEventListener('click', () => {
+             saveUserData(userId, true);
         });
 
         document.getElementById('lead-form')?.addEventListener('submit', async (e) => {
@@ -176,88 +246,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        document.getElementById('caixa-form')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            caixa.push({ data: document.getElementById('caixa-data').value, descricao: document.getElementById('caixa-descricao').value, valor: parseFloat(document.getElementById('caixa-valor').value), tipo: document.getElementById('caixa-tipo').value });
-            await saveUserData(userId);
-            renderCaixaTable();
-            updateCaixa();
-            e.target.reset();
-        });
-
+        document.getElementById('caixa-form')?.addEventListener('submit', async (e) => { e.preventDefault(); caixa.push({ data: document.getElementById('caixa-data').value, descricao: document.getElementById('caixa-descricao').value, valor: parseFloat(document.getElementById('caixa-valor').value), tipo: document.getElementById('caixa-tipo').value }); await saveUserData(userId); renderCaixaTable(); updateCaixa(); e.target.reset(); });
         document.querySelectorAll('.finance-tab').forEach(tab => { tab.addEventListener('click', e => { e.preventDefault(); document.querySelectorAll('.finance-tab, .finance-content').forEach(el => el.classList.remove('active')); e.target.classList.add('active'); document.getElementById(e.target.dataset.tab + '-tab-content').classList.add('active'); }); });
-        
-        document.getElementById('estoque-form')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newProduct = { id: `prod_${Date.now()}`, produto: document.getElementById('estoque-produto').value, descricao: document.getElementById('estoque-descricao').value, compra: parseFloat(document.getElementById('estoque-compra').value), venda: parseFloat(document.getElementById('estoque-venda').value), custos: [] };
-            estoque.push(newProduct);
-            await saveUserData(userId);
-            renderEstoqueTable();
-            e.target.reset();
-        });
-        
+        document.getElementById('estoque-form')?.addEventListener('submit', async (e) => { e.preventDefault(); const newProduct = { id: `prod_${Date.now()}`, produto: document.getElementById('estoque-produto').value, descricao: document.getElementById('estoque-descricao').value, compra: parseFloat(document.getElementById('estoque-compra').value), venda: parseFloat(document.getElementById('estoque-venda').value), custos: [] }; estoque.push(newProduct); await saveUserData(userId); renderEstoqueTable(); e.target.reset(); });
         document.getElementById('estoque-search')?.addEventListener('input', renderEstoqueTable);
-        
-        document.getElementById('estoque-table')?.addEventListener('click', async (e) => {
-            if (e.target.closest('.btn-custo')) {
-                const productId = e.target.closest('tr').dataset.id;
-                openCustosModal(productId);
-            }
-            if (e.target.closest('.btn-delete-estoque')) {
-                if (confirm('Tem certeza?')) {
-                    const productId = e.target.closest('tr').dataset.id;
-                    estoque = estoque.filter(p => p.id !== productId);
-                    await saveUserData(userId);
-                    renderEstoqueTable();
-                }
-            }
-        });
-        
-        document.getElementById('add-custo-form')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const produto = estoque.find(p => p.id === currentProductId);
-            if (produto) {
-                const descricao = document.getElementById('custo-descricao').value;
-                const valor = parseFloat(document.getElementById('custo-valor').value);
-                if (!produto.custos) produto.custos = [];
-                produto.custos.push({ descricao, valor });
-                await saveUserData(userId);
-                renderCustosList(produto);
-                renderEstoqueTable();
-                e.target.reset();
-            }
-        });
-
+        document.getElementById('estoque-table')?.addEventListener('click', async (e) => { if (e.target.closest('.btn-custo')) { const productId = e.target.closest('tr').dataset.id; openCustosModal(productId); } if (e.target.closest('.btn-delete-estoque')) { if (confirm('Tem certeza?')) { const productId = e.target.closest('tr').dataset.id; estoque = estoque.filter(p => p.id !== productId); await saveUserData(userId); renderEstoqueTable(); } } });
+        document.getElementById('add-custo-form')?.addEventListener('submit', async (e) => { e.preventDefault(); const produto = estoque.find(p => p.id === currentProductId); if (produto) { const descricao = document.getElementById('custo-descricao').value; const valor = parseFloat(document.getElementById('custo-valor').value); if (!produto.custos) produto.custos = []; produto.custos.push({ descricao, valor }); await saveUserData(userId); renderCustosList(produto); renderEstoqueTable(); e.target.reset(); } });
         document.getElementById('export-leads-btn')?.addEventListener('click', () => { if (leads.length === 0) { alert("Não há leads para exportar."); return; } const header = ["Nome", "Email", "WhatsApp", "Origem", "Qualificação", "Status", "Notas"]; const rows = leads.map(l => [l.nome, l.email, l.whatsapp, l.origem, l.qualificacao, l.status, `"${(l.notas || '').replace(/"/g, '""')}"`]); const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Leads"); XLSX.writeFile(workbook, "leads.xlsx"); });
         document.getElementById('export-csv-btn')?.addEventListener('click', () => { if (estoque.length === 0) { alert("Não há produtos para exportar."); return; } const header = ["Produto", "Descrição", "Valor de Compra", "Valor de Venda"]; const rows = estoque.map(p => [p.produto, p.descricao, p.compra, p.venda]); const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Estoque"); XLSX.writeFile(workbook, "estoque.xlsx"); });
         document.getElementById('import-csv-btn')?.addEventListener('click', () => { const input = document.createElement('input'); input.type = 'file'; input.accept = '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'; input.onchange = e => { const file = e.target.files[0]; const reader = new FileReader(); reader.onload = async (event) => { const data = new Uint8Array(event.target.result); const workbook = XLSX.read(data, {type: 'array'}); const ws = workbook.Sheets[workbook.SheetNames[0]]; const json = XLSX.utils.sheet_to_json(ws); json.forEach(item => { const pKey = Object.keys(item).find(k=>k.toLowerCase()==='produto'); const cKey = Object.keys(item).find(k=>k.toLowerCase().includes('compra')); const vKey = Object.keys(item).find(k=>k.toLowerCase().includes('venda')); if(item[pKey] && item[cKey] && item[vKey]){ estoque.push({ id: `prod_${Date.now()}_${Math.random()}`, produto: item[pKey], descricao: item['Descrição']||item['descricao']||'', compra: parseFloat(item[cKey]), venda: parseFloat(item[vKey]), custos: [] }); } }); await saveUserData(userId); renderEstoqueTable(); alert(`${json.length} produtos importados!`); }; reader.readAsArrayBuffer(file); }; input.click(); });
-        
-        document.getElementById('chatbot-form')?.addEventListener('submit', async e => {
-            e.preventDefault();
-            const chatbotInput = document.getElementById('chatbot-input');
-            const userInput = chatbotInput.value.trim();
-            if (!userInput) return;
-            addMessageToChat(userInput, 'user-message');
-            chatHistory.push({ role: "user", parts: [{ text: userInput }] });
-            chatbotInput.value = '';
-            addMessageToChat("Pensando...", 'bot-message bot-thinking');
-            try {
-                const response = await fetch('/api/gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: userInput, history: chatHistory }) });
-                document.querySelector('.bot-thinking')?.remove();
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.details || 'Erro desconhecido na API');
-                }
-                const data = await response.json();
-                addMessageToChat(data.text, 'bot-message');
-                chatHistory.push({ role: "model", parts: [{ text: data.text }] });
-            } catch (error) {
-                document.querySelector('.bot-thinking')?.remove();
-                addMessageToChat(`Erro: ${error.message}`, 'bot-message');
-            }
-            await saveUserData(userId);
-        });
-        
+        document.getElementById('chatbot-form')?.addEventListener('submit', async e => { e.preventDefault(); const chatbotInput = document.getElementById('chatbot-input'); const userInput = chatbotInput.value.trim(); if (!userInput) return; addMessageToChat(userInput, 'user-message'); chatHistory.push({ role: "user", parts: [{ text: userInput }] }); chatbotInput.value = ''; addMessageToChat("Pensando...", 'bot-message bot-thinking'); try { const response = await fetch('/api/gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: userInput, history: chatHistory }) }); document.querySelector('.bot-thinking')?.remove(); if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.details || 'Erro desconhecido na API'); } const data = await response.json(); addMessageToChat(data.text, 'bot-message'); chatHistory.push({ role: "model", parts: [{ text: data.text }] }); } catch (error) { document.querySelector('.bot-thinking')?.remove(); addMessageToChat(`Erro: ${error.message}`, 'bot-message'); } await saveUserData(userId); });
         document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', () => { document.getElementById(btn.dataset.target).style.display = 'none'; }); });
     }
 
@@ -277,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
         menu.innerHTML = mentoriaData.map((mod, i) => `<div class="sales-accelerator-menu-item ${i === 0 ? 'active' : ''}" data-module-id="${mod.moduleId}">${mod.title}</div>`).join('');
         content.innerHTML = mentoriaData.map((mod, i) => { const placeholder = mod.exercisePrompt || `Digite aqui suas anotações para o Módulo ${i + 1}...`; return `<div class="mentoria-module-content ${i === 0 ? 'active' : ''}" id="${mod.moduleId}">${mod.lessons.map(les => `<div class="mentoria-lesson"><h3>${les.title}</h3><p>${les.content}</p></div>`).join('')}<div class="anotacoes-aluno"><label for="notas-${mod.moduleId}">Minhas Anotações / Exercícios</label><textarea class="mentoria-notas" id="notas-${mod.moduleId}" rows="8" placeholder="${placeholder}"></textarea></div></div>`; }).join('');
         document.querySelectorAll('.sales-accelerator-menu-item').forEach(item => { item.addEventListener('click', e => { document.querySelectorAll('.sales-accelerator-menu-item').forEach(el => el.classList.remove('active')); document.querySelectorAll('.mentoria-module-content').forEach(el => el.classList.remove('active')); const clickedItem = e.currentTarget; clickedItem.classList.add('active'); document.getElementById(clickedItem.dataset.moduleId).classList.add('active'); }); });
-        document.querySelectorAll('.mentoria-notas').forEach(t => t.addEventListener('keyup', () => saveUserData(firebase.auth().currentUser.uid)));
+        document.querySelectorAll('.mentoria-notas').forEach(t => t.addEventListener('keyup', () => saveUserData(firebase.auth().currentUser.uid));
     }
     function getMentoriaNotes() { const n = {}; document.querySelectorAll('.mentoria-notas').forEach(t => n[t.id] = t.value); return n; }
     function loadMentoriaNotes(notes = {}) { for (const id in notes) { const t = document.getElementById(id); if (t) t.value = notes[id]; } }
