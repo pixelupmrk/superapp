@@ -87,3 +87,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function getMentoriaNotes() { document.querySelectorAll('.mentoria-notas').forEach(t => mentoriaNotes[t.id] = t.value); }
     function loadMentoriaNotes() { for (const id in mentoriaNotes) { const t = document.getElementById(id); if (t) t.value = mentoriaNotes[id]; } }
 });
+// No topo do seu arquivo principal (index.js) do bot
+const cors = require('cors');
+
+// ... outras inicializações como 'const express = require('express');'
+
+const app = express(); // Você provavelmente já tem essa linha
+
+// ADICIONE ESTA LINHA LOGO ABAIXO
+// Isso irá permitir que o seu Super App se conecte ao bot
+app.use(cors()); 
+
+// ... resto do seu código (app.get('/events'), etc.)
