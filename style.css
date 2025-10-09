@@ -26,7 +26,7 @@ body { font-family: 'Inter', sans-serif; background-color: var(--background-colo
 button { font-family: 'Inter', sans-serif; cursor: pointer; }
 .btn-save, .btn-login, .btn-delete, .btn-custo, .btn-table-action { padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: 600; }
 .btn-save, .btn-login { background-color: var(--accent-color); color: #000; }
-.btn-delete { background-color: var(--delete-color); color: #fff; }
+.btn-delete, .btn-delete-item { background-color: var(--delete-color); color: #fff; }
 .card { background-color: var(--primary-color); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid var(--secondary-color); }
 input, select, textarea { width: 100%; padding: 0.75rem 1rem; background-color: var(--secondary-color); border: 1px solid transparent; border-radius: 8px; color: var(--text-color); font-size: 1rem; }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-color); }
