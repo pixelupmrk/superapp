@@ -6,9 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let unsubscribeLeadChat;
     let currentUserId;
     let currentLeadId = null;
-    let botUrl = null; // 🔧 Armazenar botUrl globalmente
+    let botUrl = null;
 
-    // 🔧 Verificação de Firebase antes de iniciar
     if (typeof firebase === 'undefined') {
         console.error("❌ Firebase não carregado!");
         return;
@@ -27,10 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     main();
 
-    // 🔧 Escuta em tempo real dos leads
     function setupRealtimeListeners(userId) {
         if (unsubscribeLeads) unsubscribeLeads();
-
         unsubscribeLeads = db.collection('users').doc(userId).collection('leads')
             .onSnapshot(snapshot => {
                 leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -41,14 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    // 🔧 Carrega informações iniciais, como o bot URL
     async function loadInitialData(userId) {
         try {
             const doc = await db.collection('users').doc(userId).get();
             if (doc.exists) {
                 const data = doc.data();
                 if (data.botUrl) {
-                    botUrl = data.botUrl; // 🔧 Guardar globalmente
+                    botUrl = data.botUrl;
                     const frame = document.getElementById('bot-qr-frame');
                     const placeholder = document.getElementById('bot-url-placeholder');
                     if (frame && placeholder) {
@@ -63,17 +59,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // 🔧 Atualiza todos os elementos de UI
     function updateAllUI() {
         renderKanbanCards();
         renderLeadsTable();
     }
 
-    // 🔧 Renderização otimizada do Kanban
     function renderKanbanCards() {
         const lists = document.querySelectorAll('.kanban-cards-list');
         lists.forEach(list => list.innerHTML = '');
-
         leads.forEach(lead => {
             const column = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`);
             if (!column) return;
@@ -86,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 🔧 Renderiza tabela de leads
     function renderLeadsTable() {
         const tbody = document.querySelector('#leads-table tbody');
         if (!tbody) return;
@@ -102,9 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ).join('');
     }
 
-    // 🔧 Configura todos os listeners de interface
     function setupEventListeners(userId) {
-        // Navegação lateral
         document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
             item.addEventListener('click', e => {
                 if (e.currentTarget.id === 'logout-btn') return;
@@ -126,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Abertura do modal pelo Kanban
         const kanbanBoard = document.getElementById('kanban-board');
         if (kanbanBoard) {
             kanbanBoard.addEventListener('click', e => {
@@ -135,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Abertura do modal pela tabela
         document.getElementById('leads-table')?.addEventListener('click', e => {
             if (e.target.closest('.btn-edit-table')) {
                 const row = e.target.closest('tr');
@@ -143,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Fechar modais
         document.querySelectorAll('.close-modal').forEach(btn => {
             btn.addEventListener('click', () => {
                 const targetModal = document.getElementById(btn.dataset.target);
@@ -155,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Envio de mensagens no chat do lead
         document.getElementById('lead-chat-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('lead-chat-input');
@@ -188,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Atualização do lead
         document.getElementById('edit-lead-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentLeadId) return;
@@ -210,7 +195,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 🔧 Abre modal de edição e histórico de chat
     async function openEditModal(leadId) {
         currentLeadId = leadId;
         const lead = leads.find(l => l.id === leadId);
@@ -257,7 +241,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 🔧 Renderiza mensagens no chat
     function renderChatMessage(sender, text) {
         const chatHistoryDiv = document.getElementById('lead-chat-history');
         if (!chatHistoryDiv) return;
