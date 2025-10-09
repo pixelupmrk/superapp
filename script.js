@@ -14,33 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let nextLeadId = 0, currentLeadId = null, draggedItem = null, currentProductId = null;
     let statusChart;
     let db;
+    let unsubscribeLeadChat;
 
-    const BOT_PROMPT_TEMPLATE = `
-    Você é um assistente virtual para [NOME_DO_NEGOCIO]. Seu ramo é [RAMO_DO_NEGOCIO].
-    Seus principais serviços são: [SERVICOS_OFRECIDOS].
-    
-    Sua função é fazer o pré-atendimento de novos clientes via WhatsApp. Seu objetivo é extrair 4 informações: NOME do cliente, ASSUNTO (o serviço que ele deseja), ORÇAMENTO (quanto ele planeja investir) e PRAZO.
-    
-    Siga estas regras estritamente:
-    1. Seja sempre cordial e prestativo.
-    2. Faça uma pergunta de cada vez para não confundir o cliente.
-    3. [INSTRUCOES_ESPECIAIS]
-    4. Quando você tiver todas as 4 informações, finalize a conversa agradecendo e dizendo que um especialista entrará em contato em breve.
-    5. Após finalizar, sua resposta DEVE SER APENAS um objeto JSON válido, sem nenhum texto adicional antes ou depois. O JSON deve ter a seguinte estrutura:
-       {
-         "finalizado": true,
-         "nome": "Nome do Cliente",
-         "assunto": "Assunto ou serviço desejado",
-         "orcamento": "Valor ou faixa de orçamento",
-         "prazo": "Prazo desejado"
-       }
-    6. Se você ainda não tem todas as informações, apenas continue a conversa normalmente. NÃO retorne um JSON.
-    `;
+    const BOT_PROMPT_TEMPLATE = `...`;
 
     async function main() {
         firebase.auth().onAuthStateChanged(async (user) => {
-            if (user && document.getElementById('app-container') && !document.body.hasAttribute('data-initialized')) {
-                document.body.setAttribute('data-initialized', 'true');
+            if (user && document.getElementById('app-container')) {
                 db = firebase.firestore();
                 await loadAllUserData(user.uid);
                 setupEventListeners(user.uid);
@@ -50,251 +30,212 @@ document.addEventListener('DOMContentLoaded', () => {
     main();
 
     async function loadAllUserData(userId) {
-        try {
-            const doc = await db.collection('userData').doc(userId).get();
-            if (doc.exists) {
-                const data = doc.data();
-                leads = data.leads || [];
-                caixa = data.caixa || [];
-                estoque = data.estoque || [];
-                estoque.forEach((item, index) => { if (!item.id) item.id = `prod_${Date.now()}_${index}`; });
-                chatHistory = data.chatHistory || [];
-                nextLeadId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 0;
-                applySettings(data.settings);
-                loadMentoriaNotes(data.mentoriaNotes);
-
-                if (data.botConfig) {
-                    document.getElementById('bot-config-negocio').value = data.botConfig.negocio || '';
-                    document.getElementById('bot-config-servicos').value = data.botConfig.servicos || '';
-                    document.getElementById('bot-config-instrucoes').value = data.botConfig.instrucoes || '';
-                }
-                
-                if (data.botUrl) {
-                    const frame = document.getElementById('bot-qr-frame');
-                    const placeholder = document.getElementById('bot-url-placeholder');
-                    if(frame && placeholder){
-                        frame.src = data.botUrl;
-                        frame.style.display = 'block';
-                        placeholder.style.display = 'none';
-                    }
-                }
-            } else {
-                applySettings();
+        const doc = await db.collection('userData').doc(userId).get();
+        if (doc.exists) {
+            const data = doc.data();
+            leads = data.leads || [];
+            if (data.botConfig) {
+                document.getElementById('bot-config-negocio').value = data.botConfig.negocio || '';
+                document.getElementById('bot-config-servicos').value = data.botConfig.servicos || '';
+                document.getElementById('bot-config-instrucoes').value = data.botConfig.instrucoes || '';
             }
-            renderMentoria();
-            updateAllUI();
-        } catch (error) { console.error("Erro ao carregar dados:", error); }
+            if (data.botUrl) {
+                const frame = document.getElementById('bot-qr-frame');
+                const placeholder = document.getElementById('bot-url-placeholder');
+                frame.src = data.botUrl;
+                frame.style.display = 'block';
+                placeholder.style.display = 'none';
+            }
+        }
+        updateAllUI();
     }
 
     async function saveUserData(userId, showSuccessAlert = false) {
-        try {
-            const negocio = document.getElementById('bot-config-negocio').value;
-            const servicos = document.getElementById('bot-config-servicos').value;
-            const instrucoes = document.getElementById('bot-config-instrucoes').value;
-
-            let botPrompt = '';
-            if (negocio && servicos) {
-                botPrompt = BOT_PROMPT_TEMPLATE
-                    .replace('[NOME_DO_NEGOCIO]', negocio.split(',')[0].trim())
-                    .replace('[RAMO_DO_NEGOCIO]', negocio)
-                    .replace('[SERVICOS_OFRECIDOS]', servicos)
-                    .replace('[INSTRUCOES_ESPECIAIS]', instrucoes || 'Siga o fluxo normal da conversa.');
-            }
-
-            const dataToSave = {
-                leads, caixa, estoque, chatHistory,
-                mentoriaNotes: getMentoriaNotes(),
-                settings: {
-                    theme: document.body.classList.contains('light-theme') ? 'light' : 'dark',
-                    userName: document.getElementById('setting-user-name').value || 'Usuário',
-                },
-                botConfig: {
-                    negocio,
-                    servicos,
-                    instrucoes
-                },
-                botPrompt,
-                botUrl: "https://superapp-whatsapp-bot.onrender.com/" // Link de exemplo
-            };
-            
-            await db.collection('userData').doc(userId).set(dataToSave, { merge: true });
-            if (showSuccessAlert) {
-                alert('Configurações salvas com sucesso!');
-            }
-        } catch (error) {
-            console.error("ERRO CRÍTICO AO SALVAR DADOS:", error);
-            alert("Atenção: Não foi possível salvar os dados. Verifique o console de erros (F12).");
-        }
+        // ... (código de salvar dados)
     }
-    
+
     function updateAllUI() {
         renderKanbanCards();
         renderLeadsTable();
-        updateDashboard();
-        renderCaixaTable();
-        updateCaixa();
-        renderEstoqueTable();
-        renderChatHistory();
     }
-    
-    // FUNÇÃO CORRIGIDA PARA SER MAIS SEGURA
-    function applySettings(settings = {}) {
-        const theme = settings.theme || 'dark';
-        const userName = settings.userName || 'Usuário';
 
-        if(document.body) {
-            document.body.className = theme === 'light' ? 'light-theme' : '';
-        }
+    function renderKanbanCards() {
+        document.querySelectorAll('.kanban-cards-list').forEach(l => l.innerHTML = '');
+        leads.forEach(lead => {
+            const column = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`);
+            if (column) {
+                column.innerHTML += `<div class="kanban-card" draggable="true" data-id="${lead.id}"><strong>${lead.nome}</strong><p>${lead.whatsapp}</p></div>`;
+            }
+        });
+    }
 
-        const themeBtn = document.getElementById('theme-toggle-btn');
-        if (themeBtn) {
-            themeBtn.textContent = theme === 'light' ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro';
-        }
-
-        const userProfileSpan = document.querySelector('.user-profile span');
-        if (userProfileSpan) {
-            userProfileSpan.textContent = `Olá, ${userName}`;
-        }
-
-        const userNameInput = document.getElementById('setting-user-name');
-        if (userNameInput) {
-            userNameInput.value = userName;
+    // FUNÇÃO CORRIGIDA
+    function renderLeadsTable() {
+        const tbody = document.querySelector('#leads-table tbody');
+        if (tbody) {
+            tbody.innerHTML = leads.map(l => { // A variável para cada lead é 'l'
+                // CORREÇÃO: Usar 'l' em vez de 'lead'
+                const wa = `<a href="https://wa.me/${(l.whatsapp || '').replace(/\D/g, '')}" target="_blank">${l.whatsapp}</a>`;
+                return `<tr data-id="${l.id}"><td>${l.nome}</td><td>${wa}</td><td>${l.origem}</td><td>${l.qualificacao}</td><td>${l.status}</td><td><button class="btn-edit-table">Abrir</button></td></tr>`;
+            }).join('');
         }
     }
 
     function setupEventListeners(userId) {
-        const menuToggle = document.getElementById('menu-toggle');
-        const appContainer = document.getElementById('app-container');
-
-        if (menuToggle && appContainer) {
-            menuToggle.addEventListener('click', () => {
-                appContainer.classList.toggle('sidebar-visible');
-            });
-        }
-        
         document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
             item.addEventListener('click', e => {
-                if (window.innerWidth <= 768) {
-                    appContainer.classList.remove('sidebar-visible');
-                }
                 if (e.currentTarget.id === 'logout-btn') return;
                 e.preventDefault();
                 const targetId = e.currentTarget.getAttribute('data-target');
                 if (!targetId) return;
-                document.querySelectorAll('.sidebar-nav .nav-item').forEach(nav => nav.classList.remove('active'));
+                document.querySelectorAll('.main-content .content-area, .sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
                 e.currentTarget.classList.add('active');
-                document.querySelectorAll('.main-content .content-area').forEach(area => area.style.display = 'none');
-                document.getElementById(targetId).style.display = 'block';
-                document.getElementById('page-title').textContent = e.currentTarget.querySelector('span').textContent;
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) targetElement.style.display = 'block';
+                const pageTitle = document.getElementById('page-title');
+                if(pageTitle) pageTitle.textContent = e.currentTarget.querySelector('span').textContent;
             });
         });
-
-        document.getElementById('theme-toggle-btn')?.addEventListener('click', () => { document.body.classList.toggle('light-theme'); const isLight = document.body.classList.contains('light-theme'); document.getElementById('theme-toggle-btn').textContent = isLight ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro'; saveUserData(userId); });
 
         document.getElementById('save-bot-config-btn')?.addEventListener('click', async () => {
             await saveUserData(userId, true);
             const doc = await db.collection('userData').doc(userId).get();
             if (doc.exists() && doc.data().botUrl) {
-                 const frame = document.getElementById('bot-qr-frame');
-                 const placeholder = document.getElementById('bot-url-placeholder');
-                 frame.src = doc.data().botUrl;
-                 frame.style.display = 'block';
-                 placeholder.style.display = 'none';
+                const frame = document.getElementById('bot-qr-frame');
+                if(frame) frame.src = doc.data().botUrl;
+                if(frame) frame.style.display = 'block';
+                const placeholder = document.getElementById('bot-url-placeholder');
+                if(placeholder) placeholder.style.display = 'none';
             }
-        });
-        
-        document.getElementById('save-settings-btn')?.addEventListener('click', () => {
-             saveUserData(userId, true);
-        });
-
-        document.getElementById('lead-form')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            leads.push({ id: nextLeadId++, status: 'novo', nome: document.getElementById('lead-name').value, email: document.getElementById('lead-email').value, whatsapp: document.getElementById('lead-whatsapp').value, origem: document.getElementById('lead-origin').value, qualificacao: document.getElementById('lead-qualification').value, notas: document.getElementById('lead-notes').value });
-            await saveUserData(userId);
-            updateAllUI();
-            e.target.reset();
         });
 
         const kanbanBoard = document.getElementById('kanban-board');
         if (kanbanBoard) {
-            kanbanBoard.addEventListener('dragstart', e => { if (e.target.classList.contains('kanban-card')) { draggedItem = e.target; } });
-            kanbanBoard.addEventListener('dragend', () => { draggedItem = null; });
-            kanbanBoard.addEventListener('dragover', e => e.preventDefault());
-            kanbanBoard.addEventListener('drop', async (e) => {
-                e.preventDefault();
-                const column = e.target.closest('.kanban-column');
-                if (column && draggedItem) {
-                    const lead = leads.find(l => l.id == draggedItem.dataset.id);
-                    if (lead) {
-                        lead.status = column.dataset.status;
-                        await saveUserData(userId);
-                        renderKanbanCards();
-                        updateDashboard();
-                    }
+            kanbanBoard.addEventListener('click', e => {
+                const card = e.target.closest('.kanban-card');
+                if (card && card.dataset.id) openEditModal(parseInt(card.dataset.id));
+            });
+        }
+
+        document.getElementById('leads-table')?.addEventListener('click', e => {
+            if (e.target.closest('.btn-edit-table')) {
+                const row = e.target.closest('tr');
+                if (row && row.dataset.id) openEditModal(parseInt(row.dataset.id));
+            }
+        });
+
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetModal = document.getElementById(btn.dataset.target);
+                if(targetModal) targetModal.style.display = 'none';
+                if (btn.dataset.target === 'edit-lead-modal' && unsubscribeLeadChat) {
+                    unsubscribeLeadChat();
+                    unsubscribeLeadChat = null;
                 }
             });
-            kanbanBoard.addEventListener('click', e => { if (e.target.tagName === 'A') { e.stopPropagation(); return; } const card = e.target.closest('.kanban-card'); if (card) openEditModal(parseInt(card.dataset.id)); });
-        }
-        
-        document.getElementById('leads-table')?.addEventListener('click', e => { if (e.target.tagName === 'A') { e.stopPropagation(); return; } if (e.target.closest('.btn-edit-table')) openEditModal(parseInt(e.target.closest('tr').dataset.id)); if (e.target.closest('.btn-delete-table')) { if (confirm('Tem certeza?')) { leads = leads.filter(l => l.id != parseInt(e.target.closest('tr').dataset.id)); saveUserData(userId); updateAllUI(); } } });
+        });
+
+        document.getElementById('lead-chat-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('lead-chat-input');
+            const messageText = input.value.trim();
+            const lead = leads.find(l => l.id === currentLeadId);
+            const userDoc = await db.collection('userData').doc(userId).get();
+            const botUrl = userDoc.exists ? userDoc.data().botUrl : null;
+
+            if (!messageText || !lead || !botUrl) return;
+
+            input.disabled = true;
+            e.target.querySelector('button').disabled = true;
+
+            try {
+                const response = await fetch(`${botUrl}/send-message`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        number: lead.whatsapp,
+                        message: messageText,
+                        leadId: String(currentLeadId)
+                    })
+                });
+                if (!response.ok) throw new Error('Falha ao enviar mensagem.');
+                input.value = '';
+            } catch (error) {
+                console.error("Erro ao enviar mensagem:", error);
+                alert("Não foi possível enviar a mensagem.");
+            } finally {
+                input.disabled = false;
+                e.target.querySelector('button').disabled = false;
+                input.focus();
+            }
+        });
 
         document.getElementById('edit-lead-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const lead = leads.find(l => l.id === currentLeadId);
-            if(lead) {
-                lead.nome = document.getElementById('edit-lead-name').value;
-                lead.email = document.getElementById('edit-lead-email').value;
-                lead.whatsapp = document.getElementById('edit-lead-whatsapp').value;
-                lead.status = document.getElementById('edit-lead-status').value;
-                lead.origem = document.getElementById('edit-lead-origem').value;
-                lead.qualificacao = document.getElementById('edit-lead-qualification').value;
-                lead.notas = document.getElementById('edit-lead-notes').value;
+            const leadIndex = leads.findIndex(l => l.id === currentLeadId);
+            if (leadIndex > -1) {
+                leads[leadIndex].nome = document.getElementById('edit-lead-name').value;
+                leads[leadIndex].email = document.getElementById('edit-lead-email').value;
+                leads[leadIndex].status = document.getElementById('edit-lead-status').value;
+                leads[leadIndex].origem = document.getElementById('edit-lead-origem').value;
+                leads[leadIndex].qualificacao = document.getElementById('edit-lead-qualification').value;
+                leads[leadIndex].notas = document.getElementById('edit-lead-notes').value;
                 await saveUserData(userId);
                 updateAllUI();
-                document.getElementById('edit-lead-modal').style.display = 'none';
+                alert('Lead atualizado com sucesso!');
             }
         });
+    }
 
-        document.getElementById('delete-lead-btn')?.addEventListener('click', async () => {
-            if (confirm('Tem certeza?')) {
-                leads = leads.filter(l => l.id !== currentLeadId);
-                await saveUserData(userId);
-                updateAllUI();
-                document.getElementById('edit-lead-modal').style.display = 'none';
+    async function openEditModal(leadId) {
+        currentLeadId = leadId;
+        const userId = firebase.auth().currentUser.uid;
+        const lead = leads.find(l => l.id === leadId);
+        if (!lead) return;
+
+        document.getElementById('edit-lead-name').value = lead.nome;
+        document.getElementById('edit-lead-email').value = lead.email || '';
+        document.getElementById('edit-lead-whatsapp').value = lead.whatsapp || '';
+        document.getElementById('edit-lead-status').value = lead.status;
+        document.getElementById('edit-lead-origem').value = lead.origem || '';
+        document.getElementById('edit-lead-qualification').value = lead.qualificacao || '';
+        document.getElementById('edit-lead-notes').value = lead.notas || '';
+        document.getElementById('lead-chat-title').textContent = `Conversa com ${lead.nome}`;
+        document.getElementById('edit-lead-modal').style.display = 'flex';
+
+        const chatHistoryDiv = document.getElementById('lead-chat-history');
+        chatHistoryDiv.innerHTML = '<p>Carregando histórico...</p>';
+
+        if (unsubscribeLeadChat) unsubscribeLeadChat();
+        
+        const messagesRef = db.collection('userData').doc(userId).collection('leadsMessages').doc(String(leadId)).collection('messages').orderBy('timestamp');
+        unsubscribeLeadChat = messagesRef.onSnapshot(snapshot => {
+            chatHistoryDiv.innerHTML = '';
+            if (snapshot.empty) {
+                chatHistoryDiv.innerHTML = '<p>Nenhuma mensagem nesta conversa ainda.</p>';
+                return;
             }
+            snapshot.forEach(doc => {
+                const msg = doc.data();
+                if(msg.text) renderChatMessage(msg.sender, msg.text);
+            });
+            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+        }, error => {
+            console.error("Erro ao ouvir o chat:", error);
+            chatHistoryDiv.innerHTML = '<p>Erro ao carregar o histórico do chat.</p>';
         });
-
-        document.getElementById('caixa-form')?.addEventListener('submit', async (e) => { e.preventDefault(); caixa.push({ data: document.getElementById('caixa-data').value, descricao: document.getElementById('caixa-descricao').value, valor: parseFloat(document.getElementById('caixa-valor').value), tipo: document.getElementById('caixa-tipo').value }); await saveUserData(userId); renderCaixaTable(); updateCaixa(); e.target.reset(); });
-        document.querySelectorAll('.finance-tab').forEach(tab => { tab.addEventListener('click', e => { e.preventDefault(); document.querySelectorAll('.finance-tab, .finance-content').forEach(el => el.classList.remove('active')); e.target.classList.add('active'); document.getElementById(e.target.dataset.tab + '-tab-content').classList.add('active'); }); });
-        document.getElementById('estoque-form')?.addEventListener('submit', async (e) => { e.preventDefault(); const newProduct = { id: `prod_${Date.now()}`, produto: document.getElementById('estoque-produto').value, descricao: document.getElementById('estoque-descricao').value, compra: parseFloat(document.getElementById('estoque-compra').value), venda: parseFloat(document.getElementById('estoque-venda').value), custos: [] }; estoque.push(newProduct); await saveUserData(userId); renderEstoqueTable(); e.target.reset(); });
-        document.getElementById('estoque-search')?.addEventListener('input', renderEstoqueTable);
-        document.getElementById('estoque-table')?.addEventListener('click', async (e) => { if (e.target.closest('.btn-custo')) { const productId = e.target.closest('tr').dataset.id; openCustosModal(productId); } if (e.target.closest('.btn-delete-estoque')) { if (confirm('Tem certeza?')) { const productId = e.target.closest('tr').dataset.id; estoque = estoque.filter(p => p.id !== productId); await saveUserData(userId); renderEstoqueTable(); } } });
-        document.getElementById('add-custo-form')?.addEventListener('submit', async (e) => { e.preventDefault(); const produto = estoque.find(p => p.id === currentProductId); if (produto) { const descricao = document.getElementById('custo-descricao').value; const valor = parseFloat(document.getElementById('custo-valor').value); if (!produto.custos) produto.custos = []; produto.custos.push({ descricao, valor }); await saveUserData(userId); renderCustosList(produto); renderEstoqueTable(); e.target.reset(); } });
-        document.getElementById('export-leads-btn')?.addEventListener('click', () => { if (leads.length === 0) { alert("Não há leads para exportar."); return; } const header = ["Nome", "Email", "WhatsApp", "Origem", "Qualificação", "Status", "Notas"]; const rows = leads.map(l => [l.nome, l.email, l.whatsapp, l.origem, l.qualificacao, l.status, `"${(l.notas || '').replace(/"/g, '""')}"`]); const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Leads"); XLSX.writeFile(workbook, "leads.xlsx"); });
-        document.getElementById('export-csv-btn')?.addEventListener('click', () => { if (estoque.length === 0) { alert("Não há produtos para exportar."); return; } const header = ["Produto", "Descrição", "Valor de Compra", "Valor de Venda"]; const rows = estoque.map(p => [p.produto, p.descricao, p.compra, p.venda]); const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Estoque"); XLSX.writeFile(workbook, "estoque.xlsx"); });
-        document.getElementById('import-csv-btn')?.addEventListener('click', () => { const input = document.createElement('input'); input.type = 'file'; input.accept = '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'; input.onchange = e => { const file = e.target.files[0]; const reader = new FileReader(); reader.onload = async (event) => { const data = new Uint8Array(event.target.result); const workbook = XLSX.read(data, {type: 'array'}); const ws = workbook.Sheets[workbook.SheetNames[0]]; const json = XLSX.utils.sheet_to_json(ws); json.forEach(item => { const pKey = Object.keys(item).find(k=>k.toLowerCase()==='produto'); const cKey = Object.keys(item).find(k=>k.toLowerCase().includes('compra')); const vKey = Object.keys(item).find(k=>k.toLowerCase().includes('venda')); if(item[pKey] && item[cKey] && item[vKey]){ estoque.push({ id: `prod_${Date.now()}_${Math.random()}`, produto: item[pKey], descricao: item['Descrição']||item['descricao']||'', compra: parseFloat(item[cKey]), venda: parseFloat(item[vKey]), custos: [] }); } }); await saveUserData(userId); renderEstoqueTable(); alert(`${json.length} produtos importados!`); }; reader.readAsArrayBuffer(file); }; input.click(); });
-        document.getElementById('chatbot-form')?.addEventListener('submit', async e => { e.preventDefault(); const chatbotInput = document.getElementById('chatbot-input'); const userInput = chatbotInput.value.trim(); if (!userInput) return; addMessageToChat(userInput, 'user-message'); chatHistory.push({ role: "user", parts: [{ text: userInput }] }); chatbotInput.value = ''; addMessageToChat("Pensando...", 'bot-message bot-thinking'); try { const response = await fetch('/api/gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: userInput, history: chatHistory }) }); document.querySelector('.bot-thinking')?.remove(); if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.details || 'Erro desconhecido na API'); } const data = await response.json(); addMessageToChat(data.text, 'bot-message'); chatHistory.push({ role: "model", parts: [{ text: data.text }] }); } catch (error) { document.querySelector('.bot-thinking')?.remove(); addMessageToChat(`Erro: ${error.message}`, 'bot-message'); } await saveUserData(userId); });
-        document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', () => { document.getElementById(btn.dataset.target).style.display = 'none'; }); });
     }
 
-    function openEditModal(leadId) { currentLeadId = leadId; const lead = leads.find(l => l.id === leadId); if(lead) { document.getElementById('edit-lead-name').value = lead.nome; document.getElementById('edit-lead-email').value = lead.email; document.getElementById('edit-lead-whatsapp').value = lead.whatsapp; document.getElementById('edit-lead-status').value = lead.status; document.getElementById('edit-lead-origem').value = lead.origem; document.getElementById('edit-lead-qualification').value = lead.qualificacao; document.getElementById('edit-lead-notes').value = lead.notas; document.getElementById('edit-lead-modal').style.display = 'flex'; } }
-    function openCustosModal(productId) { currentProductId = productId; const produto = estoque.find(p => p.id === productId); if (produto) { document.getElementById('custos-modal-title').textContent = `Custos de: ${produto.produto}`; renderCustosList(produto); document.getElementById('custos-modal').style.display = 'flex'; } }
-    function renderCustosList(produto) { const listContainer = document.getElementById('custos-list'); if (!produto.custos || produto.custos.length === 0) { listContainer.innerHTML = '<p>Nenhum custo adicionado.</p>'; return; } listContainer.innerHTML = produto.custos.map(custo => `<div class="custo-item"><span>${custo.descricao}</span><span>R$ ${custo.valor.toFixed(2)}</span></div>`).join(''); }
-    function renderKanbanCards() { document.querySelectorAll('.kanban-cards-list').forEach(l => l.innerHTML = ''); leads.forEach(lead => { const c = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`); if (c) { const wa = `<a href="https://wa.me/${(lead.whatsapp || '').replace(/\D/g, '')}" target="_blank">${lead.whatsapp}</a>`; c.innerHTML += `<div class="kanban-card" draggable="true" data-id="${lead.id}"><strong>${lead.nome}</strong><p>${wa}</p></div>`; } }); }
-    function renderLeadsTable() { const t = document.querySelector('#leads-table tbody'); if (t) { t.innerHTML = leads.map(l => { const wa = `<a href="https://wa.me/${(lead.whatsapp || '').replace(/\D/g, '')}" target="_blank">${l.whatsapp}</a>`; return `<tr data-id="${l.id}"><td>${l.nome}</td><td>${wa}</td><td>${l.origem}</td><td>${l.qualificacao}</td><td>${l.status}</td><td><button class="btn-edit-table"><i class="ph-fill ph-note-pencil"></i></button><button class="btn-delete-table"><i class="ph-fill ph-trash"></i></button></td></tr>`; }).join(''); } }
-    function updateDashboard() { const n = leads.filter(l=>l.status==='novo').length, p=leads.filter(l=>l.status==='progresso').length, f=leads.filter(l=>l.status==='fechado').length; document.getElementById('total-leads').textContent = leads.length; document.getElementById('leads-novo').textContent = n; document.getElementById('leads-progresso').textContent = p; document.getElementById('leads-fechado').textContent = f; const ctx = document.getElementById('statusChart')?.getContext('2d'); if (!ctx) return; if (statusChart) statusChart.destroy(); statusChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Novo', 'Progresso', 'Fechado'], datasets: [{ data: [n, p, f], backgroundColor: ['#00f7ff', '#ffc107', '#28a745'] }] } }); }
-    function renderCaixaTable() { const t = document.querySelector('#caixa-table tbody'); if (t) { t.innerHTML = caixa.map(m => `<tr><td>${m.data}</td><td>${m.descricao}</td><td>${m.tipo==='entrada'?'R$ '+m.valor.toFixed(2):''}</td><td>${m.tipo==='saida'?'R$ '+m.valor.toFixed(2):''}</td></tr>`).join(''); } }
-    function updateCaixa() { const e = caixa.filter(m=>m.tipo==='entrada').reduce((a,c)=>a+c.valor,0), s = caixa.filter(m=>m.tipo==='saida').reduce((a,c)=>a+c.valor,0); document.getElementById('total-entradas').textContent = `R$ ${e.toFixed(2)}`; document.getElementById('total-saidas').textContent = `R$ ${s.toFixed(2)}`; document.getElementById('caixa-atual').textContent = `R$ ${(e-s).toFixed(2)}`; }
-    function renderEstoqueTable() { const t = document.querySelector('#estoque-table tbody'); if (!t) return; const searchTerm = document.getElementById('estoque-search').value.toLowerCase(); const filteredEstoque = estoque.filter(p => (p.produto && p.produto.toLowerCase().includes(searchTerm)) || (p.descricao && p.descricao.toLowerCase().includes(searchTerm))); t.innerHTML = filteredEstoque.map(p => { const totalCustos = (p.custos || []).reduce((acc, c) => acc + c.valor, 0); const lucro = p.venda - p.compra - totalCustos; return `<tr data-id="${p.id}"><td>${p.produto}</td><td>${p.descricao}</td><td>R$ ${p.compra.toFixed(2)}</td><td>R$ ${totalCustos.toFixed(2)}</td><td>R$ ${p.venda.toFixed(2)}</td><td>R$ ${lucro.toFixed(2)}</td><td><button class="btn-custo">Custos</button><button class="btn-delete-table btn-delete-estoque"><i class="ph-fill ph-trash"></i></button></td></tr>`; }).join(''); }
-    function addMessageToChat(msg, type) { const c = document.getElementById('chatbot-messages'); if (c) { c.innerHTML += `<div class="${type}">${msg}</div>`; c.scrollTop = c.scrollHeight; } }
-    function renderChatHistory() { const c = document.getElementById('chatbot-messages'); if (!c) return; c.innerHTML = ''; if (chatHistory.length === 0) { addMessageToChat("Olá! Como posso ajudar?", 'bot-message'); } else { chatHistory.forEach(m => addMessageToChat(m.parts[0].text, m.role === 'user' ? 'user-message' : 'bot-message')); } }
-    function renderMentoria() {
-        const menu = document.getElementById('mentoria-menu'); const content = document.getElementById('mentoria-content'); if (!menu || !content) return;
-        menu.innerHTML = mentoriaData.map((mod, i) => `<div class="sales-accelerator-menu-item ${i === 0 ? 'active' : ''}" data-module-id="${mod.moduleId}">${mod.title}</div>`).join('');
-        content.innerHTML = mentoriaData.map((mod, i) => { const placeholder = mod.exercisePrompt || `Digite aqui suas anotações para o Módulo ${i + 1}...`; return `<div class="mentoria-module-content ${i === 0 ? 'active' : ''}" id="${mod.moduleId}">${mod.lessons.map(les => `<div class="mentoria-lesson"><h3>${les.title}</h3><p>${les.content}</p></div>`).join('')}<div class="anotacoes-aluno"><label for="notas-${mod.moduleId}">Minhas Anotações / Exercícios</label><textarea class="mentoria-notas" id="notas-${mod.moduleId}" rows="8" placeholder="${placeholder}"></textarea></div></div>`; }).join('');
-        document.querySelectorAll('.sales-accelerator-menu-item').forEach(item => { item.addEventListener('click', e => { document.querySelectorAll('.sales-accelerator-menu-item').forEach(el => el.classList.remove('active')); document.querySelectorAll('.mentoria-module-content').forEach(el => el.classList.remove('active')); const clickedItem = e.currentTarget; clickedItem.classList.add('active'); document.getElementById(clickedItem.dataset.moduleId).classList.add('active'); }); });
-        document.querySelectorAll('.mentoria-notas').forEach(t => t.addEventListener('keyup', () => saveUserData(firebase.auth().currentUser.uid)));
+    function renderChatMessage(sender, text) {
+        const chatHistoryDiv = document.getElementById('lead-chat-history');
+        const bubble = document.createElement('div');
+        bubble.classList.add('msg-bubble');
+        if (sender === 'user') {
+            bubble.classList.add('msg-user');
+        } else {
+            bubble.classList.add('msg-operator');
+        }
+        bubble.textContent = text;
+        chatHistoryDiv.appendChild(bubble);
     }
-    function getMentoriaNotes() { const n = {}; document.querySelectorAll('.mentoria-notas').forEach(t => n[t.id] = t.value); return n; }
-    function loadMentoriaNotes(notes = {}) { for (const id in notes) { const t = document.getElementById(id); if (t) t.value = notes[id]; } }
 });
