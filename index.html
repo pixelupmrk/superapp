@@ -40,53 +40,69 @@
             
             <div class="content-area active" id="dashboard-section">
                  </div>
+
             <div class="content-area" id="crm-kanban-section">
+                <div class="crm-layout-container">
+                    <div id="kanban-board" class="kanban-board">
+                        </div>
+
+                    <div class="lead-details-column">
+                        <div id="lead-chat-placeholder" class="lead-chat-placeholder">
+                            <i class="ph-fill ph-chats-circle"></i>
+                            <p>Selecione um lead para ver a conversa e os detalhes</p>
+                        </div>
+                        <div id="lead-interaction-area" class="lead-interaction-area" style="display: none;">
+                            <div class="lead-chat-main">
+                                <h2 id="lead-chat-title">Conversa com o Lead</h2>
+                                <div id="lead-chat-history" class="lead-chat-history"></div>
+                                <form id="lead-chat-form" class="lead-chat-form">
+                                    <input type="text" id="lead-chat-input" placeholder="Digite sua mensagem..." autocomplete="off">
+                                    <button type="submit"><i class="ph-fill ph-paper-plane-right"></i></button>
+                                </form>
+                            </div>
+                            <div class="lead-info-sidebar">
+                                <h2>Detalhes do Lead</h2>
+                                <form id="edit-lead-form">
+                                    <input type="text" id="edit-lead-name" placeholder="Nome">
+                                    <input type="email" id="edit-lead-email" placeholder="E-mail">
+                                    <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp" readonly>
+                                    <select id="edit-lead-status">
+                                        <option value="novo">Novo</option>
+                                        <option value="progresso">Em Progresso</option>
+                                        <option value="fechado">Fechado</option>
+                                    </select>
+                                    <input type="text" id="edit-lead-origem" placeholder="Origem">
+                                    <select id="edit-lead-qualification">
+                                        <option value="">Qualificação</option>
+                                        <option value="quente">Lead Quente</option>
+                                        <option value="morno">Lead Morno</option>
+                                        <option value="frio">Lead Frio</option>
+                                    </select>
+                                    <textarea id="edit-lead-notes" placeholder="Notas Internas"></textarea>
+                                    <div class="form-actions">
+                                        <button type="button" class="btn-delete" id="delete-lead-btn">Excluir</button>
+                                        <button type="submit" class="btn-save">Salvar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+
             <div class="content-area" id="crm-list-section">
-                 </div>
+                </div>
             <div class="content-area" id="finance-section">
                 </div>
             <div class="content-area" id="sales-accelerator-section">
-                 </div>
-            <div class="content-area" id="chatbot-section">
                 </div>
+            <div class="content-area" id="chatbot-section">
+                 </div>
             <div class="content-area" id="bot-section">
                 </div>
             <div class="content-area" id="settings-section">
                  </div>
         </main>
-    </div>
-
-    <div class="modal-overlay" id="edit-lead-modal">
-        <div class="modal-content modal-lead-chat">
-            <span class="close-modal" data-target="edit-lead-modal">&times;</span>
-            <div class="lead-chat-container">
-                <div class="lead-info-sidebar">
-                    <h2>Detalhes do Lead</h2>
-                    <form id="edit-lead-form">
-                        <input type="text" id="edit-lead-name" placeholder="Nome">
-                        <input type="email" id="edit-lead-email" placeholder="E-mail">
-                        <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp" readonly>
-                        <select id="edit-lead-status"> <option value="novo">Novo</option> <option value="progresso">Em Progresso</option> <option value="fechado">Fechado</option> </select>
-                        <input type="text" id="edit-lead-origem" placeholder="Origem">
-                        <select id="edit-lead-qualification"> <option value="">Qualificação</option> <option value="quente">Lead Quente</option> <option value="morno">Lead Morno</option> <option value="frio">Lead Frio</option> </select>
-                        <textarea id="edit-lead-notes" placeholder="Notas Internas"></textarea>
-                        <div class="modal-actions">
-                            <button type="button" class="btn-delete" id="delete-lead-btn">Excluir Lead</button>
-                            <button type="submit" class="btn-save">Salvar Alterações</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="lead-chat-main">
-                    <h2 id="lead-chat-title">Conversa com o Lead</h2>
-                    <div id="lead-chat-history" class="lead-chat-history"></div>
-                    <form id="lead-chat-form" class="lead-chat-form">
-                        <input type="text" id="lead-chat-input" placeholder="Digite sua mensagem..." autocomplete="off">
-                        <button type="submit"><i class="ph-fill ph-paper-plane-right"></i></button>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
