@@ -86,40 +86,165 @@
                     </div>
                 </div>
             </div>
-            
-            </main>
-    </div>
 
-    <div class="modal-overlay" id="edit-lead-modal">
-        <div class="modal-content modal-lead-chat">
-            <span class="close-modal" data-target="edit-lead-modal">&times;</span>
-            <div class="lead-chat-container">
-                <div class="lead-info-sidebar">
-                    <h2>Detalhes do Lead</h2>
-                    <form id="edit-lead-form">
-                        <input type="text" id="edit-lead-name" placeholder="Nome">
-                        <input type="email" id="edit-lead-email" placeholder="E-mail">
-                        <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
-                        <select id="edit-lead-status"> <option value="novo">Novo</option> <option value="progresso">Em Progresso</option> <option value="fechado">Fechado</option> </select>
-                        <input type="text" id="edit-lead-origem" placeholder="Origem">
-                        <select id="edit-lead-qualification"> <option value="">Qualificação</option> <option value="quente">Lead Quente</option> <option value="morno">Lead Morno</option> <option value="frio">Lead Frio</option> </select>
-                        <textarea id="edit-lead-notes" placeholder="Notas Internas"></textarea>
-                        <div class="modal-actions">
-                            <button type="button" class="btn-delete" id="delete-lead-btn">Excluir Lead</button>
-                            <button type="submit" class="btn-save">Salvar Alterações</button>
-                        </div>
-                    </form>
+            <div class="content-area" id="finance-section">
+                <div class="finance-nav">
+                    <a href="#" class="finance-tab active" data-tab="caixa">Caixa</a>
+                    <a href="#" class="finance-tab" data-tab="custos">Custos e Estoque</a>
                 </div>
-                <div class="lead-chat-main">
-                    <h2 id="lead-chat-title">Conversa com o Lead</h2>
-                    <div id="lead-chat-history" class="lead-chat-history">
+                <div class="finance-content active" id="caixa-tab-content">
+                    <div class="dashboard-stats">
+                        <div class="stat-card"> <h3>Total de Entradas</h3> <p id="total-entradas">R$ 0,00</p> </div>
+                        <div class="stat-card"> <h3>Total de Saídas</h3> <p id="total-saidas">R$ 0,00</p> </div>
+                        <div class="stat-card"> <h3>Saldo Atual</h3> <p id="caixa-atual">R$ 0,00</p> </div>
+                    </div>
+                    <div class="card">
+                        <h3>Adicionar Movimentação</h3>
+                        <form id="caixa-form">
+                            <div class="input-grid">
+                                <input type="date" id="caixa-data" required>
+                                <input type="text" id="caixa-descricao" placeholder="Descrição" required>
+                                <input type="number" id="caixa-valor" placeholder="Valor (R$)" step="0.01" required>
+                                <select id="caixa-tipo" required> <option value="">Tipo</option> <option value="entrada">Entrada</option> <option value="saida">Saída</option> </select>
+                            </div>
+                            <button type="submit" class="btn-save">Adicionar</button>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <h3>Histórico de Movimentações</h3>
+                        <div class="table-container">
+                            <table id="caixa-table">
+                                <thead> <tr> <th>Data</th> <th>Descrição</th> <th>Entrada</th> <th>Saída</th> </tr> </thead>
+                                <tbody></tbody>
+                            </table>
                         </div>
-                    <form id="lead-chat-form" class="lead-chat-form">
-                        <input type="text" id="lead-chat-input" placeholder="Digite sua mensagem..." autocomplete="off">
+                    </div>
+                </div>
+                <div class="finance-content" id="custos-tab-content">
+                    <div class="card">
+                        <h3>Adicionar Novo Produto</h3>
+                        <form id="estoque-form">
+                            <div class="input-grid">
+                                <input type="text" id="estoque-produto" placeholder="Produto" required>
+                                <input type="text" id="estoque-descricao" placeholder="Descrição">
+                                <input type="number" id="estoque-compra" placeholder="Valor de Compra (R$)" step="0.01" required>
+                                <input type="number" id="estoque-venda" placeholder="Valor de Venda (R$)" step="0.01" required>
+                            </div>
+                            <button type="submit" class="btn-save">Adicionar Produto</button>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <h3>Estoque de Produtos</h3>
+                        <div class="estoque-actions">
+                            <input type="text" id="estoque-search" placeholder="Pesquisar por produto...">
+                            <button class="btn-save" id="import-csv-btn">Importar CSV</button>
+                            <button class="btn-save" id="export-csv-btn">Exportar CSV</button>
+                        </div>
+                        <div class="table-container">
+                            <table id="estoque-table">
+                                <thead> <tr> <th>Produto</th> <th>Descrição</th> <th>V. Compra</th> <th>Custos</th> <th>V. Venda</th> <th>Lucro</th> <th>Ações</th> </tr> </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             
+            <div class="content-area" id="sales-accelerator-section">
+                <div class="sales-accelerator-container">
+                    <aside class="sales-accelerator-sidebar"> <nav class="sales-accelerator-menu" id="mentoria-menu"></nav> </aside>
+                    <main class="sales-accelerator-content" id="mentoria-content"></main>
+                </div>
+            </div>
+            
+            <div class="content-area" id="chatbot-section">
+                <div class="chatbot-container">
+                    <div id="chatbot-messages" class="chatbot-messages"></div>
+                    <form id="chatbot-form" class="chatbot-form">
+                        <input type="text" id="chatbot-input" placeholder="Digite sua pergunta..." autocomplete="off">
                         <button type="submit"><i class="ph-fill ph-paper-plane-right"></i></button>
                     </form>
                 </div>
             </div>
+
+            <div class="content-area" id="bot-section">
+                <div class="card">
+                    <h2>Assistente Virtual de WhatsApp</h2>
+                    <p class="card-subtitle">Ensine seu bot a atender seus clientes e conecte-o ao seu número de WhatsApp.</p>
+
+                    <h3>Passo 1: Personalize seu Assistente</h3>
+                    <p>Descreva seu negócio e como o bot deve se comportar. Quanto mais detalhes, melhor será o atendimento.</p>
+                    
+                    <div class="input-grid" style="grid-template-columns: 1fr;">
+                        <input type="text" id="bot-config-negocio" placeholder="Qual é o nome e o ramo do seu negócio? Ex: Oficina do Zé, mecânica automotiva">
+                        <textarea id="bot-config-servicos" rows="4" placeholder="Quais são os principais serviços que você oferece? Ex: Troca de óleo, alinhamento, conserto de motor..."></textarea>
+                        <textarea id="bot-config-instrucoes" rows="4" placeholder="Tem alguma instrução especial? Ex: Sempre perguntar o modelo e ano do carro, não passar orçamento, usar um tom amigável..."></textarea>
+                    </div>
+                    <button class="btn-save" id="save-bot-config-btn">Salvar Personalidade do Bot</button>
+                </div>
+
+                <div class="card">
+                    <h3>Passo 2: Conecte seu WhatsApp</h3>
+                    <p>Acesse o link abaixo para escanear o QR Code com o aplicativo do WhatsApp do seu celular.</p>
+                    <p>Após escanear, seu bot ficará online e começará a atender seus clientes automaticamente.</p>
+                    <div id="bot-connection-area">
+                        <p id="bot-url-placeholder">Suas configurações de conexão aparecerão aqui após salvar o Passo 1.</p>
+                        <iframe id="bot-qr-frame" style="width: 100%; height: 400px; border: none; border-radius: 8px; margin-top: 1rem; display: none;"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area" id="settings-section">
+                <div class="card">
+                    <h3>Dados do Usuário</h3>
+                    <div class="input-grid"> <input type="text" id="setting-user-name" placeholder="Seu Nome de Usuário"> </div>
+                </div>
+                <div class="card">
+                    <h3>Aparência</h3>
+                    <button class="btn-save" id="theme-toggle-btn">Mudar para Tema Claro</button>
+                </div>
+                <div class="card">
+                     <button class="btn-save" id="save-settings-btn">Salvar Configurações</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="edit-lead-modal">
+        <div class="modal-content">
+            <span class="close-modal" data-target="edit-lead-modal">&times;</span>
+            <h2>Editar Lead</h2>
+            <form id="edit-lead-form">
+                <div class="input-grid">
+                    <input type="text" id="edit-lead-name" placeholder="Nome">
+                    <input type="email" id="edit-lead-email" placeholder="E-mail">
+                    <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
+                    <select id="edit-lead-status"> <option value="novo">Novo</option> <option value="progresso">Em Progresso</option> <option value="fechado">Fechado</option> </select>
+                    <input type="text" id="edit-lead-origem" placeholder="Origem">
+                    <select id="edit-lead-qualification"> <option value="">Qualificação</option> <option value="quente">Lead Quente</option> <option value="morno">Lead Morno</option> <option value="frio">Lead Frio</option> </select>
+                </div>
+                <textarea id="edit-lead-notes" placeholder="Notas"></textarea>
+                <div class="modal-actions">
+                    <button type="button" class="btn-delete" id="delete-lead-btn">Excluir Lead</button>
+                    <button type="submit" class="btn-save">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="custos-modal">
+        <div class="modal-content">
+            <span class="close-modal" data-target="custos-modal">&times;</span>
+            <h2 id="custos-modal-title">Custos do Produto</h2>
+            <div id="custos-list"></div>
+            <form id="add-custo-form">
+                <h3>Adicionar Novo Custo</h3>
+                <div class="input-grid">
+                    <input type="text" id="custo-descricao" placeholder="Descrição do Custo" required>
+                    <input type="number" id="custo-valor" placeholder="Valor (R$)" step="0.01" required>
+                </div>
+                <button type="submit" class="btn-save">Adicionar Custo</button>
+            </form>
         </div>
     </div>
     
