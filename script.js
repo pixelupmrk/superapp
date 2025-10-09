@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    let leads = []; // Agora será preenchido em tempo real
+    let leads = [];
     let db;
     let unsubscribeLeads;
     let unsubscribeLeadChat;
@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (user) {
                 currentUserId = user.uid;
                 db = firebase.firestore();
-                setupRealtimeListeners(currentUserId);
                 setupEventListeners(currentUserId);
+                setupRealtimeListeners(currentUserId); // Chamado depois para garantir que os listeners de UI existam
                 loadInitialData(currentUserId);
             }
         });
@@ -20,8 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupRealtimeListeners(userId) {
         if (unsubscribeLeads) unsubscribeLeads();
-
-        // Listener em tempo real para a coleção de leads
         unsubscribeLeads = db.collection('users').doc(userId).collection('leads')
             .onSnapshot(snapshot => {
                 leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -40,9 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.botUrl) {
                     const frame = document.getElementById('bot-qr-frame');
                     const placeholder = document.getElementById('bot-url-placeholder');
-                    frame.src = data.botUrl;
-                    frame.style.display = 'block';
-                    placeholder.style.display = 'none';
+                    if (frame && placeholder) {
+                        frame.src = data.botUrl;
+                        frame.style.display = 'block';
+                        placeholder.style.display = 'none';
+                    }
                 }
             }
         } catch (error) {
@@ -81,23 +81,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 const targetId = e.currentTarget.getAttribute('data-target');
                 if (!targetId) return;
-                document.querySelectorAll('.main-content .content-area, .sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
+                
+                document.querySelectorAll('.main-content .content-area').forEach(area => area.style.display = 'none');
+                document.querySelectorAll('.sidebar-nav .nav-item').forEach(nav => nav.classList.remove('active'));
+                
                 e.currentTarget.classList.add('active');
                 const targetElement = document.getElementById(targetId);
                 if (targetElement) targetElement.style.display = 'block';
+                
                 const pageTitle = document.getElementById('page-title');
-                if(pageTitle) pageTitle.textContent = e.currentTarget.querySelector('span').textContent;
+                if(pageTitle && e.currentTarget.querySelector('span')) {
+                    pageTitle.textContent = e.currentTarget.querySelector('span').textContent;
+                }
             });
-        });
-
-        document.getElementById('save-bot-config-btn')?.addEventListener('click', async () => {
-            // Esta função precisa ser implementada com a lógica de salvar as configs do bot
         });
 
         const kanbanBoard = document.getElementById('kanban-board');
         if (kanbanBoard) {
             kanbanBoard.addEventListener('click', e => {
                 const card = e.target.closest('.kanban-card');
+                // CORREÇÃO: Usar o ID como texto (string), sem parseInt
                 if (card && card.dataset.id) openEditModal(card.dataset.id);
             });
         }
@@ -105,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('leads-table')?.addEventListener('click', e => {
             if (e.target.closest('.btn-edit-table')) {
                 const row = e.target.closest('tr');
+                // CORREÇÃO: Usar o ID como texto (string), sem parseInt
                 if (row && row.dataset.id) openEditModal(row.dataset.id);
             }
         });
@@ -126,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const messageText = input.value.trim();
             const lead = leads.find(l => l.id === currentLeadId);
             const userDoc = await db.collection('users').doc(userId).get();
-            const botUrl = userDoc.exists ? userDoc.data().botUrl : null;
+            const botUrl = userDoc.exists() ? userDoc.data().botUrl : null;
 
             if (!messageText || !lead || !botUrl) return;
 
@@ -175,13 +179,21 @@ document.addEventListener('DOMContentLoaded', () => {
     async function openEditModal(leadId) {
         currentLeadId = leadId;
         const lead = leads.find(l => l.id === leadId);
-        if (!lead) return;
+        if (!lead) {
+            console.error("Lead não encontrado com o ID:", leadId);
+            return;
+        }
 
-        document.getElementById('edit-lead-name').value = lead.nome;
-        document.getElementById('edit-lead-whatsapp').value = lead.whatsapp;
-        // ... (preenche outros campos)
-
+        document.getElementById('edit-lead-name').value = lead.nome || '';
+        document.getElementById('edit-lead-email').value = lead.email || '';
+        document.getElementById('edit-lead-whatsapp').value = lead.whatsapp || '';
+        document.getElementById('edit-lead-status').value = lead.status || 'novo';
+        document.getElementById('edit-lead-origem').value = lead.origem || '';
+        document.getElementById('edit-lead-qualification').value = lead.qualificacao || '';
+        document.getElementById('edit-lead-notes').value = lead.notas || '';
+        document.getElementById('lead-chat-title').textContent = `Conversa com ${lead.nome}`;
         document.getElementById('edit-lead-modal').style.display = 'flex';
+
         const chatHistoryDiv = document.getElementById('lead-chat-history');
         chatHistoryDiv.innerHTML = '<p>Carregando histórico...</p>';
 
@@ -207,12 +219,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderChatMessage(sender, text) {
         const chatHistoryDiv = document.getElementById('lead-chat-history');
+        if (!chatHistoryDiv) return;
         const bubble = document.createElement('div');
         bubble.classList.add('msg-bubble');
         if (sender === 'user') {
             bubble.classList.add('msg-user');
         } else {
-            bubble.classList.add('msg-operator'); // Bot e operador têm o mesmo estilo
+            bubble.classList.add('msg-operator');
         }
         bubble.textContent = text;
         chatHistoryDiv.appendChild(bubble);
