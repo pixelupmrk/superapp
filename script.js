@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const doc = await db.collection('users').doc(userId).get();
             if (doc.exists) {
                 const data = doc.data();
-                // Carrega configurações, etc. (se houver)
                 if (data.botUrl) {
                     const frame = document.getElementById('bot-qr-frame');
                     const placeholder = document.getElementById('bot-url-placeholder');
@@ -76,28 +75,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupEventListeners(userId) {
-        // ... (outros listeners como navegação, tema, etc. permanecem iguais)
-
-        document.getElementById('lead-form')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newLead = {
-                nome: document.getElementById('lead-name').value,
-                email: document.getElementById('lead-email').value,
-                whatsapp: document.getElementById('lead-whatsapp').value,
-                origem: document.getElementById('lead-origin').value,
-                qualificacao: document.getElementById('lead-qualification').value,
-                status: 'novo',
-                notas: document.getElementById('lead-notes').value
-            };
-            try {
-                await db.collection('users').doc(userId).collection('leads').add(newLead);
-                e.target.reset();
-            } catch (error) {
-                console.error("Erro ao adicionar novo lead:", error);
-                alert("Falha ao criar lead.");
-            }
+        document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
+            item.addEventListener('click', e => {
+                if (e.currentTarget.id === 'logout-btn') return;
+                e.preventDefault();
+                const targetId = e.currentTarget.getAttribute('data-target');
+                if (!targetId) return;
+                document.querySelectorAll('.main-content .content-area, .sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) targetElement.style.display = 'block';
+                const pageTitle = document.getElementById('page-title');
+                if(pageTitle) pageTitle.textContent = e.currentTarget.querySelector('span').textContent;
+            });
         });
-        
+
+        document.getElementById('save-bot-config-btn')?.addEventListener('click', async () => {
+            // Esta função precisa ser implementada com a lógica de salvar as configs do bot
+        });
+
         const kanbanBoard = document.getElementById('kanban-board');
         if (kanbanBoard) {
             kanbanBoard.addEventListener('click', e => {
@@ -115,7 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.close-modal').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.getElementById(btn.dataset.target).style.display = 'none';
+                const targetModal = document.getElementById(btn.dataset.target);
+                if(targetModal) targetModal.style.display = 'none';
                 if (btn.dataset.target === 'edit-lead-modal' && unsubscribeLeadChat) {
                     unsubscribeLeadChat();
                     unsubscribeLeadChat = null;
@@ -132,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const botUrl = userDoc.exists ? userDoc.data().botUrl : null;
 
             if (!messageText || !lead || !botUrl) return;
+
             input.disabled = true;
             e.target.querySelector('button').disabled = true;
 
@@ -179,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const lead = leads.find(l => l.id === leadId);
         if (!lead) return;
 
-        // Preenche o formulário
         document.getElementById('edit-lead-name').value = lead.nome;
         document.getElementById('edit-lead-whatsapp').value = lead.whatsapp;
         // ... (preenche outros campos)
@@ -209,6 +206,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderChatMessage(sender, text) {
-        // ... (função sem alteração)
+        const chatHistoryDiv = document.getElementById('lead-chat-history');
+        const bubble = document.createElement('div');
+        bubble.classList.add('msg-bubble');
+        if (sender === 'user') {
+            bubble.classList.add('msg-user');
+        } else {
+            bubble.classList.add('msg-operator'); // Bot e operador têm o mesmo estilo
+        }
+        bubble.textContent = text;
+        chatHistoryDiv.appendChild(bubble);
     }
 });
