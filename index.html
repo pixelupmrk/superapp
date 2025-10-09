@@ -39,21 +39,22 @@
             </header>
             
             <div class="content-area active" id="dashboard-section">
-                 </div>
+                <h2>Bem-vindo ao seu Dashboard</h2>
+                <p>Aqui você verá um resumo das suas atividades.</p>
+            </div>
 
             <div class="content-area" id="crm-kanban-section">
                 <div class="crm-layout-container">
                     <div id="kanban-board" class="kanban-board">
                         </div>
-
                     <div class="lead-details-column">
                         <div id="lead-chat-placeholder" class="lead-chat-placeholder">
                             <i class="ph-fill ph-chats-circle"></i>
-                            <p>Selecione um lead para ver a conversa e os detalhes</p>
+                            <p>Selecione um lead para ver a conversa</p>
                         </div>
                         <div id="lead-interaction-area" class="lead-interaction-area" style="display: none;">
                             <div class="lead-chat-main">
-                                <h2 id="lead-chat-title">Conversa com o Lead</h2>
+                                <h2 id="lead-chat-title">Conversa</h2>
                                 <div id="lead-chat-history" class="lead-chat-history"></div>
                                 <form id="lead-chat-form" class="lead-chat-form">
                                     <input type="text" id="lead-chat-input" placeholder="Digite sua mensagem..." autocomplete="off">
@@ -63,26 +64,8 @@
                             <div class="lead-info-sidebar">
                                 <h2>Detalhes do Lead</h2>
                                 <form id="edit-lead-form">
-                                    <input type="text" id="edit-lead-name" placeholder="Nome">
-                                    <input type="email" id="edit-lead-email" placeholder="E-mail">
-                                    <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp" readonly>
-                                    <select id="edit-lead-status">
-                                        <option value="novo">Novo</option>
-                                        <option value="progresso">Em Progresso</option>
-                                        <option value="fechado">Fechado</option>
-                                    </select>
-                                    <input type="text" id="edit-lead-origem" placeholder="Origem">
-                                    <select id="edit-lead-qualification">
-                                        <option value="">Qualificação</option>
-                                        <option value="quente">Lead Quente</option>
-                                        <option value="morno">Lead Morno</option>
-                                        <option value="frio">Lead Frio</option>
-                                    </select>
-                                    <textarea id="edit-lead-notes" placeholder="Notas Internas"></textarea>
-                                    <div class="form-actions">
-                                        <button type="button" class="btn-delete" id="delete-lead-btn">Excluir</button>
-                                        <button type="submit" class="btn-save">Salvar</button>
-                                    </div>
+                                    <input type="text" id="edit-lead-name" placeholder="Nome"><input type="email" id="edit-lead-email" placeholder="E-mail"><input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp" readonly><select id="edit-lead-status"><option value="novo">Novo</option><option value="progresso">Em Progresso</option><option value="fechado">Fechado</option></select><input type="text" id="edit-lead-origem" placeholder="Origem"><select id="edit-lead-qualification"><option value="">Qualificação</option><option value="quente">Lead Quente</option><option value="morno">Lead Morno</option><option value="frio">Lead Frio</option></select><textarea id="edit-lead-notes" placeholder="Notas Internas"></textarea>
+                                    <div class="form-actions"><button type="button" class="btn-delete" id="delete-lead-btn">Excluir</button><button type="submit" class="btn-save">Salvar</button></div>
                                 </form>
                             </div>
                         </div>
@@ -91,17 +74,59 @@
             </div>
 
             <div class="content-area" id="crm-list-section">
+                <div class="card">
+                    <h2>Lista de Leads</h2>
+                    <table id="leads-table">
+                        <thead><tr><th>Nome</th><th>WhatsApp</th><th>Origem</th><th>Qualificação</th><th>Status</th><th>Ações</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
+            </div>
+
             <div class="content-area" id="finance-section">
+                <div class="card">
+                    <h3>Saldo Atual</h3>
+                    <p id="finance-balance" style="font-size: 2rem; font-weight: bold;">R$ 0,00</p>
                 </div>
+                <div class="card">
+                    <h3>Adicionar Movimentação</h3>
+                    <form id="finance-form" class="input-grid" style="grid-template-columns: 1fr 2fr 1fr; gap: 1rem;">
+                        <input type="date" id="finance-date" required>
+                        <input type="text" id="finance-description" placeholder="Descrição" required>
+                        <input type="number" id="finance-value" placeholder="Valor (R$)" step="0.01" required>
+                        <select id="finance-type" required><option value="">Selecione o Tipo</option><option value="entrada">Entrada</option><option value="saida">Saída</option></select>
+                        <button type="submit" class="btn-save" style="grid-column: 3;">Adicionar</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3>Histórico de Movimentações</h3>
+                    <table id="finance-history-table">
+                        <thead><tr><th>Data</th><th>Descrição</th><th>Entrada</th><th>Saída</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="content-area" id="sales-accelerator-section">
-                </div>
+                <h2>Acelerador de Vendas</h2>
+                <div id="accelerator-modules-container">
+                    </div>
+            </div>
+
             <div class="content-area" id="chatbot-section">
-                 </div>
+                <h2>Configurar Chatbot AI</h2>
+                <p>Em breve...</p>
+            </div>
+
             <div class="content-area" id="bot-section">
-                </div>
+                <h2>Meu Bot WhatsApp</h2>
+                <p>Em breve...</p>
+            </div>
+
             <div class="content-area" id="settings-section">
-                 </div>
+                <h2>Configurações</h2>
+                <p>Em breve...</p>
+            </div>
         </main>
     </div>
     
