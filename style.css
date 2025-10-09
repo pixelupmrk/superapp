@@ -25,7 +25,7 @@ body { font-family: 'Inter', sans-serif; background-color: var(--background-colo
 .content-area { display: none; }
 .content-area.active { display: block; }
 
-/* --- BOTÕES (Estilo original restaurado) --- */
+/* --- BOTÕES --- */
 .btn-save, .btn-login, .btn-delete, .btn-custo, button {
     width: auto; padding: 0.8rem 1.5rem; border: 1px solid var(--highlight-color); border-radius: 10px; 
     font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s ease-in-out; 
@@ -40,14 +40,17 @@ body { font-family: 'Inter', sans-serif; background-color: var(--background-colo
 .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
 input, select, textarea { width: 100%; padding: 0.75rem 1rem; background-color: var(--secondary-color); border: 1px solid var(--secondary-color); border-radius: 8px; color: var(--text-color); font-size: 1rem; }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-color); }
+
+/* --- DASHBOARD (CARD MENOR) --- */
 .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-.stat-card { background-color: var(--primary-color); padding: 1.5rem; border-radius: 12px; text-align: center; }
-.stat-card p { font-size: 2.5rem; font-weight: bold; }
+.stat-card { background-color: var(--primary-color); padding: 1rem; border-radius: 12px; text-align: center; }
+.stat-card h3 { font-size: 1rem; color: var(--text-color-muted); margin-bottom: 0.5rem; }
+.stat-card p { font-size: 2rem; font-weight: bold; }
+
 .kanban-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
 .kanban-column { background-color: var(--primary-color); padding: 1rem; border-radius: 12px; }
 .kanban-cards-list { min-height: 400px; }
 .kanban-card { background-color: var(--secondary-color); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; cursor: pointer; }
-.kanban-card a { color: var(--accent-color); text-decoration: none; font-weight: bold; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); text-align: left; }
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); display: none; justify-content: center; align-items: center; z-index: 1000; }
@@ -62,7 +65,12 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
 .sales-accelerator-sidebar { flex: 0 0 320px; }
 .sales-accelerator-menu-item { background-color: var(--primary-color); border: 1px solid var(--secondary-color); padding: 1rem; border-radius: 10px; cursor: pointer; }
 .sales-accelerator-menu-item.active { background-color: var(--accent-color); color: #000; font-weight: bold; }
-.chatbot-container { height: 75vh; }
+.chatbot-container { display: flex; flex-direction: column; height: 75vh; }
+.chatbot-messages { flex-grow: 1; overflow-y: auto; padding: 1rem; }
+.chatbot-form { display: flex; gap: 1rem; padding: 1rem; border-top: 1px solid var(--secondary-color); }
+.user-message, .bot-message { padding: 0.75rem 1.25rem; border-radius: 20px; max-width: 75%; }
+.user-message { background-color: var(--accent-color); color: #000; align-self: flex-end; }
+.bot-message { background-color: var(--secondary-color); align-self: flex-start; }
 
 /* --- ESTILOS PARA O MODAL DE CHAT --- */
 .modal-content.modal-lead-chat { max-width: 900px; }
