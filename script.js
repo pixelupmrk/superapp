@@ -1,43 +1,54 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 🔧 Variáveis globais
     let leads = [];
     let db;
     let unsubscribeLeads;
     let unsubscribeLeadChat;
     let currentUserId;
-    let currentLeadId = null; // Garante que a variável exista globalmente no script
+    let currentLeadId = null;
+    let botUrl = null; // 🔧 Armazenar botUrl globalmente
+
+    // 🔧 Verificação de Firebase antes de iniciar
+    if (typeof firebase === 'undefined') {
+        console.error("❌ Firebase não carregado!");
+        return;
+    }
 
     async function main() {
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 currentUserId = user.uid;
                 db = firebase.firestore();
+                await loadInitialData(currentUserId);
                 setupEventListeners(currentUserId);
                 setupRealtimeListeners(currentUserId);
-                loadInitialData(currentUserId);
             }
         });
     }
     main();
 
+    // 🔧 Escuta em tempo real dos leads
     function setupRealtimeListeners(userId) {
         if (unsubscribeLeads) unsubscribeLeads();
 
         unsubscribeLeads = db.collection('users').doc(userId).collection('leads')
             .onSnapshot(snapshot => {
                 leads = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log("Leads atualizados em tempo real:", leads);
+                console.log("📡 Leads atualizados em tempo real:", leads);
                 updateAllUI();
             }, error => {
                 console.error("Erro ao ouvir os leads:", error);
             });
     }
 
+    // 🔧 Carrega informações iniciais, como o bot URL
     async function loadInitialData(userId) {
         try {
             const doc = await db.collection('users').doc(userId).get();
             if (doc.exists) {
                 const data = doc.data();
                 if (data.botUrl) {
+                    botUrl = data.botUrl; // 🔧 Guardar globalmente
                     const frame = document.getElementById('bot-qr-frame');
                     const placeholder = document.getElementById('bot-url-placeholder');
                     if (frame && placeholder) {
@@ -52,31 +63,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // 🔧 Atualiza todos os elementos de UI
     function updateAllUI() {
         renderKanbanCards();
         renderLeadsTable();
     }
 
+    // 🔧 Renderização otimizada do Kanban
     function renderKanbanCards() {
-        document.querySelectorAll('.kanban-cards-list').forEach(list => list.innerHTML = '');
+        const lists = document.querySelectorAll('.kanban-cards-list');
+        lists.forEach(list => list.innerHTML = '');
+
         leads.forEach(lead => {
             const column = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`);
-            if (column) {
-                column.innerHTML += `<div class="kanban-card" draggable="true" data-id="${lead.id}"><strong>${lead.nome}</strong><p>${lead.whatsapp}</p></div>`;
-            }
+            if (!column) return;
+            const card = document.createElement('div');
+            card.className = 'kanban-card';
+            card.draggable = true;
+            card.dataset.id = lead.id;
+            card.innerHTML = `<strong>${lead.nome}</strong><p>${lead.whatsapp}</p>`;
+            column.appendChild(card);
         });
     }
 
+    // 🔧 Renderiza tabela de leads
     function renderLeadsTable() {
         const tbody = document.querySelector('#leads-table tbody');
-        if (tbody) {
-            tbody.innerHTML = leads.map(l => 
-                `<tr data-id="${l.id}"><td>${l.nome}</td><td>${l.whatsapp}</td><td>${l.origem}</td><td>${l.qualificacao}</td><td>${l.status}</td><td><button class="btn-edit-table">Abrir</button></td></tr>`
-            ).join('');
-        }
+        if (!tbody) return;
+        tbody.innerHTML = leads.map(l => 
+            `<tr data-id="${l.id}">
+                <td>${l.nome}</td>
+                <td>${l.whatsapp}</td>
+                <td>${l.origem}</td>
+                <td>${l.qualificacao}</td>
+                <td>${l.status}</td>
+                <td><button class="btn-edit-table">Abrir</button></td>
+            </tr>`
+        ).join('');
     }
 
+    // 🔧 Configura todos os listeners de interface
     function setupEventListeners(userId) {
+        // Navegação lateral
         document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
             item.addEventListener('click', e => {
                 if (e.currentTarget.id === 'logout-btn') return;
@@ -98,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Abertura do modal pelo Kanban
         const kanbanBoard = document.getElementById('kanban-board');
         if (kanbanBoard) {
             kanbanBoard.addEventListener('click', e => {
@@ -106,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Abertura do modal pela tabela
         document.getElementById('leads-table')?.addEventListener('click', e => {
             if (e.target.closest('.btn-edit-table')) {
                 const row = e.target.closest('tr');
@@ -113,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Fechar modais
         document.querySelectorAll('.close-modal').forEach(btn => {
             btn.addEventListener('click', () => {
                 const targetModal = document.getElementById(btn.dataset.target);
@@ -124,15 +155,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Envio de mensagens no chat do lead
         document.getElementById('lead-chat-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('lead-chat-input');
             const messageText = input.value.trim();
             const lead = leads.find(l => l.id === currentLeadId);
-            const userDoc = await db.collection('users').doc(userId).get();
-            const botUrl = userDoc.exists ? userDoc.data().botUrl : null;
 
-            if (!messageText || !lead || !botUrl) return;
+            if (!messageText || !lead || !botUrl) {
+                alert("Preencha a mensagem e verifique se o bot está conectado.");
+                return;
+            }
 
             input.disabled = true;
             e.target.querySelector('button').disabled = true;
@@ -147,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 input.value = '';
             } catch (error) {
                 console.error("Erro ao enviar mensagem:", error);
-                alert("Não foi possível enviar a mensagem. Verifique se o bot está conectado.");
+                alert("Não foi possível enviar a mensagem. Verifique o bot.");
             } finally {
                 input.disabled = false;
                 e.target.querySelector('button').disabled = false;
@@ -155,10 +188,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // CORREÇÃO DO ERRO DE DIGITAÇÃO ESTAVA AQUI
+        // Atualização do lead
         document.getElementById('edit-lead-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!currentLeadId) return; // Variável com 'L' e 'I' maiúsculos
+            if (!currentLeadId) return;
             const updatedData = {
                 nome: document.getElementById('edit-lead-name').value,
                 email: document.getElementById('edit-lead-email').value,
@@ -169,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             try {
                 await db.collection('users').doc(userId).collection('leads').doc(currentLeadId).update(updatedData);
-                alert('Lead atualizado com sucesso!');
+                alert('✅ Lead atualizado com sucesso!');
             } catch (error) {
                 console.error("Erro ao atualizar lead:", error);
                 alert("Falha ao atualizar lead.");
@@ -177,13 +210,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // 🔧 Abre modal de edição e histórico de chat
     async function openEditModal(leadId) {
-        currentLeadId = leadId; // Define o ID do lead atual
+        currentLeadId = leadId;
         const lead = leads.find(l => l.id === leadId);
         if (!lead) {
             console.error("Lead não encontrado com o ID:", leadId);
             return;
         }
+
+        if (!document.getElementById('edit-lead-modal')) return;
 
         document.getElementById('edit-lead-name').value = lead.nome || '';
         document.getElementById('edit-lead-email').value = lead.email || '';
@@ -200,7 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (unsubscribeLeadChat) unsubscribeLeadChat();
         
-        const messagesRef = db.collection('users').doc(currentUserId).collection('leads').doc(leadId).collection('messages').orderBy('timestamp');
+        const messagesRef = db.collection('users').doc(currentUserId)
+            .collection('leads').doc(leadId)
+            .collection('messages').orderBy('timestamp');
+
         unsubscribeLeadChat = messagesRef.onSnapshot(snapshot => {
             chatHistoryDiv.innerHTML = '';
             if (snapshot.empty) {
@@ -209,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             snapshot.forEach(doc => {
                 const msg = doc.data();
-                if(msg.text) renderChatMessage(msg.sender, msg.text);
+                if (msg.text) renderChatMessage(msg.sender, msg.text);
             });
             chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
         }, error => {
@@ -218,16 +257,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // 🔧 Renderiza mensagens no chat
     function renderChatMessage(sender, text) {
         const chatHistoryDiv = document.getElementById('lead-chat-history');
         if (!chatHistoryDiv) return;
         const bubble = document.createElement('div');
-        bubble.classList.add('msg-bubble');
-        if (sender === 'user') {
-            bubble.classList.add('msg-user');
-        } else {
-            bubble.classList.add('msg-operator');
-        }
+        bubble.classList.add('msg-bubble', sender === 'user' ? 'msg-user' : 'msg-operator');
         bubble.textContent = text;
         chatHistoryDiv.appendChild(bubble);
     }
