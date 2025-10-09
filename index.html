@@ -39,73 +39,55 @@
             </header>
             
             <div class="content-area active" id="dashboard-section">
-                </div>
-
+                 </div>
             <div class="content-area" id="crm-kanban-section">
                 </div>
-
             <div class="content-area" id="crm-list-section">
-                </div>
-
+                 </div>
             <div class="content-area" id="finance-section">
-                <div class="finance-nav">
-                    <a href="#" class="finance-tab active" data-tab="caixa">Caixa</a>
-                    <a href="#" class="finance-tab" data-tab="custos">Custos e Estoque</a>
                 </div>
-                <div class="finance-content active" id="caixa-tab-content">
-                    <div class="dashboard-stats">
-                        <div class="stat-card"> <h3>Total de Entradas</h3> <p id="total-entradas">R$ 0,00</p> </div>
-                        <div class="stat-card"> <h3>Total de Saídas</h3> <p id="total-saidas">R$ 0,00</p> </div>
-                        <div class="stat-card"> <h3>Saldo Atual</h3> <p id="caixa-atual">R$ 0,00</p> </div>
-                    </div>
-                    <div class="card">
-                        <h3>Adicionar Movimentação</h3>
-                        <form id="caixa-form">
-                            <div class="input-grid">
-                                <input type="date" id="caixa-data" required>
-                                <input type="text" id="caixa-descricao" placeholder="Descrição" required>
-                                <input type="number" id="caixa-valor" placeholder="Valor (R$)" step="0.01" required>
-                                <select id="caixa-tipo" required> <option value="">Tipo</option> <option value="entrada">Entrada</option> <option value="saida">Saída</option> </select>
-                            </div>
-                            <button type="submit" class="btn-save">Adicionar</button>
-                        </form>
-                    </div>
-                    <div class="card">
-                        <h3>Histórico de Movimentações</h3>
-                        <div class="table-container">
-                            <table id="caixa-table">
-                                <thead> <tr> <th>Data</th> <th>Descrição</th> <th>Entrada</th> <th>Saída</th> </tr> </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="finance-content" id="custos-tab-content">
-                    </div>
-            </div>
-             
             <div class="content-area" id="sales-accelerator-section">
-                <div class="sales-accelerator-container">
-                    <aside class="sales-accelerator-sidebar">
-                        <nav class="sales-accelerator-menu" id="mentoria-menu"></nav>
-                    </aside>
-                    <main class="sales-accelerator-content" id="mentoria-content"></main>
-                </div>
-            </div>
-            
+                 </div>
             <div class="content-area" id="chatbot-section">
                 </div>
-
             <div class="content-area" id="bot-section">
                 </div>
-
             <div class="content-area" id="settings-section">
                  </div>
         </main>
     </div>
-    
+
     <div class="modal-overlay" id="edit-lead-modal">
+        <div class="modal-content modal-lead-chat">
+            <span class="close-modal" data-target="edit-lead-modal">&times;</span>
+            <div class="lead-chat-container">
+                <div class="lead-info-sidebar">
+                    <h2>Detalhes do Lead</h2>
+                    <form id="edit-lead-form">
+                        <input type="text" id="edit-lead-name" placeholder="Nome">
+                        <input type="email" id="edit-lead-email" placeholder="E-mail">
+                        <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp" readonly>
+                        <select id="edit-lead-status"> <option value="novo">Novo</option> <option value="progresso">Em Progresso</option> <option value="fechado">Fechado</option> </select>
+                        <input type="text" id="edit-lead-origem" placeholder="Origem">
+                        <select id="edit-lead-qualification"> <option value="">Qualificação</option> <option value="quente">Lead Quente</option> <option value="morno">Lead Morno</option> <option value="frio">Lead Frio</option> </select>
+                        <textarea id="edit-lead-notes" placeholder="Notas Internas"></textarea>
+                        <div class="modal-actions">
+                            <button type="button" class="btn-delete" id="delete-lead-btn">Excluir Lead</button>
+                            <button type="submit" class="btn-save">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="lead-chat-main">
+                    <h2 id="lead-chat-title">Conversa com o Lead</h2>
+                    <div id="lead-chat-history" class="lead-chat-history"></div>
+                    <form id="lead-chat-form" class="lead-chat-form">
+                        <input type="text" id="lead-chat-input" placeholder="Digite sua mensagem..." autocomplete="off">
+                        <button type="submit"><i class="ph-fill ph-paper-plane-right"></i></button>
+                    </form>
+                </div>
+            </div>
         </div>
+    </div>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
