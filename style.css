@@ -119,3 +119,22 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
     .sales-accelerator-sidebar { flex: 0 0 auto; width: 100%; }
     .modal-content { width: 95%; padding: 1.5rem; }
 }
+
+/* Estilos para a nova seção do Bot */
+.card-subtitle {
+    color: var(--text-color-muted);
+    margin-top: -1.5rem;
+    margin-bottom: 2rem;
+}
+
+#bot-connection-area {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    text-align: center;
+}
+
+#bot-url-placeholder {
+    color: var(--text-color-muted);
+}
