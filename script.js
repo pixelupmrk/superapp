@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 🔧 Variáveis globais
     let leads = [];
     let db;
     let unsubscribeLeads;
@@ -17,9 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (user) {
                 currentUserId = user.uid;
                 db = firebase.firestore();
+                await loadInitialData(currentUserId);
                 setupEventListeners(currentUserId);
                 setupRealtimeListeners(currentUserId);
-                loadInitialData(currentUserId);
             }
         });
     }
@@ -65,18 +66,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderKanbanCards() {
         const lists = document.querySelectorAll('.kanban-cards-list');
-        if (!lists) return;
         lists.forEach(list => list.innerHTML = '');
         leads.forEach(lead => {
             const column = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`);
-            if (column) {
-                const card = document.createElement('div');
-                card.className = 'kanban-card';
-                card.draggable = true;
-                card.dataset.id = lead.id;
-                card.innerHTML = `<strong>${lead.nome}</strong><p>${lead.whatsapp}</p>`;
-                column.appendChild(card);
-            }
+            if (!column) return;
+            const card = document.createElement('div');
+            card.className = 'kanban-card';
+            card.draggable = true;
+            card.dataset.id = lead.id;
+            card.innerHTML = `<strong>${lead.nome}</strong><p>${lead.whatsapp}</p>`;
+            column.appendChild(card);
         });
     }
 
@@ -85,11 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!tbody) return;
         tbody.innerHTML = leads.map(l => 
             `<tr data-id="${l.id}">
-                <td>${l.nome || ''}</td>
-                <td>${l.whatsapp || ''}</td>
-                <td>${l.origem || ''}</td>
-                <td>${l.qualificacao || ''}</td>
-                <td>${l.status || ''}</td>
+                <td>${l.nome}</td>
+                <td>${l.whatsapp}</td>
+                <td>${l.origem}</td>
+                <td>${l.qualificacao}</td>
+                <td>${l.status}</td>
                 <td><button class="btn-edit-table">Abrir</button></td>
             </tr>`
         ).join('');
@@ -103,11 +102,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const targetId = e.currentTarget.getAttribute('data-target');
                 if (!targetId) return;
                 
-                document.querySelectorAll('.main-content .content-area, .sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.main-content .content-area').forEach(area => area.style.display = 'none');
+                document.querySelectorAll('.sidebar-nav .nav-item').forEach(nav => nav.classList.remove('active'));
                 
+                e.currentTarget.classList.add('active');
                 const targetElement = document.getElementById(targetId);
                 if (targetElement) targetElement.style.display = 'block';
-                e.currentTarget.classList.add('active');
                 
                 const pageTitle = document.getElementById('page-title');
                 if(pageTitle && e.currentTarget.querySelector('span')) {
@@ -148,7 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const messageText = input.value.trim();
             const lead = leads.find(l => l.id === currentLeadId);
 
-            if (!messageText || !lead || !botUrl) return;
+            if (!messageText || !lead || !botUrl) {
+                alert("Preencha a mensagem e verifique se o bot está conectado.");
+                return;
+            }
 
             input.disabled = true;
             e.target.querySelector('button').disabled = true;
@@ -159,11 +162,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ number: lead.whatsapp, message: messageText, leadId: currentLeadId })
                 });
-                if (!response.ok) throw new Error('Falha ao enviar mensagem.');
+                if (!response.ok) throw new Error('Falha ao enviar mensagem pelo servidor do bot.');
                 input.value = '';
             } catch (error) {
                 console.error("Erro ao enviar mensagem:", error);
-                alert("Não foi possível enviar a mensagem.");
+                alert("Não foi possível enviar a mensagem. Verifique o bot.");
             } finally {
                 input.disabled = false;
                 e.target.querySelector('button').disabled = false;
@@ -195,7 +198,12 @@ document.addEventListener('DOMContentLoaded', () => {
     async function openEditModal(leadId) {
         currentLeadId = leadId;
         const lead = leads.find(l => l.id === leadId);
-        if (!lead) return;
+        if (!lead) {
+            console.error("Lead não encontrado com o ID:", leadId);
+            return;
+        }
+
+        if (!document.getElementById('edit-lead-modal')) return;
 
         document.getElementById('edit-lead-name').value = lead.nome || '';
         document.getElementById('edit-lead-email').value = lead.email || '';
@@ -205,30 +213,31 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('edit-lead-qualification').value = lead.qualificacao || '';
         document.getElementById('edit-lead-notes').value = lead.notas || '';
         document.getElementById('lead-chat-title').textContent = `Conversa com ${lead.nome}`;
-        
-        const modal = document.getElementById('edit-lead-modal');
-        if (modal) modal.style.display = 'flex';
+        document.getElementById('edit-lead-modal').style.display = 'flex';
 
         const chatHistoryDiv = document.getElementById('lead-chat-history');
-        if (chatHistoryDiv) chatHistoryDiv.innerHTML = '<p>Carregando histórico...</p>';
+        chatHistoryDiv.innerHTML = '<p>Carregando histórico...</p>';
 
         if (unsubscribeLeadChat) unsubscribeLeadChat();
         
-        const messagesRef = db.collection('users').doc(currentUserId).collection('leads').doc(leadId).collection('messages').orderBy('timestamp');
+        const messagesRef = db.collection('users').doc(currentUserId)
+            .collection('leads').doc(leadId)
+            .collection('messages').orderBy('timestamp');
+
         unsubscribeLeadChat = messagesRef.onSnapshot(snapshot => {
-            if (chatHistoryDiv) chatHistoryDiv.innerHTML = '';
+            chatHistoryDiv.innerHTML = '';
             if (snapshot.empty) {
-                if (chatHistoryDiv) chatHistoryDiv.innerHTML = '<p>Nenhuma mensagem nesta conversa ainda.</p>';
+                chatHistoryDiv.innerHTML = '<p>Nenhuma mensagem nesta conversa ainda.</p>';
                 return;
             }
             snapshot.forEach(doc => {
                 const msg = doc.data();
-                if(msg.text) renderChatMessage(msg.sender, msg.text);
+                if (msg.text) renderChatMessage(msg.sender, msg.text);
             });
-            if (chatHistoryDiv) chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
         }, error => {
             console.error("Erro ao ouvir o chat:", error);
-            if (chatHistoryDiv) chatHistoryDiv.innerHTML = `<p style="color:red;">Erro ao carregar o histórico.</p>`;
+            chatHistoryDiv.innerHTML = `<p style="color:red;">Erro ao carregar o histórico: ${error.message}</p>`;
         });
     }
 
