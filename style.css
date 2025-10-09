@@ -10,7 +10,6 @@
 body.light-theme {
     --background-color: #f0f2f5; --primary-color: #ffffff; --secondary-color: #e9ecef;
     --accent-color: #00b8d4; --text-color: #212529; --text-color-muted: #6c757d;
-    --delete-color: #c9302c;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -18,80 +17,59 @@ body { font-family: 'Inter', sans-serif; background-color: var(--background-colo
 .app-container { display: flex; }
 .sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-color); border-right: 1px solid var(--secondary-color); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; transition: left 0.3s ease-in-out; z-index: 1001; }
 .sidebar-header h2 { font-family: 'Orbitron', sans-serif; color: var(--accent-color); text-align: center; margin-bottom: 3rem; font-size: 1.8rem; text-shadow: 0 0 5px var(--accent-color), 0 0 10px rgba(0, 247, 255, 0.5); }
-.sidebar-nav { flex-grow: 1; }
 .nav-item { display: flex; align-items: center; padding: 0.9rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; text-decoration: none; color: var(--text-color-muted); transition: all 0.3s ease; }
 .nav-item:hover { background-color: var(--secondary-color); color: var(--text-color); }
 .nav-item.active { background-color: var(--accent-color); color: #000; font-weight: 600; box-shadow: 0 0 15px var(--accent-color); }
 .nav-item i { font-size: 1.5rem; margin-right: 1rem; }
-.sidebar-footer { margin-top: auto; }
-.main-content { flex-grow: 1; margin-left: var(--sidebar-width); padding: 2rem; transition: margin-left 0.3s ease-in-out; }
+.main-content { flex-grow: 1; margin-left: var(--sidebar-width); padding: 2rem; }
 .main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .content-area { display: none; }
 .content-area.active { display: block; }
 .card { background-color: var(--primary-color); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid var(--secondary-color); box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+.input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
 input, select, textarea { width: 100%; padding: 0.75rem 1rem; background-color: var(--secondary-color); border: 1px solid var(--secondary-color); border-radius: 8px; color: var(--text-color); font-size: 1rem; }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-color); }
-textarea { min-height: 100px; resize: vertical; margin-bottom: 1rem; }
-
-/* === NOVOS ESTILOS PARA O CRM === */
-.crm-grid-container { display: grid; grid-template-columns: 3fr 2fr; gap: 2rem; height: calc(100vh - 120px); }
-.kanban-container { display: flex; flex-direction: column; overflow: hidden; }
-.kanban-board { flex-grow: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; overflow-y: auto; }
-.kanban-column { background-color: var(--primary-color); padding: 1rem; border-radius: 12px; display: flex; flex-direction: column; }
-.kanban-cards-list { min-height: 300px; flex-grow: 1; overflow-y: auto; }
-.kanban-card { background-color: var(--secondary-color); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; cursor: pointer; transition: background-color 0.2s; }
-.kanban-card:hover { background-color: #2a3b5c; }
-.lead-details-container { display: flex; flex-direction: column; height: 100%; padding: 1.5rem; overflow-y: auto; }
-.lead-details-placeholder { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: var(--text-color-muted); height: 100%; }
-.lead-details-placeholder i { font-size: 4rem; margin-bottom: 1rem; }
-#lead-details-content { display: none; height: 100%; flex-direction: column; }
-.lead-chat-container { flex: 1; display: flex; flex-direction: column; min-height: 300px; margin-bottom: 2rem; }
-.lead-chat-history { flex-grow: 1; background-color: var(--secondary-color); border-radius: 8px; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
-.lead-chat-form { display: flex; gap: 0.5rem; }
-.lead-chat-form button { flex-shrink: 0; width: 45px; height: 45px; border-radius: 50%; border: none; background-color: var(--accent-color); color: #000; font-size: 1.5rem; cursor: pointer; }
-
-/* ESTILOS DE MENSAGENS DO CHAT (Reaproveitado do chatbot) */
-.msg-bubble { padding: 0.75rem 1.25rem; border-radius: 20px; max-width: 80%; line-height: 1.5; }
-.msg-from-user { background-color: var(--accent-color); color: #000; align-self: flex-end; }
-.msg-from-lead { background-color: var(--primary-color); align-self: flex-start; }
-
-/* --- FIM DOS NOVOS ESTILOS --- */
-
 .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
 .stat-card { background-color: var(--primary-color); padding: 1.5rem; border-radius: 12px; text-align: center; }
-.chart-container { position: relative; height: 350px; width: 100%; max-width: 600px; margin: auto; }
-.kanban-card a, #leads-table a { color: var(--accent-color); text-decoration: none; font-weight: bold; }
+.stat-card p { font-size: 2.5rem; font-weight: bold; }
+.kanban-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.kanban-column { background-color: var(--primary-color); padding: 1rem; border-radius: 12px; }
+.kanban-cards-list { min-height: 400px; }
+.kanban-card { background-color: var(--secondary-color); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem; cursor: pointer; }
+.kanban-card a { color: var(--accent-color); text-decoration: none; font-weight: bold; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); text-align: left; }
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); display: none; justify-content: center; align-items: center; z-index: 1000; }
 .modal-content { position: relative; background-color: var(--primary-color); padding: 2rem; border-radius: 12px; width: 90%; max-width: 800px; }
 .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; color: var(--text-color-muted); cursor: pointer; }
-.menu-toggle { display: none; font-size: 2rem; cursor: pointer; color: var(--accent-color); }
-.sales-accelerator-container { display: flex; gap: 2rem; }
-
-/* Outros estilos do seu arquivo original... (mantidos) */
 .finance-nav { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--secondary-color); }
-.finance-tab { padding: 0.75rem 1.5rem; cursor: pointer; border-bottom: 4px solid transparent; color: var(--text-color-muted); text-decoration: none; border-radius: 8px 8px 0 0; }
-.finance-tab:hover { background-color: var(--secondary-color); }
+.finance-tab { padding: 0.75rem 1.5rem; cursor: pointer; border-bottom: 4px solid transparent; color: var(--text-color-muted); }
 .finance-tab.active { color: var(--accent-color); border-bottom-color: var(--accent-color); font-weight: bold; }
 .finance-content { display: none; }
 .finance-content.active { display: block; }
+.sales-accelerator-container { display: flex; gap: 2rem; }
+.sales-accelerator-sidebar { flex: 0 0 320px; }
+.sales-accelerator-menu-item.active { background-color: var(--accent-color); color: #000; font-weight: bold; }
+.chatbot-container { height: 75vh; }
 
-.chatbot-container { display: flex; flex-direction: column; height: 75vh; background-color: var(--primary-color); border-radius: 12px; overflow: hidden; }
-.chatbot-messages { flex-grow: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
-.chatbot-form { flex-shrink: 0; display: flex; padding: 1rem; border-top: 1px solid var(--secondary-color); gap: 1rem; }
-.user-message { background-color: transparent; border: 2px solid var(--accent-color); color: var(--text-color); align-self: flex-end; border-bottom-right-radius: 5px; }
-.bot-message { background-color: var(--secondary-color); color: var(--text-color); align-self: flex-start; border-bottom-left-radius: 5px; }
+/* --- ESTILOS PARA O NOVO MODAL DE CHAT --- */
+.modal-content.modal-lead-chat { max-width: 900px; }
+.lead-modal-body { display: flex; flex-direction: column; gap: 2rem; }
+.lead-chat-container { display: flex; flex-direction: column; height: 40vh; border: 1px solid var(--secondary-color); border-radius: 12px; padding: 1rem; }
+.lead-chat-history { flex-grow: 1; overflow-y: auto; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.lead-chat-form { display: flex; gap: 1rem; }
+.lead-chat-form input { flex-grow: 1; }
+.lead-chat-form button { flex-shrink: 0; border: none; background-color: var(--accent-color); color: #000; border-radius: 50%; width: 45px; height: 45px; font-size: 1.5rem; cursor: pointer; }
+.msg-bubble { padding: 0.75rem 1.25rem; border-radius: 20px; max-width: 70%; line-height: 1.5; }
+.msg-from-operator { background-color: var(--accent-color); color: #000; align-self: flex-end; }
+.msg-from-lead { background-color: var(--secondary-color); align-self: flex-start; }
+.lead-info-container h3 { margin-bottom: 1rem; border-top: 1px solid var(--secondary-color); padding-top: 1.5rem; }
 
-@media (max-width: 1200px) {
-    .crm-grid-container { grid-template-columns: 1fr; }
-    .lead-details-container { display: none; /* Em telas menores, esconde a coluna do chat */ }
-}
+.menu-toggle { display: none; font-size: 2rem; cursor: pointer; }
 @media (max-width: 768px) {
     .sidebar { left: -100%; }
     .app-container.sidebar-visible .sidebar { left: 0; }
-    .main-content { margin-left: 0; padding: 1rem; }
+    .main-content { margin-left: 0; }
     .menu-toggle { display: block; }
-    .dashboard-stats, .kanban-board { grid-template-columns: 1fr; }
-    .sales-accelerator-container { flex-direction: column; }
+    .kanban-board { grid-template-columns: 1fr; }
 }
