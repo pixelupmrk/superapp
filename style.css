@@ -16,7 +16,7 @@ body.light-theme {
 body { font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); }
 .app-container { display: flex; }
 .sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-color); border-right: 1px solid var(--secondary-color); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; transition: left 0.3s ease-in-out; z-index: 1001; }
-.sidebar-header h2, .login-container h2:first-of-type { font-family: 'Orbitron', sans-serif; color: var(--accent-color); text-align: center; margin-bottom: 3rem; font-size: 1.8rem; text-shadow: 0 0 5px var(--accent-color), 0 0 10px rgba(0, 247, 255, 0.5); }
+.sidebar-header h2 { font-family: 'Orbitron', sans-serif; color: var(--accent-color); text-align: center; margin-bottom: 3rem; font-size: 1.8rem; text-shadow: 0 0 5px var(--accent-color), 0 0 10px rgba(0, 247, 255, 0.5); }
 .nav-item { display: flex; align-items: center; padding: 0.9rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; text-decoration: none; color: var(--text-color-muted); transition: all 0.3s ease; }
 .nav-item:hover { background-color: var(--secondary-color); color: var(--text-color); }
 .nav-item.active { background-color: var(--accent-color); color: #000; font-weight: 600; box-shadow: 0 0 15px var(--accent-color); }
