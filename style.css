@@ -81,17 +81,21 @@ body.light-theme .chatbot-form button { color: #fff; }
 body.light-theme .user-message { color: #fff; }
 .bot-message { background-color: var(--secondary-color); align-self: flex-start; }
 .bot-message.thinking { font-style: italic; color: var(--text-color-muted); }
+
+/* --- CÓDIGO CORRIGIDO PARA A CAIXA DE CONVERSA DO CRM --- */
 .modal-lead-chat .lead-modal-body { display: flex; flex-direction: column; gap: 2rem; }
 .lead-chat-container { display: flex; flex-direction: column; height: 40vh; border: 1px solid var(--secondary-color); border-radius: 12px; padding: 1rem; }
-.lead-chat-history { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; }
+.lead-chat-history { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; padding: 0.5rem; }
 .lead-chat-form { display: flex; gap: 1rem; }
 .lead-chat-form input { flex-grow: 1; }
 .lead-chat-form button { flex-shrink: 0; border-radius: 50%; width: 45px; height: 45px; font-size: 1.5rem; padding: 0; background: var(--accent-color); color: #000; }
 body.light-theme .lead-chat-form button { color: #fff; }
-.msg-bubble { padding: 0.75rem 1.25rem; border-radius: 20px; max-width: 80%; line-height: 1.6; word-wrap: break-word; }
+.msg-bubble { padding: 0.75rem 1.25rem; border-radius: 20px; max-width: 80%; line-height: 1.6; word-wrap: break-word; width: -moz-fit-content; width: fit-content; }
 .msg-from-operator { background-color: var(--accent-color); color: #000; align-self: flex-end; }
 body.light-theme .msg-from-operator { color: #fff; }
 .msg-from-lead { background-color: var(--secondary-color); align-self: flex-start; }
+/* ----------------------------------------------------------- */
+
 .lead-info-container h3 { margin-bottom: 1rem; border-top: 1px solid var(--secondary-color); padding-top: 1.5rem; }
 .menu-toggle { display: none; font-size: 2rem; cursor: pointer; }
 @media (max-width: 768px) { .sidebar { left: -100%; } .app-container.sidebar-visible .sidebar { left: 0; } .main-content { margin-left: 0; } .menu-toggle { display: block; } .kanban-board, .sales-accelerator-container { flex-direction: column; } .sales-accelerator-sidebar { flex-basis: auto; } }
