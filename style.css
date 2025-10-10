@@ -17,13 +17,13 @@ body.light-theme {
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
 .app-container { display: flex; }
-.sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-color); border-right: 1px solid var(--secondary-color); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; z-index: 1001; transition: background-color 0.3s; }
+.sidebar { width: var(--sidebar-width); height: 100vh; background-color: var(--primary-color); border-right: 1px solid var(--secondary-color); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; z-index: 1001; transition: background-color 0.3s, left 0.3s ease; }
 .sidebar-header h2 { font-family: 'Orbitron', sans-serif; color: var(--accent-color); text-align: center; margin-bottom: 3rem; font-size: 1.8rem; text-shadow: 0 0 5px var(--accent-color); }
 .nav-item { display: flex; align-items: center; padding: 0.9rem 1rem; margin-bottom: 0.5rem; border-radius: 8px; text-decoration: none; color: var(--text-color-muted); transition: all 0.2s ease; }
 .nav-item:hover { background-color: var(--secondary-color); color: var(--text-color); }
 .nav-item.active { background-color: var(--accent-color); color: #000; font-weight: 600; }
 body.light-theme .nav-item.active { color: #fff; }
-.main-content { flex-grow: 1; margin-left: var(--sidebar-width); padding: 2rem; }
+.main-content { flex-grow: 1; margin-left: var(--sidebar-width); padding: 2rem; transition: margin-left 0.3s ease; }
 .main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .content-area { display: none; }
 .content-area.active { display: block; animation: fadeIn 0.5s ease; }
@@ -92,4 +92,4 @@ body.light-theme .msg-from-operator { color: #fff; }
 .msg-from-lead { background-color: var(--secondary-color); align-self: flex-start; }
 .lead-info-container h3 { margin-bottom: 1rem; border-top: 1px solid var(--secondary-color); padding-top: 1.5rem; }
 .menu-toggle { display: none; font-size: 2rem; cursor: pointer; }
-@media (max-width: 768px) { .sidebar { left: -100%; transition: left 0.3s ease; } .app-container.sidebar-visible .sidebar { left: 0; } .main-content { margin-left: 0; } .menu-toggle { display: block; } .kanban-board, .sales-accelerator-container { flex-direction: column; } .sales-accelerator-sidebar { flex-basis: auto; } }
+@media (max-width: 768px) { .sidebar { left: -100%; } .app-container.sidebar-visible .sidebar { left: 0; } .main-content { margin-left: 0; } .menu-toggle { display: block; } .kanban-board, .sales-accelerator-container { flex-direction: column; } .sales-accelerator-sidebar { flex-basis: auto; } }
