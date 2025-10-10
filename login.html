@@ -9,21 +9,26 @@
 <body class="login-page">
 
     <div class="login-container">
-        <h2>Super App PixelUp</h2>
-        <h2 style="font-family: 'Inter', sans-serif; font-size: 1.5rem; text-shadow: none; margin-bottom: 2rem;">Login</h2>
-        <form id="login-form">
-            <div class="input-grid" style="grid-template-columns: 1fr; gap: 1.5rem;">
-                <input type="email" id="login-email" placeholder="E-mail" required style="margin-bottom: 0;">
-                <input type="password" id="login-password" placeholder="Senha" required style="margin-bottom: 0;">
+        <div class="login-card">
+            <div class="sidebar-header">
+                <h2>Super App PixelUp</h2>
             </div>
-            <button type="submit" class="btn-login" style="width: 100%; margin-top: 2rem;">Entrar</button>
-            <p id="login-error-message" style="color: var(--delete-color); margin-top: 1.5rem; height: 1.2em;"></p>
-        </form>
+            <h3>Login</h3>
+            <form id="login-form">
+                <div class="input-group">
+                    <input type="email" id="login-email" placeholder="E-mail" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="login-password" placeholder="Senha" required>
+                </div>
+                <button type="submit" class="btn-login">Entrar</button>
+                <p id="login-error-message"></p>
+            </form>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    
     <script src="auth.js"></script>
 
 </body>
