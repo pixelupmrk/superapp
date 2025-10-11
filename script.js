@@ -58,14 +58,13 @@ document.addEventListener('DOMContentLoaded', () => {
             applySettings(data.settings);
         }
         loadMentoriaNotes();
-        renderChatHistory(); // Esta função agora pode chamar addMessageToChat sem erro
+        renderChatHistory();
         updateAllUI();
     }
 
     async function saveAllUserData(userId, showConfirmation = false) { getMentoriaNotes(); const settings = { userName: document.getElementById('setting-user-name').value || 'Usuário' }; const botInstructions = document.getElementById('bot-instructions').value; const dataToSave = { leads, caixa, estoque, mentoriaNotes, chatHistory, settings, botInstructions }; await db.collection('userData').doc(userId).set({ ...dataToSave }, { merge: true }); if (showConfirmation) alert('Configurações salvas!'); }
 
     function setupEventListeners(userId) {
-        // (código dos event listeners - sem alterações)
         document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => { item.addEventListener('click', e => { e.preventDefault(); if (e.currentTarget.id === 'logout-btn') return; const targetId = e.currentTarget.getAttribute('data-target'); document.querySelectorAll('.sidebar-nav .nav-item, .content-area').forEach(el => el.classList.remove('active')); e.currentTarget.classList.add('active'); const targetElement = document.getElementById(targetId); if(targetElement) targetElement.classList.add('active'); const pageTitle = document.getElementById('page-title'); if(pageTitle && e.currentTarget.querySelector('span')) pageTitle.textContent = e.currentTarget.querySelector('span').textContent; }); });
         document.getElementById('save-bot-instructions-btn')?.addEventListener('click', async () => { await saveAllUserData(userId); initBotConnection(userId); });
         document.getElementById('edit-lead-form')?.addEventListener('submit', async e => { e.preventDefault(); const leadIndex = leads.findIndex(l => l.id === currentLeadId); if (leadIndex > -1) { leads[leadIndex].nome = document.getElementById('edit-lead-name').value; leads[leadIndex].whatsapp = document.getElementById('edit-lead-whatsapp').value; leads[leadIndex].status = document.getElementById('edit-lead-status').value; await saveAllUserData(userId); updateAllUI(); alert('Lead salvo!'); } });
