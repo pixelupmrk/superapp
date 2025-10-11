@@ -112,7 +112,10 @@
     <div class="modal-overlay" id="custos-modal">
         <div class="modal-content"><span class="close-modal" data-target="custos-modal">&times;</span><h2 id="custos-modal-title">Custos</h2><div id="custos-list"></div><form id="add-custo-form"><div class="input-grid"><input type="text" id="custo-descricao" placeholder="Descrição" required><input type="number" id="custo-valor" placeholder="Valor (R$)" step="0.01" required></div><button type="submit" class="btn-save">Adicionar</button></form></div>
     </div>
-    
+    <div class="anotacoes-aluno">
+    <h3>Suas Anotações</h3>
+    <textarea class="mentoria-notas" id="notas-${mod.moduleId}" rows="8" placeholder="Ex: Ligar para a Maria amanhã às 10h para fechar o contrato."></textarea>
+</div>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
