@@ -1,4 +1,4 @@
-name: CD Seletivo para Micro-Frontends (Super App)
+name: CI/CD Super App - Deploy Seletivo Final
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  # 1. Job Corrigido: detect_changes (em vez de detectar_mudanças)
+  # 1. Job para Detecção de Mudanças (Verifica o que foi alterado)
   detect_changes:
     runs-on: ubuntu-latest
     outputs:
@@ -27,61 +27,75 @@ jobs:
         with:
           filters: |
             app_host:
-              - 'apps/host/**'
+              - 'apps/host/**'          # Pasta do Host App
+              - 'packages/shared/**'    # Se usa código compartilhado
             app_reserva:
-              - 'apps/reserva/**'
-              - 'packages/core/**'
+              - 'apps/reserva/**'       # Pasta do Módulo Reserva
+              - 'packages/shared/**'
 
-  # 2. Job Corrigido: deploy_host (em vez de host_de_implantação)
+  # 2. Job de Deploy para o Módulo HOST (Nome Seguro)
   deploy_host:
+    # Só roda se o Host foi alterado E for um push para main
     if: needs.detect_changes.outputs.app_host == 'true' && github.event_name == 'push' && success()
     needs: detect_changes
     runs-on: ubuntu-latest
-    environment: production_host
+    environment: Production-Host # Nome comum de Ambiente
 
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
         
-      - name: ⚙️ Configurar Node.js e Dependências
+      - name: ⚙️ Configurar Node.js (v20)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: ⬇️ Instalar Dependências e Fazer Build do Host
-        # ⚠️ AJUSTE ESTE COMANDO DE BUILD
         run: |
           npm install
-          npm run build:host
+          npm run build:host # O script de build do Host
         
-      - name: 🚀 Passo de Implantação Real do Host (SEU CÓDIGO AQUI)
-        run: |
-          echo "Executando deploy do Host App..."
-          # ...
+      - name: 🚀 Deploy Exemplo: AWS S3
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          # Credenciais Salvas como Secrets no GitHub
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1 
 
-  # 3. Job Corrigido: deploy_reserva (em vez de implantar_reserva)
+      - name: 🌐 Sincronizar Arquivos com S3
+        # Assume que o build está em './dist/host' e o bucket chama 'super-app-host'
+        run: aws s3 sync ./dist/host s3://super-app-host-bucket/ --delete
+
+  # 3. Job de Deploy para o Módulo RESERVA (Nome Seguro)
   deploy_reserva:
+    # Só roda se o Reserva foi alterado E for um push para main
     if: needs.detect_changes.outputs.app_reserva == 'true' && github.event_name == 'push' && success()
     needs: detect_changes
     runs-on: ubuntu-latest
-    environment: production_reserva
+    environment: Production-Reserva # Nome comum de Ambiente
 
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
         
-      - name: ⚙️ Configurar Node.js e Dependências
+      - name: ⚙️ Configurar Node.js (v20)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: ⬇️ Instalar Dependências e Fazer Build do Reserva
-        # ⚠️ AJUSTE ESTE COMANDO DE BUILD
         run: |
           npm install
-          npm run build:reserva
-        
-      - name: 🚀 Passo de Implantação Real do Reserva (SEU CÓDIGO AQUI)
-        run: |
-          echo "Executando deploy do Módulo Reserva..."
-          # ...
+          npm run build:reserva # O script de build do Reserva
+
+      - name: 🚀 Deploy Exemplo: Vercel
+        uses: amondnet/vercel-action@v20
+        with:
+          # Credenciais Salvas como Secrets no GitHub
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_RESERVA }}
+          vercel-project-name: super-app-reserva
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-args: '--prod'
