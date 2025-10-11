@@ -105,3 +105,15 @@ body.light-theme .msg-from-operator { color: #fff; }
 .modal-actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; }
 .menu-toggle { display: none; font-size: 2rem; cursor: pointer; }
 @media (max-width: 768px) { .sidebar { left: -100%; } .app-container.sidebar-visible .sidebar { left: 0; } .main-content { margin-left: 0; } .menu-toggle { display: block; } .modal-lead-chat .lead-modal-body, .sales-accelerator-container { flex-direction: column; } .sales-accelerator-sidebar { flex-basis: auto; } }
+/* Adicione este código ao final do seu arquivo style.css */
+
+.kanban-card:hover {
+    box-shadow: 0 0 10px var(--accent-color);
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
+}
+
+.kanban-card.dragging {
+    opacity: 0.5;
+    border: 2px dashed var(--accent-color);
+}
