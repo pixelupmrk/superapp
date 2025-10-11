@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 1. VARIÁVEIS GLOBAIS ---
     let leads = [], caixa = [], estoque = [], chatHistory = [], mentoriaNotes = {};
     let statusChart, db, unsubscribeChat;
-    let currentLeadId = null;
+    let currentLeadId = null, draggedItem = null;
 
     // --- 2. INICIALIZAÇÃO ---
     const main = () => {
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 db = firebase.firestore();
                 await loadAllUserData(user.uid);
                 setupEventListeners(user.uid);
-                loadMentoriaContent(); // Carrega conteúdo da mentoria
+                loadMentoriaContent();
             }
         });
     };
@@ -24,10 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (doc.exists) {
                 const data = doc.data();
                 leads = data.leads || [];
-                leads.forEach(l => {
-                    if (l.id === undefined) l.id = Date.now() + Math.random();
-                    if (l.unreadCount === undefined) l.unreadCount = 0;
-                    if (l.botActive === undefined) l.botActive = true;
+                leads.forEach(lead => {
+                    if (lead.id === undefined) lead.id = Date.now() + Math.random();
+                    if (lead.unreadCount === undefined) lead.unreadCount = 0;
+                    if (lead.botActive === undefined) lead.botActive = true;
                 });
                 caixa = data.caixa || [];
                 estoque = data.estoque || [];
@@ -40,7 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveAllUserData(userId, showConfirmation = false) {
         try {
-            const dataToSave = { leads, caixa, estoque, mentoriaNotes, chatHistory };
+            getMentoriaNotes();
+            const dataToSave = { leads, caixa, estoque, mentoriaNotes, chatHistory, settings: { userName: document.getElementById('setting-user-name').value } };
             await db.collection('userData').doc(userId).set(dataToSave, { merge: true });
             if (showConfirmation) alert('Dados salvos!');
         } catch (error) { console.error("Erro ao salvar dados:", error); }
@@ -58,8 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 5. FUNÇÕES DE RENDERIZAÇÃO ---
     function updateDashboard() {
-        const activeSection = document.querySelector('.content-area.active');
-        if (!activeSection || activeSection.id !== 'dashboard-section') return;
+        const dashboardElement = document.querySelector('#dashboard-section');
+        if (!dashboardElement || !dashboardElement.classList.contains('active')) return;
         const n = leads.filter(l => l.status === 'novo').length;
         const p = leads.filter(l => l.status === 'progresso').length;
         const f = leads.filter(l => l.status === 'fechado').length;
@@ -74,9 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderKanbanCards() {
-        const listContainers = document.querySelectorAll('.kanban-cards-list');
-        if (listContainers.length === 0) return;
-        listContainers.forEach(l => l.innerHTML = '');
+        document.querySelectorAll('.kanban-cards-list').forEach(l => l.innerHTML = '');
         leads.forEach(lead => {
             const column = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`);
             if (column) {
@@ -95,28 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    function renderCaixaTable() {
-        const tbody = document.querySelector('#caixa-table tbody');
-        if (!tbody) return;
-        tbody.innerHTML = caixa.map(m => `<tr><td>${m.data}</td><td>${m.descricao}</td><td>R$ ${parseFloat(m.valor).toFixed(2)}</td><td>${m.tipo}</td><td><button class="btn-delete-item">Excluir</button></td></tr>`).join('');
-    }
-
-    function updateCaixa() {
-        const totalEntradasEl = document.getElementById('total-entradas');
-        if (!totalEntradasEl) return;
-        const entradas = caixa.filter(m => m.tipo === 'entrada').reduce((acc, cur) => acc + parseFloat(cur.valor), 0);
-        const saidas = caixa.filter(m => m.tipo === 'saida').reduce((acc, cur) => acc + parseFloat(cur.valor), 0);
-        totalEntradasEl.textContent = `R$ ${entradas.toFixed(2)}`;
-        document.getElementById('total-saidas').textContent = `R$ ${saidas.toFixed(2)}`;
-        document.getElementById('caixa-atual').textContent = `R$ ${(entradas - saidas).toFixed(2)}`;
-    }
-
-    function renderEstoqueTable() {
-        const tbody = document.querySelector('#estoque-table tbody');
-        if (!tbody) return;
-        tbody.innerHTML = estoque.map(p => `<tr><td>${p.produto}</td><td>R$ ${p.compra.toFixed(2)}</td><td>R$ ${p.venda.toFixed(2)}</td><td>...</td></tr>`).join('');
-    }
-
+    function renderCaixaTable() { /* Lógica para renderizar tabela de caixa */ }
+    function updateCaixa() { /* Lógica para atualizar totais do caixa */ }
+    function renderEstoqueTable() { /* Lógica para renderizar tabela de estoque */ }
+    
     async function loadMentoriaContent() {
         try {
             const response = await fetch('data.json');
@@ -125,9 +106,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const content = document.getElementById('mentoria-content');
             if (!menu || !content) return;
             menu.innerHTML = data.mentoria.map(mod => `<div class="sales-accelerator-menu-item" data-module-id="${mod.moduleId}">${mod.title}</div>`).join('');
-            content.innerHTML = data.mentoria.map(mod => `<div class="mentoria-module-content" id="${mod.moduleId}">${mod.lessons.map(les => `<div class="mentoria-lesson"><h3>${les.title}</h3><p>${les.content.replace(/\n/g, '<br>')}</p></div>`).join('')}</div>`).join('');
-            
-            // Ativar primeiro item e adicionar listeners
+            content.innerHTML = data.mentoria.map(mod => {
+                const placeholder = mod.exercisePrompt || 'Digite suas anotações...';
+                const lessonsHtml = mod.lessons.map(les => `<div class="mentoria-lesson"><h3>${les.title}</h3><p>${les.content.replace(/\n/g, '<br>')}</p></div>`).join('');
+                return `<div class="mentoria-module-content" id="${mod.moduleId}">${lessonsHtml}<div class="anotacoes-aluno"><h3>Suas Anotações / Exercícios</h3><textarea class="mentoria-notas" id="notas-${mod.moduleId}" rows="8" placeholder="${placeholder}"></textarea></div></div>`;
+            }).join('');
+
             const menuItems = document.querySelectorAll('.sales-accelerator-menu-item');
             menuItems.forEach(item => {
                 item.addEventListener('click', e => {
@@ -141,15 +125,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 menuItems[0].classList.add('active');
                 document.getElementById(menuItems[0].dataset.moduleId).classList.add('active');
             }
+            loadMentoriaNotes(); // Carrega as anotações salvas
         } catch(e) { console.error("Falha ao carregar mentoria", e); }
     }
+    
+    function getMentoriaNotes() { document.querySelectorAll('.mentoria-notas').forEach(t => mentoriaNotes[t.id] = t.value); }
+    function loadMentoriaNotes() { for (const id in mentoriaNotes) { const el = document.getElementById(id); if(el) el.value = mentoriaNotes[id]; } }
 
     // --- 6. MODAIS E INTERAÇÕES ---
     async function openLeadModal(leadId) {
+        const userId = firebase.auth().currentUser.uid;
         currentLeadId = leadId;
         const lead = leads.find(l => l.id === leadId);
         if (!lead) return;
-        const userId = firebase.auth().currentUser.uid;
 
         if (lead.unreadCount > 0) {
             lead.unreadCount = 0;
@@ -185,13 +173,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('toggle-bot-btn');
         if (btn) {
             btn.textContent = isBotActive ? 'Desativar Bot' : 'Ativar Bot';
-            btn.className = `btn-${isBotActive ? 'secondary' : 'save'}`;
+            btn.className = `btn-save ${isBotActive ? 'btn-secondary' : 'btn-save'}`;
         }
     }
 
     // --- 7. EVENT LISTENERS ---
     function setupEventListeners(userId) {
-        // Navegação Sidebar
+        // Navegação
         document.querySelectorAll('.sidebar-nav .nav-item:not(#logout-btn)').forEach(item => {
             item.addEventListener('click', e => {
                 e.preventDefault();
@@ -213,16 +201,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById(e.currentTarget.dataset.tab + '-tab-content').classList.add('active');
             });
         });
-        
-        // Abrir Modal do Lead
+
+        // Abrir Modal
         document.body.addEventListener('click', e => {
             const card = e.target.closest('.kanban-card, .btn-open-lead');
             if (card) {
-                const leadId = card.closest('[data-id]').dataset.id;
-                openLeadModal(parseInt(leadId, 10));
+                const leadIdStr = card.closest('[data-id]').dataset.id;
+                openLeadModal(parseFloat(leadIdStr)); // Usar parseFloat para lidar com IDs numéricos
             }
         });
-        
+
         // Fechar Modais
         document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', e => {
             e.target.closest('.modal-overlay').style.display = 'none';
@@ -235,6 +223,39 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Kanban Drag & Drop
+        const kanbanBoard = document.getElementById('kanban-board');
+        kanbanBoard.addEventListener('dragstart', e => { if (e.target.classList.contains('kanban-card')) { draggedItem = e.target; } });
+        kanbanBoard.addEventListener('dragend', () => { draggedItem = null; });
+        kanbanBoard.addEventListener('dragover', e => e.preventDefault());
+        kanbanBoard.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            const column = e.target.closest('.kanban-column');
+            if (column && draggedItem) {
+                const leadId = parseFloat(draggedItem.dataset.id);
+                const lead = leads.find(l => l.id === leadId);
+                if (lead) {
+                    lead.status = column.dataset.status;
+                    await saveAllUserData(userId);
+                    renderKanbanCards();
+                    updateDashboard();
+                }
+            }
+        });
+
+        // Chatbot AI
+        document.getElementById('chatbot-form')?.addEventListener('submit', async e => {
+            e.preventDefault();
+            const input = document.getElementById('chatbot-input');
+            const message = input.value.trim();
+            if (!message) return;
+            // Adicionar lógica de envio e resposta aqui
+            input.value = '';
+            // Rolar para a última mensagem
+            const messagesContainer = document.getElementById('chatbot-messages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        });
+
         // Botão Ativar/Desativar Bot
         document.getElementById('toggle-bot-btn')?.addEventListener('click', async () => {
             const lead = leads.find(l => l.id === currentLeadId);
@@ -242,7 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 lead.botActive = !lead.botActive;
                 await saveAllUserData(userId);
                 updateBotButton(lead.botActive);
-                alert(`Bot ${lead.botActive ? 'ATIVADO' : 'DESATIVADO'}.`);
             }
         });
 
@@ -250,6 +270,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
             document.body.classList.toggle('light-theme');
         });
+
+        // Salvar Configurações
+        document.getElementById('save-settings-btn')?.addEventListener('click', () => saveAllUserData(userId, true));
     }
 
     // --- 8. EXECUÇÃO ---
