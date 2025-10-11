@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let leads = [], caixa = [], estoque = [], chatHistory = [], mentoriaNotes = {};
     let statusChart, db, unsubscribeChat;
     let currentLeadId = null, draggedItem = null;
+    const BOT_BACKEND_URL = 'https://superapp-whatsapp-bot.onrender.com';
 
     // --- 2. INICIALIZAÇÃO ---
     const main = () => {
@@ -112,8 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
             menu.innerHTML = data.mentoria.map(mod => `<div class="sales-accelerator-menu-item" data-module-id="${mod.moduleId}">${mod.title}</div>`).join('');
             content.innerHTML = data.mentoria.map(mod => {
                 const placeholder = mod.exercisePrompt || 'Digite suas anotações...';
-                const lessonsHtml = mod.lessons.map(les => `<div class="mentoria-lesson"><h3>${les.title}</h3><p>${les.content.replace(/\n/g, '<br>')}</p></div>`).join('');
-                return `<div class="mentoria-module-content" id="${mod.moduleId}">${lessonsHtml}<div class="anotacoes-aluno"><h3>Suas Anotações / Exercícios</h3><textarea class="mentoria-notas" id="notas-${mod.moduleId}" rows="8" placeholder="${placeholder}"></textarea></div></div>`;
+                const lessonsHtml = mod.lessons.map(les => `<div class="card mentoria-lesson"><h3>${les.title}</h3><p>${les.content.replace(/\n/g, '<br>')}</p></div>`).join('');
+                return `<div class="mentoria-module-content" id="${mod.moduleId}">${lessonsHtml}<div class="anotacoes-aluno card"><h3>Suas Anotações / Exercícios</h3><textarea class="mentoria-notas" id="notas-${mod.moduleId}" rows="8" placeholder="${placeholder}"></textarea></div></div>`;
             }).join('');
 
             const menuItems = document.querySelectorAll('.sales-accelerator-menu-item');
@@ -245,22 +246,78 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
+        
+        // Adicionar novo Lead
+        document.getElementById('lead-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newLead = {
+                id: Date.now(),
+                nome: document.getElementById('lead-name').value,
+                whatsapp: document.getElementById('lead-whatsapp').value,
+                status: document.getElementById('lead-status-form').value,
+                unreadCount: 0,
+                botActive: true
+            };
+            leads.push(newLead);
+            await saveAllUserData(userId);
+            updateAllUI();
+            e.target.reset();
+        });
 
         // Chatbot AI
         document.getElementById('chatbot-form')?.addEventListener('submit', async e => {
             e.preventDefault();
             const input = document.getElementById('chatbot-input');
             const messagesContainer = document.getElementById('chatbot-messages');
-            const message = input.value.trim();
-            if (!message) return;
+            const userMessage = input.value.trim();
+            if (!userMessage) return;
             
-            chatHistory.push({role: 'user', parts: [{ text: message }]});
-            messagesContainer.innerHTML += `<div class="user-message">${message}</div>`;
+            chatHistory.push({role: 'user', parts: [{ text: userMessage }]});
+            messagesContainer.innerHTML += `<div class="user-message">${userMessage}</div>`;
             input.value = '';
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            try {
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ history: chatHistory.slice(0, -1), prompt: userMessage })
+                });
+                if (!response.ok) throw new Error('Falha na API');
+                const data = await response.json();
+                chatHistory.push({role: 'model', parts: [{ text: data.text }]});
+                messagesContainer.innerHTML += `<div class="bot-message">${data.text}</div>`;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                await saveAllUserData(userId);
+            } catch (error) {
+                console.error("Erro no Chatbot AI:", error);
+                messagesContainer.innerHTML += `<div class="bot-message">Desculpe, não consegui responder. Tente novamente.</div>`;
+            }
+        });
 
-            // Lógica de resposta (pode ser API do Gemini)
-            // ...
+        // Botão Gerar QR Code
+        document.getElementById('save-bot-instructions-btn')?.addEventListener('click', () => {
+            const botInstructions = document.getElementById('bot-instructions').value;
+            // Salvar instruções antes de conectar
+            db.collection('userData').doc(userId).set({ botInstructions }, { merge: true });
+            
+            const connectionArea = document.getElementById('bot-connection-area');
+            connectionArea.innerHTML = '<p>Iniciando conexão... Aguarde o QR Code.</p>';
+            
+            const eventSource = new EventSource(`${BOT_BACKEND_URL}/events?userId=${userId}`);
+            eventSource.onmessage = event => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'qr') {
+                    connectionArea.innerHTML = `<h3>Escaneie o QR Code</h3><img src="${data.data}" alt="QR Code do WhatsApp">`;
+                    eventSource.close();
+                } else if (data.type === 'status') {
+                    connectionArea.innerHTML = `<p style="color: lightgreen;">Status: ${data.data}</p>`;
+                }
+            };
+            eventSource.onerror = () => {
+                connectionArea.innerHTML = '<p style="color: red;">Erro ao conectar com o servidor do bot.</p>';
+                eventSource.close();
+            };
         });
 
         // Botão Ativar/Desativar Bot
