@@ -1,51 +1,17 @@
-name: CD Seletivo para Micro-Frontends (Super App)
+name: Deploy do Host - Sempre no Push
 
 on:
   push:
     branches:
-      - main
-  # Este workflow também pode rodar em Pull Requests para fins de CI,
-  # mas o deploy só ocorrerá em 'push' para a main (ver condições 'if').
-  pull_request:
-    branches:
-      - main
+      - main # Dispara o deploy quando há push na branch principal
 
 jobs:
-  # 1. Job para Detectar Mudanças
-  # Ele verifica quais pastas foram alteradas e armazena o resultado.
-  detect_changes:
+  # Job de Deploy para o Módulo HOST
+  host_de_implantação:
+    # ⚠️ A condição de filtro seletivo foi REMOVIDA.
+    # Este job será executado em TODO push na branch 'main'.
     runs-on: ubuntu-latest
-    outputs:
-      app_host: ${{ steps.filter.outputs.app_host }}
-      app_reserva: ${{ steps.filter.outputs.app_reserva }}
-    steps:
-      - name: Checkout do Código
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Necessário para a action de filtro funcionar corretamente
-
-      - name: 🔎 Verificar Arquivos Alterados
-        uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            app_host:
-              - 'apps/host/**'    # Acionado se algo mudar no código do Host
-              - 'packages/core/**'  # Exemplo: se houver mudança em libs comuns
-            app_reserva:
-              - 'apps/reserva/**' # Acionado se algo mudar no módulo Reserva
-              - 'packages/core/**'
-
-  # 2. Job de Deploy para o Módulo HOST
-  deploy_host:
-    # ⚠️ Esta condição de 'if' garante que o job SÓ roda se:
-    # 1. O módulo 'host' foi alterado (detectado acima) E
-    # 2. O evento foi um 'push' (não um Pull Request) E
-    # 3. O job anterior passou.
-    if: needs.detect_changes.outputs.app_host == 'true' && github.event_name == 'push' && success()
-    needs: detect_changes
-    runs-on: ubuntu-latest
-    environment: production_host # ⚠️ Defina este ambiente nas Configurações do GitHub
+    environment: production_host # ⚠️ Mantenha o ambiente para segurança
 
     steps:
       - name: Checkout do Código
@@ -57,49 +23,18 @@ jobs:
           node-version: '20'
 
       - name: ⬇️ Instalar Dependências e Fazer Build do Host
-        # Use 'npm run build' ou o comando específico do seu monorepo (e.g., Lerna, Nx)
+        # VERIFIQUE E AJUSTE ESTES COMANDOS PARA SEU MONOREPO
         run: |
           npm install
-          # Ajuste este comando para o seu build:
-          npm run build:host # Exemplo de script que faz o build do app/host
+          # Exemplo: npm run build:host (seu script de build)
+          npm run build:host
         
-      - name: 🚀 Passo de Implantação Real do Host (ADAPTE AQUI!)
-        # SUBSTITUA ESTE RUN PELO SEU CÓDIGO DE DEPLOY.
-        # Exemplo com Vercel/Firebase/AWS/Azure:
+      - name: 🚀 Passo de Implantação Real do Host (SEU CÓDIGO AQUI)
+        # SUBSTITUA ESTE ECHO pelo seu comando real de deploy (Vercel, AWS, etc.)
         run: |
           echo "Iniciando deploy do Host App..."
           # Ex: vercel deploy --prebuilt --prod
-          # Ex: firebase deploy --only hosting:host-app
-          # Ex: aws s3 sync ./dist/host-app s3://host-bucket/
           echo "Deploy do Host App concluído!"
 
-
-  # 3. Job de Deploy para o Módulo RESERVA
-  deploy_reserva:
-    # ⚠️ Condição de 'if' para rodar SÓ se o módulo 'reserva' foi alterado
-    if: needs.detect_changes.outputs.app_reserva == 'true' && github.event_name == 'push' && success()
-    needs: detect_changes
-    runs-on: ubuntu-latest
-    environment: production_reserva # ⚠️ Defina este ambiente nas Configurações do GitHub
-
-    steps:
-      - name: Checkout do Código
-        uses: actions/checkout@v4
-        
-      - name: ⚙️ Configurar Node.js e Dependências
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: ⬇️ Instalar Dependências e Fazer Build do Reserva
-        run: |
-          npm install
-          # Ajuste este comando para o seu build:
-          npm run build:reserva # Exemplo de script que faz o build do app/reserva
-        
-      - name: 🚀 Passo de Implantação Real do Reserva (ADAPTE AQUI!)
-        # SUBSTITUA ESTE RUN PELO SEU CÓDIGO DE DEPLOY.
-        run: |
-          echo "Iniciando deploy do Módulo Reserva..."
-          # Ex: aws s3 sync ./dist/reserva-app s3://reserva-bucket/
-          echo "Deploy do Módulo Reserva concluído!"
+  # O Job 'implantar_reserva' foi removido desta versão simplificada.
+  # Se você precisar dele, use a mesma estrutura sem a condição 'if'.
