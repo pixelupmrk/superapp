@@ -111,6 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkTheme() { const theme = localStorage.getItem('theme'); const btn = document.getElementById('theme-toggle-btn'); if (theme === 'light') { document.body.classList.add('light-theme'); if (btn) btn.textContent = 'Mudar para Tema Escuro'; } else { document.body.classList.remove('light-theme'); if (btn) btn.textContent = 'Mudar para Tema Claro'; } }
     function toggleTheme() { document.body.classList.toggle('light-theme'); localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark'); checkTheme(); }
     
+    async function handleChatbotSubmit(userId) { /* ...código do chatbot... */ }
+    
     // --- FUNÇÃO PRINCIPAL (PONTO DE ENTRADA) ---
     async function main() {
         await loadMentoriaContent();
