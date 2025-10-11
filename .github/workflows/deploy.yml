@@ -1,67 +1,45 @@
-# Arquivo: .github/workflows/selective-deploy.yml
-name: CD Seletivo para Micro-Frontends (Super App)
+name: Deploy Completo - Todos os Módulos
 
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
-      - main
+      - main # Dispara o deploy quando há push na branch principal
 
 jobs:
-  # 1. Job para Detectar Mudanças
-  detect_changes:
-    runs-on: ubuntu-latest
-    outputs:
-      app_host: ${{ steps.filter.outputs.app_host }}
-      app_booking: ${{ steps.filter.outputs.app_booking }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3 # Action para filtrar arquivos alterados
-        id: filter
-        with:
-          filters: |
-            app_host:
-              - 'apps/host/**'    # Acionado se algo mudar no código do Host
-            app_booking:
-              - 'apps/booking/**' # Acionado se algo mudar no módulo Booking
-              - 'packages/shared/**' # Acionado se algo mudar em pacotes compartilhados
-
-  # 2. Job de Deploy para o Módulo HOST
+  # Job de Deploy para o Módulo HOST
   deploy_host:
-    # Roda SOMENTE se o módulo Host foi alterado
-    if: needs.detect_changes.outputs.app_host == 'true' && github.event_name == 'push'
-    needs: detect_changes
     runs-on: ubuntu-latest
-    environment: production_host # Ambiente específico do Host App
+    environment: production_host
 
     steps:
       - uses: actions/checkout@v4
       
       # [ADAPTAR] Etapas de Build e Deploy para o Módulo Host
-      - name: Build do Host App
-        run: cd apps/host && npm install && npm run build
+      - name: Instalar e Build do Host App
+        run: |
+          cd apps/host
+          npm install
+          npm run build
         
-      - name: Deploy do Host App
-        run: echo "Fazendo deploy do Host App..."
-        # ... (Sua Action de Deploy)
+      - name: Deploy do Host App (EXEMPLO AWS)
+        run: echo "Fazendo deploy do Host App na AWS..."
+        # ADICIONE A SUA ACTION DE DEPLOY AQUI!
 
-  # 3. Job de Deploy para o Módulo BOOKING
-  deploy_booking:
-    # Roda SOMENTE se o módulo Booking foi alterado
-    if: needs.detect_changes.outputs.app_booking == 'true' && github.event_name == 'push'
-    needs: detect_changes
+  # Job de Deploy para o Módulo RESERVA
+  deploy_reserva:
     runs-on: ubuntu-latest
-    environment: production_booking # Ambiente específico do Módulo Booking
+    environment: production_reserva
 
     steps:
       - uses: actions/checkout@v4
       
-      # [ADAPTAR] Etapas de Build e Deploy para o Módulo Booking
-      - name: Build do Módulo Booking
-        run: cd apps/booking && npm install && npm run build
+      # [ADAPTAR] Etapas de Build e Deploy para o Módulo Reserva
+      - name: Instalar e Build do Módulo Reserva
+        run: |
+          cd apps/reserva # Ajuste o caminho da sua pasta
+          npm install
+          npm run build
         
-      - name: Deploy do Módulo Booking
-        run: echo "Fazendo deploy do Módulo Booking..."
-        # ... (Sua Action de Deploy)
+      - name: Deploy do Módulo Reserva (EXEMPLO GOOGLE CLOUD)
+        run: echo "Fazendo deploy do Módulo Reserva no Google Cloud..."
+        # ADICIONE A SUA ACTION DE DEPLOY AQUI!
