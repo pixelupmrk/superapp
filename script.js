@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderEstoqueTable() { const t = document.querySelector('#estoque-table tbody'); if(!t) return; t.innerHTML = estoque.map(p => { const totalCustos = p.custos?.reduce((a, c) => a + c.valor, 0) || 0; const lucro = p.venda - p.compra - totalCustos; return `<tr data-id="${p.id}"><td>${p.produto}</td><td>R$ ${p.compra.toFixed(2)}</td><td>R$ ${totalCustos.toFixed(2)}</td><td>R$ ${p.venda.toFixed(2)}</td><td>R$ ${lucro.toFixed(2)}</td><td><button class="btn-table-action btn-custo">Custos</button><button class="btn-table-action btn-delete-item btn-delete-estoque">Excluir</button></td></tr>`}).join(''); }
     function renderCustosList(produto) { const list = document.getElementById('custos-list'); if (!produto.custos || produto.custos.length === 0) { list.innerHTML = '<p>Nenhum custo adicionado.</p>'; return; } list.innerHTML = produto.custos.map(c => `<div><span>${c.descricao}</span><span>R$ ${c.valor.toFixed(2)}</span></div>`).join(''); }
     function renderChatHistory() { const container = document.getElementById('chatbot-messages'); if (!container) return; container.innerHTML = ''; if (chatHistory.length === 0) { addMessageToChat("Olá! Como posso ajudar?", 'bot-message'); } else { chatHistory.forEach(m => addMessageToChat(m.parts[0].text, m.role === 'user' ? 'user-message' : 'bot-message')); } }
-    function renderMentoria(mentoriaData) { const menu = document.getElementById('mentoria-menu'); const content = document.getElementById('mentoria-content'); if (!menu || !content || !mentoriaData) return; menu.innerHTML = mentoriaData.map(mod => `<div class="sales-accelerator-menu-item" data-module-id="${mod.moduleId}">${mod.title}</div>`).join(''); content.innerHTML = mentoriaData.map(mod => { const lessonsHtml = mod.lessons.map(les => `<div class="mentoria-lesson"><h3>${les.title}</h3><p>${les.content.replace(/\n/g, '<br>')}</p></div>`).join(''); return `<div class="mentoria-module-content" id="${mod.moduleId}">${lessonsHtml}<div class="anotacoes-aluno"><textarea class="mentoria-notas" id="notas-${mod.moduleId}" rows="8" placeholder="Suas anotações..."></textarea></div></div>`; }).join(''); document.querySelectorAll('.sales-accelerator-menu-item').forEach(item => { item.addEventListener('click', e => { e.preventDefault(); document.querySelectorAll('.sales-accelerator-menu-item, .mentoria-module-content').forEach(el => el.classList.remove('active')); e.currentTarget.classList.add('active'); document.getElementById(e.currentTarget.dataset.moduleId).classList.add('active'); }); }); const firstMenuItem = document.querySelector('.sales-accelerator-menu-item'); if (firstMenuItem) { firstMenuItem.classList.add('active'); document.getElementById(firstMenuItem.dataset.moduleId).classList.add('active'); } }
+    function renderMentoria(mentoriaData) { const menu = document.getElementById('mentoria-menu'); const content = document.getElementById('mentoria-content'); if (!menu || !content || !mentoriaData) return; menu.innerHTML = mentoriaData.map(mod => `<div class="sales-accelerator-menu-item" data-module-id="${mod.moduleId}">${mod.title}</div>`).join(''); content.innerHTML = mentoriaData.map(mod => { const lessonsHtml = mod.lessons.map(les => `<div class="mentoria-lesson"><h3>${les.title}</h3><p>${les.content.replace(/\n/g, '<br>')}</p></div>`).join(''); return `<div class="mentoria-module-content" id="${mod.moduleId}">${lessonsHtml}<div class="anotacoes-aluno"><h3>Suas Anotações</h3><textarea class="mentoria-notas" id="notas-${mod.moduleId}" rows="8" placeholder="Ex: Falar com o cliente X sobre a nova proposta de valor na segunda-feira."></textarea></div></div>`; }).join(''); document.querySelectorAll('.sales-accelerator-menu-item').forEach(item => { item.addEventListener('click', e => { e.preventDefault(); document.querySelectorAll('.sales-accelerator-menu-item, .mentoria-module-content').forEach(el => el.classList.remove('active')); e.currentTarget.classList.add('active'); document.getElementById(e.currentTarget.dataset.moduleId).classList.add('active'); }); }); const firstMenuItem = document.querySelector('.sales-accelerator-menu-item'); if (firstMenuItem) { firstMenuItem.classList.add('active'); document.getElementById(firstMenuItem.dataset.moduleId).classList.add('active'); } }
 
     // Funções de Lógica Principal
     function updateAllUI() { renderKanbanCards(); renderLeadsTable(); updateDashboard(); renderCaixaTable(); updateCaixa(); renderEstoqueTable(); }
@@ -65,7 +65,65 @@ document.addEventListener('DOMContentLoaded', () => {
     async function saveAllUserData(userId, showConfirmation = false) { getMentoriaNotes(); const settings = { userName: document.getElementById('setting-user-name').value || 'Usuário' }; const botInstructions = document.getElementById('bot-instructions').value; const dataToSave = { leads, caixa, estoque, mentoriaNotes, chatHistory, settings, botInstructions }; await db.collection('userData').doc(userId).set({ ...dataToSave }, { merge: true }); if (showConfirmation) alert('Configurações salvas!'); }
 
     function setupEventListeners(userId) {
+        // Navegação principal
         document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => { item.addEventListener('click', e => { e.preventDefault(); if (e.currentTarget.id === 'logout-btn') return; const targetId = e.currentTarget.getAttribute('data-target'); document.querySelectorAll('.sidebar-nav .nav-item, .content-area').forEach(el => el.classList.remove('active')); e.currentTarget.classList.add('active'); const targetElement = document.getElementById(targetId); if(targetElement) targetElement.classList.add('active'); const pageTitle = document.getElementById('page-title'); if(pageTitle && e.currentTarget.querySelector('span')) pageTitle.textContent = e.currentTarget.querySelector('span').textContent; }); });
+
+        // Navegação Financeiro (Caixa/Custos)
+        document.querySelectorAll('.finance-nav .finance-tab').forEach(tab => {
+            tab.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelectorAll('.finance-nav .finance-tab, .finance-content').forEach(el => el.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                const tabContentId = `${e.currentTarget.dataset.tab}-tab-content`;
+                document.getElementById(tabContentId)?.classList.add('active');
+            });
+        });
+
+        // Kanban Drag and Drop e Clique
+        const kanbanBoard = document.getElementById('kanban-board');
+        kanbanBoard.addEventListener('dragstart', e => { if (e.target.classList.contains('kanban-card')) { draggedItem = e.target; setTimeout(() => e.target.style.display = 'none', 0); } });
+        kanbanBoard.addEventListener('dragend', e => { if (draggedItem) { setTimeout(() => { draggedItem.style.display = 'block'; draggedItem = null; }, 0); } });
+        kanbanBoard.addEventListener('dragover', e => e.preventDefault());
+        kanbanBoard.addEventListener('drop', async e => {
+            const column = e.target.closest('.kanban-column');
+            if (column && draggedItem) {
+                const leadId = draggedItem.dataset.id;
+                const newStatus = column.dataset.status;
+                const leadIndex = leads.findIndex(l => l.id === leadId);
+                if (leadIndex > -1) {
+                    leads[leadIndex].status = newStatus;
+                    await saveAllUserData(userId);
+                    updateAllUI();
+                }
+            }
+        });
+
+        kanbanBoard.addEventListener('click', e => {
+            const card = e.target.closest('.kanban-card');
+            if(card) openLeadModal(card.dataset.id, userId);
+        });
+
+        // Lista de Leads Clique
+        document.getElementById('leads-table')?.addEventListener('click', e => {
+            if (e.target.classList.contains('btn-open-lead')) {
+                const leadId = e.target.closest('tr').dataset.id;
+                openLeadModal(leadId, userId);
+            }
+        });
+
+        // Fechar Modais
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const modalId = e.currentTarget.dataset.target;
+                document.getElementById(modalId).style.display = 'none';
+                if (unsubscribeChat) {
+                    unsubscribeChat();
+                    unsubscribeChat = null;
+                }
+            });
+        });
+
+
         document.getElementById('save-bot-instructions-btn')?.addEventListener('click', async () => { await saveAllUserData(userId); initBotConnection(userId); });
         document.getElementById('edit-lead-form')?.addEventListener('submit', async e => { e.preventDefault(); const leadIndex = leads.findIndex(l => l.id === currentLeadId); if (leadIndex > -1) { leads[leadIndex].nome = document.getElementById('edit-lead-name').value; leads[leadIndex].whatsapp = document.getElementById('edit-lead-whatsapp').value; leads[leadIndex].status = document.getElementById('edit-lead-status').value; await saveAllUserData(userId); updateAllUI(); alert('Lead salvo!'); } });
         document.getElementById('toggle-bot-btn')?.addEventListener('click', async () => { const leadIndex = leads.findIndex(l => l.id === currentLeadId); if (leadIndex > -1) { if (leads[leadIndex].botActive === undefined) { leads[leadIndex].botActive = false; } else { leads[leadIndex].botActive = !leads[leadIndex].botActive; } await saveAllUserData(userId); updateBotButton(leads[leadIndex].botActive); alert(`Bot ${leads[leadIndex].botActive ? 'ATIVADO' : 'DESATIVADO'} para este lead.`); } });
@@ -120,7 +178,46 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error("Erro ao carregar mentoria:", error); }
     }
 
-    async function handleChatbotSubmit(userId) { /* ...código do chatbot... */ }
+    async function handleChatbotSubmit(userId) {
+        const userInput = document.getElementById('chatbot-input');
+        const userMessage = userInput.value.trim();
+        if (!userMessage) return;
+
+        addMessageToChat(userMessage, 'user-message');
+        chatHistory.push({ role: 'user', parts: [{ text: userMessage }] });
+        userInput.value = '';
+
+        const loadingMessage = addMessageToChat('Digitando...', 'bot-message loading');
+
+        try {
+            const response = await fetch('/api/gemini', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    history: chatHistory.slice(0, -1), // Envia o histórico sem a última pergunta
+                    prompt: userMessage
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Erro na API');
+            }
+
+            const data = await response.json();
+            const botMessage = data.text;
+
+            loadingMessage.remove();
+            addMessageToChat(botMessage, 'bot-message');
+            chatHistory.push({ role: 'model', parts: [{ text: botMessage }] });
+            
+            await saveAllUserData(userId);
+
+        } catch (error) {
+            loadingMessage.textContent = 'Desculpe, não consegui responder. Tente novamente.';
+            console.error("Erro no chatbot:", error);
+        }
+    }
 
     // --- FUNÇÃO PRINCIPAL (PONTO DE ENTRADA) ---
     async function main() {
