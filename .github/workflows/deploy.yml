@@ -1,17 +1,43 @@
-name: Deploy do Host - Sempre no Push
+name: CD Seletivo para Micro-Frontends (Super App)
 
 on:
   push:
     branches:
-      - main # Dispara o deploy quando há push na branch principal
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  # Job de Deploy para o Módulo HOST
-  host_de_implantação:
-    # ⚠️ A condição de filtro seletivo foi REMOVIDA.
-    # Este job será executado em TODO push na branch 'main'.
+  # 1. Job Corrigido: detect_changes (em vez de detectar_mudanças)
+  detect_changes:
     runs-on: ubuntu-latest
-    environment: production_host # ⚠️ Mantenha o ambiente para segurança
+    outputs:
+      app_host: ${{ steps.filter.outputs.app_host }}
+      app_reserva: ${{ steps.filter.outputs.app_reserva }}
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔎 Verificar Arquivos Alterados
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            app_host:
+              - 'apps/host/**'
+            app_reserva:
+              - 'apps/reserva/**'
+              - 'packages/core/**'
+
+  # 2. Job Corrigido: deploy_host (em vez de host_de_implantação)
+  deploy_host:
+    if: needs.detect_changes.outputs.app_host == 'true' && github.event_name == 'push' && success()
+    needs: detect_changes
+    runs-on: ubuntu-latest
+    environment: production_host
 
     steps:
       - name: Checkout do Código
@@ -23,18 +49,39 @@ jobs:
           node-version: '20'
 
       - name: ⬇️ Instalar Dependências e Fazer Build do Host
-        # VERIFIQUE E AJUSTE ESTES COMANDOS PARA SEU MONOREPO
+        # ⚠️ AJUSTE ESTE COMANDO DE BUILD
         run: |
           npm install
-          # Exemplo: npm run build:host (seu script de build)
           npm run build:host
         
       - name: 🚀 Passo de Implantação Real do Host (SEU CÓDIGO AQUI)
-        # SUBSTITUA ESTE ECHO pelo seu comando real de deploy (Vercel, AWS, etc.)
         run: |
-          echo "Iniciando deploy do Host App..."
-          # Ex: vercel deploy --prebuilt --prod
-          echo "Deploy do Host App concluído!"
+          echo "Executando deploy do Host App..."
+          # ...
 
-  # O Job 'implantar_reserva' foi removido desta versão simplificada.
-  # Se você precisar dele, use a mesma estrutura sem a condição 'if'.
+  # 3. Job Corrigido: deploy_reserva (em vez de implantar_reserva)
+  deploy_reserva:
+    if: needs.detect_changes.outputs.app_reserva == 'true' && github.event_name == 'push' && success()
+    needs: detect_changes
+    runs-on: ubuntu-latest
+    environment: production_reserva
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+        
+      - name: ⚙️ Configurar Node.js e Dependências
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: ⬇️ Instalar Dependências e Fazer Build do Reserva
+        # ⚠️ AJUSTE ESTE COMANDO DE BUILD
+        run: |
+          npm install
+          npm run build:reserva
+        
+      - name: 🚀 Passo de Implantação Real do Reserva (SEU CÓDIGO AQUI)
+        run: |
+          echo "Executando deploy do Módulo Reserva..."
+          # ...
