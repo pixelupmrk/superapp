@@ -2,13 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 1. DECLARAÇÃO DE VARIÁVEIS GLOBAIS ---
     let leads = [], caixa = [], estoque = [], chatHistory = [], mentoriaNotes = {};
     let statusChart, db, unsubscribeChat;
-    let currentLeadId = null;
+    let currentLeadId = null, draggedItem = null;
 
     // --- 2. FUNÇÃO PRINCIPAL (INICIALIZAÇÃO) ---
     const main = async () => {
         firebase.auth().onAuthStateChanged(async user => {
             if (user && !document.body.dataset.initialized) {
-                document.body.dataset.initialized = 'true';
+                document.body.setAttribute('data-initialized', 'true');
                 db = firebase.firestore();
                 await loadAllUserData(user.uid);
                 setupEventListeners(user.uid);
@@ -29,42 +29,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 caixa = data.caixa || [];
                 estoque = data.estoque || [];
+                // Carregar outros dados como mentoria, chat, etc.
+                mentoriaNotes = data.mentoriaNotes || {};
+                chatHistory = data.chatHistory || {};
             }
-            // Chama a função para desenhar TUDO na tela após carregar os dados
-            updateAllUI();
+            updateAllUI(); // Agora isso vai renderizar tudo
         } catch (error) {
             console.error("Erro Crítico ao carregar dados do usuário:", error);
-            alert("Não foi possível carregar os dados. Verifique o console para mais detalhes.");
         }
     }
 
-    async function saveAllUserData(userId) {
+    async function saveAllUserData(userId, showConfirmation = false) {
         try {
-            // Inclua todas as variáveis que precisam ser salvas
             const dataToSave = { leads, caixa, estoque, mentoriaNotes, chatHistory };
             await db.collection('userData').doc(userId).set(dataToSave, { merge: true });
+            if (showConfirmation) {
+                alert('Dados salvos com sucesso!');
+            }
         } catch (error) {
             console.error("Erro ao salvar dados:", error);
         }
     }
 
-    // --- 4. FUNÇÃO CENTRAL DE ATUALIZAÇÃO DA UI (CORRIGIDA) ---
+    // --- 4. FUNÇÃO CENTRAL DE ATUALIZAÇÃO DA UI ---
     function updateAllUI() {
-        // Comandos que faltavam:
         updateDashboard();
+        renderKanbanCards();
+        renderLeadsTable();
         renderCaixaTable();
         updateCaixa();
         renderEstoqueTable();
-        
-        // Comandos que já estavam:
-        renderKanbanCards();
-        renderLeadsTable();
     }
 
-    // --- 5. FUNÇÕES DE RENDERIZAÇÃO ESPECÍFICAS ---
+    // --- 5. FUNÇÕES DE RENDERIZAÇÃO ESPECÍFICAS (COMPLETAS) ---
     function updateDashboard() {
         const dashboardElement = document.getElementById('dashboard-section');
-        if (!dashboardElement || dashboardElement.style.display === 'none' && !dashboardElement.classList.contains('active')) return;
+        if (!dashboardElement || !dashboardElement.classList.contains('active')) return;
 
         const n = leads.filter(l => l.status === 'novo').length;
         const p = leads.filter(l => l.status === 'progresso').length;
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const ctx = document.getElementById('statusChart')?.getContext('2d');
         if (!ctx) return;
         if (statusChart) statusChart.destroy();
-        statusChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Novo', 'Progresso', 'Fechado'], datasets: [{ data: [n, p, f], backgroundColor: ['#00f7ff', '#ffc107', '#28a745'], borderWidth: 0 }] } });
+        statusChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Novo', 'Progresso', 'Fechado'], datasets: [{ data: [n, p, f], backgroundColor: ['#00f7ff', '#ffc107', '#28a745'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false } });
     }
 
     function renderKanbanCards() {
@@ -101,10 +101,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
         }
     }
+    
+    function renderCaixaTable() {
+        const tbody = document.querySelector('#caixa-table tbody');
+        if (tbody) {
+            tbody.innerHTML = caixa.map(m => `<tr><td>${m.data}</td><td>${m.descricao}</td><td>R$ ${parseFloat(m.valor).toFixed(2)}</td><td>${m.tipo}</td><td><button class="btn-delete-item">Excluir</button></td></tr>`).join('');
+        }
+    }
 
-    function renderCaixaTable() { /* Adicione a lógica para renderizar a tabela do caixa */ }
-    function updateCaixa() { /* Adicione a lógica para atualizar os totais do caixa */ }
-    function renderEstoqueTable() { /* Adicione a lógica para renderizar a tabela de estoque */ }
+    function updateCaixa() {
+        const entradas = caixa.filter(m => m.tipo === 'entrada').reduce((acc, cur) => acc + parseFloat(cur.valor), 0);
+        const saidas = caixa.filter(m => m.tipo === 'saida').reduce((acc, cur) => acc + parseFloat(cur.valor), 0);
+        document.getElementById('total-entradas').textContent = `R$ ${entradas.toFixed(2)}`;
+        document.getElementById('total-saidas').textContent = `R$ ${saidas.toFixed(2)}`;
+        document.getElementById('caixa-atual').textContent = `R$ ${(entradas - saidas).toFixed(2)}`;
+    }
+
+    function renderEstoqueTable() {
+        const tbody = document.querySelector('#estoque-table tbody');
+        if (tbody) {
+            tbody.innerHTML = estoque.map(p => `<tr><td>${p.produto}</td><td>R$ ${p.compra.toFixed(2)}</td><td>R$ ${p.venda.toFixed(2)}</td><td>...</td></tr>`).join('');
+        }
+    }
 
     // --- 6. FUNÇÕES DE INTERAÇÃO E MODAIS ---
     async function openLeadModal(leadId) {
@@ -150,26 +168,65 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 7. SETUP DE EVENT LISTENERS ---
+    // --- 7. SETUP DE EVENT LISTENERS (COMPLETO) ---
     function setupEventListeners(userId) {
-        document.body.addEventListener('click', e => {
-            const kanbanCard = e.target.closest('.kanban-card');
-            if (kanbanCard) openLeadModal(parseInt(kanbanCard.dataset.id, 10));
+        // Navegação principal do Sidebar
+        document.querySelectorAll('.sidebar-nav .nav-item:not(#logout-btn)').forEach(item => {
+            item.addEventListener('click', e => {
+                e.preventDefault();
+                const targetId = e.currentTarget.dataset.target;
+                document.querySelectorAll('.sidebar-nav .nav-item, .content-area').forEach(el => el.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.classList.add('active');
+                }
+                document.getElementById('page-title').textContent = e.currentTarget.querySelector('span').textContent;
+                // Atualiza o dashboard se ele for selecionado
+                if (targetId === 'dashboard-section') {
+                    updateDashboard();
+                }
+            });
+        });
 
-            const openLeadButton = e.target.closest('.btn-open-lead');
-            if (openLeadButton) openLeadModal(parseInt(openLeadButton.closest('tr').dataset.id, 10));
+        // Navegação das abas do Financeiro
+        document.querySelectorAll('.finance-tab').forEach(tab => {
+            tab.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelectorAll('.finance-tab, .finance-content').forEach(el => el.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                document.getElementById(e.currentTarget.dataset.tab + '-tab-content').classList.add('active');
+            });
+        });
+        
+        // Abrir Modal de Lead (Kanban e Lista)
+        document.body.addEventListener('click', e => {
+            if (e.target.closest('.kanban-card')) {
+                openLeadModal(parseInt(e.target.closest('.kanban-card').dataset.id, 10));
+            }
+            if (e.target.closest('.btn-open-lead')) {
+                openLeadModal(parseInt(e.target.closest('tr').dataset.id, 10));
+            }
+        });
+        
+        // Fechar Modais (Botão X e tecla ESC)
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.target.closest('.modal-overlay').style.display = 'none';
+                if (unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
+            });
         });
 
         window.addEventListener('keydown', e => {
             if (e.key === 'Escape') {
-                const leadModal = document.getElementById('lead-modal');
-                if (leadModal && leadModal.style.display === 'flex') {
-                    leadModal.style.display = 'none';
-                    if (unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
-                }
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+                if (unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
             }
         });
 
+        // Botão Ativar/Desativar Bot
         document.getElementById('toggle-bot-btn')?.addEventListener('click', async () => {
             const leadIndex = leads.findIndex(l => l.id === currentLeadId);
             if (leadIndex > -1) {
@@ -179,8 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(`Bot ${leads[leadIndex].botActive ? 'ATIVADO' : 'DESATIVADO'} para este lead.`);
             }
         });
-        
-        // Adicione aqui outros listeners essenciais que possam estar faltando
     }
 
     // --- 8. EXECUÇÃO INICIAL ---
