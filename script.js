@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 estoque = data.estoque || [];
                 mentoriaNotes = data.mentoriaNotes || {};
                 chatHistory = data.chatHistory || [];
+                document.getElementById('setting-user-name').value = data.settings?.userName || '';
             }
             updateAllUI();
         } catch (error) { console.error("Erro ao carregar dados:", error); }
@@ -41,7 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
     async function saveAllUserData(userId, showConfirmation = false) {
         try {
             getMentoriaNotes();
-            const dataToSave = { leads, caixa, estoque, mentoriaNotes, chatHistory, settings: { userName: document.getElementById('setting-user-name').value } };
+            const dataToSave = { 
+                leads, caixa, estoque, mentoriaNotes, chatHistory, 
+                settings: { userName: document.getElementById('setting-user-name').value } 
+            };
             await db.collection('userData').doc(userId).set(dataToSave, { merge: true });
             if (showConfirmation) alert('Dados salvos!');
         } catch (error) { console.error("Erro ao salvar dados:", error); }
@@ -125,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 menuItems[0].classList.add('active');
                 document.getElementById(menuItems[0].dataset.moduleId).classList.add('active');
             }
-            loadMentoriaNotes(); // Carrega as anotações salvas
+            loadMentoriaNotes();
         } catch(e) { console.error("Falha ao carregar mentoria", e); }
     }
     
@@ -134,10 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 6. MODAIS E INTERAÇÕES ---
     async function openLeadModal(leadId) {
-        const userId = firebase.auth().currentUser.uid;
         currentLeadId = leadId;
         const lead = leads.find(l => l.id === leadId);
         if (!lead) return;
+        const userId = firebase.auth().currentUser.uid;
 
         if (lead.unreadCount > 0) {
             lead.unreadCount = 0;
@@ -201,16 +205,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById(e.currentTarget.dataset.tab + '-tab-content').classList.add('active');
             });
         });
-
-        // Abrir Modal
+        
+        // Abrir Modal do Lead
         document.body.addEventListener('click', e => {
             const card = e.target.closest('.kanban-card, .btn-open-lead');
             if (card) {
                 const leadIdStr = card.closest('[data-id]').dataset.id;
-                openLeadModal(parseFloat(leadIdStr)); // Usar parseFloat para lidar com IDs numéricos
+                openLeadModal(parseFloat(leadIdStr));
             }
         });
-
+        
         // Fechar Modais
         document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', e => {
             e.target.closest('.modal-overlay').style.display = 'none';
@@ -234,11 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (column && draggedItem) {
                 const leadId = parseFloat(draggedItem.dataset.id);
                 const lead = leads.find(l => l.id === leadId);
-                if (lead) {
+                if (lead && lead.status !== column.dataset.status) {
                     lead.status = column.dataset.status;
                     await saveAllUserData(userId);
                     renderKanbanCards();
-                    updateDashboard();
                 }
             }
         });
@@ -247,13 +250,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('chatbot-form')?.addEventListener('submit', async e => {
             e.preventDefault();
             const input = document.getElementById('chatbot-input');
+            const messagesContainer = document.getElementById('chatbot-messages');
             const message = input.value.trim();
             if (!message) return;
-            // Adicionar lógica de envio e resposta aqui
+            
+            chatHistory.push({role: 'user', parts: [{ text: message }]});
+            messagesContainer.innerHTML += `<div class="user-message">${message}</div>`;
             input.value = '';
-            // Rolar para a última mensagem
-            const messagesContainer = document.getElementById('chatbot-messages');
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Lógica de resposta (pode ser API do Gemini)
+            // ...
         });
 
         // Botão Ativar/Desativar Bot
