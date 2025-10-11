@@ -298,7 +298,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Botão Gerar QR Code
         document.getElementById('save-bot-instructions-btn')?.addEventListener('click', () => {
             const botInstructions = document.getElementById('bot-instructions').value;
-            // Salvar instruções antes de conectar
             db.collection('userData').doc(userId).set({ botInstructions }, { merge: true });
             
             const connectionArea = document.getElementById('bot-connection-area');
