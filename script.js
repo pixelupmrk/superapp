@@ -62,9 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
         currentLeadId = leadId;
         const leadIndex = leads.findIndex(l => l.id === leadId);
         if (leadIndex === -1) return;
-        const lead = leads[leadIndex];
         leads[leadIndex].newMessages = 0;
         saveAllUserData(userId);
+        const lead = leads[leadIndex];
         const isBotActive = lead.botActive !== false;
         updateBotButton(isBotActive);
         document.getElementById('lead-modal-title').textContent = `Conversa com ${lead.nome}`;
@@ -95,22 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 db = firebase.firestore();
                 if (unsubscribeUserData) unsubscribeUserData();
                 unsubscribeUserData = db.collection('userData').doc(user.uid).onSnapshot(doc => {
+                    console.log("Recebeu atualização do Firebase!");
                     if (doc.exists) {
                         const data = doc.data();
-                        const oldLeads = [...leads];
                         leads = data.leads || [];
                         caixa = data.caixa || [];
                         estoque = data.estoque || [];
-                        
-                        let hasNewData = false;
-                        if(leads.length !== oldLeads.length) hasNewData = true;
-
-                        if (hasNewData) {
-                           updateNotificationBadge();
-                           updateAllUI();
-                        } else {
-                           updateNotificationBadge();
-                        }
+                        updateAllUI();
                     }
                 }, err => {
                     console.error("Erro no listener do Firebase:", err);
