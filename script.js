@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNÇÃO PRINCIPAL (INICIALIZAÇÃO) ---
     const main = async () => {
-        // Carrega o conteúdo da mentoria de um arquivo JSON externo
         try {
             const response = await fetch('data.json');
             const data = await response.json();
@@ -16,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Erro ao carregar o arquivo data.json da mentoria:", error);
         }
         
-        // Observador de autenticação do Firebase
         firebase.auth().onAuthStateChanged(async user => {
             if (user && !document.body.dataset.initialized) {
                 document.body.dataset.initialized = 'true';
@@ -27,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // --- FUNÇÕES DE LÓGICA DE DADOS (CARREGAR E SALVAR) ---
+    // --- LÓGICA DE DADOS (CARREGAR E SALVAR) ---
     async function loadAllUserData(userId) {
         const doc = await db.collection('userData').doc(userId).get();
         if (doc.exists) {
@@ -46,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function saveAllUserData(userId, showConfirmation = false) {
-        getMentoriaNotes(); // Garante que as últimas anotações sejam salvas
+        getMentoriaNotes();
         const settings = { userName: document.getElementById('setting-user-name').value || 'Usuário' };
         const botInstructions = document.getElementById('bot-instructions').value;
         const dataToSave = { leads, caixa, estoque, mentoriaNotes, chatHistory, settings, botInstructions };
@@ -87,12 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tbody = document.querySelector('#leads-table tbody');
         if (tbody) {
             tbody.innerHTML = leads.map(l => 
-                `<tr data-id="${l.id}">
-                    <td>${l.nome}</td>
-                    <td>${l.whatsapp}</td>
-                    <td>${l.status}</td>
-                    <td><button class="btn-table-action btn-open-lead">Abrir</button></td>
-                </tr>`
+                `<tr data-id="${l.id}"><td>${l.nome}</td><td>${l.whatsapp}</td><td>${l.status}</td><td><button class="btn-table-action btn-open-lead">Abrir</button></td></tr>`
             ).join('');
         }
     }
@@ -108,27 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const ctx = document.getElementById('statusChart')?.getContext('2d');
         if (!ctx) return;
         if (statusChart) statusChart.destroy();
-        statusChart = new Chart(ctx, { 
-            type: 'doughnut', 
-            data: { 
-                labels: ['Novo', 'Progresso', 'Fechado'], 
-                datasets: [{ data: [n, p, f], backgroundColor: ['#00f7ff', '#ffc107', '#28a745'], borderWidth: 0 }] 
-            } 
-        });
+        statusChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Novo', 'Progresso', 'Fechado'], datasets: [{ data: [n, p, f], backgroundColor: ['#00f7ff', '#ffc107', '#28a745'], borderWidth: 0 }] } });
     }
 
     function renderCaixaTable() {
         const tbody = document.querySelector('#caixa-table tbody');
         if (tbody) {
-            tbody.innerHTML = caixa.map(m => 
-                `<tr data-id="${m.id}">
-                    <td>${m.data}</td>
-                    <td>${m.descricao}</td>
-                    <td>R$ ${parseFloat(m.valor).toFixed(2)}</td>
-                    <td>${m.tipo}</td>
-                    <td><button class="btn-table-action btn-delete-item btn-delete-caixa" data-id="${m.id}">Excluir</button></td>
-                </tr>`
-            ).join('');
+            tbody.innerHTML = caixa.map(m => `<tr data-id="${m.id}"><td>${m.data}</td><td>${m.descricao}</td><td>R$ ${parseFloat(m.valor).toFixed(2)}</td><td>${m.tipo}</td><td><button class="btn-table-action btn-delete-item btn-delete-caixa" data-id="${m.id}">Excluir</button></td></tr>`).join('');
         }
     }
 
@@ -154,19 +133,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const menu = document.getElementById('mentoria-menu');
         const content = document.getElementById('mentoria-content');
         if (!menu || !content || !mentoriaData) return;
-
         menu.innerHTML = mentoriaData.map(mod => `<div class="sales-accelerator-menu-item" data-module-id="${mod.moduleId}">${mod.title}</div>`).join('');
-        
         content.innerHTML = mentoriaData.map(mod => {
-            const lessonsHtml = mod.lessons.map(les => {
-                const formattedContent = les.content.replace(/\n/g, '<br>');
-                return `<div class="mentoria-lesson"><h3>${les.title}</h3><p>${formattedContent}</p></div>`;
-            }).join('');
-            
+            const lessonsHtml = mod.lessons.map(les => `<div class="mentoria-lesson"><h3>${les.title}</h3><p>${les.content.replace(/\n/g, '<br>')}</p></div>`).join('');
             return `<div class="mentoria-module-content" id="${mod.moduleId}">${lessonsHtml}<div class="anotacoes-aluno"><h3>Suas Anotações</h3><textarea class="mentoria-notas" id="notas-${mod.moduleId}" rows="8" placeholder="Ex: Falar com o cliente X sobre a nova proposta de valor na segunda-feira."></textarea></div></div>`;
         }).join('');
-
-        // Adiciona os event listeners para a navegação da mentoria
         document.querySelectorAll('.sales-accelerator-menu-item').forEach(item => {
             item.addEventListener('click', e => {
                 e.preventDefault();
@@ -175,8 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById(e.currentTarget.dataset.moduleId).classList.add('active');
             });
         });
-
-        // Ativa o primeiro módulo por padrão
         const firstMenuItem = document.querySelector('.sales-accelerator-menu-item');
         if (firstMenuItem) {
             firstMenuItem.classList.add('active');
@@ -184,16 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function getMentoriaNotes() {
-        document.querySelectorAll('.mentoria-notas').forEach(t => mentoriaNotes[t.id] = t.value);
-    }
-    
-    function loadMentoriaNotes() {
-        for (const id in mentoriaNotes) {
-            const t = document.getElementById(id);
-            if (t) t.value = mentoriaNotes[id];
-        }
-    }
+    function getMentoriaNotes() { document.querySelectorAll('.mentoria-notas').forEach(t => mentoriaNotes[t.id] = t.value); }
+    function loadMentoriaNotes() { for (const id in mentoriaNotes) { const t = document.getElementById(id); if (t) t.value = mentoriaNotes[id]; } }
 
     // --- FUNÇÕES DE INTERAÇÃO E MODAIS ---
     function openLeadModal(leadId) {
@@ -231,18 +192,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const userInput = document.getElementById('chatbot-input');
         const userMessage = userInput.value.trim();
         if (!userMessage) return;
-
         addMessageToChat(userMessage, 'user-message');
         chatHistory.push({ role: 'user', parts: [{ text: userMessage }] });
         userInput.value = '';
         const loadingMessage = addMessageToChat('Digitando...', 'bot-message loading');
-
         try {
-            const response = await fetch('/api/gemini', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ history: chatHistory.slice(0, -1), prompt: userMessage })
-            });
+            const response = await fetch('/api/gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ history: chatHistory.slice(0, -1), prompt: userMessage }) });
             if (!response.ok) throw new Error((await response.json()).error || 'Erro na API');
             const data = await response.json();
             loadingMessage.remove();
@@ -251,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
             await saveAllUserData(userId);
         } catch (error) {
             loadingMessage.textContent = `Desculpe, ocorreu um erro: ${error.message}`;
-            console.error("Erro no chatbot:", error);
         }
     }
     
@@ -305,20 +259,34 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.addEventListener('click', e => {
             const kanbanCard = e.target.closest('.kanban-card');
             const openLeadButton = e.target.closest('.btn-open-lead');
-            if (kanbanCard) {
-                openLeadModal(parseInt(kanbanCard.dataset.id, 10));
-            }
-            if (openLeadButton) {
-                openLeadModal(parseInt(openLeadButton.closest('tr').dataset.id, 10));
-            }
+            if (kanbanCard) openLeadModal(parseInt(kanbanCard.dataset.id, 10));
+            if (openLeadButton) openLeadModal(parseInt(openLeadButton.closest('tr').dataset.id, 10));
         });
 
         // Fechar Modais
         document.querySelectorAll('.close-modal').forEach(btn => {
             btn.addEventListener('click', e => {
-                document.getElementById(e.currentTarget.dataset.target).style.display = 'none';
-                if (unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
+                const modal = document.getElementById(e.currentTarget.dataset.target);
+                modal.style.display = 'none';
+                if (modal.id === 'lead-modal' && unsubscribeChat) {
+                    unsubscribeChat();
+                    unsubscribeChat = null;
+                }
             });
+        });
+
+        // **CORREÇÃO 2: Fechar modal do lead com a tecla ESC**
+        window.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                const leadModal = document.getElementById('lead-modal');
+                if (leadModal.style.display === 'flex') {
+                    leadModal.style.display = 'none';
+                    if (unsubscribeChat) {
+                        unsubscribeChat();
+                        unsubscribeChat = null;
+                    }
+                }
+            }
         });
 
         // Kanban Drag & Drop
@@ -329,27 +297,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => e.target.classList.add('dragging'), 0);
             }
         });
-        kanbanBoard.addEventListener('dragend', () => {
-            draggedItem?.classList.remove('dragging');
-            draggedItem = null;
-        });
+        kanbanBoard.addEventListener('dragend', () => draggedItem?.classList.remove('dragging'));
         kanbanBoard.addEventListener('dragover', e => e.preventDefault());
         kanbanBoard.addEventListener('drop', async e => {
             e.preventDefault();
             const column = e.target.closest('.kanban-column');
             if (column && draggedItem) {
                 const leadId = parseInt(draggedItem.dataset.id, 10);
-                const newStatus = column.dataset.status;
-                const leadIndex = leads.findIndex(l => l.id === leadId);
-                if (leadIndex > -1 && leads[leadIndex].status !== newStatus) {
-                    leads[leadIndex].status = newStatus;
+                const lead = leads.find(l => l.id === leadId);
+                if (lead && lead.status !== column.dataset.status) {
+                    lead.status = column.dataset.status;
                     await saveAllUserData(userId);
                     updateAllUI();
                 }
             }
         });
 
-        // Formulário do Chatbot
+        // **CORREÇÃO 1: Envio de mensagem no chat do lead e foco automático**
+        document.getElementById('lead-chat-form')?.addEventListener('submit', async e => {
+            e.preventDefault();
+            const chatInput = document.getElementById('lead-chat-input');
+            const messageText = chatInput.value.trim();
+            if (messageText && currentLeadId !== null) {
+                const message = {
+                    text: messageText,
+                    sender: 'operator', // 'operator' para você, 'lead' para o cliente
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                await db.collection('userData').doc(userId).collection('leads').doc(String(currentLeadId)).collection('messages').add(message);
+                chatInput.value = ''; // Limpa o campo
+                chatInput.focus(); // Devolve o foco ao campo
+            }
+        });
+
+        // Formulário do Chatbot AI
         document.getElementById('chatbot-form')?.addEventListener('submit', e => {
             e.preventDefault();
             handleChatbotSubmit(userId);
