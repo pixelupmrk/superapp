@@ -25,10 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            const loginErrorMessage = document.getElementById('login-error-message');
-            loginErrorMessage.textContent = '';
             firebase.auth().signInWithEmailAndPassword(email, password)
-                .catch(() => { loginErrorMessage.textContent = 'E-mail ou senha inválidos.'; });
+                .catch(() => { document.getElementById('login-error-message').textContent = 'E-mail ou senha inválidos.'; });
         });
     }
     const logoutButton = document.getElementById('logout-btn');
