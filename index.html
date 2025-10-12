@@ -51,40 +51,6 @@
             <div class="content-area" id="crm-list-section">
                 <div class="card"><div class="table-container"><table id="leads-table"><thead><tr><th>Nome</th><th>WhatsApp</th><th>Status</th><th>Ações</th></tr></thead><tbody></tbody></table></div></div>
             </div>
-
-            <div class="content-area" id="finance-section">
-                 <div class="finance-nav"><a href="#" class="finance-tab active" data-tab="caixa">Caixa</a><a href="#" class="finance-tab" data-tab="custos">Custos e Estoque</a></div>
-                 <div class="finance-content active" id="caixa-tab-content"><div class="dashboard-stats"><div class="stat-card"><h3>Entradas</h3><p id="total-entradas">R$ 0,00</p></div><div class="stat-card"><h3>Saídas</h3><p id="total-saidas">R$ 0,00</p></div><div class="stat-card"><h3>Saldo</h3><p id="caixa-atual">R$ 0,00</p></div></div><div class="card"><form id="caixa-form"><div class="input-grid"><input type="date" id="caixa-data" required><input type="text" id="caixa-descricao" placeholder="Descrição" required><input type="number" id="caixa-valor" placeholder="Valor (R$)" step="0.01" required><select id="caixa-tipo" required><option value="">Tipo</option><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div><button type="submit" class="btn-save">Adicionar</button></form></div><div class="card"><h3>Histórico</h3><div class="table-container"><table id="caixa-table"><thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Tipo</th><th>Ações</th></tr></thead><tbody></tbody></table></div></div></div>
-                 <div class="finance-content" id="custos-tab-content"><div class="card"><form id="estoque-form"><div class="input-grid"><input type="text" id="estoque-produto" placeholder="Produto" required><input type="number" id="estoque-compra" placeholder="Valor de Compra (R$)" step="0.01" required><input type="number" id="estoque-venda" placeholder="Valor de Venda (R$)" step="0.01" required></div><button type="submit" class="btn-save">Adicionar Produto</button></form></div><div class="card"><h3>Estoque</h3><div class="estoque-actions"><button id="import-csv-btn" class="btn-secondary">Importar de Excel</button><button id="export-csv-btn" class="btn-secondary">Exportar para Excel</button></div><div class="table-container"><table id="estoque-table"><thead><tr><th>Produto</th><th>V. Compra</th><th>Custos</th><th>V. Venda</th><th>Lucro</th><th>Ações</th></tr></thead><tbody></tbody></table></div></div></div>
-            </div>
-             
-            <div class="content-area" id="sales-accelerator-section">
-                <div class="sales-accelerator-container"><aside class="sales-accelerator-sidebar"><nav class="sales-accelerator-menu" id="mentoria-menu"></nav></aside><main class="sales-accelerator-content" id="mentoria-content"></main></div>
-            </div>
-            
-            <div class="content-area" id="chatbot-section">
-                <div class="card chatbot-container"><div id="chatbot-messages" class="chatbot-messages"></div><form id="chatbot-form" class="chatbot-form"><input type="text" id="chatbot-input" placeholder="Digite sua mensagem..." autocomplete="off"><button type="submit"><i class="ph-fill ph-paper-plane-right"></i></button></form></div>
-            </div>
-
-            <div class="content-area" id="bot-section">
-                <div class="card">
-                    <h2>Configurar Personalidade do Bot</h2>
-                    <p>Defina como o seu bot de atendimento deve se comportar e responder. Salve as instruções para gerar o QR Code.</p>
-                    <textarea id="bot-instructions" rows="10" placeholder="Ex: Você é um assistente virtual da PixelUp. Seja amigável, pergunte o nome do cliente e o serviço que ele deseja."></textarea>
-                    <button id="save-bot-instructions-btn" class="btn-save" style="margin-top: 1rem;">Salvar e Gerar QR Code</button>
-                </div>
-                <div class="card">
-                    <h2>Conexão com WhatsApp</h2>
-                    <div id="bot-connection-area" style="text-align: center;">
-                        <p>Salve as instruções acima para iniciar a conexão.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="content-area" id="settings-section">
-                <div class="card"><h3>Dados do Usuário</h3><div class="input-grid" style="grid-template-columns: 1fr;"><input type="text" id="setting-user-name" placeholder="Seu Nome de Usuário"></div> <button id="save-settings-btn" class="btn-save" style="margin-top: 1.5rem;">Salvar Configurações</button> </div>
-                <div class="card"><h3>Aparência</h3><button id="theme-toggle-btn" class="btn-secondary">Mudar para Tema Claro</button></div>
-            </div>
         </main>
     </div>
 
