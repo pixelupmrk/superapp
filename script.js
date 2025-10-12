@@ -165,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const msg = doc.data();
                     const bubble = document.createElement('div');
                     bubble.className = `msg-bubble msg-from-${msg.sender}`;
+                    // CORREÇÃO APLICADA AQUI
                     bubble.innerHTML = msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
                     chatHistoryDiv.appendChild(bubble);
                 });
@@ -178,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('toggle-bot-btn');
         if (btn) {
             btn.textContent = isBotActive ? 'Desativar Bot' : 'Ativar Bot';
-            btn.className = `btn-save ${isBotActive ? 'btn-secondary' : 'btn-save'}`;
+            btn.className = `btn-secondary ${isBotActive ? '' : 'btn-delete'}`;
         }
     }
 
@@ -264,6 +265,38 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.reset();
         });
 
+        // NOVA CORREÇÃO: Enviar mensagem no chat do lead
+        document.getElementById('lead-chat-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('lead-chat-input');
+            const text = input.value.trim();
+            if (!text || !currentLeadId) return;
+
+            const message = {
+                sender: 'operator',
+                text: text,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                await db.collection('userData').doc(userId)
+                        .collection('leads').doc(String(currentLeadId))
+                        .collection('messages').add(message);
+                input.value = '';
+            } catch (error) {
+                console.error("Erro ao enviar mensagem:", error);
+                alert('Não foi possível enviar a mensagem.');
+            }
+        });
+
+        // NOVA CORREÇÃO: Menu responsivo (sanduíche)
+        const menuToggle = document.getElementById('menu-toggle');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                document.getElementById('app-container').classList.toggle('sidebar-visible');
+            });
+        }
+        
         // Chatbot AI
         document.getElementById('chatbot-form')?.addEventListener('submit', async e => {
             e.preventDefault();
@@ -328,12 +361,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateBotButton(lead.botActive);
             }
         });
-
+        
         // Botão de Tema
         document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
             document.body.classList.toggle('light-theme');
         });
-
+        
         // Salvar Configurações
         document.getElementById('save-settings-btn')?.addEventListener('click', () => saveAllUserData(userId, true));
     }
