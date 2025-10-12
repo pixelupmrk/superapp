@@ -34,7 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 estoque = data.estoque || [];
                 mentoriaNotes = data.mentoriaNotes || {};
                 chatHistory = data.chatHistory || [];
-                document.getElementById('setting-user-name').value = data.settings?.userName || '';
+                if(document.getElementById('setting-user-name')) {
+                   document.getElementById('setting-user-name').value = data.settings?.userName || '';
+                }
             }
             updateAllUI();
         } catch (error) { console.error("Erro ao carregar dados:", error); }
@@ -57,9 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDashboard();
         renderKanbanCards();
         renderLeadsTable();
-        renderCaixaTable();
-        updateCaixa();
-        renderEstoqueTable();
+        // As funções de financeiro podem ser adicionadas aqui
     }
 
     // --- 5. FUNÇÕES DE RENDERIZAÇÃO ---
@@ -99,10 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    function renderCaixaTable() { /* Lógica para renderizar tabela de caixa */ }
-    function updateCaixa() { /* Lógica para atualizar totais do caixa */ }
-    function renderEstoqueTable() { /* Lógica para renderizar tabela de estoque */ }
-    
     async function loadMentoriaContent() {
         try {
             const response = await fetch('data.json');
@@ -178,4 +174,53 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('toggle-bot-btn');
         if (btn) {
             btn.textContent = isBotActive ? 'Desativar Bot' : 'Ativar Bot';
-            btn.className = `btn-save ${isBotA
+            btn.className = `btn-secondary ${isBotActive ? '' : 'btn-delete'}`;
+        }
+    }
+
+    // --- 7. EVENT LISTENERS ---
+    function setupEventListeners(userId) {
+        document.querySelectorAll('.sidebar-nav .nav-item:not(#logout-btn)').forEach(item => {
+            item.addEventListener('click', e => {
+                e.preventDefault();
+                const targetId = e.currentTarget.dataset.target;
+                document.querySelectorAll('.sidebar-nav .nav-item, .content-area').forEach(el => el.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                document.getElementById(targetId)?.classList.add('active');
+                document.getElementById('page-title').textContent = e.currentTarget.querySelector('span').textContent;
+            });
+        });
+
+        document.body.addEventListener('click', e => {
+            const card = e.target.closest('.kanban-card, .btn-open-lead');
+            if (card) {
+                const leadIdStr = card.closest('[data-id]').dataset.id;
+                openLeadModal(parseFloat(leadIdStr));
+            }
+        });
+        
+        document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', e => {
+            e.target.closest('.modal-overlay').style.display = 'none';
+            if (unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
+        }));
+
+        document.getElementById('lead-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newLead = {
+                id: Date.now(),
+                nome: document.getElementById('lead-name').value,
+                whatsapp: document.getElementById('lead-whatsapp').value,
+                status: document.getElementById('lead-status-form').value,
+                unreadCount: 0,
+                botActive: true
+            };
+            leads.push(newLead);
+            await saveAllUserData(userId);
+            updateAllUI();
+            e.target.reset();
+        });
+    }
+
+    // --- 8. EXECUÇÃO ---
+    main();
+});
