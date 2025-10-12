@@ -1,0 +1,104 @@
+[debug] [2025-10-12T22:27:15.549Z] ----------------------------------------------------------------------
+[debug] [2025-10-12T22:27:15.555Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Acer\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only functions --debug
+[debug] [2025-10-12T22:27:15.556Z] CLI Version:   14.19.1
+[debug] [2025-10-12T22:27:15.556Z] Platform:      win32
+[debug] [2025-10-12T22:27:15.556Z] Node Version:  v22.19.0
+[debug] [2025-10-12T22:27:15.557Z] Time:          Sun Oct 12 2025 19:27:15 GMT-0300 (Horário Padrão de Brasília)
+[debug] [2025-10-12T22:27:15.557Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-10-12T22:27:16.017Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-10-12T22:27:16.020Z] > authorizing via signed-in user (pixelupmrkt@gmail.com)
+[debug] [2025-10-12T22:27:16.020Z] [iam] checking project superapp-d0368 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2025-10-12T22:27:16.023Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:16.024Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:16.026Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/superapp-d0368:testIamPermissions [none]
+[debug] [2025-10-12T22:27:16.027Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/superapp-d0368:testIamPermissions x-goog-quota-user=projects/superapp-d0368
+[debug] [2025-10-12T22:27:16.027Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/superapp-d0368:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-10-12T22:27:16.997Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/superapp-d0368:testIamPermissions 200
+[debug] [2025-10-12T22:27:16.998Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/superapp-d0368:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-10-12T22:27:16.999Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:17.000Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:17.001Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/superapp-d0368/serviceAccounts/superapp-d0368@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2025-10-12T22:27:17.002Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/superapp-d0368/serviceAccounts/superapp-d0368@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2025-10-12T22:27:17.910Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/superapp-d0368/serviceAccounts/superapp-d0368@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2025-10-12T22:27:17.910Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/superapp-d0368/serviceAccounts/superapp-d0368@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'superapp-d0368'...
+[info] 
+[info] i  deploying functions 
+[debug] [2025-10-12T22:27:17.918Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:17.918Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:17.919Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/superapp-d0368 [none]
+[debug] [2025-10-12T22:27:18.128Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/superapp-d0368 200
+[debug] [2025-10-12T22:27:18.129Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/superapp-d0368 {"projectNumber":"469594170619","projectId":"superapp-d0368","lifecycleState":"ACTIVE","name":"superapp","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-10-01T23:57:54.554189Z"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2025-10-12T22:27:18.135Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:18.136Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:18.136Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/superapp-d0368/adminSdkConfig [none]
+[debug] [2025-10-12T22:27:18.640Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/superapp-d0368/adminSdkConfig 200
+[debug] [2025-10-12T22:27:18.641Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/superapp-d0368/adminSdkConfig {"projectId":"superapp-d0368","storageBucket":"superapp-d0368.firebasestorage.app"}
+[debug] [2025-10-12T22:27:18.642Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:18.643Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:18.643Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/superapp-d0368/configs [none]
+[debug] [2025-10-12T22:27:19.176Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/superapp-d0368/configs 200
+[debug] [2025-10-12T22:27:19.177Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/superapp-d0368/configs {"configs":[{"name":"projects/superapp-d0368/configs/gemini"}]}
+[debug] [2025-10-12T22:27:19.178Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:19.178Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:19.179Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/superapp-d0368/configs/gemini/variables [none]
+[debug] [2025-10-12T22:27:20.119Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/superapp-d0368/configs/gemini/variables 200
+[debug] [2025-10-12T22:27:20.120Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/superapp-d0368/configs/gemini/variables {"variables":[{"name":"projects/superapp-d0368/configs/gemini/variables/key","updateTime":"2025-10-12T21:46:51.722272160Z"}]}
+[debug] [2025-10-12T22:27:20.121Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:20.121Z] Checked if tokens are valid: true, expires at: 1760310042960
+[debug] [2025-10-12T22:27:20.122Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/superapp-d0368/configs/gemini/variables/key [none]
+[debug] [2025-10-12T22:27:21.081Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/superapp-d0368/configs/gemini/variables/key 200
+[debug] [2025-10-12T22:27:21.083Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/superapp-d0368/configs/gemini/variables/key {"name":"projects/superapp-d0368/configs/gemini/variables/key","updateTime":"2025-10-12T21:46:51.722272160Z","text":"AIzaSyDSLlNgmXKWZnrZSw5qP2sbOYhMnsUZcGE"}
+[debug] [2025-10-12T22:27:21.088Z] Validating nodejs source
+[debug] [2025-10-12T22:27:23.099Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/tasks": "^6.2.0",
+    "@google/generative-ai": "^0.24.1",
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.0.1"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2025-10-12T22:27:23.101Z] Building nodejs source
+[info] i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[debug] [2025-10-12T22:27:23.105Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-10-12T22:27:23.126Z] Found firebase-functions binary at 'C:\Users\Acer\Desktop\super app\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8445
+
+[error] TypeError: functions.runWith is not a function
+    at Object.<anonymous> (C:\Users\Acer\Desktop\super app\functions\index.js:53:35)
+    at Module._compile (node:internal/modules/cjs/loader:1706:14)
+    at Object..js (node:internal/modules/cjs/loader:1839:10)
+    at Module.load (node:internal/modules/cjs/loader:1441:32)
+    at Function._load (node:internal/modules/cjs/loader:1263:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+    at Module.require (node:internal/modules/cjs/loader:1463:12)
+    at require (node:internal/modules/helpers:147:16)
+    at loadModule (C:\Users\Acer\Desktop\super app\functions\node_modules\firebase-functions\lib\runtime\loader.js:40:16)
+
+[debug] [2025-10-12T22:27:25.076Z] Got response code 400; body Failed to generate manifest from function source: functions.runWith is not a function
+[error] 
+[error] Error: Functions codebase could not be analyzed successfully. It may have a syntax or runtime error

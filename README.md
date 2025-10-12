@@ -1,6 +1,5 @@
 # PixelUp SuperApp — V7 PixelUp (Como-style)
-[![CI/CD Super App - Deploy Seletivo Final](https://github.com/pixelupmrk/superapp/actions/workflows/deploy.yml/badge.svg)](https://github.com/pixelupmrk/superapp/actions/workflows/deploy.yml)
-[![CI/CD Super App - Deploy Seletivo Final](https://github.com/pixelupmrk/superapp/actions/workflows/deploy.yml/badge.svg)](https://github.com/pixelupmrk/superapp/actions/workflows/deploy.yml)
+
 Projeto **pronto** com sua logo e layout em 3 colunas no CRM (Contatos • Conversa • Ficha + Agenda).
 
 ## O que tem de novo
