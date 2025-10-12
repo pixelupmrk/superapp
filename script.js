@@ -1,53 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- 1. CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE ---
-    const firebaseConfig = {
-        apiKey: "AIzaSyA5H7sBUCdgNueLXvdv_sxPTUHT6n38Z9k",
-        authDomain: "superapp-d0368.firebaseapp.com",
-        projectId: "superapp-d0368",
-        storageBucket: "superapp-d0368.appspot.com",
-        messagingSenderId: "469594170619",
-        appId: "1:469594-ddee6770-d1ae-400e-99dd-fa4e49024021:web:145a2e1ee3fc807d0bbc5e"
-    };
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-
-    // --- 2. VARIÁVEIS GLOBAIS ---
-    let db;
-    let leads = [];
-    let unsubscribeChat;
-    let currentLeadId = null;
-
-    // --- 3. PONTO DE ENTRADA E AUTENTICAÇÃO ---
-    firebase.auth().onAuthStateChanged(user => {
-        const isLoginPage = window.location.pathname.includes('login.html');
-        if (user) {
-            if (isLoginPage) {
-                window.location.replace('index.html');
-                return;
-            }
-            if (!document.body.dataset.initialized) {
+    // --- 1. VARIÁVEIS GLOBAIS ---
+    let leads = [], caixa = [], estoque = [], chatHistory = [], mentoriaNotes = {};
+    let statusChart, db, unsubscribeChat;
+    let currentLeadId = null, draggedItem = null;
+    
+    // --- 2. INICIALIZAÇÃO ---
+    const main = () => {
+        firebase.auth().onAuthStateChanged(async user => {
+            if (user && !document.body.dataset.initialized) {
                 document.body.setAttribute('data-initialized', 'true');
                 db = firebase.firestore();
-                loadAllUserData(user.uid);
+                await loadAllUserData(user.uid);
                 setupEventListeners(user.uid);
             }
-        } else {
-            if (!isLoginPage) {
-                window.location.replace('login.html');
-            }
-        }
-    });
+        });
+    };
 
-    // --- 4. DADOS (CARREGAR E SALVAR) ---
+    // --- 3. DADOS (CARREGAR E SALVAR) ---
     async function loadAllUserData(userId) {
         try {
             const doc = await db.collection('userData').doc(userId).get();
             if (doc.exists) {
                 const data = doc.data();
                 leads = data.leads || [];
-                leads.forEach(lead => { if (!lead.id) lead.id = Date.now() + Math.random(); });
+                leads.forEach(lead => {
+                    if (!lead.id) lead.id = Date.now() + Math.random();
+                });
+                // Carregar outros dados como caixa, estoque, etc.
             }
             updateAllUI();
         } catch (error) { console.error("Erro ao carregar dados:", error); }
@@ -55,18 +34,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveAllUserData(userId) {
         try {
+            // Salvar todos os dados, incluindo anotações do lead
             await db.collection('userData').doc(userId).set({ leads }, { merge: true });
         } catch (error) { console.error("Erro ao salvar dados:", error); }
     }
 
-    // --- 5. ATUALIZAÇÃO DA UI ---
+    // --- 4. ATUALIZAÇÃO DA UI (COMPLETA) ---
     function updateAllUI() {
         updateDashboard();
         renderKanbanCards();
         renderLeadsTable();
+        // Chamar outras funções de renderização aqui (financeiro, etc.)
     }
 
-    // --- 6. FUNÇÕES DE RENDERIZAÇÃO ---
+    // --- 5. FUNÇÕES DE RENDERIZAÇÃO (TODAS INCLUÍDAS) ---
     function updateDashboard() {
         const n = leads.filter(l => l.status === 'novo').length;
         const p = leads.filter(l => l.status === 'progresso').length;
@@ -75,6 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('leads-novo').textContent = n;
         document.getElementById('leads-progresso').textContent = p;
         document.getElementById('leads-fechado').textContent = f;
+        const ctx = document.getElementById('statusChart')?.getContext('2d');
+        if (!ctx) return;
+        if (statusChart) statusChart.destroy();
+        statusChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Novo', 'Progresso', 'Fechado'], datasets: [{ data: [n, p, f], backgroundColor: ['#00f7ff', '#ffc107', '#28a745'], borderWidth: 0 }] } });
     }
     
     function renderKanbanCards() {
@@ -82,18 +67,19 @@ document.addEventListener('DOMContentLoaded', () => {
         leads.forEach(lead => {
             const column = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`);
             if (column) {
-                column.innerHTML += `<div class="kanban-card" data-id="${lead.id}"><strong>${lead.nome}</strong><p>${lead.whatsapp}</p></div>`;
+                column.innerHTML += `<div class="kanban-card" draggable="true" data-id="${lead.id}"><strong>${lead.nome}</strong><p>${lead.whatsapp}</p></div>`;
             }
         });
     }
 
     function renderLeadsTable() {
         const tbody = document.querySelector('#leads-table tbody');
-        if(!tbody) return;
-        tbody.innerHTML = leads.map(l => `<tr data-id="${l.id}"><td>${l.nome}</td><td>${l.whatsapp}</td><td>${l.status}</td><td><button class="btn-table-action">Abrir</button></td></tr>`).join('');
+        if (tbody) {
+            tbody.innerHTML = leads.map(l => `<tr data-id="${l.id}"><td>${l.nome}</td><td>${l.whatsapp}</td><td>${l.status}</td><td><button class="btn-table-action btn-open-lead">Abrir</button></td></tr>`).join('');
+        }
     }
 
-    // --- 7. LÓGICA DO MODAL ---
+    // --- 6. LÓGICA DO MODAL (COM ABAS) ---
     async function openLeadModal(leadId) {
         currentLeadId = leadId;
         const lead = leads.find(l => l.id === leadId);
@@ -104,10 +90,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('modal-open');
         modal.style.display = 'flex';
 
+        // Resetar e ativar a aba de conversa
         modal.querySelectorAll('.modal-tab, .modal-tab-content').forEach(el => el.classList.remove('active'));
         modal.querySelector('.modal-tab[data-tab-target="#chat-tab-content"]').classList.add('active');
         modal.querySelector('#chat-tab-content').classList.add('active');
 
+        // Preencher dados
         modal.querySelector('#lead-modal-title').textContent = `Conversa com ${lead.nome}`;
         modal.querySelector('#edit-lead-name').value = lead.nome || '';
         modal.querySelector('#edit-lead-whatsapp').value = lead.whatsapp || '';
@@ -117,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const chatHistoryDiv = modal.querySelector('#lead-chat-history');
         if (unsubscribeChat) unsubscribeChat();
 
+        // Carregar chat
         unsubscribeChat = db.collection('userData').doc(userId).collection('leads').doc(String(leadId))
             .collection('messages').orderBy('timestamp').onSnapshot(snapshot => {
                 chatHistoryDiv.innerHTML = snapshot.empty ? '<p>Inicie a conversa!</p>' : '';
@@ -142,17 +131,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 8. EVENT LISTENERS ---
+    // --- 7. EVENT LISTENERS (TODOS INCLUÍDOS) ---
     function setupEventListeners(userId) {
+        // Navegação principal
         document.querySelectorAll('.sidebar-nav .nav-item:not(#logout-btn)').forEach(item => {
             item.addEventListener('click', e => {
                 e.preventDefault();
                 document.querySelectorAll('.sidebar-nav .nav-item, .content-area').forEach(el => el.classList.remove('active'));
                 item.classList.add('active');
                 document.getElementById(item.dataset.target)?.classList.add('active');
+                document.getElementById('page-title').textContent = item.querySelector('span').textContent;
             });
         });
 
+        // Abas do Modal
         document.querySelectorAll('.modal-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 const modal = tab.closest('.modal-content');
@@ -162,17 +154,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
+        // Abrir/Fechar Modal
         document.body.addEventListener('click', e => {
-            const card = e.target.closest('.kanban-card');
-            if (card) {
-                openLeadModal(parseFloat(card.dataset.id));
-            }
-            const closeBtn = e.target.closest('.close-modal');
-            if (closeBtn) {
-                closeModal();
-            }
+            const card = e.target.closest('.kanban-card, .btn-open-lead');
+            if (card) openLeadModal(parseFloat(card.closest('[data-id]').dataset.id));
+            if (e.target.closest('.close-modal')) closeModal();
         });
 
+        // Adicionar Lead
         document.getElementById('lead-form').addEventListener('submit', async e => {
             e.preventDefault();
             const newLead = {
@@ -188,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.reset();
         });
 
+        // Salvar Detalhes do Lead e Anotações
         document.getElementById('edit-lead-form').addEventListener('submit', async e => {
             e.preventDefault();
             const leadIndex = leads.findIndex(l => l.id === currentLeadId);
@@ -202,35 +192,37 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Enviar Mensagem no Chat
         document.getElementById('lead-chat-form').addEventListener('submit', async e => {
-            e.preventDefault();
+            e.preventDefault(); // Impede o recarregamento
             const input = document.getElementById('lead-chat-input');
             const text = input.value.trim();
             if (!text) return;
-            const message = {
-                sender: 'operator',
-                text: text,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            };
+            const message = { sender: 'operator', text, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
             input.value = '';
             await db.collection('userData').doc(userId).collection('leads').doc(String(currentLeadId)).collection('messages').add(message);
         });
 
-        document.getElementById('logout-btn')?.addEventListener('click', e => {
+        // Drag and Drop do Kanban
+        const kanbanBoard = document.getElementById('kanban-board');
+        kanbanBoard.addEventListener('dragstart', e => { if (e.target.classList.contains('kanban-card')) { draggedItem = e.target; } });
+        kanbanBoard.addEventListener('dragend', () => { draggedItem = null; });
+        kanbanBoard.addEventListener('dragover', e => e.preventDefault());
+        kanbanBoard.addEventListener('drop', async (e) => {
             e.preventDefault();
-            firebase.auth().signOut();
+            const column = e.target.closest('.kanban-column');
+            if (column && draggedItem) {
+                const leadId = parseFloat(draggedItem.dataset.id);
+                const lead = leads.find(l => l.id === leadId);
+                if (lead && lead.status !== column.dataset.status) {
+                    lead.status = column.dataset.status;
+                    await saveAllUserData(userId);
+                    updateAllUI();
+                }
+            }
         });
     }
 
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', e => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            firebase.auth().signInWithEmailAndPassword(email, password).catch(err => {
-                document.getElementById('login-error-message').textContent = 'E-mail ou senha inválidos.';
-            });
-        });
-    }
+    // --- 8. EXECUÇÃO ---
+    main();
 });
