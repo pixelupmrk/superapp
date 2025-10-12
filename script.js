@@ -110,25 +110,232 @@ document.addEventListener('DOMContentLoaded', () => {
             const menu = document.getElementById('mentoria-menu');
             const content = document.getElementById('mentoria-content');
             if (!menu || !content) return;
-            // ... (resto da função original)
+            menu.innerHTML = data.mentoria.map(mod => `<div class="sales-accelerator-menu-item" data-module-id="${mod.moduleId}">${mod.title}</div>`).join('');
+            content.innerHTML = data.mentoria.map(mod => {
+                const placeholder = mod.exercisePrompt || 'Digite suas anotações...';
+                const lessonsHtml = mod.lessons.map(les => `<div class="card mentoria-lesson"><h3>${les.title}</h3><p>${les.content.replace(/\n/g, '<br>')}</p></div>`).join('');
+                return `<div class="mentoria-module-content" id="${mod.moduleId}">${lessonsHtml}<div class="anotacoes-aluno card"><h3>Suas Anotações / Exercícios</h3><textarea class="mentoria-notas" id="notas-${mod.moduleId}" rows="8" placeholder="${placeholder}"></textarea></div></div>`;
+            }).join('');
+
+            const menuItems = document.querySelectorAll('.sales-accelerator-menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', e => {
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    document.querySelectorAll('.mentoria-module-content').forEach(c => c.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    document.getElementById(e.currentTarget.dataset.moduleId).classList.add('active');
+                });
+            });
+            if (menuItems.length > 0) {
+                menuItems[0].classList.add('active');
+                document.getElementById(menuItems[0].dataset.moduleId).classList.add('active');
+            }
+            loadMentoriaNotes();
         } catch(e) { console.error("Falha ao carregar mentoria", e); }
     }
     
-    function getMentoriaNotes() { /* ... */ }
-    function loadMentoriaNotes() { /* ... */ }
+    function getMentoriaNotes() { document.querySelectorAll('.mentoria-notas').forEach(t => mentoriaNotes[t.id] = t.value); }
+    function loadMentoriaNotes() { for (const id in mentoriaNotes) { const el = document.getElementById(id); if(el) el.value = mentoriaNotes[id]; } }
 
     // --- 6. MODAIS E INTERAÇÕES ---
     async function openLeadModal(leadId) {
-        // ... (lógica original do modal)
+        currentLeadId = leadId;
+        const lead = leads.find(l => l.id === leadId);
+        if (!lead) return;
+        const userId = firebase.auth().currentUser.uid;
+
+        if (lead.unreadCount > 0) {
+            lead.unreadCount = 0;
+            await saveAllUserData(userId);
+            updateAllUI();
+        }
+        
+        updateBotButton(lead.botActive);
+        document.getElementById('lead-modal-title').textContent = `Conversa com ${lead.nome}`;
+        document.getElementById('edit-lead-name').value = lead.nome;
+        document.getElementById('edit-lead-whatsapp').value = lead.whatsapp;
+        document.getElementById('edit-lead-status').value = lead.status;
+        
+        const chatHistoryDiv = document.getElementById('lead-chat-history');
+        if (unsubscribeChat) unsubscribeChat();
+        unsubscribeChat = db.collection('userData').doc(userId).collection('leads').doc(String(leadId))
+            .collection('messages').orderBy('timestamp').onSnapshot(snapshot => {
+                chatHistoryDiv.innerHTML = snapshot.empty ? '<p>Inicie a conversa!</p>' : '';
+                snapshot.forEach(doc => {
+                    const msg = doc.data();
+                    const bubble = document.createElement('div');
+                    bubble.className = `msg-bubble msg-from-${msg.sender}`;
+                    bubble.innerHTML = msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                    chatHistoryDiv.appendChild(bubble);
+                });
+                chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+            });
+        
+        document.getElementById('lead-modal').style.display = 'flex';
     }
 
     function updateBotButton(isBotActive) {
-        // ... (lógica original do botão)
+        const btn = document.getElementById('toggle-bot-btn');
+        if (btn) {
+            btn.textContent = isBotActive ? 'Desativar Bot' : 'Ativar Bot';
+            btn.className = `btn-save ${isBotActive ? 'btn-secondary' : 'btn-save'}`;
+        }
     }
 
     // --- 7. EVENT LISTENERS ---
     function setupEventListeners(userId) {
-        // ... (todos os listeners originais)
+        // Navegação
+        document.querySelectorAll('.sidebar-nav .nav-item:not(#logout-btn)').forEach(item => {
+            item.addEventListener('click', e => {
+                e.preventDefault();
+                const targetId = e.currentTarget.dataset.target;
+                document.querySelectorAll('.sidebar-nav .nav-item, .content-area').forEach(el => el.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                document.getElementById(targetId)?.classList.add('active');
+                document.getElementById('page-title').textContent = e.currentTarget.querySelector('span').textContent;
+                if (targetId === 'dashboard-section') updateDashboard();
+            });
+        });
+
+        // Abas Financeiro
+        document.querySelectorAll('.finance-tab').forEach(tab => {
+            tab.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelectorAll('.finance-tab, .finance-content').forEach(el => el.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                document.getElementById(e.currentTarget.dataset.tab + '-tab-content').classList.add('active');
+            });
+        });
+        
+        // Abrir Modal do Lead
+        document.body.addEventListener('click', e => {
+            const card = e.target.closest('.kanban-card, .btn-open-lead');
+            if (card) {
+                const leadIdStr = card.closest('[data-id]').dataset.id;
+                openLeadModal(parseFloat(leadIdStr));
+            }
+        });
+        
+        // Fechar Modais
+        document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', e => {
+            e.target.closest('.modal-overlay').style.display = 'none';
+            if (unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
+        }));
+        window.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+                if (unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
+            }
+        });
+
+        // Kanban Drag & Drop
+        const kanbanBoard = document.getElementById('kanban-board');
+        kanbanBoard.addEventListener('dragstart', e => { if (e.target.classList.contains('kanban-card')) { draggedItem = e.target; } });
+        kanbanBoard.addEventListener('dragend', () => { draggedItem = null; });
+        kanbanBoard.addEventListener('dragover', e => e.preventDefault());
+        kanbanBoard.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            const column = e.target.closest('.kanban-column');
+            if (column && draggedItem) {
+                const leadId = parseFloat(draggedItem.dataset.id);
+                const lead = leads.find(l => l.id === leadId);
+                if (lead && lead.status !== column.dataset.status) {
+                    lead.status = column.dataset.status;
+                    await saveAllUserData(userId);
+                    renderKanbanCards();
+                }
+            }
+        });
+        
+        // Adicionar novo Lead
+        document.getElementById('lead-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newLead = {
+                id: Date.now(),
+                nome: document.getElementById('lead-name').value,
+                whatsapp: document.getElementById('lead-whatsapp').value,
+                status: document.getElementById('lead-status-form').value,
+                unreadCount: 0,
+                botActive: true
+            };
+            leads.push(newLead);
+            await saveAllUserData(userId);
+            updateAllUI();
+            e.target.reset();
+        });
+
+        // Chatbot AI
+        document.getElementById('chatbot-form')?.addEventListener('submit', async e => {
+            e.preventDefault();
+            const input = document.getElementById('chatbot-input');
+            const messagesContainer = document.getElementById('chatbot-messages');
+            const userMessage = input.value.trim();
+            if (!userMessage) return;
+            
+            chatHistory.push({role: 'user', parts: [{ text: userMessage }]});
+            messagesContainer.innerHTML += `<div class="user-message">${userMessage}</div>`;
+            input.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            try {
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ history: chatHistory.slice(0, -1), prompt: userMessage })
+                });
+                if (!response.ok) throw new Error('Falha na API');
+                const data = await response.json();
+                chatHistory.push({role: 'model', parts: [{ text: data.text }]});
+                messagesContainer.innerHTML += `<div class="bot-message">${data.text}</div>`;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                await saveAllUserData(userId);
+            } catch (error) {
+                console.error("Erro no Chatbot AI:", error);
+                messagesContainer.innerHTML += `<div class="bot-message">Desculpe, não consegui responder. Tente novamente.</div>`;
+            }
+        });
+
+        // Botão Gerar QR Code
+        document.getElementById('save-bot-instructions-btn')?.addEventListener('click', () => {
+            const botInstructions = document.getElementById('bot-instructions').value;
+            db.collection('userData').doc(userId).set({ botInstructions }, { merge: true });
+            
+            const connectionArea = document.getElementById('bot-connection-area');
+            connectionArea.innerHTML = '<p>Iniciando conexão... Aguarde o QR Code.</p>';
+            
+            const eventSource = new EventSource(`${BOT_BACKEND_URL}/events?userId=${userId}`);
+            eventSource.onmessage = event => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'qr') {
+                    connectionArea.innerHTML = `<h3>Escaneie o QR Code</h3><img src="${data.data}" alt="QR Code do WhatsApp">`;
+                    eventSource.close();
+                } else if (data.type === 'status') {
+                    connectionArea.innerHTML = `<p style="color: lightgreen;">Status: ${data.data}</p>`;
+                }
+            };
+            eventSource.onerror = () => {
+                connectionArea.innerHTML = '<p style="color: red;">Erro ao conectar com o servidor do bot.</p>';
+                eventSource.close();
+            };
+        });
+
+        // Botão Ativar/Desativar Bot
+        document.getElementById('toggle-bot-btn')?.addEventListener('click', async () => {
+            const lead = leads.find(l => l.id === currentLeadId);
+            if (lead) {
+                lead.botActive = !lead.botActive;
+                await saveAllUserData(userId);
+                updateBotButton(lead.botActive);
+            }
+        });
+
+        // Botão de Tema
+        document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+        });
+
+        // Salvar Configurações
+        document.getElementById('save-settings-btn')?.addEventListener('click', () => saveAllUserData(userId, true));
     }
 
     // --- 8. EXECUÇÃO ---
