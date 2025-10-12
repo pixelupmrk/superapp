@@ -57,9 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDashboard();
         renderKanbanCards();
         renderLeadsTable();
-        renderCaixaTable();
-        updateCaixa();
-        renderEstoqueTable();
+        // As funções de financeiro podem ser adicionadas aqui se necessário
     }
 
     // --- 5. FUNÇÕES DE RENDERIZAÇÃO ---
@@ -98,10 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return `<tr data-id="${l.id}"><td>${l.nome} ${badgeHtml}</td><td>${l.whatsapp}</td><td>${l.status}</td><td><button class="btn-table-action btn-open-lead">Abrir</button></td></tr>`;
         }).join('');
     }
-
-    function renderCaixaTable() { /* Lógica para renderizar tabela de caixa */ }
-    function updateCaixa() { /* Lógica para atualizar totais do caixa */ }
-    function renderEstoqueTable() { /* Lógica para renderizar tabela de estoque */ }
     
     async function loadMentoriaContent() {
         try {
@@ -137,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function getMentoriaNotes() { document.querySelectorAll('.mentoria-notas').forEach(t => mentoriaNotes[t.id] = t.value); }
     function loadMentoriaNotes() { for (const id in mentoriaNotes) { const el = document.getElementById(id); if(el) el.value = mentoriaNotes[id]; } }
 
-    // --- 6. MODAIS E INTERAÇÕES ---
+    // --- 6. MODAIS E INTERAÇÕES (VERSÃO CORRIGIDA) ---
     async function openLeadModal(leadId) {
         currentLeadId = leadId;
         const lead = leads.find(l => l.id === leadId);
@@ -158,18 +152,23 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const chatHistoryDiv = document.getElementById('lead-chat-history');
         if (unsubscribeChat) unsubscribeChat();
+
         unsubscribeChat = db.collection('userData').doc(userId).collection('leads').doc(String(leadId))
             .collection('messages').orderBy('timestamp').onSnapshot(snapshot => {
                 chatHistoryDiv.innerHTML = snapshot.empty ? '<p>Inicie a conversa!</p>' : '';
-                snapshot.forEach(doc => {
-                    const msg = doc.data();
-                    const bubble = document.createElement('div');
-                    bubble.className = `msg-bubble msg-from-${msg.sender}`;
-                    // CORREÇÃO APLICADA AQUI
-                    bubble.innerHTML = msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-                    chatHistoryDiv.appendChild(bubble);
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === "added") {
+                        const msg = change.doc.data();
+                        const bubble = document.createElement('div');
+                        bubble.className = `msg-bubble msg-from-${msg.sender}`; 
+                        bubble.innerHTML = msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                        chatHistoryDiv.appendChild(bubble);
+                    }
                 });
                 chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+            }, error => {
+                console.error("Erro ao carregar mensagens:", error);
+                chatHistoryDiv.innerHTML = '<p style="color:red;">Não foi possível carregar o histórico de chat.</p>';
             });
         
         document.getElementById('lead-modal').style.display = 'flex';
@@ -183,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 7. EVENT LISTENERS ---
+    // --- 7. EVENT LISTENERS (VERSÃO CORRIGIDA) ---
     function setupEventListeners(userId) {
         // Navegação
         document.querySelectorAll('.sidebar-nav .nav-item:not(#logout-btn)').forEach(item => {
@@ -198,16 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Abas Financeiro
-        document.querySelectorAll('.finance-tab').forEach(tab => {
-            tab.addEventListener('click', e => {
-                e.preventDefault();
-                document.querySelectorAll('.finance-tab, .finance-content').forEach(el => el.classList.remove('active'));
-                e.currentTarget.classList.add('active');
-                document.getElementById(e.currentTarget.dataset.tab + '-tab-content').classList.add('active');
-            });
-        });
-        
         // Abrir Modal do Lead
         document.body.addEventListener('click', e => {
             const card = e.target.closest('.kanban-card, .btn-open-lead');
@@ -265,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.reset();
         });
 
-        // NOVA CORREÇÃO: Enviar mensagem no chat do lead
+        // ** CÓDIGO DO CHAT DO LEAD CORRIGIDO E ROBUSTO **
         document.getElementById('lead-chat-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('lead-chat-input');
@@ -284,12 +273,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         .collection('messages').add(message);
                 input.value = '';
             } catch (error) {
-                console.error("Erro ao enviar mensagem:", error);
-                alert('Não foi possível enviar a mensagem.');
+                console.error("ERRO AO ENVIAR MENSAGEM:", error);
+                alert('Falha ao enviar mensagem! Verifique o console (F12). O problema pode estar nas regras de segurança do Firestore.');
             }
         });
 
-        // NOVA CORREÇÃO: Menu responsivo (sanduíche)
+        // Menu responsivo (sanduíche)
         const menuToggle = document.getElementById('menu-toggle');
         if (menuToggle) {
             menuToggle.addEventListener('click', () => {
@@ -319,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!response.ok) throw new Error('Falha na API');
                 const data = await response.json();
                 chatHistory.push({role: 'model', parts: [{ text: data.text }]});
-                messagesContainer.innerHTML += `<div class="bot-message">${data.text}</div>`;
+                messagesContainer.innerHTML += `<div class="bot-message">${data.text.replace(/\n/g, '<br>')}</div>`;
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 await saveAllUserData(userId);
             } catch (error) {
@@ -332,19 +321,19 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('save-bot-instructions-btn')?.addEventListener('click', () => {
             const botInstructions = document.getElementById('bot-instructions').value;
             db.collection('userData').doc(userId).set({ botInstructions }, { merge: true });
-            
             const connectionArea = document.getElementById('bot-connection-area');
             connectionArea.innerHTML = '<p>Iniciando conexão... Aguarde o QR Code.</p>';
-            
             const eventSource = new EventSource(`${BOT_BACKEND_URL}/events?userId=${userId}`);
             eventSource.onmessage = event => {
-                const data = JSON.parse(event.data);
-                if (data.type === 'qr') {
-                    connectionArea.innerHTML = `<h3>Escaneie o QR Code</h3><img src="${data.data}" alt="QR Code do WhatsApp">`;
-                    eventSource.close();
-                } else if (data.type === 'status') {
-                    connectionArea.innerHTML = `<p style="color: lightgreen;">Status: ${data.data}</p>`;
-                }
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'qr') {
+                        connectionArea.innerHTML = `<h3>Escaneie o QR Code</h3><img src="${data.data}" alt="QR Code do WhatsApp">`;
+                        eventSource.close();
+                    } else if (data.type === 'status') {
+                        connectionArea.innerHTML = `<p style="color: lightgreen;">Status: ${data.data}</p>`;
+                    }
+                } catch (e) { console.error("Erro no evento do bot:", e); }
             };
             eventSource.onerror = () => {
                 connectionArea.innerHTML = '<p style="color: red;">Erro ao conectar com o servidor do bot.</p>';
@@ -360,11 +349,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 await saveAllUserData(userId);
                 updateBotButton(lead.botActive);
             }
-        });
-        
-        // Botão de Tema
-        document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
-            document.body.classList.toggle('light-theme');
         });
         
         // Salvar Configurações
