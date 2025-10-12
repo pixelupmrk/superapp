@@ -51,13 +51,14 @@
             <div class="content-area" id="crm-list-section">
                 <div class="card"><div class="table-container"><table id="leads-table"><thead><tr><th>Nome</th><th>WhatsApp</th><th>Status</th><th>Ações</th></tr></thead><tbody></tbody></table></div></div>
             </div>
-        </main>
+            
+            </main>
     </div>
 
     <div class="modal-overlay" id="lead-modal">
         <div class="modal-content">
-            <span class="close-modal" data-target="lead-modal">&times;</span>
-            <h2 id="lead-modal-title">Conversa com Lead</h2>
+            <span class="close-modal">&times;</span>
+            <h2 id="lead-modal-title"></h2>
             
             <div class="modal-tabs">
                 <button class="modal-tab active" data-tab-target="#chat-tab-content">Conversa</button>
@@ -70,7 +71,7 @@
                         <div id="lead-chat-history"></div>
                         <form id="lead-chat-form" class="lead-chat-form">
                             <input type="text" id="lead-chat-input" placeholder="Digite sua mensagem...">
-                            <button type="submit"><i class="ph-fill ph-paper-plane-right"></i></button>
+                            <button type="submit" class="btn-save"><i class="ph-fill ph-paper-plane-right"></i></button>
                         </form>
                     </div>
                 </div>
@@ -104,8 +105,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="auth.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
