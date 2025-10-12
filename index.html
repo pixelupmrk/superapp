@@ -89,31 +89,50 @@
     </div>
 
     <div class="modal-overlay" id="lead-modal">
-        <div class="modal-content modal-lead-chat">
+        <div class="modal-content">
             <span class="close-modal" data-target="lead-modal">&times;</span>
             <h2 id="lead-modal-title">Conversa com Lead</h2>
-            <div class="lead-modal-body">
-                <div class="lead-chat-container">
-                    <div id="lead-chat-history"></div>
-                    <form id="lead-chat-form" class="lead-chat-form"><input type="text" id="lead-chat-input" placeholder="Digite sua mensagem..."><button type="submit"><i class="ph-fill ph-paper-plane-right"></i></button></form>
+            
+            <div class="modal-tabs">
+                <button class="modal-tab active" data-tab-target="#chat-tab-content">Conversa</button>
+                <button class="modal-tab" data-tab-target="#details-tab-content">Detalhes & Anotações</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="modal-tab-content active" id="chat-tab-content">
+                    <div class="lead-chat-container">
+                        <div id="lead-chat-history"></div>
+                        <form id="lead-chat-form" class="lead-chat-form">
+                            <input type="text" id="lead-chat-input" placeholder="Digite sua mensagem...">
+                            <button type="submit"><i class="ph-fill ph-paper-plane-right"></i></button>
+                        </form>
+                    </div>
                 </div>
-                <div class="lead-info-container">
-                    <h3>Editar Detalhes</h3>
-                    <form id="edit-lead-form">
-                        <div class="input-grid"><input type="text" id="edit-lead-name" placeholder="Nome"><input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp"><select id="edit-lead-status"><option value="novo">Novo</option><option value="progresso">Em Progresso</option><option value="fechado">Fechado</option></select></div>
-                        <div class="modal-actions">
-                            <button type="button" class="btn-secondary" id="toggle-bot-btn">Ativar/Desativar Bot</button>
-                            <button type="button" class="btn-delete" id="delete-lead-btn">Excluir</button>
-                            <button type="submit" class="btn-save">Salvar</button>
-                        </div>
-                    </form>
+
+                <div class="modal-tab-content" id="details-tab-content">
+                    <div class="lead-info-container">
+                        <h3>Editar Detalhes</h3>
+                        <form id="edit-lead-form">
+                            <div class="input-grid">
+                                <input type="text" id="edit-lead-name" placeholder="Nome">
+                                <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
+                                <select id="edit-lead-status">
+                                    <option value="novo">Novo</option>
+                                    <option value="progresso">Em Progresso</option>
+                                    <option value="fechado">Fechado</option>
+                                </select>
+                            </div>
+                            <textarea id="lead-notes" placeholder="Anotações internas sobre este lead..." rows="8" style="margin-top: 1rem;"></textarea>
+                            <div class="modal-actions">
+                                <button type="button" class="btn-secondary" id="toggle-bot-btn">Ativar/Desativar Bot</button>
+                                <button type="button" class="btn-delete" id="delete-lead-btn">Excluir</button>
+                                <button type="submit" class="btn-save">Salvar</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="modal-overlay" id="custos-modal">
-        <div class="modal-content"><span class="close-modal" data-target="custos-modal">&times;</span><h2 id="custos-modal-title">Custos</h2><div id="custos-list"></div><form id="add-custo-form"><div class="input-grid"><input type="text" id="custo-descricao" placeholder="Descrição" required><input type="number" id="custo-valor" placeholder="Valor (R$)" step="0.01" required></div><button type="submit" class="btn-save">Adicionar</button></form></div>
     </div>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
