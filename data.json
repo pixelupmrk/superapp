@@ -3,6 +3,7 @@
     {
       "moduleId": "MD01",
       "title": "Módulo 1: Conectando com o Cliente Ideal",
+      "exercisePrompt": "Exercício: Defina sua persona respondendo às 8 perguntas da lição e descreva sua Proposta de Valor Única aqui.",
       "lessons": [
         {
           "title": "Questionário para Definição de Persona",
