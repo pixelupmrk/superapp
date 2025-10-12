@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 db = firebase.firestore();
                 await loadAllUserData(user.uid);
                 setupEventListeners(user.uid);
-                loadMentoriaContent();
+                await loadMentoriaContent(); // Função agora está presente
             }
         });
     };
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!lead.id) lead.id = Date.now() + Math.random();
                     if (lead.botActive === undefined) lead.botActive = true;
                 });
-                // ... (outros dados)
+                mentoriaNotes = data.mentoriaNotes || {};
             }
             updateAllUI();
         } catch (error) { console.error("Erro ao carregar dados:", error); }
@@ -37,8 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveAllUserData(userId, showConfirmation = false) {
         try {
+            getMentoriaNotes();
             const dataToSave = { 
-                leads, // ... (outros dados)
+                leads, mentoriaNotes,
+                settings: { userName: document.getElementById('setting-user-name').value } 
             };
             await db.collection('userData').doc(userId).set(dataToSave, { merge: true });
             if (showConfirmation) alert('Dados salvos!');
@@ -48,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 4. ATUALIZAÇÃO DA UI ---
     function updateAllUI() {
         renderKanbanCards();
-        // ... (outras funções de renderização)
     }
 
     // --- 5. FUNÇÕES DE RENDERIZAÇÃO ---
@@ -62,9 +63,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // (outras funções de renderização aqui...)
+    // ** FUNÇÕES QUE ESTAVAM FALTANDO **
+    async function loadMentoriaContent() {
+        try {
+            const response = await fetch('data.json');
+            const data = await response.json();
+            const menu = document.getElementById('mentoria-menu');
+            const content = document.getElementById('mentoria-content');
+            if (!menu || !content) return;
+            menu.innerHTML = data.mentoria.map(mod => `<div class="sales-accelerator-menu-item" data-module-id="${mod.moduleId}">${mod.title}</div>`).join('');
+            content.innerHTML = data.mentoria.map(mod => {
+                const placeholder = mod.exercisePrompt || 'Digite suas anotações...';
+                const lessonsHtml = mod.lessons.map(les => `<div class="card mentoria-lesson"><h3>${les.title}</h3><p>${les.content.replace(/\n/g, '<br>')}</p></div>`).join('');
+                return `<div class="mentoria-module-content" id="${mod.moduleId}">${lessonsHtml}<div class="anotacoes-aluno card"><h3>Suas Anotações / Exercícios</h3><textarea class="mentoria-notas" id="notas-${mod.moduleId}" rows="8" placeholder="${placeholder}"></textarea></div></div>`;
+            }).join('');
 
-    // --- 6. MODAIS E INTERAÇÕES (VERSÃO COM ABAS) ---
+            const menuItems = document.querySelectorAll('.sales-accelerator-menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', e => {
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    document.querySelectorAll('.mentoria-module-content').forEach(c => c.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    document.getElementById(e.currentTarget.dataset.moduleId).classList.add('active');
+                });
+            });
+            if (menuItems.length > 0) {
+                menuItems[0].classList.add('active');
+                document.getElementById(menuItems[0].dataset.moduleId).classList.add('active');
+            }
+            loadMentoriaNotes();
+        } catch(e) { console.error("Falha ao carregar mentoria", e); }
+    }
+    
+    function getMentoriaNotes() { document.querySelectorAll('.mentoria-notas').forEach(t => mentoriaNotes[t.id] = t.value); }
+    function loadMentoriaNotes() { for (const id in mentoriaNotes) { const el = document.getElementById(id); if(el) el.value = mentoriaNotes[id]; } }
+
+
+    // --- 6. MODAIS E INTERAÇÕES ---
     async function openLeadModal(leadId) {
         currentLeadId = leadId;
         const lead = leads.find(l => l.id === leadId);
@@ -72,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const userId = firebase.auth().currentUser.uid;
 
         // Resetar para a aba de conversa como padrão
-        document.querySelectorAll('.modal-tab, .modal-tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('#lead-modal .modal-tab, #lead-modal .modal-tab-content').forEach(el => el.classList.remove('active'));
         document.querySelector('.modal-tab[data-tab-target="#chat-tab-content"]').classList.add('active');
         document.querySelector('#chat-tab-content').classList.add('active');
 
@@ -81,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('edit-lead-name').value = lead.nome || '';
         document.getElementById('edit-lead-whatsapp').value = lead.whatsapp || '';
         document.getElementById('edit-lead-status').value = lead.status;
-        document.getElementById('lead-notes').value = lead.notes || ''; // Carrega anotações
+        document.getElementById('lead-notes').value = lead.notes || '';
         
         const chatHistoryDiv = document.getElementById('lead-chat-history');
         if (unsubscribeChat) unsubscribeChat();
@@ -111,18 +146,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupEventListeners(userId) {
         // Navegação principal
         document.querySelectorAll('.sidebar-nav .nav-item:not(#logout-btn)').forEach(item => {
-            item.addEventListener('click', e => { /* ... (código existente) ... */ });
+            item.addEventListener('click', e => {
+                e.preventDefault();
+                const targetId = e.currentTarget.dataset.target;
+                document.querySelectorAll('.sidebar-nav .nav-item, .content-area').forEach(el => el.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                document.getElementById(targetId)?.classList.add('active');
+            });
         });
         
-        // ** NOVA LÓGICA PARA AS ABAS DO MODAL **
+        // Lógica para as abas do modal
         document.querySelectorAll('.modal-tab').forEach(tab => {
             tab.addEventListener('click', () => {
-                const target = document.querySelector(tab.dataset.tabTarget);
-                // Remove 'active' de todas as abas e conteúdos do modal
-                document.querySelectorAll('.modal-tab, .modal-tab-content').forEach(el => {
-                    el.classList.remove('active');
-                });
-                // Adiciona 'active' à aba clicada e ao seu conteúdo correspondente
+                const modal = tab.closest('.modal-content');
+                const target = modal.querySelector(tab.dataset.tabTarget);
+                modal.querySelectorAll('.modal-tab, .modal-tab-content').forEach(el => el.classList.remove('active'));
                 tab.classList.add('active');
                 target.classList.add('active');
             });
@@ -130,9 +168,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Abrir Modal do Lead
         document.body.addEventListener('click', e => {
-            const card = e.target.closest('.kanban-card, .btn-open-lead');
+            const card = e.target.closest('.kanban-card');
             if (card) {
-                const leadIdStr = card.closest('[data-id]').dataset.id;
+                const leadIdStr = card.dataset.id;
                 openLeadModal(parseFloat(leadIdStr));
             }
         });
@@ -154,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 whatsapp: document.getElementById('lead-whatsapp').value,
                 status: document.getElementById('lead-status-form').value,
                 botActive: true,
-                notes: '' // Campo de anotações inicia vazio
+                notes: ''
             };
             leads.push(newLead);
             await saveAllUserData(userId);
@@ -170,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 leads[leadIndex].nome = document.getElementById('edit-lead-name').value;
                 leads[leadIndex].whatsapp = document.getElementById('edit-lead-whatsapp').value;
                 leads[leadIndex].status = document.getElementById('edit-lead-status').value;
-                leads[leadIndex].notes = document.getElementById('lead-notes').value; // Salva as anotações
+                leads[leadIndex].notes = document.getElementById('lead-notes').value;
                 await saveAllUserData(userId);
                 updateAllUI();
                 alert('Lead salvo com sucesso!');
@@ -203,9 +241,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('menu-toggle')?.addEventListener('click', () => {
             document.querySelector('.app-container').classList.toggle('sidebar-visible');
         });
-
-        // ... (resto dos seus event listeners: chatbot, bot, etc.)
     }
 
+    // --- 8. EXECUÇÃO ---
     main();
 });
