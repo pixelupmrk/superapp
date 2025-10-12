@@ -1,31 +1,53 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- 1. VARIÁVEIS GLOBAIS ---
-    let leads = [], caixa = [], estoque = [], chatHistory = [], mentoriaNotes = {};
-    let statusChart, db, unsubscribeChat;
-    let currentLeadId = null, draggedItem = null;
-
-    // --- 2. INICIALIZAÇÃO ---
-    const main = () => {
-        firebase.auth().onAuthStateChanged(async user => {
-            if (user && !document.body.dataset.initialized) {
-                document.body.setAttribute('data-initialized', 'true');
-                db = firebase.firestore();
-                await loadAllUserData(user.uid);
-                setupEventListeners(user.uid);
-            }
-        });
+    // --- 1. CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyA5H7sBUCdgNueLXvdv_sxPTUHT6n38Z9k",
+        authDomain: "superapp-d0368.firebaseapp.com",
+        projectId: "superapp-d0368",
+        storageBucket: "superapp-d0368.appspot.com",
+        messagingSenderId: "469594170619",
+        appId: "1:469594-ddee6770-d1ae-400e-99dd-fa4e49024021:web:145a2e1ee3fc807d0bbc5e"
     };
 
-    // --- 3. DADOS (CARREGAR E SALVAR) ---
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    // --- 2. VARIÁVEIS GLOBAIS ---
+    let db;
+    let leads = [];
+    let unsubscribeChat;
+    let currentLeadId = null;
+
+    // --- 3. PONTO DE ENTRADA E AUTENTICAÇÃO ---
+    firebase.auth().onAuthStateChanged(user => {
+        const isLoginPage = window.location.pathname.includes('login.html');
+        if (user) {
+            if (isLoginPage) {
+                window.location.replace('index.html');
+                return;
+            }
+            if (!document.body.dataset.initialized) {
+                document.body.setAttribute('data-initialized', 'true');
+                db = firebase.firestore();
+                loadAllUserData(user.uid);
+                setupEventListeners(user.uid);
+            }
+        } else {
+            if (!isLoginPage) {
+                window.location.replace('login.html');
+            }
+        }
+    });
+
+    // --- 4. DADOS (CARREGAR E SALVAR) ---
     async function loadAllUserData(userId) {
         try {
             const doc = await db.collection('userData').doc(userId).get();
             if (doc.exists) {
                 const data = doc.data();
                 leads = data.leads || [];
-                leads.forEach(lead => {
-                    if (!lead.id) lead.id = Date.now() + Math.random();
-                });
+                leads.forEach(lead => { if (!lead.id) lead.id = Date.now() + Math.random(); });
             }
             updateAllUI();
         } catch (error) { console.error("Erro ao carregar dados:", error); }
@@ -37,14 +59,14 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error("Erro ao salvar dados:", error); }
     }
 
-    // --- 4. ATUALIZAÇÃO DA UI ---
+    // --- 5. ATUALIZAÇÃO DA UI ---
     function updateAllUI() {
         updateDashboard();
         renderKanbanCards();
         renderLeadsTable();
     }
 
-    // --- 5. FUNÇÕES DE RENDERIZAÇÃO ---
+    // --- 6. FUNÇÕES DE RENDERIZAÇÃO ---
     function updateDashboard() {
         const n = leads.filter(l => l.status === 'novo').length;
         const p = leads.filter(l => l.status === 'progresso').length;
@@ -60,17 +82,18 @@ document.addEventListener('DOMContentLoaded', () => {
         leads.forEach(lead => {
             const column = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`);
             if (column) {
-                column.innerHTML += `<div class="kanban-card" draggable="true" data-id="${lead.id}"><strong>${lead.nome}</strong><p>${lead.whatsapp}</p></div>`;
+                column.innerHTML += `<div class="kanban-card" data-id="${lead.id}"><strong>${lead.nome}</strong><p>${lead.whatsapp}</p></div>`;
             }
         });
     }
 
     function renderLeadsTable() {
         const tbody = document.querySelector('#leads-table tbody');
-        tbody.innerHTML = leads.map(l => `<tr data-id="${l.id}"><td>${l.nome}</td><td>${l.whatsapp}</td><td>${l.status}</td><td><button class="btn-table-action btn-open-lead">Abrir</button></td></tr>`).join('');
+        if(!tbody) return;
+        tbody.innerHTML = leads.map(l => `<tr data-id="${l.id}"><td>${l.nome}</td><td>${l.whatsapp}</td><td>${l.status}</td><td><button class="btn-table-action">Abrir</button></td></tr>`).join('');
     }
 
-    // --- 6. LÓGICA DO MODAL ---
+    // --- 7. LÓGICA DO MODAL ---
     async function openLeadModal(leadId) {
         currentLeadId = leadId;
         const lead = leads.find(l => l.id === leadId);
@@ -119,16 +142,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 7. EVENT LISTENERS ---
+    // --- 8. EVENT LISTENERS ---
     function setupEventListeners(userId) {
         document.querySelectorAll('.sidebar-nav .nav-item:not(#logout-btn)').forEach(item => {
             item.addEventListener('click', e => {
                 e.preventDefault();
-                // ... (lógica de navegação)
+                document.querySelectorAll('.sidebar-nav .nav-item, .content-area').forEach(el => el.classList.remove('active'));
+                item.classList.add('active');
+                document.getElementById(item.dataset.target)?.classList.add('active');
             });
         });
 
-        // Abas do Modal
         document.querySelectorAll('.modal-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 const modal = tab.closest('.modal-content');
@@ -138,18 +162,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        // Abrir/Fechar Modal
         document.body.addEventListener('click', e => {
-            const card = e.target.closest('.kanban-card, .btn-open-lead');
+            const card = e.target.closest('.kanban-card');
             if (card) {
-                openLeadModal(parseFloat(card.closest('[data-id]').dataset.id));
+                openLeadModal(parseFloat(card.dataset.id));
             }
-            if (e.target.closest('.close-modal')) {
+            const closeBtn = e.target.closest('.close-modal');
+            if (closeBtn) {
                 closeModal();
             }
         });
 
-        // Adicionar Lead
         document.getElementById('lead-form').addEventListener('submit', async e => {
             e.preventDefault();
             const newLead = {
@@ -165,7 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.reset();
         });
 
-        // Salvar Detalhes do Lead e Anotações
         document.getElementById('edit-lead-form').addEventListener('submit', async e => {
             e.preventDefault();
             const leadIndex = leads.findIndex(l => l.id === currentLeadId);
@@ -180,9 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Enviar Mensagem no Chat (NÃO RECARREGA A PÁGINA)
         document.getElementById('lead-chat-form').addEventListener('submit', async e => {
-            e.preventDefault(); // Comando mágico que impede o recarregamento
+            e.preventDefault();
             const input = document.getElementById('lead-chat-input');
             const text = input.value.trim();
             if (!text) return;
@@ -194,8 +215,22 @@ document.addEventListener('DOMContentLoaded', () => {
             input.value = '';
             await db.collection('userData').doc(userId).collection('leads').doc(String(currentLeadId)).collection('messages').add(message);
         });
+
+        document.getElementById('logout-btn')?.addEventListener('click', e => {
+            e.preventDefault();
+            firebase.auth().signOut();
+        });
     }
 
-    // --- 8. EXECUÇÃO ---
-    main();
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            firebase.auth().signInWithEmailAndPassword(email, password).catch(err => {
+                document.getElementById('login-error-message').textContent = 'E-mail ou senha inválidos.';
+            });
+        });
+    }
 });
