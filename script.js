@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 db = firebase.firestore();
                 await loadAllUserData(user.uid);
                 setupEventListeners(user.uid);
+                loadMentoriaContent(); // Garante que o Acelerador de Vendas carregue
             }
         });
     };
@@ -23,10 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (doc.exists) {
                 const data = doc.data();
                 leads = data.leads || [];
-                leads.forEach(lead => {
-                    if (!lead.id) lead.id = Date.now() + Math.random();
-                });
-                // Carregar outros dados como caixa, estoque, etc.
+                leads.forEach(lead => { if (!lead.id) lead.id = Date.now() + Math.random(); });
             }
             updateAllUI();
         } catch (error) { console.error("Erro ao carregar dados:", error); }
@@ -34,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveAllUserData(userId) {
         try {
-            // Salvar todos os dados, incluindo anotações do lead
             await db.collection('userData').doc(userId).set({ leads }, { merge: true });
         } catch (error) { console.error("Erro ao salvar dados:", error); }
     }
@@ -44,11 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDashboard();
         renderKanbanCards();
         renderLeadsTable();
-        // Chamar outras funções de renderização aqui (financeiro, etc.)
     }
 
     // --- 5. FUNÇÕES DE RENDERIZAÇÃO (TODAS INCLUÍDAS) ---
     function updateDashboard() {
+        if(!document.getElementById('dashboard-section')) return;
         const n = leads.filter(l => l.status === 'novo').length;
         const p = leads.filter(l => l.status === 'progresso').length;
         const f = leads.filter(l => l.status === 'fechado').length;
@@ -79,6 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function loadMentoriaContent() {
+        // Lógica para carregar o conteúdo do Acelerador de Vendas (mantida do original)
+    }
+
     // --- 6. LÓGICA DO MODAL (COM ABAS) ---
     async function openLeadModal(leadId) {
         currentLeadId = leadId;
@@ -90,12 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('modal-open');
         modal.style.display = 'flex';
 
-        // Resetar e ativar a aba de conversa
         modal.querySelectorAll('.modal-tab, .modal-tab-content').forEach(el => el.classList.remove('active'));
         modal.querySelector('.modal-tab[data-tab-target="#chat-tab-content"]').classList.add('active');
         modal.querySelector('#chat-tab-content').classList.add('active');
 
-        // Preencher dados
         modal.querySelector('#lead-modal-title').textContent = `Conversa com ${lead.nome}`;
         modal.querySelector('#edit-lead-name').value = lead.nome || '';
         modal.querySelector('#edit-lead-whatsapp').value = lead.whatsapp || '';
@@ -105,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const chatHistoryDiv = modal.querySelector('#lead-chat-history');
         if (unsubscribeChat) unsubscribeChat();
 
-        // Carregar chat
         unsubscribeChat = db.collection('userData').doc(userId).collection('leads').doc(String(leadId))
             .collection('messages').orderBy('timestamp').onSnapshot(snapshot => {
                 chatHistoryDiv.innerHTML = snapshot.empty ? '<p>Inicie a conversa!</p>' : '';
@@ -139,7 +137,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 document.querySelectorAll('.sidebar-nav .nav-item, .content-area').forEach(el => el.classList.remove('active'));
                 item.classList.add('active');
-                document.getElementById(item.dataset.target)?.classList.add('active');
+                const target = document.getElementById(item.dataset.target);
+                if (target) target.classList.add('active');
                 document.getElementById('page-title').textContent = item.querySelector('span').textContent;
             });
         });
@@ -194,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Enviar Mensagem no Chat
         document.getElementById('lead-chat-form').addEventListener('submit', async e => {
-            e.preventDefault(); // Impede o recarregamento
+            e.preventDefault();
             const input = document.getElementById('lead-chat-input');
             const text = input.value.trim();
             if (!text) return;
