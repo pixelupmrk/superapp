@@ -1,235 +1,151 @@
-// script.js - VERSÃO FINAL COMPLETA E CORRIGIDA
-document.addEventListener('DOMContentLoaded', () => {
-    // --- DADOS COMPLETOS DA MENTORIA ---
-    const mentoriaData = [
-        {"moduleId":"MD01","title":"Módulo 1: Conectando com o Cliente Ideal","exercisePrompt":"Exercício Módulo 1:\n\n1. Descreva sua persona (cliente ideal).\n2. Qual é a principal dor que seu serviço resolve?\n3. Escreva sua Proposta de Valor.","lessons":[{"lessonId":"L01.01","title":"Questionário para Definição de Persona","content":"Antes de qualquer estratégia, é essencial saber com quem você está falando. O questionário irá ajudar a identificar o perfil do seu cliente ideal. Use o CRM para registrar as respostas e começar a segmentar seus leads.\n\nPerguntas do Questionário:\n1. Nome fictício da persona:\n2. Idade aproximada:\n3. Profissão ou ocupação:\n4. Quais são suas dores e dificuldades?\n5. Quais são seus desejos ou objetivos?\n6. Onde essa pessoa busca informação?\n7. Quais redes sociais essa pessoa usa com frequência?\n8. Que tipo de conteúdo ela consome?"},{"lessonId":"L01.02","title":"Proposta de Valor e Posicionamento","content":"Com base na persona, vamos definir a proposta de valor do seu serviço. A proposta responde: 'Eu ajudo [persona] a [solução] através de [diferencial do seu serviço].'\n\nExemplo: Ajudo [vendedores autônomos] a [acelerar vendas] usando [o super app com CRM e automação]."}]},
-        {"moduleId":"MD02","title":"Módulo 2: O Algoritmo da Meta","exercisePrompt":"Exercício Módulo 2:\n\n1. Crie 3 ganchos para um vídeo sobre seu serviço.\n2. Liste 2 tipos de conteúdo que geram mais salvamentos.","lessons":[{"lessonId":"L02.01","title":"Como o Algoritmo Funciona","content":"O algoritmo da Meta analisa o comportamento dos usuários para decidir o que mostrar. Ele prioriza conteúdos que geram interação rápida. Quanto mais relevante for o seu conteúdo para o público, mais ele será entregue."},{"lessonId":"L02.03","title":"Comece com um Gancho Forte","content":"O primeiro segundo do seu conteúdo precisa chamar a atenção imediatamente. Depois do gancho, entregue valor real e finalize com uma chamada para ação (CTA). Exemplo de ganchos: 'Você está postando, mas ninguém engaja? Isso aqui é pra você.'"}]},
-        {"moduleId":"MD03","title":"Módulo 3: Cronograma de Postagens","exercisePrompt":"Exercício Módulo 3:\n\n1. Defina a frequência ideal de postagens para você.\n2. Monte um cronograma de conteúdo para a próxima semana.","lessons":[{"lessonId":"L03.01","title":"Melhores Horários e Dias para Postagem","content":"O ideal é postar quando seu público está mais ativo (geralmente entre 11h e 13h ou 18h e 20h, de terça a quinta). Use as métricas do Instagram para ver quando seus seguidores estão online."},{"lessonId":"L03.03","title":"Exemplo de Cronograma Semanal","content":"Utilize um calendário para organizar o conteúdo por dia da semana:\nSegunda-feira: Conteúdo Educativo\nTerça-feira: Prova Social (depoimento)\nQuarta-feira: Vídeo Reels\nQuinta-feira: Dica + Engajamento\nSexta-feira: Chamada para Ação/Oferta\nSábado: Conteúdo leve/Bastidor\nDomingo: (Opcional) Inspiração"}]},
-        {"moduleId":"MD04","title":"Módulo 4: Conteúdo que Conecta","exercisePrompt":"Exercício Módulo 4:\n\n1. Escreva um roteiro curto para um vídeo.\n2. Quais são as 2 cores principais da sua marca?","lessons":[{"lessonId":"L04.01","title":"Estrutura de Vídeos que Engajam","content":"Um vídeo precisa seguir uma estrutura estratégica: Gancho (1º segundo), Valor (dica ou solução) e CTA (chamada para ação). Exemplo: 'Você quer mais clientes? Então evite esse erro aqui...'"}]},
-        {"moduleId":"MD05","title":"Módulo 5: Copywriting com ChatGPT","exercisePrompt":"Exercício Módulo 5:\n\n1. Use a fórmula PAS (Problema, Agitação, Solução) para escrever uma legenda de post.\n2. Crie um prompt para o ChatGPT pedindo 3 ideias de conteúdo.","lessons":[{"lessonId":"L05.01","title":"Como Criar Textos Persuasivos com IA","content":"O ChatGPT é uma ferramenta poderosa para gerar textos que vendem. A chave está em saber o que pedir e como direcionar a IA com clareza. Use as fórmulas de copy para montar seus prompts."},{"lessonId":"L05.02","title":"Fórmulas Testadas: AIDA e PAS","content":"Aprenda a usar as estruturas de texto persuasivo:\nAIDA: Atenção, Interesse, Desejo, Ação\nPAS: Problema, Agitação, Solução"}]},
-        {"moduleId":"MD06","title":"Módulo 6: Implementação de CRM","exercisePrompt":"Exercício Módulo 6:\n\n1. Defina as etapas do seu funil de vendas.\n2. Crie um lead de teste no CRM e mova-o pelo funil.","lessons":[{"lessonId":"L06.01","title":"O que é CRM e Por que sua Empresa Precisa","content":"CRM (Customer Relationship Management) é uma ferramenta que organiza o relacionamento com seus leads e clientes, acompanhando-os desde o primeiro contato até o fechamento da venda."},{"lessonId":"L06.02","title":"Construção de Funil de Vendas Básico","content":"Um funil simples pode ter 4 etapas: Contato Inicial, Conversa/Apresentação, Proposta Enviada, Cliente Fechado. O super app ajudará a organizar os leads por estágio para manter a eficiência."}]},
-        {"moduleId":"MD07","title":"Módulo 7: Processo Comercial","exercisePrompt":"Exercício Módulo 7:\n\n1. Escreva seu pitch de vendas em uma única frase.\n2. Qual gatilho mental faz mais sentido para sua oferta?","lessons":[{"lessonId":"L07.01","title":"Como Montar um Pitch Comercial","content":"O pitch é a sua 'apresentação relâmpago'. Ele precisa ser claro e direto. Inclua: Quem você ajuda, o problema que resolve e o diferencial do seu serviço. Exemplo: 'Nós ajudamos negócios locais a atrair clientes todos os dias usando vídeos e tráfego pago.'"}]},
-        {"moduleId":"MD08","title":"Módulo 8: Conexão com a Audiência","exercisePrompt":"Exercício Módulo 8:\n\n1. Liste 3 ideias de conteúdo de bastidores para os Stories.\n2. Escreva uma pergunta para fazer em uma enquete.","lessons":[{"lessonId":"L08.01","title":"Gerando Conexão Real (sem Forçar)","content":"Pessoas se conectam com pessoas. Mostrar sua rotina e bastidores cria empatia. Seja autêntico, não perfeito. Use a câmera frontal e fale como se fosse para um amigo."}]}
-    ];
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM | Super App PixelUp</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
 
-    let leads = [], caixa = [], estoque = [];
-    let nextLeadId = 0, currentLeadId = null, draggedItem = null, currentProductId = null;
-    let statusChart;
-    let db;
-    let unsubscribeLeadChatListener = null;
+    <div id="app-container" class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Super App PixelUp</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="dashboard-section"> <i class="ph-fill ph-gauge"></i> <span>Dashboard</span> </a>
+                <a href="#" class="nav-item" data-target="crm-kanban-section"> <i class="ph-fill ph-trello-logo"></i> <span>CRM / Kanban</span> </a>
+                <a href="#" class="nav-item" data-target="crm-list-section"> <i class="ph-fill ph-list-dashes"></i> <span>Lista de Leads</span> </a>
+                <a href="#" class="nav-item" data-target="finance-section"> <i class="ph-fill ph-chart-bar"></i> <span>Financeiro</span> </a>
+                <a href="#" class="nav-item" data-target="sales-accelerator-section"> <i class="ph-fill ph-rocket-launch"></i> <span>Acelerador de Vendas</span> </a>
+                <a href="#" class="nav-item" data-target="settings-section"> <i class="ph-fill ph-gear-six"></i> <span>Configurações</span> </a>
+                <a href="#" id="logout-btn" class="nav-item"> <i class="ph-fill ph-sign-out"></i> <span>Sair</span> </a>
+            </nav>
+            <div class="sidebar-footer">
+                 <a href="https://wa.me/5547988968000" target="_blank" class="nav-item sac-button"> <i class="ph-fill ph-whatsapp-logo"></i> <span>SAC / Suporte</span> </a>
+            </div>
+        </aside>
 
-    async function main() {
-        firebase.auth().onAuthStateChanged(async (user) => {
-            if (user && !document.body.hasAttribute('data-initialized')) {
-                document.body.setAttribute('data-initialized', 'true');
-                db = firebase.firestore();
-                await loadStaticUserData(user.uid);
-                setupRealtimeListeners(user.uid);
-                setupEventListeners(user.uid);
-            }
-        });
-    }
-    main();
-
-    async function loadStaticUserData(userId) {
-        try {
-            const userDocRef = db.collection('userData').doc(userId);
-            const doc = await userDocRef.get();
-            if (doc.exists) {
-                const data = doc.data();
-                caixa = data.caixa || [];
-                estoque = data.estoque || [];
-                estoque.forEach((item, index) => { if (!item.id) item.id = `prod_${Date.now()}_${index}`; });
-                applySettings(data.settings);
-                loadMentoriaNotes(data.mentoriaNotes);
-            } else {
-                applySettings();
-            }
-            renderMentoria();
-            updateFinanceUI();
-        } catch (error) { console.error("Erro ao carregar dados estáticos:", error); }
-    }
-
-    function setupRealtimeListeners(userId) {
-        db.collection('userData').doc(userId).collection('leads').onSnapshot(snapshot => {
-            leads = [];
-            snapshot.forEach(doc => {
-                leads.push({ firestoreId: doc.id, ...doc.data() });
-            });
-            nextLeadId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 0;
-            updateCrmUI();
-        }, error => {
-            console.error("Erro no listener de leads: ", error);
-        });
-    }
-
-    function updateCrmUI() {
-        renderKanbanCards();
-        renderLeadsTable();
-        updateDashboard();
-    }
-
-    function updateFinanceUI() {
-        renderCaixaTable();
-        updateCaixa();
-        renderEstoqueTable();
-    }
-    
-    function applySettings(settings = {}) {
-        const theme = settings.theme || 'dark';
-        const userName = settings.userName || 'Usuário';
-        document.body.className = theme === 'light' ? 'light-theme' : '';
-        const themeBtn = document.getElementById('theme-toggle-btn');
-        if (themeBtn) themeBtn.textContent = theme === 'light' ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro';
-        const userProfile = document.querySelector('.user-profile span');
-        if (userProfile) userProfile.textContent = `Olá, ${userName}`;
-        const settingName = document.getElementById('setting-user-name');
-        if(settingName) settingName.value = userName;
-    }
-    
-    async function saveUserData(userId, dataToSave) {
-        try {
-            await db.collection('userData').doc(userId).set(dataToSave, { merge: true });
-        } catch (error) {
-            console.error("ERRO AO SALVAR DADOS NO FIRESTORE:", error);
-            alert("Atenção: Não foi possível salvar os dados.");
-        }
-    }
-
-    function setupEventListeners(userId) {
-        // ... (código dos event listeners)
-    }
-
-    function openEditModal(leadId) {
-        currentLeadId = leadId;
-        const lead = leads.find(l => l.id === leadId);
-        
-        if(lead) {
-            document.getElementById('edit-lead-name').value = lead.nome;
-            document.getElementById('edit-lead-email').value = lead.email;
-            document.getElementById('edit-lead-whatsapp').value = lead.whatsapp;
-            document.getElementById('edit-lead-status').value = lead.status;
-            document.getElementById('edit-lead-origem').value = lead.origem;
-            document.getElementById('edit-lead-qualification').value = lead.qualificacao;
-            document.getElementById('edit-lead-notes').value = lead.notas;
+        <main class="main-content">
+            <header class="main-header">
+                <div class="menu-toggle" id="menu-toggle"> <i class="ph-fill ph-list"></i> </div>
+                <h1 id="page-title">Dashboard</h1>
+                <div class="user-profile"> <span>Olá, Usuário</span> </div>
+            </header>
             
-            const userId = firebase.auth().currentUser.uid;
-            const leadChatRef = db.collection('userData').doc(userId).collection('leads').doc(lead.firestoreId).collection('chatHistory').orderBy('timestamp');
+            <div class="content-area active" id="dashboard-section">
+                <div class="dashboard-stats">
+                    <div class="stat-card"> <h3>Total de Leads</h3> <p id="total-leads">0</p> </div>
+                    <div class="stat-card"> <h3>Leads Novos</h3> <p id="leads-novo">0</p> </div>
+                    <div class="stat-card"> <h3>Leads em Progresso</h3> <p id="leads-progresso">0</p> </div>
+                    <div class="stat-card"> <h3>Leads Fechados</h3> <p id="leads-fechado">0</p> </div>
+                </div>
+                <div class="card">
+                    <h3>Status dos Leads</h3>
+                    <div class="chart-container"> <canvas id="statusChart"></canvas> </div>
+                </div>
+            </div>
 
-            if (unsubscribeLeadChatListener) unsubscribeLeadChatListener();
-            
-            unsubscribeLeadChatListener = leadChatRef.onSnapshot(snapshot => {
-                const messagesContainer = document.getElementById('lead-chatbot-messages');
-                messagesContainer.innerHTML = '';
-                if (snapshot.empty) {
-                    addMessageToChat("Converse com a IA para iniciar.", 'bot-message', 'lead-chatbot-messages');
-                } else {
-                    snapshot.forEach(doc => {
-                        const message = doc.data();
-                        addMessageToChat(message.parts[0].text, message.role === 'user' ? 'user-message' : 'bot-message', 'lead-chatbot-messages');
-                    });
-                }
-            }, error => console.error("Erro no listener de chat do lead: ", error));
+            <div class="content-area" id="crm-kanban-section">
+                <div class="card">
+                    <h2>Novo Lead</h2>
+                    <form id="lead-form">
+                        <div class="input-grid">
+                            <input type="text" id="lead-name" placeholder="Nome" required>
+                            <input type="email" id="lead-email" placeholder="E-mail">
+                            <input type="tel" id="lead-whatsapp" placeholder="WhatsApp" required>
+                            <input type="text" id="lead-origin" placeholder="Origem">
+                            <select id="lead-qualification"> <option value="">Qualificação</option> <option value="quente">Lead Quente</option> <option value="morno">Lead Morno</option> <option value="frio">Lead Frio</option> </select>
+                        </div>
+                        <textarea id="lead-notes" placeholder="Notas..."></textarea>
+                        <button type="submit" class="btn-save">Salvar Lead</button>
+                    </form>
+                </div>
+                <div class="kanban-board" id="kanban-board">
+                    <div class="kanban-column" data-status="novo"> <h3>Novo</h3> <div class="kanban-cards-list"></div> </div>
+                    <div class="kanban-column" data-status="progresso"> <h3>Em Progresso</h3> <div class="kanban-cards-list"></div> </div>
+                    <div class="kanban-column" data-status="fechado"> <h3>Fechado</h3> <div class="kanban-cards-list"></div> </div>
+                </div>
+            </div>
 
-            document.getElementById('edit-lead-modal').style.display = 'flex';
-        }
-    }
+            <div class="content-area" id="crm-list-section">
+                <div class="card">
+                    <div class="table-container">
+                        <table id="leads-table">
+                            <thead> <tr> <th>Nome</th> <th>WhatsApp</th> <th>Origem</th> <th>Qualificação</th> <th>Status</th> <th>Ações</th> </tr> </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-    function addMessageToChat(msg, type, containerId) { 
-        const container = document.getElementById(containerId);
-        if (container) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = type;
-            msgDiv.textContent = msg;
-            container.appendChild(msgDiv);
-            container.scrollTop = container.scrollHeight;
-        }
-    }
+             <div class="content-area" id="finance-section">
+                </div>
+             
+            <div class="content-area" id="sales-accelerator-section">
+                </div>
 
-    function renderKanbanCards() { 
-        const lists = document.querySelectorAll('.kanban-cards-list');
-        if (!lists.length) return;
-        lists.forEach(l => l.innerHTML = ''); 
-        leads.forEach(lead => { 
-            const column = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`); 
-            if (column) { 
-                const card = document.createElement('div');
-                card.className = 'kanban-card';
-                card.draggable = true;
-                card.dataset.id = lead.id;
-                card.innerHTML = `<strong>${lead.nome}</strong><p><a href="https://wa.me/${(lead.whatsapp || '').replace(/\D/g, '')}" target="_blank">${lead.whatsapp}</a></p>`;
-                column.appendChild(card);
-            } 
-        }); 
-    }
+            <div class="content-area" id="settings-section">
+                <div class="card">
+                    <h3>Dados do Usuário</h3>
+                    <div class="input-grid"> <input type="text" id="setting-user-name" placeholder="Seu Nome de Usuário"> </div>
+                </div>
+                <div class="card">
+                    <h3>Aparência</h3>
+                    <button class="btn-save" id="theme-toggle-btn">Mudar para Tema Claro</button>
+                </div>
+                <div class="card">
+                     <button class="btn-save" id="save-settings-btn">Salvar Configurações</button>
+                </div>
+            </div>
+        </main>
+    </div>
 
-    function renderLeadsTable() { 
-        const tbody = document.querySelector('#leads-table tbody'); 
-        if (tbody) { 
-            tbody.innerHTML = leads.map(l => { 
-                const waLink = `<a href="https://wa.me/${(l.whatsapp || '').replace(/\D/g, '')}" target="_blank">${l.whatsapp}</a>`; 
-                return `<tr data-id="${l.id}"><td>${l.nome}</td><td>${waLink}</td><td>${l.origem}</td><td>${l.qualificacao}</td><td>${l.status}</td><td><button class="btn-edit-table"><i class="ph-fill ph-note-pencil"></i></button><button class="btn-delete-table"><i class="ph-fill ph-trash"></i></button></td></tr>`; 
-            }).join(''); 
-        } 
-    }
+    <div class="modal-overlay" id="edit-lead-modal">
+        <div class="modal-content" style="max-width: 1000px; display: flex; gap: 2rem;">
+            <div class="lead-form-column" style="flex: 1;">
+                <span class="close-modal" data-target="edit-lead-modal">&times;</span>
+                <h2>Editar Lead</h2>
+                <form id="edit-lead-form">
+                    <div class="input-grid">
+                        <input type="text" id="edit-lead-name" placeholder="Nome">
+                        <input type="email" id="edit-lead-email" placeholder="E-mail">
+                        <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
+                        <select id="edit-lead-status"> <option value="novo">Novo</option> <option value="progresso">Em Progresso</option> <option value="fechado">Fechado</option> </select>
+                        <input type="text" id="edit-lead-origem" placeholder="Origem">
+                        <select id="edit-lead-qualification"> <option value="">Qualificação</option> <option value="quente">Lead Quente</option> <option value="morno">Lead Morno</option> <option value="frio">Lead Frio</option> </select>
+                    </div>
+                    <textarea id="edit-lead-notes" placeholder="Notas"></textarea>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-delete" id="delete-lead-btn">Excluir Lead</button>
+                        <button type="submit" class="btn-save">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+            <div class="lead-chat-column" style="flex: 1; display: flex; flex-direction: column; border-left: 1px solid var(--secondary-color); padding-left: 2rem;">
+                <h3>Chat com Assistente AI</h3>
+                <div class="chatbot-container" style="height: 100%;">
+                    <div id="lead-chatbot-messages" class="chatbot-messages" style="height: 400px;">
+                        </div>
+                    <form id="lead-chatbot-form" class="chatbot-form">
+                        <input type="text" id="lead-chatbot-input" placeholder="Converse com a IA sobre este lead..." autocomplete="off">
+                        <button type="submit"><i class="ph-fill ph-paper-plane-right"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    function updateDashboard() { 
-        if (!document.getElementById('total-leads')) return;
-        const n = leads.filter(l=>l.status==='novo').length;
-        const p=leads.filter(l=>l.status==='progresso').length;
-        const f=leads.filter(l=>l.status==='fechado').length; 
-        document.getElementById('total-leads').textContent = leads.length; 
-        document.getElementById('leads-novo').textContent = n; 
-        document.getElementById('leads-progresso').textContent = p; 
-        document.getElementById('leads-fechado').textContent = f; 
-        const ctx = document.getElementById('statusChart')?.getContext('2d'); 
-        if (!ctx) return; 
-        if (statusChart) statusChart.destroy(); 
-        statusChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Novo', 'Progresso', 'Fechado'], datasets: [{ data: [n, p, f], backgroundColor: ['#00f7ff', '#ffc107', '#28a745'] }] } }); 
-    }
-
-    function renderCaixaTable() { 
-        const tbody = document.querySelector('#caixa-table tbody'); 
-        if (tbody) { 
-            tbody.innerHTML = caixa.map(m => `<tr><td>${m.data}</td><td>${m.descricao}</td><td>${m.tipo==='entrada'?'R$ '+m.valor.toFixed(2):''}</td><td>${m.tipo==='saida'?'R$ '+m.valor.toFixed(2):''}</td></tr>`).join(''); 
-        } 
-    }
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
-    function updateCaixa() { 
-        if (!document.getElementById('total-entradas')) return;
-        const e = caixa.filter(m=>m.tipo==='entrada').reduce((a,c)=>a+c.valor,0);
-        const s = caixa.filter(m=>m.tipo==='saida').reduce((a,c)=>a+c.valor,0); 
-        document.getElementById('total-entradas').textContent = `R$ ${e.toFixed(2)}`; 
-        document.getElementById('total-saidas').textContent = `R$ ${s.toFixed(2)}`; 
-        document.getElementById('caixa-atual').textContent = `R$ ${(e-s).toFixed(2)}`; 
-    }
-
-    function renderEstoqueTable() { 
-        const tbody = document.querySelector('#estoque-table tbody'); 
-        if (!tbody) return; 
-        const searchTerm = document.getElementById('estoque-search')?.value.toLowerCase() || ''; 
-        const filteredEstoque = estoque.filter(p => (p.produto && p.produto.toLowerCase().includes(searchTerm)) || (p.descricao && p.descricao.toLowerCase().includes(searchTerm))); 
-        tbody.innerHTML = filteredEstoque.map(p => { 
-            const totalCustos = (p.custos || []).reduce((acc, c) => acc + c.valor, 0); 
-            const lucro = p.venda - p.compra - totalCustos; 
-            return `<tr data-id="${p.id}"><td>${p.produto}</td><td>${p.descricao}</td><td>R$ ${p.compra.toFixed(2)}</td><td>R$ ${totalCustos.toFixed(2)}</td><td>R$ ${p.venda.toFixed(2)}</td><td>R$ ${lucro.toFixed(2)}</td><td><button class="btn-custo">Custos</button><button class="btn-delete-table btn-delete-estoque"><i class="ph-fill ph-trash"></i></button></td></tr>`; 
-        }).join(''); 
-    }
-    
-    function openCustosModal(productId) { currentProductId = productId; const produto = estoque.find(p => p.id === productId); if (produto) { document.getElementById('custos-modal-title').textContent = `Custos de: ${produto.produto}`; renderCustosList(produto); document.getElementById('custos-modal').style.display = 'flex'; } }
-    
-    function renderCustosList(produto) { const listContainer = document.getElementById('custos-list'); if (!listContainer) return; if (!produto.custos || produto.custos.length === 0) { listContainer.innerHTML = '<p>Nenhum custo adicionado.</p>'; return; } listContainer.innerHTML = produto.custos.map(custo => `<div class="custo-item"><span>${custo.descricao}</span><span>R$ ${custo.valor.toFixed(2)}</span></div>`).join(''); }
-    
-    function renderMentoria() {
-        const menu = document.getElementById('mentoria-menu'); 
-        const content = document.getElementById('mentoria-content'); 
-        if (!menu || !content) return;
-        menu.innerHTML = mentoriaData.map((mod, i) => `<div class="sales-accelerator-menu-item ${i === 0 ? 'active' : ''}" data-module-id="${mod.moduleId}">${mod.title}</div>`).join('');
-        content.innerHTML = mentoriaData.map((mod, i) => { const placeholder = mod.exercisePrompt || `Digite aqui suas anotações para o Módulo ${i + 1}...`; return `<div class="mentoria-module-content ${i === 0 ? 'active' : ''}" id="${mod.moduleId}">${mod.lessons.map(les => `<div class="mentoria-lesson"><h3>${les.title}</h3><p>${les.content}</p></div>`).join('')}<div class="anotacoes-aluno"><label for="notas-${mod.moduleId}">Minhas Anotações / Exercícios</label><textarea class="mentoria-notas" id="notas-${mod.moduleId}" rows="8" placeholder="${placeholder}"></textarea></div></div>`; }).join('');
-        document.querySelectorAll('.sales-accelerator-menu-item').forEach(item => { item.addEventListener('click', e => { document.querySelectorAll('.sales-accelerator-menu-item, .mentoria-module-content').forEach(el => el.classList.remove('active')); const clickedItem = e.currentTarget; clickedItem.classList.add('active'); document.getElementById(clickedItem.dataset.moduleId).classList.add('active'); }); });
-    }
-    
-    function getMentoriaNotes() { const n = {}; document.querySelectorAll('.mentoria-notas').forEach(t => n[t.id] = t.value); return n; }
-    
-    function loadMentoriaNotes(notes = {}) { for (const id in notes) { const t = document.getElementById(id); if (t) t.value = notes[id]; } }
-});
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
