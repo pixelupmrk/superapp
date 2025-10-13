@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM | Super App PixelUp</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div id="app-container" class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Super App PixelUp</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="dashboard-section"> <i class="ph-fill ph-gauge"></i> <span>Dashboard</span> </a>
+                <a href="#" class="nav-item" data-target="crm-kanban-section"> <i class="ph-fill ph-trello-logo"></i> <span>CRM / Kanban</span> </a>
+                <a href="#" class="nav-item" data-target="crm-list-section"> <i class="ph-fill ph-list-dashes"></i> <span>Lista de Leads</span> </a>
+                <a href="#" class="nav-item" data-target="finance-section"> <i class="ph-fill ph-chart-bar"></i> <span>Financeiro</span> </a>
+                <a href="#" class="nav-item" data-target="sales-accelerator-section"> <i class="ph-fill ph-rocket-launch"></i> <span>Acelerador de Vendas</span> </a>
+                <a href="#" class="nav-item" data-target="settings-section"> <i class="ph-fill ph-gear-six"></i> <span>Configurações</span> </a>
+                <a href="#" id="logout-btn" class="nav-item"> <i class="ph-fill ph-sign-out"></i> <span>Sair</span> </a>
+            </nav>
+            <div class="sidebar-footer">
+                 <a href="https://wa.me/5547988968000" target="_blank" class="nav-item sac-button"> <i class="ph-fill ph-whatsapp-logo"></i> <span>SAC / Suporte</span> </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div class="menu-toggle" id="menu-toggle"> <i class="ph-fill ph-list"></i> </div>
+                <h1 id="page-title">Dashboard</h1>
+                <div class="user-profile"> <span>Olá, Usuário</span> </div>
+            </header>
+            
+            <div class="content-area active" id="dashboard-section">
+                <div class="dashboard-stats">
+                    <div class="stat-card"> <h3>Total de Leads</h3> <p id="total-leads">0</p> </div>
+                    <div class="stat-card"> <h3>Leads Novos</h3> <p id="leads-novo">0</p> </div>
+                    <div class="stat-card"> <h3>Leads em Progresso</h3> <p id="leads-progresso">0</p> </div>
+                    <div class="stat-card"> <h3>Leads Fechados</h3> <p id="leads-fechado">0</p> </div>
+                </div>
+                <div class="card">
+                    <h3>Status dos Leads</h3>
+                    <div class="chart-container"> <canvas id="statusChart"></canvas> </div>
+                </div>
+            </div>
+
+            <div class="content-area" id="crm-kanban-section">
+                <div class="card">
+                    <h2>Novo Lead</h2>
+                    <form id="lead-form">
+                        <div class="input-grid">
+                            <input type="text" id="lead-name" placeholder="Nome" required>
+                            <input type="email" id="lead-email" placeholder="E-mail">
+                            <input type="tel" id="lead-whatsapp" placeholder="WhatsApp" required>
+                            <input type="text" id="lead-origin" placeholder="Origem">
+                            <select id="lead-qualification"> <option value="">Qualificação</option> <option value="quente">Lead Quente</option> <option value="morno">Lead Morno</option> <option value="frio">Lead Frio</option> </select>
+                        </div>
+                        <textarea id="lead-notes" placeholder="Notas..."></textarea>
+                        <button type="submit" class="btn-save">Salvar Lead</button>
+                    </form>
+                </div>
+                <div class="kanban-board" id="kanban-board">
+                    <div class="kanban-column" data-status="novo"> <h3>Novo</h3> <div class="kanban-cards-list"></div> </div>
+                    <div class="kanban-column" data-status="progresso"> <h3>Em Progresso</h3> <div class="kanban-cards-list"></div> </div>
+                    <div class="kanban-column" data-status="fechado"> <h3>Fechado</h3> <div class="kanban-cards-list"></div> </div>
+                </div>
+            </div>
+
+            <div class="content-area" id="crm-list-section">
+                <div class="card">
+                    <div class="table-container">
+                        <table id="leads-table">
+                            <thead> <tr> <th>Nome</th> <th>WhatsApp</th> <th>Origem</th> <th>Qualificação</th> <th>Status</th> <th>Ações</th> </tr> </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+             <div class="content-area" id="finance-section">
+                </div>
+             
+            <div class="content-area" id="sales-accelerator-section">
+                </div>
+
+            <div class="content-area" id="settings-section">
+                <div class="card">
+                    <h3>Dados do Usuário</h3>
+                    <div class="input-grid"> <input type="text" id="setting-user-name" placeholder="Seu Nome de Usuário"> </div>
+                </div>
+                <div class="card">
+                    <h3>Aparência</h3>
+                    <button class="btn-save" id="theme-toggle-btn">Mudar para Tema Claro</button>
+                </div>
+                <div class="card">
+                     <button class="btn-save" id="save-settings-btn">Salvar Configurações</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="edit-lead-modal">
+        <div class="modal-content" style="max-width: 1000px; display: flex; gap: 2rem;">
+            <div class="lead-form-column" style="flex: 1;">
+                <span class="close-modal" data-target="edit-lead-modal">&times;</span>
+                <h2>Editar Lead</h2>
+                <form id="edit-lead-form">
+                    <div class="input-grid">
+                        <input type="text" id="edit-lead-name" placeholder="Nome">
+                        <input type="email" id="edit-lead-email" placeholder="E-mail">
+                        <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
+                        <select id="edit-lead-status"> <option value="novo">Novo</option> <option value="progresso">Em Progresso</option> <option value="fechado">Fechado</option> </select>
+                        <input type="text" id="edit-lead-origem" placeholder="Origem">
+                        <select id="edit-lead-qualification"> <option value="">Qualificação</option> <option value="quente">Lead Quente</option> <option value="morno">Lead Morno</option> <option value="frio">Lead Frio</option> </select>
+                    </div>
+                    <textarea id="edit-lead-notes" placeholder="Notas"></textarea>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-delete" id="delete-lead-btn">Excluir Lead</button>
+                        <button type="submit" class="btn-save">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+            <div class="lead-chat-column" style="flex: 1; display: flex; flex-direction: column; border-left: 1px solid var(--secondary-color); padding-left: 2rem;">
+                <h3>Chat com Assistente AI</h3>
+                <div class="chatbot-container" style="height: 100%;">
+                    <div id="lead-chatbot-messages" class="chatbot-messages" style="height: 400px;">
+                        </div>
+                    <form id="lead-chatbot-form" class="chatbot-form">
+                        <input type="text" id="lead-chatbot-input" placeholder="Converse com a IA sobre este lead..." autocomplete="off">
+                        <button type="submit"><i class="ph-fill ph-paper-plane-right"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
