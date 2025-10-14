@@ -37,15 +37,71 @@
             </header>
             
             <div class="content-area active" id="dashboard-section">
+                <div class="dashboard-stats">
+                    <div class="stat-card"> <h3>Total de Leads</h3> <p id="total-leads">0</p> </div>
+                    <div class="stat-card"> <h3>Leads Novos</h3> <p id="leads-novo">0</p> </div>
+                    <div class="stat-card"> <h3>Leads em Progresso</h3> <p id="leads-progresso">0</p> </div>
+                    <div class="stat-card"> <h3>Leads Fechados</h3> <p id="leads-fechado">0</p> </div>
                 </div>
+                <div class="card">
+                    <h3>Status dos Leads</h3>
+                    <div class="chart-container"> <canvas id="statusChart"></canvas> </div>
+                </div>
+            </div>
 
             <div class="content-area" id="crm-kanban-section">
-                 </div>
+                <div class="card">
+                    <h2>Novo Lead</h2>
+                    <form id="lead-form">
+                        <div class="input-grid">
+                            <input type="text" id="lead-name" placeholder="Nome" required>
+                            <input type="email" id="lead-email" placeholder="E-mail">
+                            <input type="tel" id="lead-whatsapp" placeholder="WhatsApp" required>
+                            <input type="text" id="lead-origin" placeholder="Origem">
+                            <select id="lead-qualification"> <option value="">Qualificação</option> <option value="quente">Lead Quente</option> <option value="morno">Lead Morno</option> <option value="frio">Lead Frio</option> </select>
+                        </div>
+                        <textarea id="lead-notes" placeholder="Notas..."></textarea>
+                        <button type="submit" class="btn-save">Salvar Lead</button>
+                    </form>
+                </div>
+                <div class="kanban-board" id="kanban-board">
+                    <div class="kanban-column" data-status="novo"> <h3>Novo</h3> <div class="kanban-cards-list"></div> </div>
+                    <div class="kanban-column" data-status="progresso"> <h3>Em Progresso</h3> <div class="kanban-cards-list"></div> </div>
+                    <div class="kanban-column" data-status="fechado"> <h3>Fechado</h3> <div class="kanban-cards-list"></div> </div>
+                </div>
+            </div>
 
             <div class="content-area" id="crm-list-section">
+                <div class="card">
+                    <div class="table-container">
+                        <table id="leads-table">
+                            <thead> <tr> <th>Nome</th> <th>WhatsApp</th> <th>Origem</th> <th>Qualificação</th> <th>Status</th> <th>Ações</th> </tr> </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
-            
-            </main>
+            </div>
+
+             <div class="content-area" id="finance-section">
+                </div>
+             
+            <div class="content-area" id="sales-accelerator-section">
+                </div>
+
+            <div class="content-area" id="settings-section">
+                <div class="card">
+                    <h3>Dados do Usuário</h3>
+                    <div class="input-grid"> <input type="text" id="setting-user-name" placeholder="Seu Nome de Usuário"> </div>
+                </div>
+                <div class="card">
+                    <h3>Aparência</h3>
+                    <button class="btn-save" id="theme-toggle-btn">Mudar para Tema Claro</button>
+                </div>
+                <div class="card">
+                     <button class="btn-save" id="save-settings-btn">Salvar Configurações</button>
+                </div>
+            </div>
+        </main>
     </div>
 
     <div class="modal-overlay" id="edit-lead-modal">
