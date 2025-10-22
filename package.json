@@ -1,7 +1,0 @@
-{
-  "name": "superapp-backend",
-  "version": "1.0.0",
-  "dependencies": {
-    "@google/generative-ai": "^0.8.0"
-  }
-}
