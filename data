@@ -1,0 +1,224 @@
+{
+  "mentorship": [
+    {
+      "moduleId": "MD01",
+      "title": "Módulo 1: Conectando com o Cliente Ideal",
+      "description": "Aprenda a usar o CRM do super app para construir a persona do seu cliente, otimizando seu funil de vendas desde o início.",
+      "lessons": [
+        {
+          "lessonId": "L01.01",
+          "title": "Questionário para Definição de Persona",
+          "type": "text",
+          "content": "Antes de qualquer estratégia, é essencial saber com quem você está falando. O questionário irá ajudar a identificar o perfil do seu cliente ideal. Use o CRM para registrar as respostas e começar a segmentar seus leads.\n\nPerguntas do Questionário:\n1. Nome fictício da persona:\n2. Idade aproximada:\n3. Profissão ou ocupação:\n4. Quais são suas dores e dificuldades?\n5. Quais são seus desejos ou objetivos?\n6. Onde essa pessoa busca informação?\n7. Quais redes sociais essa pessoa usa com frequência?\n8. Que tipo de conteúdo ela consome?"
+        },
+        {
+          "lessonId": "L01.02",
+          "title": "Proposta de Valor e Posicionamento",
+          "type": "video",
+          "videoUrl": "URL_DO_VIDEO_A_SER_ADICIONADO_AQUI",
+          "content": "Com base na persona, vamos definir a proposta de valor do seu serviço. A proposta responde: 'Eu ajudo [persona] a [solução] através de [diferencial do seu serviço].'\n\nExemplo: Ajudo [vendedores autônomos] a [acelerar vendas] usando [o super app com CRM e automação]."
+        },
+        {
+          "lessonId": "L01.03",
+          "title": "Exercício Prático: Configurando o CRM",
+          "type": "interactive",
+          "description": "Este exercício prático irá guiá-lo a configurar o CRM do seu super app para a sua persona. Você irá criar as primeiras tags e campos para começar a registrar as informações."
+        }
+      ]
+    },
+    {
+      "moduleId": "MD02",
+      "title": "Módulo 2: O Algoritmo da Meta (Facebook & Instagram)",
+      "description": "Entenda como o algoritmo da Meta funciona e aprenda a criar ganchos e conteúdos que direcionam tráfego para o seu super app.",
+      "lessons": [
+        {
+          "lessonId": "L02.01",
+          "title": "Como o Algoritmo Funciona",
+          "type": "text",
+          "content": "O algoritmo da Meta analisa o comportamento dos usuários para decidir o que mostrar. Ele prioriza conteúdos que geram interação rápida. Quanto mais relevante for o seu conteúdo para o público, mais ele será entregue."
+        },
+        {
+          "lessonId": "L02.02",
+          "title": "O que Influencia o Alcance Orgânico",
+          "type": "text",
+          "content": "O alcance orgânico depende de fatores como: qualidade do conteúdo, engajamento nos primeiros minutos, frequência de publicações e relacionamento com o público (DMs, respostas, salvamentos)."
+        },
+        {
+          "lessonId": "L02.03",
+          "title": "Comece com um Gancho Forte",
+          "type": "text",
+          "content": "O primeiro segundo do seu conteúdo precisa chamar a atenção imediatamente. Depois do gancho, entregue valor real e finalize com uma chamada para ação (CTA). Exemplo de ganchos: 'Você está postando, mas ninguém engaja? Isso aqui é pra você.'"
+        },
+        {
+          "lessonId": "L02.04",
+          "title": "Desafio Prático: Criação de Gancho",
+          "type": "interactive",
+          "description": "Crie três ganchos diferentes para o seu super app, focando nas dores da sua persona. Exemplo: 'Você quer vender mais, mas não sabe por onde começar? O super app resolve isso!'"
+        }
+      ]
+    },
+    {
+      "moduleId": "MD03",
+      "title": "Módulo 3: Cronograma de Postagens Estratégico",
+      "description": "Planeje a sua rotina de conteúdo nas redes sociais com um calendário que aumenta o seu alcance e consistência.",
+      "lessons": [
+        {
+          "lessonId": "L03.01",
+          "title": "Melhores Horários e Dias para Postagem",
+          "type": "text",
+          "content": "O ideal é postar quando seu público está mais ativo (geralmente entre 11h e 13h ou 18h e 20h, de terça a quinta). Use as métricas do Instagram para ver quando seus seguidores estão online."
+        },
+        {
+          "lessonId": "L03.02",
+          "title": "Frequência Ideal e Consistência",
+          "type": "text",
+          "content": "Mais importante que a quantidade, é a consistência. A frequência ideal varia por nicho. A mentoria sugere: Estética e beleza (4 a 5 posts por semana); B2B (3 posts bem elaborados por semana); Varejo (diária)."
+        },
+        {
+          "lessonId": "L03.03",
+          "title": "Exemplo de Cronograma Semanal",
+          "type": "text",
+          "content": "Utilize um calendário para organizar o conteúdo por dia da semana:\nSegunda-feira: Conteúdo Educativo\nTerça-feira: Prova Social (depoimento)\nQuarta-feira: Vídeo Reels\nQuinta-feira: Dica + Engajamento\nSexta-feira: Chamada para Ação/Oferta\nSábado: Conteúdo leve/Bastidor\nDomingo: (Opcional) Inspiração"
+        }
+      ]
+    },
+    {
+      "moduleId": "MD04",
+      "title": "Módulo 4: Conteúdo que Conecta",
+      "description": "Aprenda a gravar e editar vídeos que engajam, utilizando ferramentas como CapCut e Canva para fortalecer a identidade visual da sua marca.",
+      "lessons": [
+        {
+          "lessonId": "L04.01",
+          "title": "Estrutura de Vídeos que Engajam",
+          "type": "text",
+          "content": "Um vídeo precisa seguir uma estrutura estratégica: Gancho (1º segundo), Valor (dica ou solução) e CTA (chamada para ação). Exemplo: 'Você quer mais clientes? Então evite esse erro aqui...'"
+        },
+        {
+          "lessonId": "L04.02",
+          "title": "Edição Prática com CapCut ou InShot",
+          "type": "video",
+          "videoUrl": "URL_DO_VIDEO_A_SER_ADICIONADO_AQUI",
+          "content": "Aprenda a usar ferramentas de edição como CapCut para cortar partes desnecessárias, adicionar legendas automáticas e inserir trilha sonora."
+        },
+        {
+          "lessonId": "L04.03",
+          "title": "Design com Canva",
+          "type": "text",
+          "content": "Use o Canva para criar uma identidade visual coesa. Mantenha fontes legíveis, as cores da sua marca e crie um padrão visual para que seus posts sejam reconhecidos no feed."
+        },
+        {
+          "lessonId": "L04.04",
+          "title": "Desafio de Vídeo Teste: '1 Dica, 1 Minuto'",
+          "type": "interactive",
+          "description": "Crie um roteiro para um vídeo curto e direto, com foco em engajamento. Siga a estrutura: Gancho, Valor e CTA."
+        }
+      ]
+    },
+    {
+      "moduleId": "MD05",
+      "title": "Módulo 5: Copywriting com ChatGPT",
+      "description": "Utilize o ChatGPT para criar textos persuasivos para suas redes sociais e anúncios, usando fórmulas de copy que realmente convertem.",
+      "lessons": [
+        {
+          "lessonId": "L05.01",
+          "title": "Como Criar Textos Persuasivos com IA",
+          "type": "text",
+          "content": "O ChatGPT é uma ferramenta poderosa para gerar textos que vendem. A chave está em saber o que pedir e como direcionar a IA com clareza. Use as fórmulas de copy para montar seus prompts."
+        },
+        {
+          "lessonId": "L05.02",
+          "title": "Fórmulas Testadas: AIDA e PAS",
+          "type": "text",
+          "content": "Aprenda a usar as estruturas de texto persuasivo:\nAIDA: Atenção, Interesse, Desejo, Ação\nPAS: Problema, Agitação, Solução"
+        },
+        {
+          "lessonId": "L05.03",
+          "title": "Criando Prompts Inteligentes",
+          "type": "text",
+          "content": "Um bom prompt direciona o ChatGPT a criar algo útil. Use a estrutura: [Ação] + [Assunto] + [Objetivo] + [Estilo/Tom]. Exemplo: 'Escreva uma copy para anúncio no Instagram sobre mentoria de marketing, com objetivo de gerar leads, num tom direto e persuasivo.'"
+        },
+        {
+          "lessonId": "L05.04",
+          "title": "Prompt Base Personalizado",
+          "type": "text",
+          "content": "Use este prompt base para agilizar sua criação de conteúdo:\n📍 Tema:\n🎯 Objetivo:\n🧑 Público-alvo:\n🗣 Tom de voz:\n📱 Formato desejado:"
+        }
+      ]
+    },
+    {
+      "moduleId": "MD06",
+      "title": "Módulo 6: Implementação de CRM",
+      "description": "Organize o relacionamento com seus leads e clientes, e aprenda a fazer remarketing segmentado para vender mais.",
+      "lessons": [
+        {
+          "lessonId": "L06.01",
+          "title": "O que é CRM e Por que sua Empresa Precisa",
+          "type": "text",
+          "content": "CRM (Customer Relationship Management) é uma ferramenta que organiza o relacionamento com seus leads e clientes, acompanhando-os desde o primeiro contato até o fechamento da venda."
+        },
+        {
+          "lessonId": "L06.02",
+          "title": "Construção de Funil de Vendas Básico",
+          "type": "text",
+          "content": "Um funil simples pode ter 4 etapas: Contato Inicial, Conversa/Apresentação, Proposta Enviada, Cliente Fechado. O super app ajudará a organizar os leads por estágio para manter a eficiência."
+        },
+        {
+          "lessonId": "L06.03",
+          "title": "Opções de Remarketing",
+          "type": "text",
+          "content": "Aprenda a segmentar leads no CRM e criar campanhas de remarketing para: Leads que não fecharam (com anúncios de cases), Leads que sumiram (com mensagens personalizadas) e Ex-clientes (com bônus de retorno)."
+        }
+      ]
+    },
+    {
+      "moduleId": "MD07",
+      "title": "Módulo 7: Processo Comercial e Técnicas de Venda",
+      "description": "Domine o processo comercial com técnicas de rapport, gatilhos mentais e um pitch de vendas que realmente gera interesse.",
+      "lessons": [
+        {
+          "lessonId": "L07.01",
+          "title": "Como Montar um Pitch Comercial",
+          "type": "text",
+          "content": "O pitch é a sua 'apresentação relâmpago'. Ele precisa ser claro e direto. Inclua: Quem você ajuda, o problema que resolve e o diferencial do seu serviço. Exemplo: 'Nós ajudamos negócios locais a atrair clientes todos os dias usando vídeos e tráfego pago.'"
+        },
+        {
+          "lessonId": "L07.02",
+          "title": "Rapport e Gatilhos Mentais",
+          "type": "text",
+          "content": "Crie conexão usando técnicas como: Rapport (usar linguagem e ritmo parecidos com o cliente) e Gatilhos Mentais (escassez, autoridade, prova social). O cliente compra quando sente confiança e identificação."
+        },
+        {
+          "lessonId": "L07.03",
+          "title": "Follow-up Eficiente",
+          "type": "text",
+          "content": "A maioria das vendas acontece no 2º ou 3º contato. Use o CRM do super app para agendar retornos e sempre traga um valor novo na abordagem. Evite ser insistente; seja consultivo."
+        }
+      ]
+    },
+    {
+      "moduleId": "MD08",
+      "title": "Módulo 8: Conexão com a Audiência e Humanização",
+      "description": "Construa uma audiência leal ao ser autêntico, mostrar os bastidores e interagir de forma genuína com o seu público.",
+      "lessons": [
+        {
+          "lessonId": "L08.01",
+          "title": "Gerando Conexão Real (sem Forçar)",
+          "type": "text",
+          "content": "Pessoas se conectam com pessoas. Mostrar sua rotina e bastidores cria empatia. Seja autêntico, não perfeito. Use a câmera frontal e fale como se fosse para um amigo."
+        },
+        {
+          "lessonId": "L08.02",
+          "title": "Estratégias de Bastidores nos Stories",
+          "type": "text",
+          "content": "Use os Stories para mostrar o que acontece por trás do conteúdo pronto. Compartilhe erros, aprendizados e a rotina de trabalho. Quanto mais humano, maior a identificação."
+        },
+        {
+          "lessonId": "L08.03",
+          "title": "Criando uma Comunidade Engajada e Leal",
+          "type": "text",
+          "content": "Uma audiência fiel é construída com interação real e constância. Responda comentários e DMs, envolva seguidores com perguntas e enquetes. Quem se sente visto, volta. E quem volta, compra."
+        }
+      ]
+    }
+  ]
+}
