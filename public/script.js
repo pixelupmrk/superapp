@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL E COMPLETA (SEM OMISSÃO DE FUNÇÕES E COM TODOS OS LISTENERS)
+// script.js - VERSÃO FINAL E COMPLETA (CORRIGIDO O ERRO DE SINTAXE)
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // URL BASE DO SEU BOT DE WHATSAPP NO RENDER
     const WHATSAPP_BOT_URL = 'https://superapp-whatsapp-bot.onrender.com';
 
-    // === FUNÇÕES DE DADOS E ESTADO (CORRIGIDO: Movidas para fora de main) ===
+    // === FUNÇÕES DE DADOS E ESTADO ===
     
     async function loadAllUserData(userId) {
         try {
@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 estoque = data.estoque || [];
                 estoque.forEach((item, index) => { if (!item.id) item.id = `prod_${Date.now()}_${index}`; });
                 chatHistory = data.chatHistory || [];
-                // Carrega as instruções da IA
                 botInstructions = data.botInstructions || document.getElementById('bot-instructions')?.placeholder || "Você é um assistente virtual prestativo.";
                 
                 nextLeadId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 0;
@@ -58,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const dataToSave = {
                 leads, caixa, estoque, chatHistory,
                 mentoriaNotes: getMentoriaNotes(),
-                // Garante que o valor da textarea seja salvo
                 botInstructions: document.getElementById('bot-instructions')?.value || botInstructions, 
                 settings: {
                     theme: document.body.classList.contains('light-theme') ? 'light' : 'dark',
@@ -72,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // === FIM DAS FUNÇÕES DE DADOS ===
+    // === FIM DAS FUNÇÕES DE DADOS E ESTADO ===
 
 
     async function main() {
@@ -88,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     main();
 
-    // --- LÓGICA DE CONEXÃO DO WHATSAPP BOT (SEM IA GENÉRICA) ---
+    // --- LÓGICA DE CONEXÃO DO WHATSAPP BOT ---
     function setupWhatsappBotConnection() {
         const statusElement = document.getElementById('bot-status');
         const qrCodeImg = document.getElementById('qr-code-img');
@@ -101,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Função para atualizar o status na tela
         function updateStatus(message, isConnected) {
             statusElement.textContent = message;
-            statusElement.style.color = isConnected ? '#25D366' : '#e57373'; // Verde para conectado, vermelho para desconectado
+            statusElement.style.color = isConnected ? '#25D366' : '#e57373'; 
             qrCodeImg.style.display = 'none';
             qrCodeMessage.textContent = '';
         }
@@ -112,7 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 whatsappEventsSource.close();
             }
             const currentUserId = firebase.auth().currentUser.uid;
-            // Endpoint para eventos em tempo real do seu bot (com userId)
             whatsappEventsSource = new EventSource(`${WHATSAPP_BOT_URL}/events?userId=${currentUserId}`); 
             
             whatsappEventsSource.onmessage = (event) => {
@@ -207,23 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             setTimeout(() => saveMessage.textContent = '', 3000);
         });
-        
-        // 4. Lógica Ativar/Desativar Bot no Modal de Lead (precisa estar no escopo de setupEventListeners)
-        document.getElementById('edit-lead-modal')?.addEventListener('click', (e) => {
-            if (e.target.id === 'toggle-bot-btn') {
-                const lead = leads.find(l => l.id === currentLeadId);
-                if (lead) {
-                    const newStatus = !(lead.botActive === true); 
-                    lead.botActive = newStatus;
-                    e.target.textContent = newStatus ? 'Desativar Bot' : 'Ativar Bot';
-                    e.target.classList.toggle('btn-delete', !newStatus);
-                    e.target.classList.toggle('btn-save', newStatus);
-                    saveUserData(userId);
-                }
-            }
-        });
-        
-        document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', () => { document.getElementById(btn.dataset.target).style.display = 'none'; }); });
     }
 
     // --- FUNÇÕES AUXILIARES DE RENDERIZAÇÃO E DADOS ---
@@ -247,6 +227,226 @@ document.addEventListener('DOMContentLoaded', () => {
         if(userProfileSpan) userProfileSpan.textContent = `Olá, ${userName}`;
         const settingUserName = document.getElementById('setting-user-name');
         if(settingUserName) settingUserName.value = userName;
+    }
+
+    function setupEventListeners(userId) {
+        const menuToggle = document.getElementById('menu-toggle');
+        const appContainer = document.getElementById('app-container');
+
+        if (menuToggle && appContainer) {
+            menuToggle.addEventListener('click', () => {
+                appContainer.classList.toggle('sidebar-visible');
+            });
+        }
+        
+        document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
+            item.addEventListener('click', e => {
+                if (window.innerWidth <= 768) {
+                    appContainer.classList.remove('sidebar-visible');
+                }
+                if (e.currentTarget.id === 'logout-btn') return;
+                e.preventDefault();
+                const targetId = e.currentTarget.getAttribute('data-target');
+                if (!targetId) return;
+                document.querySelectorAll('.sidebar-nav .nav-item').forEach(nav => nav.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                document.querySelectorAll('.main-content .content-area').forEach(area => area.style.display = 'none');
+                document.getElementById(targetId).style.display = 'block';
+                document.getElementById('page-title').textContent = e.currentTarget.querySelector('span').textContent;
+            });
+        });
+
+        document.getElementById('theme-toggle-btn')?.addEventListener('click', () => { document.body.classList.toggle('light-theme'); const isLight = document.body.classList.contains('light-theme'); document.getElementById('theme-toggle-btn').textContent = isLight ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro'; saveUserData(userId); });
+        
+        document.getElementById('save-settings-btn')?.addEventListener('click', async () => {
+            await saveUserData(userId);
+            alert('Configurações salvas!');
+        });
+
+        document.getElementById('lead-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            leads.push({ id: nextLeadId++, status: 'novo', nome: document.getElementById('lead-name').value, email: document.getElementById('lead-email').value, whatsapp: document.getElementById('lead-whatsapp').value, origem: document.getElementById('lead-origin').value, qualificacao: document.getElementById('lead-qualification').value, notas: document.getElementById('lead-notes').value, chatHistory: [], botActive: true }); 
+            await saveUserData(userId);
+            updateAllUI();
+            e.target.reset();
+        });
+
+        const kanbanBoard = document.getElementById('kanban-board');
+        if (kanbanBoard) {
+            kanbanBoard.addEventListener('dragstart', e => { if (e.target.classList.contains('kanban-card')) { draggedItem = e.target; } });
+            kanbanBoard.addEventListener('dragend', () => { draggedItem = null; });
+            kanbanBoard.addEventListener('dragover', e => e.preventDefault());
+            kanbanBoard.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                const column = e.target.closest('.kanban-column');
+                if (column && draggedItem) {
+                    const lead = leads.find(l => l.id == draggedItem.dataset.id);
+                    if (lead) {
+                        lead.status = column.dataset.status;
+                        await saveUserData(userId);
+                        renderKanbanCards();
+                        updateDashboard();
+                    }
+                }
+            });
+            kanbanBoard.addEventListener('click', e => { if (e.target.tagName === 'A') { e.stopPropagation(); return; } const card = e.target.closest('.kanban-card'); if (card) openEditModal(parseInt(card.dataset.id)); });
+        }
+        
+        document.getElementById('leads-table')?.addEventListener('click', e => { if (e.target.tagName === 'A') { e.stopPropagation(); return; } if (e.target.closest('.btn-edit-table')) openEditModal(parseInt(e.target.closest('tr').dataset.id)); if (e.target.closest('.btn-delete-table')) { if (confirm('Tem certeza?')) { leads = leads.filter(l => l.id != parseInt(e.target.closest('tr').dataset.id)); saveUserData(userId); updateAllUI(); } } });
+
+        document.getElementById('edit-lead-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const lead = leads.find(l => l.id === currentLeadId);
+            if(lead) {
+                lead.nome = document.getElementById('edit-lead-name').value;
+                lead.email = document.getElementById('edit-lead-email').value;
+                lead.whatsapp = document.getElementById('edit-lead-whatsapp').value;
+                lead.status = document.getElementById('edit-lead-status').value;
+                lead.origem = document.getElementById('edit-lead-origem').value;
+                lead.qualificacao = document.getElementById('edit-lead-qualification').value;
+                lead.notas = document.getElementById('edit-lead-notes').value;
+                await saveUserData(userId);
+                updateAllUI();
+                document.getElementById('edit-lead-modal').style.display = 'none';
+            }
+        });
+
+        document.getElementById('delete-lead-btn')?.addEventListener('click', async () => {
+            if (confirm('Tem certeza?')) {
+                leads = leads.filter(l => l.id !== currentLeadId);
+                await saveUserData(userId);
+                updateAllUI();
+                document.getElementById('edit-lead-modal').style.display = 'none';
+            }
+        });
+
+        document.getElementById('caixa-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            caixa.push({ data: document.getElementById('caixa-data').value, descricao: document.getElementById('caixa-descricao').value, valor: parseFloat(document.getElementById('caixa-valor').value), tipo: document.getElementById('caixa-tipo').value });
+            await saveUserData(userId);
+            renderCaixaTable();
+            updateCaixa();
+            e.target.reset();
+        });
+
+        document.querySelectorAll('.finance-tab').forEach(tab => { tab.addEventListener('click', e => { e.preventDefault(); document.querySelectorAll('.finance-tab, .finance-content').forEach(el => el.classList.remove('active')); e.target.classList.add('active'); document.getElementById(e.target.dataset.tab + '-tab-content').classList.add('active'); }); });
+        
+        document.getElementById('estoque-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newProduct = { id: `prod_${Date.now()}`, produto: document.getElementById('estoque-produto').value, descricao: document.getElementById('estoque-descricao').value, compra: parseFloat(document.getElementById('estoque-compra').value), venda: parseFloat(document.getElementById('estoque-venda').value), custos: [] };
+            estoque.push(newProduct);
+            await saveUserData(userId);
+            renderEstoqueTable();
+            e.target.reset();
+        });
+        
+        document.getElementById('estoque-search')?.addEventListener('input', renderEstoqueTable);
+        
+        document.getElementById('estoque-table')?.addEventListener('click', async (e) => {
+            if (e.target.closest('.btn-custo')) {
+                const productId = e.target.closest('tr').dataset.id;
+                openCustosModal(productId);
+            }
+            if (e.target.closest('.btn-delete-estoque')) {
+                if (confirm('Tem certeza?')) {
+                    const productId = e.target.closest('tr').dataset.id;
+                    estoque = estoque.filter(p => p.id !== productId);
+                    await saveUserData(userId);
+                    renderEstoqueTable();
+                }
+            }
+        });
+        
+        document.getElementById('add-custo-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const produto = estoque.find(p => p.id === currentProductId);
+            if (produto) {
+                const descricao = document.getElementById('custo-descricao').value;
+                const valor = parseFloat(document.getElementById('custo-valor').value);
+                if (!produto.custos) produto.custos = [];
+                produto.custos.push({ descricao, valor });
+                await saveUserData(userId);
+                renderCustosList(produto);
+                renderEstoqueTable();
+                e.target.reset();
+            }
+        });
+
+        document.getElementById('export-leads-btn')?.addEventListener('click', () => { if (leads.length === 0) { alert("Não há leads para exportar."); return; } const header = ["Nome", "Email", "WhatsApp", "Origem", "Qualificação", "Status", "Notas"]; const rows = leads.map(l => [l.nome, l.email, l.whatsapp, l.origem, l.qualificacao, l.status, `"${(l.notas || '').replace(/"/g, '""')}"`]); const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Leads"); XLSX.writeFile(workbook, "leads.xlsx"); });
+        document.getElementById('export-csv-btn')?.addEventListener('click', () => { if (estoque.length === 0) { alert("Não há produtos para exportar."); return; } const header = ["Produto", "Descrição", "Valor de Compra", "Valor de Venda"]; const rows = estoque.map(p => [p.produto, p.descricao, p.compra, p.venda]); const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Estoque"); XLSX.writeFile(workbook, "estoque.xlsx"); });
+        document.getElementById('import-csv-btn')?.addEventListener('click', () => { const input = document.createElement('input'); input.type = 'file'; input.accept = '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'; input.onchange = e => { const file = e.target.files[0]; const reader = new FileReader(); reader.onload = async (event) => { const data = new Uint8Array(event.target.result); const workbook = XLSX.read(data, {type: 'array'}); const ws = workbook.Sheets[workbook.SheetNames[0]]; const json = XLSX.utils.sheet_to_json(ws); json.forEach(item => { const pKey = Object.keys(item).find(k=>k.toLowerCase()==='produto'); const cKey = Object.keys(item).find(k=>k.toLowerCase().includes('compra')); const vKey = Object.keys(item).find(k=>k.toLowerCase().includes('venda')); if(item[pKey] && item[cKey] && item[vKey]){ estoque.push({ id: `prod_${Date.now()}_${Math.random()}`, produto: item[pKey], descricao: item['Descrição']||item['descricao']||'', compra: parseFloat(item[cKey]), venda: parseFloat(item[vKey]), custos: [] }); } }); await saveUserData(userId); renderEstoqueTable(); alert(`${json.length} produtos importados!`); }; reader.readAsArrayBuffer(file); }; input.click(); });
+        
+        // CORREÇÃO: Listener para o Chatbot de Leads (AGORA USANDO O WHATSAPP BOT BACKEND NO RENDER)
+        document.getElementById('lead-chatbot-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const lead = leads.find(l => l.id === currentLeadId);
+            if (!lead || !lead.whatsapp) {
+                addMessageToChat("Erro: Lead não encontrado ou campo WhatsApp vazio.", 'bot-message', 'lead-chatbot-messages');
+                return;
+            }
+
+            const chatbotInput = document.getElementById('lead-chatbot-input');
+            const userInput = chatbotInput.value.trim();
+            if (!userInput) return;
+            
+            addMessageToChat(userInput, 'user-message', 'lead-chatbot-messages');
+            if (!lead.chatHistory) lead.chatHistory = [];
+            lead.chatHistory.push({ role: "user", parts: [{ text: userInput }] });
+            chatbotInput.value = '';
+            
+            addMessageToChat("Enviando mensagem para o WhatsApp Bot...", 'bot-message bot-thinking', 'lead-chatbot-messages');
+            
+            try {
+                const endpoint = `${WHATSAPP_BOT_URL}/send`; 
+                
+                const response = await fetch(endpoint, { 
+                    method: 'POST', 
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    }, 
+                    body: JSON.stringify({ 
+                        to: lead.whatsapp, 
+                        text: userInput,
+                        userId: firebase.auth().currentUser.uid 
+                    }) 
+                });
+                
+                document.querySelector('.bot-thinking')?.remove(); 
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ details: 'Erro desconhecido na comunicação com o WhatsApp Bot.' }));
+                    throw new Error(errorData.details || `Falha no envio da mensagem. Status: ${response.status}`);
+                }
+                
+                const botResponseText = "Comando enviado! O bot de WhatsApp está processando sua mensagem e responderá no chat em breve.";
+
+                addMessageToChat(botResponseText, 'bot-message', 'lead-chatbot-messages');
+                lead.chatHistory.push({ role: "model", parts: [{ text: botResponseText }] });
+                
+            } catch (error) {
+                document.querySelector('.bot-thinking')?.remove();
+                addMessageToChat(`Erro de Envio: ${error.message}. Verifique a URL do endpoint e o status do seu bot de WhatsApp.`, 'bot-message', 'lead-chatbot-messages');
+                lead.chatHistory.push({ role: "model", parts: [{ text: `Erro: ${error.message}` }] }); 
+            }
+            await saveUserData(userId);
+        });
+
+        document.getElementById('edit-lead-modal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'toggle-bot-btn') {
+                const lead = leads.find(l => l.id === currentLeadId);
+                if (lead) {
+                    const newStatus = !(lead.botActive === true); 
+                    lead.botActive = newStatus;
+                    e.target.textContent = newStatus ? 'Desativar Bot' : 'Ativar Bot';
+                    e.target.classList.toggle('btn-delete', !newStatus);
+                    e.target.classList.toggle('btn-save', newStatus);
+                    saveUserData(userId);
+                }
+            }
+        });
+        
+        document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', () => { document.getElementById(btn.dataset.target).style.display = 'none'; }); });
     }
 
     function openEditModal(leadId) { 
