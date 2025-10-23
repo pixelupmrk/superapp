@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL, COMPLETA E CORRIGIDA PARA WHATSAPP BOT
+// script.js - VERSÃO FINAL, COMPLETA E CORRIGIDA PARA WHATSAPP BOT E LAYOUT
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         updateStatus(`Conectado como: ${data.user}`, true);
                         qrCodeImg.style.display = 'none';
                         qrCodeMessage.textContent = '';
-                    } else if (data.status === 'disconnected') {
+                    } else if (data.status === 'disconnected' || !data.connected) {
                          updateStatus('Desconectado. Pressione "Verificar Status" para obter um novo QR Code.', false);
                     }
                 } else if (data.type === 'message' && data.from) {
@@ -100,7 +100,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 // Endpoint para obter o status e QR Code se necessário
-                const response = await fetch(`${WHATSAPP_BOT_URL}/status`); 
+                const response = await fetch(`${WHATSAPP_BOT_URL}/status`, { 
+                    headers: { 'Access-Control-Allow-Origin': '*' } // Adicionado para tentar resolver problemas de CORS
+                }); 
+                
+                // Trata o erro de JSON, que era o problema principal (Unexpected token '<')
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") === -1) {
+                    throw new Error(`Resposta inválida. O servidor retornou: ${contentType}`);
+                }
+
                 const data = await response.json();
                 
                 if (data.connected) {
@@ -108,15 +117,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Inicia o listener de eventos assim que o status estiver OK
                     startSSEListener();
                 } else {
-                    updateStatus('Desconectado. Por favor, escaneie o QR Code.', false);
+                    updateStatus('Desconectado. Pressione "Verificar Status" para obter um novo QR Code.', false);
                     // Como está desconectado, o backend deve enviar o evento 'qr' via SSE.
-                    qrCodeMessage.textContent = 'Aguardando o backend gerar o QR Code...';
+                    qrCodeMessage.textContent = 'Aguardando o backend gerar o QR Code. Se o QR não aparecer, verifique os logs do Render.';
                     startSSEListener(); // Inicia/reinicia o listener para capturar o QR Code
                 }
 
             } catch (error) {
                 console.error("Erro ao verificar status do Bot:", error);
-                updateStatus('Erro de Conexão com o Bot. Verifique se o servidor Render está ativo.', false);
+                updateStatus(`Erro de Conexão: ${error.message}. Verifique se o servidor Render está ativo e configurado para retornar JSON no endpoint /status.`, false);
             }
         });
     }
@@ -392,7 +401,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const response = await fetch(endpoint, { 
                     method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*' // Adicionado para tentar resolver problemas de CORS
+                    }, 
                     body: JSON.stringify({ 
                         to: lead.whatsapp, // Número do WhatsApp
                         text: userInput,
