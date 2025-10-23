@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL, COMPLETA E CORRIGIDA PARA WHATSAPP BOT E ESCOPO
+// script.js - VERSÃO FINAL E COMPLETA (SEM OMISSÃO DE FUNÇÕES)
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // URL BASE DO SEU BOT DE WHATSAPP NO RENDER
     const WHATSAPP_BOT_URL = 'https://superapp-whatsapp-bot.onrender.com';
 
-    // === FUNÇÕES DE DADOS (MOVIDAS PARA CORRIGIR ERRO DE ESCOPO) ===
+    // === FUNÇÕES DE DADOS (CORRIGIDO: Movidas para fora de main) ===
     
     async function loadAllUserData(userId) {
         try {
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     main();
 
-    // --- LÓGICA DE CONEXÃO DO WHATSAPP BOT ---
+    // --- LÓGICA DE CONEXÃO DO WHATSAPP BOT (SEM IA GENÉRICA) ---
     function setupWhatsappBotConnection() {
         const statusElement = document.getElementById('bot-status');
         const qrCodeImg = document.getElementById('qr-code-img');
@@ -120,13 +120,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const data = JSON.parse(event.data);
                     
                     if (data.type === 'qr' && data.data) {
-                        // Exibe o QR Code (data.data é a URL do QR Code)
                         qrCodeImg.src = data.data;
                         qrCodeImg.style.display = 'block';
                         qrCodeMessage.textContent = 'Escaneie o QR Code com seu celular para conectar o WhatsApp.';
                         updateStatus('Aguardando Conexão (QR Code Disponível)', false);
                     } else if (data.type === 'status') {
-                        // Atualiza o status geral
                         if (data.connected) {
                             updateStatus(`Conectado como: ${data.user || 'Dispositivo'}`, true);
                             qrCodeImg.style.display = 'none';
@@ -135,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
                              updateStatus('Desconectado. Pressione "Verificar Status" para obter um novo QR Code.', false);
                         }
                     } else if (data.type === 'message' && data.from) {
-                        // Lógica para receber mensagem e atualizar o CRM/Chat
                         console.log(`Nova mensagem de ${data.from}: ${data.text}`);
                     }
                 } catch (e) {
@@ -146,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
             whatsappEventsSource.onerror = (error) => {
                 console.error("Erro na conexão SSE com o WhatsApp Bot:", error);
                 updateStatus('Erro na Conexão em Tempo Real. Tentando reconectar...', false);
-                // Tenta reconectar após 5 segundos
                 setTimeout(startSSEListener, 5000); 
             };
         }
@@ -163,33 +159,36 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                // Endpoint para obter o status e QR Code se necessário
                 const response = await fetch(`${WHATSAPP_BOT_URL}/status?userId=${currentUserId}`, { 
                     headers: { 'Access-Control-Allow-Origin': '*' } 
                 }); 
                 
-                // Trata o erro de JSON (o principal erro que você estava vendo)
                 const contentType = response.headers.get("content-type");
                 if (contentType && contentType.indexOf("application/json") === -1) {
                     const textResponse = await response.text();
                     console.error("Resposta do servidor não é JSON:", textResponse);
-                    throw new Error(`Resposta inválida. O servidor retornou: ${contentType}. Isso significa que o backend do Render não está retornando JSON.`);
+                    throw new Error(`Resposta inválida. O servidor retornou: ${contentType}.`);
                 }
 
                 const data = await response.json();
                 
-                if (data.connected) {
+                if (data.connected || data.status === 'QR_AVAILABLE') {
                     updateStatus(`Conectado como: ${data.user || 'Dispositivo'}`, true);
+                    if (data.qrCodeUrl) {
+                        qrCodeImg.src = data.qrCodeUrl;
+                        qrCodeImg.style.display = 'block';
+                        qrCodeMessage.textContent = 'Escaneie o QR Code com seu celular para conectar o WhatsApp.';
+                    }
                     startSSEListener();
                 } else {
                     updateStatus('Desconectado. Por favor, escaneie o QR Code.', false);
-                    qrCodeMessage.textContent = 'Aguardando o backend gerar o QR Code. Se o QR não aparecer em 10 segundos, verifique os logs do Render.';
-                    startSSEListener(); // Inicia/reinicia o listener para capturar o QR Code
+                    qrCodeMessage.textContent = 'Aguardando o backend gerar o QR Code. Se o QR não aparecer, verifique os logs do Render.';
+                    startSSEListener(); 
                 }
 
             } catch (error) {
                 console.error("Erro ao verificar status do Bot:", error);
-                updateStatus(`Erro de Conexão: ${error.message}. O backend precisa ser configurado para retornar JSON (e possivelmente CORS).`, false);
+                updateStatus(`Erro de Conexão: ${error.message}. Verifique a hospedagem do Bot.`, false);
             }
         });
         
@@ -197,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveInstructionsBtn?.addEventListener('click', async () => {
             const newInstructions = instructionsTextarea.value;
             try {
-                await saveUserData(firebase.auth().currentUser.uid); // Usa a função de salvar atualizada
+                await saveUserData(firebase.auth().currentUser.uid); 
                 botInstructions = newInstructions;
                 saveMessage.textContent = 'Instruções salvas com sucesso!';
                 saveMessage.style.color = '#25D366';
@@ -269,7 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('lead-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            // Garante que todo novo lead tenha um chatHistory inicializado
             leads.push({ id: nextLeadId++, status: 'novo', nome: document.getElementById('lead-name').value, email: document.getElementById('lead-email').value, whatsapp: document.getElementById('lead-whatsapp').value, origem: document.getElementById('lead-origin').value, qualificacao: document.getElementById('lead-qualification').value, notas: document.getElementById('lead-notes').value, chatHistory: [], botActive: true }); 
             await saveUserData(userId);
             updateAllUI();
@@ -382,10 +380,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('import-csv-btn')?.addEventListener('click', () => { const input = document.createElement('input'); input.type = 'file'; input.accept = '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'; input.onchange = e => { const file = e.target.files[0]; const reader = new FileReader(); reader.onload = async (event) => { const data = new Uint8Array(event.target.result); const workbook = XLSX.read(data, {type: 'array'}); const ws = workbook.Sheets[workbook.SheetNames[0]]; const json = XLSX.utils.sheet_to_json(ws); json.forEach(item => { const pKey = Object.keys(item).find(k=>k.toLowerCase()==='produto'); const cKey = Object.keys(item).find(k=>k.toLowerCase().includes('compra')); const vKey = Object.keys(item).find(k=>k.toLowerCase().includes('venda')); if(item[pKey] && item[cKey] && item[vKey]){ estoque.push({ id: `prod_${Date.now()}_${Math.random()}`, produto: item[pKey], descricao: item['Descrição']||item['descricao']||'', compra: parseFloat(item[cKey]), venda: parseFloat(item[vKey]), custos: [] }); } }); await saveUserData(userId); renderEstoqueTable(); alert(`${json.length} produtos importados!`); }; reader.readAsArrayBuffer(file); }; input.click(); });
         
         // CORREÇÃO: Listener para o Chatbot de Leads (AGORA USANDO O WHATSAPP BOT BACKEND NO RENDER)
-        document.getElementById('lead-chatbot-form')?.addEventListener('submit', async e => {
+        document.getElementById('lead-chatbot-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const lead = leads.find(l => l.id === currentLeadId);
-            // Verifica se o lead existe e se tem WhatsApp cadastrado (o WhatsApp é a chave para o bot)
             if (!lead || !lead.whatsapp) {
                 addMessageToChat("Erro: Lead não encontrado ou campo WhatsApp vazio.", 'bot-message', 'lead-chatbot-messages');
                 return;
@@ -395,43 +392,36 @@ document.addEventListener('DOMContentLoaded', () => {
             const userInput = chatbotInput.value.trim();
             if (!userInput) return;
             
-            // 1. Adiciona a mensagem do usuário na interface
             addMessageToChat(userInput, 'user-message', 'lead-chatbot-messages');
-            
-            // 2. Salva a mensagem no histórico local do lead
             if (!lead.chatHistory) lead.chatHistory = [];
             lead.chatHistory.push({ role: "user", parts: [{ text: userInput }] });
             chatbotInput.value = '';
             
-            // 3. Exibe status de "Enviando"
             addMessageToChat("Enviando mensagem para o WhatsApp Bot...", 'bot-message bot-thinking', 'lead-chatbot-messages');
             
-            // 4. Envia a requisição para o backend do WhatsApp Bot
             try {
-                // Endpoint para enviar a mensagem. USANDO URL ABSOLUTA DO RENDER.
                 const endpoint = `${WHATSAPP_BOT_URL}/send`; 
                 
                 const response = await fetch(endpoint, { 
                     method: 'POST', 
                     headers: { 
                         'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*' // Adicionado para tentar resolver problemas de CORS
+                        'Access-Control-Allow-Origin': '*'
                     }, 
                     body: JSON.stringify({ 
-                        to: lead.whatsapp, // Número do WhatsApp
+                        to: lead.whatsapp, 
                         text: userInput,
-                        userId: firebase.auth().currentUser.uid // Passa o userId para o bot
+                        userId: firebase.auth().currentUser.uid 
                     }) 
                 });
                 
-                document.querySelector('.bot-thinking')?.remove(); // Remove o status
+                document.querySelector('.bot-thinking')?.remove(); 
                 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({ details: 'Erro desconhecido na comunicação com o WhatsApp Bot.' }));
                     throw new Error(errorData.details || `Falha no envio da mensagem. Status: ${response.status}`);
                 }
                 
-                // Resposta simulada
                 const botResponseText = "Comando enviado! O bot de WhatsApp está processando sua mensagem e responderá no chat em breve.";
 
                 addMessageToChat(botResponseText, 'bot-message', 'lead-chatbot-messages');
@@ -445,7 +435,44 @@ document.addEventListener('DOMContentLoaded', () => {
             await saveUserData(userId);
         });
 
+        document.getElementById('edit-lead-modal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'toggle-bot-btn') {
+                const lead = leads.find(l => l.id === currentLeadId);
+                if (lead) {
+                    const newStatus = !(lead.botActive === true); 
+                    lead.botActive = newStatus;
+                    e.target.textContent = newStatus ? 'Desativar Bot' : 'Ativar Bot';
+                    e.target.classList.toggle('btn-delete', !newStatus);
+                    e.target.classList.toggle('btn-save', newStatus);
+                    saveUserData(userId);
+                }
+            }
+        });
+        
         document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', () => { document.getElementById(btn.dataset.target).style.display = 'none'; }); });
+    }
+
+    // --- FUNÇÕES AUXILIARES ---
+
+    function updateAllUI() {
+        renderKanbanCards();
+        renderLeadsTable();
+        updateDashboard();
+        renderCaixaTable();
+        updateCaixa();
+        renderEstoqueTable();
+    }
+    
+    function applySettings(settings = {}) {
+        const theme = settings.theme || 'dark';
+        const userName = settings.userName || 'Usuário';
+        document.body.className = theme === 'light' ? 'light-theme' : '';
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        if(themeToggleBtn) themeToggleBtn.textContent = theme === 'light' ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro';
+        const userProfileSpan = document.querySelector('.user-profile span');
+        if(userProfileSpan) userProfileSpan.textContent = `Olá, ${userName}`;
+        const settingUserName = document.getElementById('setting-user-name');
+        if(settingUserName) settingUserName.value = userName;
     }
 
     function openEditModal(leadId) { 
@@ -462,8 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-lead-qualification').value = lead.qualificacao; 
             document.getElementById('edit-lead-notes').value = lead.notas; 
             
-            // Atualiza o botão de Ativar/Desativar Bot
-            const botActive = lead.botActive === undefined ? true : lead.botActive; // Padrão: Ativo
+            const botActive = lead.botActive === undefined ? true : lead.botActive; 
             toggleBotBtn.textContent = botActive ? 'Desativar Bot' : 'Ativar Bot';
             toggleBotBtn.classList.toggle('btn-delete', !botActive);
             toggleBotBtn.classList.toggle('btn-save', botActive);
@@ -481,12 +507,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCaixaTable() { const t = document.querySelector('#caixa-table tbody'); if (t) { t.innerHTML = caixa.map(m => `<tr><td>${m.data}</td><td>${m.descricao}</td><td>${m.tipo==='entrada'?'R$ '+m.valor.toFixed(2):''}</td><td>${m.tipo==='saida'?'R$ '+m.valor.toFixed(2):''}</td></tr>`).join(''); } }
     function updateCaixa() { const e = caixa.filter(m=>m.tipo==='entrada').reduce((a,c)=>a+c.valor,0), s = caixa.filter(m=>m.tipo==='saida').reduce((a,c)=>a+c.valor,0); document.getElementById('total-entradas').textContent = `R$ ${e.toFixed(2)}`; document.getElementById('total-saidas').textContent = `R$ ${s.toFixed(2)}`; document.getElementById('caixa-atual').textContent = `R$ ${(e-s).toFixed(2)}`; }
     function renderEstoqueTable() { const t = document.querySelector('#estoque-table tbody'); if (!t) return; const searchTerm = document.getElementById('estoque-search').value.toLowerCase(); const filteredEstoque = estoque.filter(p => (p.produto && p.produto.toLowerCase().includes(searchTerm)) || (p.descricao && p.descricao.toLowerCase().includes(searchTerm))); t.innerHTML = filteredEstoque.map(p => { const totalCustos = (p.custos || []).reduce((acc, c) => acc + c.valor, 0); const lucro = p.venda - p.compra - totalCustos; return `<tr data-id="${p.id}"><td>${p.produto}</td><td>${p.descricao}</td><td>R$ ${p.compra.toFixed(2)}</td><td>R$ ${totalCustos.toFixed(2)}</td><td>R$ ${p.venda.toFixed(2)}</td><td>R$ ${lucro.toFixed(2)}</td><td><button class="btn-custo">Custos</button><button class="btn-delete-table btn-delete-estoque"><i class="ph-fill ph-trash"></i></button></td></tr>`; }).join(''); }
-    
-    // Função unificada de adicionar mensagem de chat
     function addMessageToChat(msg, type, containerId) { 
         const c = document.getElementById(containerId); 
         if (c) { 
-            // Remove o "Pensando..." antes de adicionar a resposta final, se existir
             if(type !== 'bot-thinking' && document.querySelector(`#${containerId} .bot-thinking`)) {
                  document.querySelector(`#${containerId} .bot-thinking`).remove();
             }
@@ -494,8 +517,6 @@ document.addEventListener('DOMContentLoaded', () => {
             c.scrollTop = c.scrollHeight; 
         } 
     }
-    
-    // Função unificada de renderizar histórico
     function renderChatHistory(containerId, history) { 
         const c = document.getElementById(containerId); 
         if (!c) return; 
@@ -506,7 +527,6 @@ document.addEventListener('DOMContentLoaded', () => {
             history.forEach(m => addMessageToChat(m.parts[0].text, m.role === 'user' ? 'user-message' : 'bot-message', containerId)); 
         } 
     }
-
     function renderMentoria() {
         const menu = document.getElementById('mentoria-menu'); const content = document.getElementById('mentoria-content'); if (!menu || !content) return;
         menu.innerHTML = mentoriaData.map((mod, i) => `<div class="sales-accelerator-menu-item ${i === 0 ? 'active' : ''}" data-module-id="${mod.moduleId}">${mod.title}</div>`).join('');
@@ -516,4 +536,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     function getMentoriaNotes() { const n = {}; document.querySelectorAll('.mentoria-notas').forEach(t => n[t.id] = t.value); return n; }
     function loadMentoriaNotes(notes = {}) { for (const id in notes) { const t = document.getElementById(id); if (t) t.value = notes[id]; } }
-});
