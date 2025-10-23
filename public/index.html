@@ -21,7 +21,7 @@
                 <a href="#" class="nav-item" data-target="crm-list-section"> <i class="ph-fill ph-list-dashes"></i> <span>Lista de Leads</span> </a>
                 <a href="#" class="nav-item" data-target="finance-section"> <i class="ph-fill ph-chart-bar"></i> <span>Financeiro</span> </a>
                 <a href="#" class="nav-item" data-target="sales-accelerator-section"> <i class="ph-fill ph-rocket-launch"></i> <span>Acelerador de Vendas</span> </a>
-                <a href="#" class="nav-item" data-target="chatbot-section"> <i class="ph-fill ph-robot"></i> <span>Chatbot AI</span> </a>
+                <a href="#" class="nav-item" data-target="whatsapp-bot-section"> <i class="ph-fill ph-whatsapp-logo"></i> <span>WhatsApp Bot</span> </a>
                 <a href="#" class="nav-item" data-target="settings-section"> <i class="ph-fill ph-gear-six"></i> <span>Configurações</span> </a>
                 <a href="#" id="logout-btn" class="nav-item"> <i class="ph-fill ph-sign-out"></i> <span>Sair</span> </a>
             </nav>
@@ -153,6 +153,18 @@
                 <div class="sales-accelerator-container">
                     <aside class="sales-accelerator-sidebar"> <nav class="sales-accelerator-menu" id="mentoria-menu"></nav> </aside>
                     <main class="sales-accelerator-content" id="mentoria-content"></main>
+                </div>
+            </div>
+            
+            <div class="content-area" id="whatsapp-bot-section">
+                <div class="card" id="whatsapp-status-card">
+                    <h2>Status do WhatsApp Bot</h2>
+                    <p id="bot-status">Carregando status...</p>
+                    <button class="btn-save" id="check-bot-status-btn">Verificar Status</button>
+                    <div id="qr-code-container" style="text-align: center; margin-top: 20px;">
+                        <img id="qr-code-img" style="max-width: 300px; display: none;" alt="QR Code para Conexão">
+                    </div>
+                    <p id="qr-code-message" style="margin-top: 10px; color: var(--text-color-muted);"></p>
                 </div>
             </div>
             
