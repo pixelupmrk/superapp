@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL, COMPLETA E CORRIGIDA PARA WHATSAPP BOT
+// script.js - VERSÃO FINAL, COMPLETA E CORRIGIDA COM WHATSAPP BOT
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let db;
     let leadChatHistory = {}; 
     let unsubscribeLeadChatListener = null; 
+    let whatsappEventsSource = null;
 
     async function main() {
         firebase.auth().onAuthStateChanged(async (user) => {
@@ -26,12 +27,106 @@ document.addEventListener('DOMContentLoaded', () => {
                 db = firebase.firestore();
                 await loadAllUserData(user.uid);
                 setupEventListeners(user.uid);
+                // Inicializa a conexão com o bot de WhatsApp ao carregar
+                setupWhatsappBotConnection();
             }
         });
     }
     main();
 
+    // --- LÓGICA DE CONEXÃO DO WHATSAPP BOT ---
+    function setupWhatsappBotConnection() {
+        const statusElement = document.getElementById('bot-status');
+        const qrCodeImg = document.getElementById('qr-code-img');
+        const qrCodeMessage = document.getElementById('qr-code-message');
+        const checkStatusBtn = document.getElementById('check-bot-status-btn');
+
+        // Função para atualizar o status na tela
+        function updateStatus(message, isConnected) {
+            statusElement.textContent = message;
+            statusElement.style.color = isConnected ? '#25D366' : '#e57373'; // Verde para conectado, vermelho para desconectado
+            qrCodeImg.style.display = 'none';
+            qrCodeMessage.textContent = '';
+        }
+
+        // 1. Monitorar Eventos (SSE - Server-Sent Events)
+        function startSSEListener() {
+            if (whatsappEventsSource) {
+                whatsappEventsSource.close();
+            }
+            // Endpoint para eventos em tempo real do seu bot
+            whatsappEventsSource = new EventSource('/api/events'); 
+            
+            whatsappEventsSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'qr') {
+                    // Exibe o QR Code
+                    qrCodeImg.src = data.qr;
+                    qrCodeImg.style.display = 'block';
+                    qrCodeMessage.textContent = 'Escaneie o QR Code com seu celular para conectar o WhatsApp.';
+                    updateStatus('Aguardando Conexão (QR Code Disponível)', false);
+                } else if (data.type === 'status') {
+                    // Atualiza o status geral
+                    if (data.status === 'connected') {
+                        updateStatus('Conectado. Pronto para enviar/receber mensagens.', true);
+                        qrCodeImg.style.display = 'none';
+                        qrCodeMessage.textContent = '';
+                    } else if (data.status === 'disconnected') {
+                         updateStatus('Desconectado. Pressione "Verificar Status" para obter um novo QR Code.', false);
+                    }
+                } else if (data.type === 'message' && data.from) {
+                    // Lógica para receber mensagem e atualizar o CRM/Chat (Simplificada)
+                    // Na vida real, você buscará o lead pelo número e atualizará o chat dele.
+                    console.log(`Nova mensagem de ${data.from}: ${data.text}`);
+                    // O app completo faria db.collection('leads').doc(data.leadId).update(...)
+                }
+            };
+
+            whatsappEventsSource.onerror = (error) => {
+                console.error("Erro na conexão SSE com o WhatsApp Bot:", error);
+                // Tenta reconectar após 5 segundos
+                setTimeout(startSSEListener, 5000); 
+            };
+        }
+
+        // 2. Função para verificar o status atual (chamada pelo botão)
+        checkStatusBtn?.addEventListener('click', async () => {
+            updateStatus('Verificando status...', false);
+            qrCodeImg.style.display = 'none';
+
+            try {
+                // Endpoint para obter o status e QR Code se necessário
+                const response = await fetch('/api/status'); 
+                const data = await response.json();
+                
+                if (data.connected) {
+                    updateStatus(`Conectado como: ${data.user}`, true);
+                    // Inicia o listener de eventos assim que o status estiver OK
+                    startSSEListener();
+                } else {
+                    updateStatus('Desconectado. Por favor, escaneie o QR Code.', false);
+                    // Como está desconectado, o backend deve enviar o evento 'qr' via SSE.
+                    // Se o QR Code não aparecer em 5 segundos, algo está errado no backend.
+                    qrCodeMessage.textContent = 'Aguardando o backend gerar o QR Code...';
+                    startSSEListener(); // Inicia/reinicia o listener para capturar o QR Code
+                }
+
+            } catch (error) {
+                console.error("Erro ao verificar status do Bot:", error);
+                updateStatus('Erro de Conexão com o Bot. Verifique o console.', false);
+            }
+        });
+
+        // Tenta verificar o status inicial ao carregar a seção
+        // checkStatusBtn?.click(); // Descomente para verificar automaticamente ao iniciar
+    }
+
+    // --- FIM DA LÓGICA DE CONEXÃO DO WHATSAPP BOT ---
+
+
     async function loadAllUserData(userId) {
+        // ... (código existente) ...
         try {
             const doc = await db.collection('userData').doc(userId).get();
             if (doc.exists) {
@@ -53,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function saveUserData(userId) {
+        // ... (código existente) ...
         try {
             const dataToSave = {
                 leads, caixa, estoque, chatHistory,
@@ -70,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateAllUI() {
+        // ... (código existente) ...
         renderKanbanCards();
         renderLeadsTable();
         updateDashboard();
@@ -80,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function applySettings(settings = {}) {
+        // ... (código existente) ...
         const theme = settings.theme || 'dark';
         const userName = settings.userName || 'Usuário';
         document.body.className = theme === 'light' ? 'light-theme' : '';
@@ -92,6 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupEventListeners(userId) {
+        // ... (código existente) ...
         const menuToggle = document.getElementById('menu-toggle');
         const appContainer = document.getElementById('app-container');
 
@@ -294,9 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 4. Envia a requisição para o backend do WhatsApp Bot
             try {
-                // Endpoint para enviar a mensagem do lead para o WhatsApp Bot.
-                // ATENÇÃO: Se seu bot estiver em uma URL externa, você deve usar a URL completa aqui.
-                // Se estiver no Vercel (como um serverless function /api/send-whatsapp-message), use o caminho local.
+                // Endpoint para enviar a mensagem. ATENÇÃO: Se seu bot for externo, use a URL completa.
                 const endpoint = '/api/send-whatsapp-message'; 
                 
                 const response = await fetch(endpoint, { 
@@ -305,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ 
                         to: lead.whatsapp, // Número do WhatsApp
                         text: userInput,
-                        leadId: lead.id // ID do Lead para que o backend do bot possa rotear e salvar contexto
+                        leadId: lead.id 
                     }) 
                 });
                 
