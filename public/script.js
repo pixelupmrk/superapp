@@ -219,8 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCaixaTable();
         updateCaixa();
         renderEstoqueTable();
-        // Remove a chamada para o chat genérico
-        // renderChatHistory('chatbot-messages', chatHistory); 
     }
     
     function applySettings(settings = {}) {
