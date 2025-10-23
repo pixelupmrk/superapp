@@ -449,6 +449,29 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', () => { document.getElementById(btn.dataset.target).style.display = 'none'; }); });
     }
 
+    // --- FUNÇÕES AUXILIARES DE RENDERIZAÇÃO E DADOS ---
+
+    function updateAllUI() {
+        renderKanbanCards();
+        renderLeadsTable();
+        updateDashboard();
+        renderCaixaTable();
+        updateCaixa();
+        renderEstoqueTable();
+    }
+    
+    function applySettings(settings = {}) {
+        const theme = settings.theme || 'dark';
+        const userName = settings.userName || 'Usuário';
+        document.body.className = theme === 'light' ? 'light-theme' : '';
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        if(themeToggleBtn) themeToggleBtn.textContent = theme === 'light' ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro';
+        const userProfileSpan = document.querySelector('.user-profile span');
+        if(userProfileSpan) userProfileSpan.textContent = `Olá, ${userName}`;
+        const settingUserName = document.getElementById('setting-user-name');
+        if(settingUserName) settingUserName.value = userName;
+    }
+
     function openEditModal(leadId) { 
         currentLeadId = leadId; 
         const lead = leads.find(l => l.id === leadId); 
