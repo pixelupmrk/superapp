@@ -75,16 +75,16 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
     background-color: rgba(0, 0, 0, 0.75); display: none; 
     justify-content: center; align-items: center; z-index: 1000; 
 }
-/* CORREÇÃO DO MODAL: Aumenta a largura máxima e define altura mínima */
+/* CORREÇÃO DO MODAL: Reduzido para caber melhor na tela, mantendo o layout */
 .modal-content { 
     position: relative; 
     background-color: var(--primary-color); 
     padding: 2rem; 
     border-radius: 12px; 
-    width: 95%; /* Ocupa 95% da tela */
-    max-width: 1400px; /* Permite telas maiores */
-    min-height: 80vh; /* Garante altura para o chat */
-    display: flex; /* Para layout de duas colunas */
+    width: 90%; 
+    max-width: 1200px; /* Reduzido de 1400px para 1200px */
+    min-height: 80vh; 
+    display: flex; 
     gap: 2rem;
 }
 .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; color: var(--text-color-muted); cursor: pointer; }
