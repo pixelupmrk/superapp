@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const userName = settings.userName || 'Usuário';
         document.body.className = theme === 'light' ? 'light-theme' : '';
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        if(themeToggleBtn) themeToggleBtn.textContent = isLight ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro';
+        if(themeToggleBtn) themeToggleBtn.textContent = theme === 'light' ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro';
         const userProfileSpan = document.querySelector('.user-profile span');
         if(userProfileSpan) userProfileSpan.textContent = `Olá, ${userName}`;
         const settingUserName = document.getElementById('setting-user-name');
