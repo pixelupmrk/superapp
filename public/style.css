@@ -70,8 +70,23 @@ textarea { min-height: 100px; resize: vertical; margin-bottom: 1rem; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); text-align: left; }
 .btn-delete-table i { pointer-events: none; }
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); display: none; justify-content: center; align-items: center; z-index: 1000; }
-.modal-content { position: relative; background-color: var(--primary-color); padding: 2rem; border-radius: 12px; width: 90%; max-width: 800px; }
+.modal-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background-color: rgba(0, 0, 0, 0.75); display: none; 
+    justify-content: center; align-items: center; z-index: 1000; 
+}
+/* CORREÇÃO DO MODAL: Aumenta a largura máxima e define altura mínima */
+.modal-content { 
+    position: relative; 
+    background-color: var(--primary-color); 
+    padding: 2rem; 
+    border-radius: 12px; 
+    width: 95%; /* Ocupa 95% da tela */
+    max-width: 1400px; /* Permite telas maiores */
+    min-height: 80vh; /* Garante altura para o chat */
+    display: flex; /* Para layout de duas colunas */
+    gap: 2rem;
+}
 .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; color: var(--text-color-muted); cursor: pointer; }
 .finance-nav { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--secondary-color); }
 .finance-tab { padding: 0.75rem 1.5rem; cursor: pointer; border-bottom: 4px solid transparent; color: var(--text-color-muted); text-decoration: none; border-radius: 8px 8px 0 0; }
@@ -117,5 +132,17 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
     .dashboard-stats, .kanban-board, .input-grid { grid-template-columns: 1fr; }
     .sales-accelerator-container { flex-direction: column; }
     .sales-accelerator-sidebar { flex: 0 0 auto; width: 100%; }
-    .modal-content { width: 95%; padding: 1.5rem; }
+    /* Ajuste responsivo para o modal */
+    .modal-content { 
+        width: 95%; 
+        padding: 1.5rem;
+        flex-direction: column; 
+        min-height: auto;
+    }
+    .lead-chat-column { 
+        border-left: none !important; 
+        padding-left: 0 !important; 
+        border-top: 1px solid var(--secondary-color);
+        padding-top: 2rem;
+    }
 }
