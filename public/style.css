@@ -75,15 +75,17 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
     background-color: rgba(0, 0, 0, 0.75); display: none; 
     justify-content: center; align-items: center; z-index: 1000; 
 }
-/* CORREÇÃO DO MODAL: Reduzido para caber melhor na tela, mantendo o layout */
+/* CORREÇÃO DO MODAL: Ajustado para caber na tela sem rolar */
 .modal-content { 
     position: relative; 
     background-color: var(--primary-color); 
     padding: 2rem; 
     border-radius: 12px; 
     width: 90%; 
-    max-width: 1200px; /* Reduzido de 1400px para 1200px */
+    max-width: 1200px; /* Reduzido para caber melhor na tela */
     min-height: 80vh; 
+    max-height: 90vh; /* Limite máximo para caber na maioria das telas */
+    overflow-y: auto; /* Adiciona rolagem se o conteúdo for maior que o máximo */
     display: flex; 
     gap: 2rem;
 }
