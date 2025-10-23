@@ -11,7 +11,11 @@ module.exports = async (req, res) => {
 
   if (!apiKey) {
     console.error("ERRO: Variável de ambiente GEMINI_API_KEY não encontrada na Vercel.");
-    return res.status(500).json({ error: 'Chave de API não configurada no servidor.' });
+    // Retorna 500 para o frontend, permitindo que o script.js exiba a mensagem de erro.
+    return res.status(500).json({ 
+        error: 'Chave de API não configurada no servidor.',
+        details: 'ERRO: A variável de ambiente GEMINI_API_KEY não foi definida no Vercel ou no arquivo .env local.' 
+    });
   }
 
   if (!prompt) {
@@ -29,9 +33,9 @@ module.exports = async (req, res) => {
     });
 
     // Envia a nova mensagem (prompt) dentro do contexto do chat
-    const result = await chat.sendMessage(prompt);
+    const result = await chat.sendMessage({ message: prompt });
     const response = await result.response;
-    const text = response.text();
+    const text = response.text;
     
     return res.status(200).json({ text });
 
