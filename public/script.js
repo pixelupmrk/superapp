@@ -19,14 +19,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let leadChatHistory = {}; 
     let unsubscribeLeadChatListener = null; 
     let whatsappEventsSource = null;
-    let botInstructions = ""; // Variável para armazenar as instruções da IA
+    let botInstructions = ""; 
 
     // NOVO: URL BASE DO SEU BOT DE WHATSAPP NO RENDER
     const WHATSAPP_BOT_URL = 'https://superapp-whatsapp-bot.onrender.com';
 
     // === FUNÇÕES MOVIDAS PARA FORA DO ESCOPO DE main() PARA RESOLVER O REFERENCE ERROR ===
     
-    // Função para carregar todos os dados do usuário (Leads, Caixa, etc.)
     async function loadAllUserData(userId) {
         try {
             const doc = await db.collection('userData').doc(userId).get();
@@ -54,13 +53,12 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error("Erro ao carregar dados:", error); }
     }
 
-    // Função para salvar todos os dados do usuário
     async function saveUserData(userId) {
         try {
             const dataToSave = {
                 leads, caixa, estoque, chatHistory,
                 mentoriaNotes: getMentoriaNotes(),
-                botInstructions: document.getElementById('bot-instructions')?.value || botInstructions, // Salva as instruções
+                botInstructions: document.getElementById('bot-instructions')?.value || botInstructions, 
                 settings: {
                     theme: document.body.classList.contains('light-theme') ? 'light' : 'dark',
                     userName: document.getElementById('setting-user-name').value || 'Usuário',
@@ -172,6 +170,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Trata o erro de JSON (o principal erro que você estava vendo)
                 const contentType = response.headers.get("content-type");
                 if (contentType && contentType.indexOf("application/json") === -1) {
+                    const textResponse = await response.text();
+                    console.error("Resposta do servidor não é JSON:", textResponse);
                     throw new Error(`Resposta inválida. O servidor retornou: ${contentType}. Isso significa que o backend do Render não está retornando JSON.`);
                 }
 
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateStatus(`Conectado como: ${data.user || 'Dispositivo'}`, true);
                     startSSEListener();
                 } else {
-                    updateStatus('Desconectado. Pressione "Verificar Status" para obter um novo QR Code.', false);
+                    updateStatus('Desconectado. Por favor, escaneie o QR Code.', false);
                     qrCodeMessage.textContent = 'Aguardando o backend gerar o QR Code. Se o QR não aparecer em 10 segundos, verifique os logs do Render.';
                     startSSEListener(); // Inicia/reinicia o listener para capturar o QR Code
                 }
@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ 
                         to: lead.whatsapp, // Número do WhatsApp
                         text: userInput,
-                        leadId: lead.id 
+                        userId: firebase.auth().currentUser.uid // Passa o userId para o bot
                     }) 
                 });
                 
@@ -471,6 +471,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 lead.chatHistory.push({ role: "model", parts: [{ text: `Erro: ${error.message}` }] }); 
             }
             await saveUserData(userId);
+        });
+        
+        document.getElementById('edit-lead-modal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'toggle-bot-btn') {
+                const lead = leads.find(l => l.id === currentLeadId);
+                if (lead) {
+                    // Alterna o status botActive do lead
+                    const newStatus = !(lead.botActive === true); // Assume true se for undefined ou false
+                    lead.botActive = newStatus;
+                    e.target.textContent = newStatus ? 'Desativar Bot' : 'Ativar Bot';
+                    e.target.classList.toggle('btn-delete', !newStatus);
+                    e.target.classList.toggle('btn-save', newStatus);
+                    saveUserData(userId);
+                }
+            }
         });
 
         document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', () => { document.getElementById(btn.dataset.target).style.display = 'none'; }); });
