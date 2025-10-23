@@ -54,7 +54,7 @@ body { font-family: 'Inter', sans-serif; background-color: var(--background-colo
 .btn-custo { background: #6366f1; color: #fff; padding: 0.5rem 1rem; font-size: 0.9rem; }
 .card { background-color: var(--primary-color); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid var(--secondary-color); box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
 /* Ajuste no input-grid para caber mais em telas normais */
-.input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+.input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Reduzido minmax para acomodar mais campos */ gap: 1rem; margin-bottom: 1rem; }
 input, select, textarea { width: 100%; padding: 0.75rem 1rem; background-color: var(--secondary-color); border: 1px solid var(--secondary-color); border-radius: 8px; color: var(--text-color); font-size: 1rem; }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-color); }
 textarea { min-height: 100px; resize: vertical; margin-bottom: 1rem; }
@@ -82,8 +82,8 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
     background-color: var(--primary-color); 
     padding: 2rem; 
     border-radius: 12px; 
-    width: 90%; 
-    max-width: 1000px; /* Largura máxima segura para telas menores de desktop */
+    width: 85%; /* Reduzido o percentual de largura */
+    max-width: 850px; /* Reduzido para um valor mais seguro */
     min-height: 80vh; 
     max-height: 90vh; 
     overflow-y: auto; 
