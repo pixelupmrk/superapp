@@ -61,27 +61,30 @@ document.addEventListener('DOMContentLoaded', () => {
             whatsappEventsSource = new EventSource(`${WHATSAPP_BOT_URL}/events`); 
             
             whatsappEventsSource.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                
-                if (data.type === 'qr') {
-                    // Exibe o QR Code
-                    qrCodeImg.src = data.qr;
-                    qrCodeImg.style.display = 'block';
-                    qrCodeMessage.textContent = 'Escaneie o QR Code com seu celular para conectar o WhatsApp.';
-                    updateStatus('Aguardando Conexão (QR Code Disponível)', false);
-                } else if (data.type === 'status') {
-                    // Atualiza o status geral
-                    if (data.connected) {
-                        updateStatus(`Conectado como: ${data.user}`, true);
-                        qrCodeImg.style.display = 'none';
-                        qrCodeMessage.textContent = '';
-                    } else if (data.status === 'disconnected' || !data.connected) {
-                         updateStatus('Desconectado. Pressione "Verificar Status" para obter um novo QR Code.', false);
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.type === 'qr') {
+                        // Exibe o QR Code
+                        qrCodeImg.src = data.qr;
+                        qrCodeImg.style.display = 'block';
+                        qrCodeMessage.textContent = 'Escaneie o QR Code com seu celular para conectar o WhatsApp.';
+                        updateStatus('Aguardando Conexão (QR Code Disponível)', false);
+                    } else if (data.type === 'status') {
+                        // Atualiza o status geral
+                        if (data.connected) {
+                            updateStatus(`Conectado como: ${data.user}`, true);
+                            qrCodeImg.style.display = 'none';
+                            qrCodeMessage.textContent = '';
+                        } else if (data.status === 'disconnected' || !data.connected) {
+                             updateStatus('Desconectado. Pressione "Verificar Status" para obter um novo QR Code.', false);
+                        }
+                    } else if (data.type === 'message' && data.from) {
+                        // Lógica para receber mensagem e atualizar o CRM/Chat (Simplificada)
+                        console.log(`Nova mensagem de ${data.from}: ${data.text}`);
                     }
-                } else if (data.type === 'message' && data.from) {
-                    // Lógica para receber mensagem e atualizar o CRM/Chat (Simplificada)
-                    // Na vida real, você buscará o lead pelo número e atualizará o chat dele.
-                    console.log(`Nova mensagem de ${data.from}: ${data.text}`);
+                } catch (e) {
+                    console.error("Erro ao processar evento SSE:", e, event.data);
                 }
             };
 
@@ -101,13 +104,13 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 // Endpoint para obter o status e QR Code se necessário
                 const response = await fetch(`${WHATSAPP_BOT_URL}/status`, { 
-                    headers: { 'Access-Control-Allow-Origin': '*' } // Adicionado para tentar resolver problemas de CORS
+                    headers: { 'Access-Control-Allow-Origin': '*' } // Tenta forçar o cabeçalho
                 }); 
                 
                 // Trata o erro de JSON, que era o problema principal (Unexpected token '<')
                 const contentType = response.headers.get("content-type");
                 if (contentType && contentType.indexOf("application/json") === -1) {
-                    throw new Error(`Resposta inválida. O servidor retornou: ${contentType}`);
+                    throw new Error(`Resposta inválida. O servidor retornou: ${contentType}. Isso geralmente significa que o backend está enviando uma página de erro HTML.`);
                 }
 
                 const data = await response.json();
@@ -117,9 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Inicia o listener de eventos assim que o status estiver OK
                     startSSEListener();
                 } else {
-                    updateStatus('Desconectado. Pressione "Verificar Status" para obter um novo QR Code.', false);
+                    updateStatus('Desconectado. Por favor, escaneie o QR Code.', false);
                     // Como está desconectado, o backend deve enviar o evento 'qr' via SSE.
-                    qrCodeMessage.textContent = 'Aguardando o backend gerar o QR Code. Se o QR não aparecer, verifique os logs do Render.';
+                    qrCodeMessage.textContent = 'Aguardando o backend gerar o QR Code. Se o QR não aparecer em 10 segundos, verifique os logs do Render.';
                     startSSEListener(); // Inicia/reinicia o listener para capturar o QR Code
                 }
 
