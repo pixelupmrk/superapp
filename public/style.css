@@ -83,7 +83,7 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
     padding: 2rem; 
     border-radius: 12px; 
     width: 90%; 
-    max-width: 1000px; /* Reduzido para 1000px, mais seguro */
+    max-width: 1000px; /* Largura máxima segura para telas menores de desktop */
     min-height: 80vh; 
     max-height: 90vh; 
     overflow-y: auto; 
