@@ -21,10 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let whatsappEventsSource = null;
     let botInstructions = ""; 
 
-    // NOVO: URL BASE DO SEU BOT DE WHATSAPP NO RENDER
+    // URL BASE DO SEU BOT DE WHATSAPP NO RENDER
     const WHATSAPP_BOT_URL = 'https://superapp-whatsapp-bot.onrender.com';
 
-    // === FUNÇÕES MOVIDAS PARA FORA DO ESCOPO DE main() PARA RESOLVER O REFERENCE ERROR ===
+    // === FUNÇÕES DE DADOS (MOVIDAS PARA CORRIGIR ERRO DE ESCOPO) ===
     
     async function loadAllUserData(userId) {
         try {
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 estoque.forEach((item, index) => { if (!item.id) item.id = `prod_${Date.now()}_${index}`; });
                 chatHistory = data.chatHistory || [];
                 // Carrega as instruções da IA
-                botInstructions = data.botInstructions || document.getElementById('bot-instructions')?.placeholder || "";
+                botInstructions = data.botInstructions || document.getElementById('bot-instructions')?.placeholder || "Você é um assistente virtual prestativo.";
                 
                 nextLeadId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 0;
                 applySettings(data.settings);
@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const dataToSave = {
                 leads, caixa, estoque, chatHistory,
                 mentoriaNotes: getMentoriaNotes(),
+                // Garante que o valor da textarea seja salvo
                 botInstructions: document.getElementById('bot-instructions')?.value || botInstructions, 
                 settings: {
                     theme: document.body.classList.contains('light-theme') ? 'light' : 'dark',
@@ -71,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // === FIM DAS FUNÇÕES MOVIDAS ===
+    // === FIM DAS FUNÇÕES DE DADOS ===
 
 
     async function main() {
@@ -471,21 +472,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 lead.chatHistory.push({ role: "model", parts: [{ text: `Erro: ${error.message}` }] }); 
             }
             await saveUserData(userId);
-        });
-        
-        document.getElementById('edit-lead-modal')?.addEventListener('click', (e) => {
-            if (e.target.id === 'toggle-bot-btn') {
-                const lead = leads.find(l => l.id === currentLeadId);
-                if (lead) {
-                    // Alterna o status botActive do lead
-                    const newStatus = !(lead.botActive === true); // Assume true se for undefined ou false
-                    lead.botActive = newStatus;
-                    e.target.textContent = newStatus ? 'Desativar Bot' : 'Ativar Bot';
-                    e.target.classList.toggle('btn-delete', !newStatus);
-                    e.target.classList.toggle('btn-save', newStatus);
-                    saveUserData(userId);
-                }
-            }
         });
 
         document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', () => { document.getElementById(btn.dataset.target).style.display = 'none'; }); });
