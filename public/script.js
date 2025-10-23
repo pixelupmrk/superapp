@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL, COMPLETA E CORRIGIDA PARA WHATSAPP BOT, LAYOUT E ESCOPO
+// script.js - VERSÃO FINAL, COMPLETA E CORRIGIDA PARA WHATSAPP BOT E ESCOPO
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
@@ -219,7 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCaixaTable();
         updateCaixa();
         renderEstoqueTable();
-        renderChatHistory('chatbot-messages', chatHistory);
+        // Remove a chamada para o chat genérico
+        // renderChatHistory('chatbot-messages', chatHistory); 
     }
     
     function applySettings(settings = {}) {
@@ -381,34 +382,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('export-leads-btn')?.addEventListener('click', () => { if (leads.length === 0) { alert("Não há leads para exportar."); return; } const header = ["Nome", "Email", "WhatsApp", "Origem", "Qualificação", "Status", "Notas"]; const rows = leads.map(l => [l.nome, l.email, l.whatsapp, l.origem, l.qualificacao, l.status, `"${(l.notas || '').replace(/"/g, '""')}"`]); const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Leads"); XLSX.writeFile(workbook, "leads.xlsx"); });
         document.getElementById('export-csv-btn')?.addEventListener('click', () => { if (estoque.length === 0) { alert("Não há produtos para exportar."); return; } const header = ["Produto", "Descrição", "Valor de Compra", "Valor de Venda"]; const rows = estoque.map(p => [p.produto, p.descricao, p.compra, p.venda]); const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Estoque"); XLSX.writeFile(workbook, "estoque.xlsx"); });
         document.getElementById('import-csv-btn')?.addEventListener('click', () => { const input = document.createElement('input'); input.type = 'file'; input.accept = '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'; input.onchange = e => { const file = e.target.files[0]; const reader = new FileReader(); reader.onload = async (event) => { const data = new Uint8Array(event.target.result); const workbook = XLSX.read(data, {type: 'array'}); const ws = workbook.Sheets[workbook.SheetNames[0]]; const json = XLSX.utils.sheet_to_json(ws); json.forEach(item => { const pKey = Object.keys(item).find(k=>k.toLowerCase()==='produto'); const cKey = Object.keys(item).find(k=>k.toLowerCase().includes('compra')); const vKey = Object.keys(item).find(k=>k.toLowerCase().includes('venda')); if(item[pKey] && item[cKey] && item[vKey]){ estoque.push({ id: `prod_${Date.now()}_${Math.random()}`, produto: item[pKey], descricao: item['Descrição']||item['descricao']||'', compra: parseFloat(item[cKey]), venda: parseFloat(item[vKey]), custos: [] }); } }); await saveUserData(userId); renderEstoqueTable(); alert(`${json.length} produtos importados!`); }; reader.readAsArrayBuffer(file); }; input.click(); });
-        
-        // Listener do Chatbot Principal (usando a API Vercel /api/gemini)
-        document.getElementById('chatbot-form')?.addEventListener('submit', async e => {
-            e.preventDefault();
-            const chatbotInput = document.getElementById('chatbot-input');
-            const userInput = chatbotInput.value.trim();
-            if (!userInput) return;
-            addMessageToChat(userInput, 'user-message', 'chatbot-messages');
-            chatHistory.push({ role: "user", parts: [{ text: userInput }] });
-            chatbotInput.value = '';
-            addMessageToChat("Pensando...", 'bot-message bot-thinking', 'chatbot-messages');
-            try {
-                // Endpoint local do Vercel para o Chatbot AI Geral
-                const response = await fetch('/api/gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: userInput, history: chatHistory }) });
-                document.querySelector('.bot-thinking')?.remove();
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.details || 'Erro desconhecido na API');
-                }
-                const data = await response.json();
-                addMessageToChat(data.text, 'bot-message', 'chatbot-messages');
-                chatHistory.push({ role: "model", parts: [{ text: data.text }] });
-            } catch (error) {
-                document.querySelector('.bot-thinking')?.remove();
-                addMessageToChat(`Erro: ${error.message}`, 'bot-message', 'chatbot-messages');
-            }
-            await saveUserData(userId);
-        });
         
         // CORREÇÃO: Listener para o Chatbot de Leads (AGORA USANDO O WHATSAPP BOT BACKEND NO RENDER)
         document.getElementById('lead-chatbot-form')?.addEventListener('submit', async e => {
