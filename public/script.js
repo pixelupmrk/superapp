@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL, COMPLETA E CORRIGIDA
+// script.js - VERSÃO FINAL, COMPLETA E CORRIGIDA PARA WHATSAPP BOT
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let nextLeadId = 0, currentLeadId = null, draggedItem = null, currentProductId = null;
     let statusChart;
     let db;
-    // VARIÁVEIS ADICIONAIS PARA O CHAT DE LEAD (necessário para a nova feature)
     let leadChatHistory = {}; 
     let unsubscribeLeadChatListener = null; 
 
@@ -128,7 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('lead-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            leads.push({ id: nextLeadId++, status: 'novo', nome: document.getElementById('lead-name').value, email: document.getElementById('lead-email').value, whatsapp: document.getElementById('lead-whatsapp').value, origem: document.getElementById('lead-origin').value, qualificacao: document.getElementById('lead-qualification').value, notas: document.getElementById('lead-notes').value, chatHistory: [] }); // Adicionando chatHistory ao Lead
+            // Garante que todo novo lead tenha um chatHistory inicializado
+            leads.push({ id: nextLeadId++, status: 'novo', nome: document.getElementById('lead-name').value, email: document.getElementById('lead-email').value, whatsapp: document.getElementById('lead-whatsapp').value, origem: document.getElementById('lead-origin').value, qualificacao: document.getElementById('lead-qualification').value, notas: document.getElementById('lead-notes').value, chatHistory: [] }); 
             await saveUserData(userId);
             updateAllUI();
             e.target.reset();
@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('export-csv-btn')?.addEventListener('click', () => { if (estoque.length === 0) { alert("Não há produtos para exportar."); return; } const header = ["Produto", "Descrição", "Valor de Compra", "Valor de Venda"]; const rows = estoque.map(p => [p.produto, p.descricao, p.compra, p.venda]); const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Estoque"); XLSX.writeFile(workbook, "estoque.xlsx"); });
         document.getElementById('import-csv-btn')?.addEventListener('click', () => { const input = document.createElement('input'); input.type = 'file'; input.accept = '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'; input.onchange = e => { const file = e.target.files[0]; const reader = new FileReader(); reader.onload = async (event) => { const data = new Uint8Array(event.target.result); const workbook = XLSX.read(data, {type: 'array'}); const ws = workbook.Sheets[workbook.SheetNames[0]]; const json = XLSX.utils.sheet_to_json(ws); json.forEach(item => { const pKey = Object.keys(item).find(k=>k.toLowerCase()==='produto'); const cKey = Object.keys(item).find(k=>k.toLowerCase().includes('compra')); const vKey = Object.keys(item).find(k=>k.toLowerCase().includes('venda')); if(item[pKey] && item[cKey] && item[vKey]){ estoque.push({ id: `prod_${Date.now()}_${Math.random()}`, produto: item[pKey], descricao: item['Descrição']||item['descricao']||'', compra: parseFloat(item[cKey]), venda: parseFloat(item[vKey]), custos: [] }); } }); await saveUserData(userId); renderEstoqueTable(); alert(`${json.length} produtos importados!`); }; reader.readAsArrayBuffer(file); }; input.click(); });
         
-        // Listener do Chatbot Principal (Vercel API)
+        // Listener do Chatbot Principal (usando a API Vercel /api/gemini)
         document.getElementById('chatbot-form')?.addEventListener('submit', async e => {
             e.preventDefault();
             const chatbotInput = document.getElementById('chatbot-input');
@@ -250,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
             chatbotInput.value = '';
             addMessageToChat("Pensando...", 'bot-message bot-thinking', 'chatbot-messages');
             try {
+                // Endpoint local do Vercel para o Chatbot AI Geral
                 const response = await fetch('/api/gemini', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: userInput, history: chatHistory }) });
                 document.querySelector('.bot-thinking')?.remove();
                 if (!response.ok) {
@@ -265,45 +266,66 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             await saveUserData(userId);
         });
-
-        // NOVO: Listener para o Chatbot de Leads (usando a Vercel API, mas salvando no lead)
+        
+        // CORREÇÃO: Listener para o Chatbot de Leads (AGORA USANDO O WHATSAPP BOT BACKEND)
         document.getElementById('lead-chatbot-form')?.addEventListener('submit', async e => {
             e.preventDefault();
             const lead = leads.find(l => l.id === currentLeadId);
-            if (!lead) return;
+            // Verifica se o lead existe e se tem WhatsApp cadastrado (o WhatsApp é a chave para o bot)
+            if (!lead || !lead.whatsapp) {
+                addMessageToChat("Erro: Lead não encontrado ou campo WhatsApp vazio.", 'bot-message', 'lead-chatbot-messages');
+                return;
+            }
 
             const chatbotInput = document.getElementById('lead-chatbot-input');
             const userInput = chatbotInput.value.trim();
             if (!userInput) return;
             
+            // 1. Adiciona a mensagem do usuário na interface
             addMessageToChat(userInput, 'user-message', 'lead-chatbot-messages');
+            
+            // 2. Salva a mensagem no histórico local do lead
+            if (!lead.chatHistory) lead.chatHistory = [];
             lead.chatHistory.push({ role: "user", parts: [{ text: userInput }] });
             chatbotInput.value = '';
             
-            addMessageToChat("Pensando...", 'bot-message bot-thinking', 'lead-chatbot-messages');
+            // 3. Exibe status de "Enviando"
+            addMessageToChat("Enviando mensagem para o WhatsApp Bot...", 'bot-message bot-thinking', 'lead-chatbot-messages');
             
+            // 4. Envia a requisição para o backend do WhatsApp Bot
             try {
-                // Envia a requisição para a API Vercel, usando o histórico do lead
-                const response = await fetch('/api/gemini', { 
+                // Endpoint para enviar a mensagem do lead para o WhatsApp Bot.
+                // ATENÇÃO: Se seu bot estiver em uma URL externa, você deve usar a URL completa aqui.
+                // Se estiver no Vercel (como um serverless function /api/send-whatsapp-message), use o caminho local.
+                const endpoint = '/api/send-whatsapp-message'; 
+                
+                const response = await fetch(endpoint, { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ prompt: userInput, history: lead.chatHistory }) 
+                    body: JSON.stringify({ 
+                        to: lead.whatsapp, // Número do WhatsApp
+                        text: userInput,
+                        leadId: lead.id // ID do Lead para que o backend do bot possa rotear e salvar contexto
+                    }) 
                 });
                 
-                document.querySelector('.bot-thinking')?.remove();
+                document.querySelector('.bot-thinking')?.remove(); // Remove o status
+                
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.details || 'Erro desconhecido na API');
+                    const errorData = await response.json().catch(() => ({ details: 'Erro desconhecido na comunicação com o WhatsApp Bot.' }));
+                    throw new Error(errorData.details || `Falha no envio da mensagem. Status: ${response.status}`);
                 }
                 
-                const data = await response.json();
-                addMessageToChat(data.text, 'bot-message', 'lead-chatbot-messages');
-                lead.chatHistory.push({ role: "model", parts: [{ text: data.text }] });
+                // Resposta simulada
+                const botResponseText = "Comando enviado! O bot de WhatsApp está processando sua mensagem e responderá no chat em breve.";
+
+                addMessageToChat(botResponseText, 'bot-message', 'lead-chatbot-messages');
+                lead.chatHistory.push({ role: "model", parts: [{ text: botResponseText }] });
                 
             } catch (error) {
                 document.querySelector('.bot-thinking')?.remove();
-                addMessageToChat(`Erro: ${error.message}`, 'bot-message', 'lead-chatbot-messages');
-                lead.chatHistory.push({ role: "model", parts: [{ text: `Erro: ${error.message}` }] }); // Salva o erro no histórico do lead
+                addMessageToChat(`Erro de Envio: ${error.message}. Verifique a URL do endpoint e o status do seu bot de WhatsApp.`, 'bot-message', 'lead-chatbot-messages');
+                lead.chatHistory.push({ role: "model", parts: [{ text: `Erro: ${error.message}` }] }); 
             }
             await saveUserData(userId);
         });
@@ -344,8 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const c = document.getElementById(containerId); 
         if (c) { 
             // Remove o "Pensando..." antes de adicionar a resposta final, se existir
-            if(type !== 'bot-thinking') {
-                 document.querySelector(`#${containerId} .bot-thinking`)?.remove();
+            if(type !== 'bot-thinking' && document.querySelector(`#${containerId} .bot-thinking`)) {
+                 document.querySelector(`#${containerId} .bot-thinking`).remove();
             }
             c.innerHTML += `<div class="${type}">${msg}</div>`; 
             c.scrollTop = c.scrollHeight; 
