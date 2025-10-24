@@ -82,13 +82,12 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
     background-color: var(--primary-color); 
     padding: 2rem; 
     border-radius: 12px; 
-    width: 85%; /* Reduzido o percentual de largura */
-    max-width: 850px; /* Reduzido para um valor mais seguro */
+    width: 95%; /* MANTÉM UMA BOA PROPORÇÃO */
+    max-width: 900px; /* AUMENTADO levemente o máximo */
     min-height: 80vh; 
     max-height: 90vh; 
     overflow-y: auto; 
-    /* CORREÇÃO PARA A BARRA HORIZONTAL: Garante que nada estoure a largura */
-    overflow-x: hidden; 
+    overflow-x: hidden; /* GARANTE QUE A BARRA HORIZONTAL NÃO APAREÇA */
     display: flex; 
     gap: 2rem;
 }
@@ -114,8 +113,15 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
 .mentoria-module-content.active { display: block; }
 .chatbot-container { display: flex; flex-direction: column; height: 75vh; background-color: var(--primary-color); border-radius: 12px; overflow: hidden; }
 .chatbot-messages { flex-grow: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
-.chatbot-form { flex-shrink: 0; display: flex; padding: 1rem; border-top: 1px solid var(--secondary-color); gap: 1rem; }
-.user-message, .bot-message { padding: 0.75rem 1.25rem; border-radius: 20px; max-width: 75%; line-height: 1.5; }
+/* Ajuste para que o balão de mensagem não estoure o container */
+.user-message, .bot-message { 
+    padding: 0.75rem 1.25rem; 
+    border-radius: 20px; 
+    max-width: 95%; /* Aumentado de 75% para 95% para acomodar textos longos */
+    line-height: 1.5; 
+    word-wrap: break-word; /* Garante que o texto longo quebre a linha dentro do balão */
+    white-space: pre-wrap; 
+}
 .user-message { background-color: transparent; border: 2px solid var(--accent-color); color: var(--text-color); align-self: flex-end; border-bottom-right-radius: 5px; }
 .bot-message { background-color: var(--secondary-color); color: var(--text-color); align-self: flex-start; border-bottom-left-radius: 5px; }
 .chatbot-form button { background-color: var(--accent-color); color: #000; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 1.5rem; cursor: pointer; flex-shrink: 0; }
@@ -127,6 +133,29 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
 .custo-item { display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--secondary-color); }
 .custo-item span:last-child { font-weight: bold; }
 .menu-toggle { display: none; font-size: 2rem; cursor: pointer; color: var(--accent-color); }
+
+/* --- Estilo para a Bolinha de Notificação (Badge) --- */
+.notification-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    margin-left: 8px;
+    background-color: var(--delete-color); /* Vermelho */
+    color: white;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: bold;
+    line-height: 1;
+    min-width: 15px;
+    text-align: center;
+    box-shadow: 0 0 5px var(--delete-color);
+}
+
+.kanban-card strong {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 
 @media (max-width: 768px) {
     .sidebar { left: -100%; }
@@ -145,8 +174,9 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
         min-height: auto;
         /* CORREÇÃO: Garante que o modal caiba na tela */
         max-height: 95vh; 
+        overflow-x: hidden; /* CORREÇÃO APLICADA AQUI TAMBÉM */
     }
-    .lead-form-column { 
+    .lead-chat-column { 
         border-left: none !important; 
         padding-left: 0 !important; 
         border-top: 1px solid var(--secondary-color);
