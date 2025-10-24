@@ -82,12 +82,12 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
     background-color: var(--primary-color); 
     padding: 2rem; 
     border-radius: 12px; 
-    width: 95%; /* MANTÉM UMA BOA PROPORÇÃO */
-    max-width: 900px; /* AUMENTADO levemente o máximo */
+    width: 95%; 
+    max-width: 900px; 
     min-height: 80vh; 
     max-height: 90vh; 
     overflow-y: auto; 
-    overflow-x: hidden; /* GARANTE QUE A BARRA HORIZONTAL NÃO APAREÇA */
+    overflow-x: hidden; /* CORREÇÃO FINAL DA BARRA HORIZONTAL */
     display: flex; 
     gap: 2rem;
 }
@@ -117,7 +117,7 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
 .user-message, .bot-message { 
     padding: 0.75rem 1.25rem; 
     border-radius: 20px; 
-    max-width: 95%; /* Aumentado de 75% para 95% para acomodar textos longos */
+    max-width: 95%; /* Aumentado para melhor uso do espaço */
     line-height: 1.5; 
     word-wrap: break-word; /* Garante que o texto longo quebre a linha dentro do balão */
     white-space: pre-wrap; 
