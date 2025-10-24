@@ -217,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const chatRef = db.collection('userData').doc(userId).collection('leads').doc(String(leadId)).collection('messages');
 
         try {
+            // Busca e ordena por timestamp (cria o campo no momento de salvar, se não existir)
             const snapshot = await chatRef.orderBy('timestamp', 'asc').get();
             const history = [];
             snapshot.forEach(doc => {
@@ -226,14 +227,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 history.push({ role: role, parts: [{ text: data.text }] });
             });
 
-            // Atualiza o histórico do lead no array local 
+            // Atualiza o histórico do lead no array local (Embora o histórico esteja na subcoleção, o array principal o usa para renderização)
             const lead = leads.find(l => l.id === leadId);
             if(lead) {
                  lead.chatHistory = history;
             }
             
             renderChatHistory('lead-chatbot-messages', history); // Renderiza o histórico atualizado
-            // Não precisa salvar o histórico no saveUserData, pois ele está sendo lido da subcoleção.
             
         } catch (error) {
             console.error("Erro ao carregar histórico do Firestore:", error);
@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', () => { document.getElementById(btn.dataset.target).style.display = 'none'; }); });
     }
-    
+
     // === FUNÇÃO CRÍTICA: CARREGA O HISTÓRICO REAL DO FIRESTORE (Subcoleção) ===
     async function reloadChatHistoryFromFirestore(leadId) {
         const userId = firebase.auth().currentUser.uid;
@@ -500,6 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const chatRef = db.collection('userData').doc(userId).collection('leads').doc(String(leadId)).collection('messages');
 
         try {
+            // Busca e ordena por timestamp (cria o campo no momento de salvar, se não existir)
             const snapshot = await chatRef.orderBy('timestamp', 'asc').get();
             const history = [];
             snapshot.forEach(doc => {
@@ -509,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 history.push({ role: role, parts: [{ text: data.text }] });
             });
 
-            // Atualiza o histórico do lead no array local 
+            // Atualiza o histórico do lead no array local (Embora o histórico esteja na subcoleção, o array principal o usa para renderização)
             const lead = leads.find(l => l.id === leadId);
             if(lead) {
                  lead.chatHistory = history;
