@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL E COMPLETA (AGORA LÊ O CHAT DO FIRESTORE CORRETAMENTE)
+// script.js - VERSÃO FINAL E COMPLETA (CORRIGIDO O ERRO DE SINTAXE)
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
