@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL E COMPLETA (CORRIGIDO O ERRO DE SINTAXE)
+// script.js - VERSÃO FINAL E COMPLETA (CORRIGIDO O ERRO DE SINTAXE E ESCOPO)
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
