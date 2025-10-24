@@ -40,7 +40,15 @@ body { font-family: 'Inter', sans-serif; background-color: var(--background-colo
 .sidebar-footer { margin-top: auto; }
 .sac-button { background-color: #25D366; color: #ffffff; font-weight: 600; }
 .sac-button:hover { background-color: #128C7E; }
-.main-content { flex-grow: 1; margin-left: var(--sidebar-width); padding: 2rem; transition: margin-left 0.3s ease-in-out; }
+.main-content { 
+    flex-grow: 1; 
+    margin-left: var(--sidebar-width); 
+    padding: 2rem; 
+    transition: margin-left 0.3s ease-in-out; 
+    /* CORREÇÃO DA PROPORÇÃO: Garante que a largura se ajuste */
+    width: calc(100% - var(--sidebar-width)); 
+    overflow-x: hidden; 
+}
 .main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
 .main-header h1 { font-size: 2rem; }
 .user-profile { font-weight: 600; }
