@@ -76,7 +76,7 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
     background-color: rgba(0, 0, 0, 0.75); display: none; 
     justify-content: center; align-items: center; z-index: 1000; 
 }
-/* CORREÇÃO DO MODAL: Ajustado para caber na tela sem rolar */
+/* CORREÇÃO DO MODAL: Ajustado para caber na tela sem rolagem */
 .modal-content { 
     position: relative; 
     background-color: var(--primary-color); 
