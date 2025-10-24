@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL E COMPLETA (CORRIGIDO O ERRO DE SINTAXE)
+// script.js - VERSÃO FINAL E COMPLETA (AGORA LÊ O CHAT DO FIRESTORE CORRETAMENTE)
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
@@ -128,7 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
                              updateStatus('Desconectado. Pressione "Verificar Status" para obter um novo QR Code.', false);
                         }
                     } else if (data.type === 'message' && data.from) {
-                        console.log(`Nova mensagem de ${data.from}: ${data.text}`);
+                        // === PONTO CRÍTICO: RECARREGA O CHAT QUANDO O BOT ENVIA UMA RESPOSTA ===
+                        // Força a recarga dos leads (para novos leads e atualização do Kanban)
+                        loadAllUserData(currentUserId);
+                        // Se o modal de edição de lead estiver aberto, recarrega o histórico
+                        if (currentLeadId !== null) {
+                            reloadChatHistoryFromFirestore(currentLeadId);
+                        }
                     }
                 } catch (e) {
                     console.error("Erro ao processar evento SSE:", e, event.data);
@@ -204,6 +210,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // === FUNÇÃO CRÍTICA: CARREGA O HISTÓRICO REAL DO FIRESTORE (Subcoleção) ===
+    async function reloadChatHistoryFromFirestore(leadId) {
+        const userId = firebase.auth().currentUser.uid;
+        // O bot salva as mensagens na subcoleção 'messages' dentro do lead, por isso precisamos buscar aqui
+        const chatRef = db.collection('userData').doc(userId).collection('leads').doc(String(leadId)).collection('messages');
+
+        try {
+            const snapshot = await chatRef.orderBy('timestamp', 'asc').get();
+            const history = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                // Adapta o formato do bot (sender: 'lead' ou 'operator') para o formato do chat (role: 'user' ou 'model')
+                const role = data.sender === 'lead' ? 'user' : 'model';
+                history.push({ role: role, parts: [{ text: data.text }] });
+            });
+
+            // Atualiza o histórico do lead no array local 
+            const lead = leads.find(l => l.id === leadId);
+            if(lead) {
+                 lead.chatHistory = history;
+            }
+            
+            renderChatHistory('lead-chatbot-messages', history); // Renderiza o histórico atualizado
+            // Não precisa salvar o histórico no saveUserData, pois ele está sendo lido da subcoleção.
+            
+        } catch (error) {
+            console.error("Erro ao carregar histórico do Firestore:", error);
+            addMessageToChat("Erro: Falha ao carregar histórico de conversas do Firestore.", 'bot-message', 'lead-chatbot-messages');
+        }
+    }
+
+
     // --- FUNÇÕES AUXILIARES DE RENDERIZAÇÃO E DADOS ---
 
     function updateAllUI() {
@@ -220,7 +258,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const userName = settings.userName || 'Usuário';
         document.body.className = theme === 'light' ? 'light-theme' : '';
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        if(themeToggleBtn) themeToggleBtn.textContent = theme === 'light' ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro';
+        if(themeToggleBtn) {
+            const isLight = document.body.classList.contains('light-theme');
+            themeToggleBtn.textContent = isLight ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro';
+        }
         const userProfileSpan = document.querySelector('.user-profile span');
         if(userProfileSpan) userProfileSpan.textContent = `Olá, ${userName}`;
         const settingUserName = document.getElementById('setting-user-name');
@@ -374,7 +415,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('export-csv-btn')?.addEventListener('click', () => { if (estoque.length === 0) { alert("Não há produtos para exportar."); return; } const header = ["Produto", "Descrição", "Valor de Compra", "Valor de Venda"]; const rows = estoque.map(p => [p.produto, p.descricao, p.compra, p.venda]); const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Estoque"); XLSX.writeFile(workbook, "estoque.xlsx"); });
         document.getElementById('import-csv-btn')?.addEventListener('click', () => { const input = document.createElement('input'); input.type = 'file'; input.accept = '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'; input.onchange = e => { const file = e.target.files[0]; const reader = new FileReader(); reader.onload = async (event) => { const data = new Uint8Array(event.target.result); const workbook = XLSX.read(data, {type: 'array'}); const ws = workbook.Sheets[workbook.SheetNames[0]]; const json = XLSX.utils.sheet_to_json(ws); json.forEach(item => { const pKey = Object.keys(item).find(k=>k.toLowerCase()==='produto'); const cKey = Object.keys(item).find(k=>k.toLowerCase().includes('compra')); const vKey = Object.keys(item).find(k=>k.toLowerCase().includes('venda')); if(item[pKey] && item[cKey] && item[vKey]){ estoque.push({ id: `prod_${Date.now()}_${Math.random()}`, produto: item[pKey], descricao: item['Descrição']||item['descricao']||'', compra: parseFloat(item[cKey]), venda: parseFloat(item[vKey]), custos: [] }); } }); await saveUserData(userId); renderEstoqueTable(); alert(`${json.length} produtos importados!`); }; reader.readAsArrayBuffer(file); }; input.click(); });
         
-        // CORREÇÃO: Listener para o Chatbot de Leads (AGORA USANDO O WHATSAPP BOT BACKEND NO RENDER)
+        // --- LÓGICA DE EVENT LISTENERS PARA CHAT E BOTÃO ---
+
+        // Listener do Chatbot de Leads (Envio de Mensagem)
         document.getElementById('lead-chatbot-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const lead = leads.find(l => l.id === currentLeadId);
@@ -417,10 +460,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(errorData.details || `Falha no envio da mensagem. Status: ${response.status}`);
                 }
                 
-                const botResponseText = "Comando enviado! O bot de WhatsApp está processando sua mensagem e responderá no chat em breve.";
+                // === ATUALIZAÇÃO DO CHAT APÓS ENVIO ===
+                // 1. Força a recarga do histórico do Firestore para ver a mensagem enviada
+                await reloadChatHistoryFromFirestore(lead.id); 
 
+                const botResponseText = "Comando enviado! Verifique o WhatsApp e aguarde a resposta da IA. O chat será atualizado em tempo real (SSE).";
                 addMessageToChat(botResponseText, 'bot-message', 'lead-chatbot-messages');
-                lead.chatHistory.push({ role: "model", parts: [{ text: botResponseText }] });
                 
             } catch (error) {
                 document.querySelector('.bot-thinking')?.remove();
@@ -430,6 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await saveUserData(userId);
         });
 
+        // Lógica do Botão Ativar/Desativar Bot
         document.getElementById('edit-lead-modal')?.addEventListener('click', (e) => {
             if (e.target.id === 'toggle-bot-btn') {
                 const lead = leads.find(l => l.id === currentLeadId);
@@ -446,6 +492,37 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', () => { document.getElementById(btn.dataset.target).style.display = 'none'; }); });
     }
+    
+    // === FUNÇÃO CRÍTICA: CARREGA O HISTÓRICO REAL DO FIRESTORE (Subcoleção) ===
+    async function reloadChatHistoryFromFirestore(leadId) {
+        const userId = firebase.auth().currentUser.uid;
+        // O bot salva as mensagens na subcoleção 'messages' dentro do lead, por isso precisamos buscar aqui
+        const chatRef = db.collection('userData').doc(userId).collection('leads').doc(String(leadId)).collection('messages');
+
+        try {
+            const snapshot = await chatRef.orderBy('timestamp', 'asc').get();
+            const history = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                // Adapta o formato do bot (sender: 'lead' ou 'operator') para o formato do chat (role: 'user' ou 'model')
+                const role = data.sender === 'lead' ? 'user' : 'model';
+                history.push({ role: role, parts: [{ text: data.text }] });
+            });
+
+            // Atualiza o histórico do lead no array local 
+            const lead = leads.find(l => l.id === leadId);
+            if(lead) {
+                 lead.chatHistory = history;
+            }
+            
+            renderChatHistory('lead-chatbot-messages', history); // Renderiza o histórico atualizado
+            
+        } catch (error) {
+            console.error("Erro ao carregar histórico do Firestore:", error);
+            addMessageToChat("Erro: Falha ao carregar histórico de conversas do Firestore.", 'bot-message', 'lead-chatbot-messages');
+        }
+    }
+
 
     // --- FUNÇÕES AUXILIARES DE RENDERIZAÇÃO E DADOS ---
 
@@ -463,7 +540,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const userName = settings.userName || 'Usuário';
         document.body.className = theme === 'light' ? 'light-theme' : '';
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        if(themeToggleBtn) themeToggleBtn.textContent = theme === 'light' ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro';
+        if(themeToggleBtn) {
+            const isLight = document.body.classList.contains('light-theme');
+            themeToggleBtn.textContent = isLight ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro';
+        }
         const userProfileSpan = document.querySelector('.user-profile span');
         if(userProfileSpan) userProfileSpan.textContent = `Olá, ${userName}`;
         const settingUserName = document.getElementById('setting-user-name');
@@ -489,7 +569,9 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleBotBtn.classList.toggle('btn-delete', !botActive);
             toggleBotBtn.classList.toggle('btn-save', botActive);
 
-            renderChatHistory('lead-chatbot-messages', lead.chatHistory || []);
+            // CARREGA O HISTÓRICO DO FIRESTORE QUANDO O MODAL É ABERTO
+            reloadChatHistoryFromFirestore(lead.id);
+
             document.getElementById('edit-lead-modal').style.display = 'flex'; 
         } 
     }
