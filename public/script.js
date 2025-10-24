@@ -162,10 +162,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const chatContainer = document.getElementById('lead-chatbot-messages');
             if (chatContainer) {
                 chatContainer.innerHTML = ''; // Limpa mensagens antigas
+                // O listener renderiza o histórico. Esta mensagem será substituída.
                 addMessageToChat("Carregando histórico...", 'bot-message bot-thinking', 'lead-chatbot-messages'); 
             }
 
-            // ATIVA O LISTENER DE CHAT EM TEMPO REAL. Ele sobreescreverá o 'Carregando...' com o histórico completo.
+            // ATIVA O LISTENER DE CHAT EM TEMPO REAL. 
             setupLeadChatListener(lead.id);
 
             document.getElementById('edit-lead-modal').style.display = 'flex'; 
@@ -517,6 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
             } catch (error) {
                 document.querySelector('#lead-chatbot-messages .bot-thinking')?.remove();
+                // A linha abaixo era o que gerava o erro visto na imagem!
                 const errorMessage = error.message.includes('permission-denied') ? 'Erro de permissão do Firebase Functions.' : error.message;
                 addMessageToChat(`Erro ao iniciar chat do Lead: ${errorMessage}`, 'bot-message', 'lead-chatbot-messages');
             }
@@ -569,7 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 db = firebase.firestore();
                 await loadAllUserData(user.uid);
                 setupEventListeners(user.uid); 
-                setupWhatsappBotConnection(); // Mantido para atendimento 24/7
+                setupWhatsappBotConnection(); 
             }
         });
     }
