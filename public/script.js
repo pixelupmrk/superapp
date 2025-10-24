@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL E COMPLETA (CHAT EM TEMPO REAL FUNCIONANDO)
+// script.js - VERSÃO FINAL E ESTÁVEL
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
@@ -568,7 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 estoque = data.estoque || [];
                 estoque.forEach((item, index) => { if (!item.id) item.id = `prod_${Date.now()}_${index}`; });
                 chatHistory = data.chatHistory || [];
-                botInstructions = data.botInstructions || document.getElementById('bot-instructions')?.placeholder || "Você é um assistente virtual prestativo.";
+                botInstructions = document.getElementById('bot-instructions')?.value || data.botInstructions || document.getElementById('bot-instructions')?.placeholder || "Você é um assistente virtual prestativo.";
                 
                 nextLeadId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 0;
                 applySettings(data.settings);
