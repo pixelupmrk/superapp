@@ -50,7 +50,30 @@ document.addEventListener('DOMContentLoaded', () => {
         } 
     }
     
-    function renderKanbanCards() { document.querySelectorAll('.kanban-cards-list').forEach(l => l.innerHTML = ''); leads.forEach(lead => { const c = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`); if (c) { const wa = `<a href="https://wa.me/${(lead.whatsapp || '').replace(/\D/g, '')}" target="_blank">${lead.whatsapp}</a>`; c.innerHTML += `<div class="kanban-card" draggable="true" data-id="${lead.id}"><strong>${lead.nome}</strong><p>${wa}</p></div>`; } }); }
+    // --- FUNÇÃO DE RENDERIZAÇÃO DO KANBAN COM NOTIFICAÇÃO ---
+    function renderKanbanCards() { 
+        document.querySelectorAll('.kanban-cards-list').forEach(l => l.innerHTML = ''); 
+        leads.forEach(lead => { 
+            const c = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`); 
+            if (c) { 
+                const wa = `<a href="https://wa.me/${(lead.whatsapp || '').replace(/\D/g, '')}" target="_blank">${lead.whatsapp}</a>`; 
+                
+                // LÓGICA DA BOLINHA DE NOTIFICAÇÃO
+                const unreadCount = lead.unreadCount || 0;
+                let notificationBadge = '';
+                if (unreadCount > 0) {
+                    notificationBadge = `<span class="notification-badge">${unreadCount}</span>`;
+                }
+
+                c.innerHTML += `
+                    <div class="kanban-card" draggable="true" data-id="${lead.id}">
+                        <strong>${lead.nome} ${notificationBadge}</strong>
+                        <p>${wa}</p>
+                    </div>`; 
+            } 
+        }); 
+    }
+    
     function renderLeadsTable() { const t = document.querySelector('#leads-table tbody'); if (t) { t.innerHTML = leads.map(l => { const wa = `<a href="https://wa.me/${(l.whatsapp || '').replace(/\D/g, '')}" target="_blank">${l.whatsapp}</a>`; return `<tr data-id="${l.id}"><td>${l.nome}</td><td>${wa}</td><td>${l.origem}</td><td>${l.qualificacao}</td><td>${l.status}</td><td><button class="btn-edit-table"><i class="ph-fill ph-note-pencil"></i></button><button class="btn-delete-table"><i class="ph-fill ph-trash"></i></button></td></tr>`; }).join(''); } }
     function updateDashboard() { const n = leads.filter(l=>l.status==='novo').length, p=leads.filter(l=>l.status==='progresso').length, f=leads.filter(l=>l.status==='fechado').length; document.getElementById('total-leads').textContent = leads.length; document.getElementById('leads-novo').textContent = n; document.getElementById('leads-progresso').textContent = p; document.getElementById('leads-fechado').textContent = f; const ctx = document.getElementById('statusChart')?.getContext('2d'); if (!ctx) return; if (statusChart) statusChart.destroy(); statusChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Novo', 'Progresso', 'Fechado'], datasets: [{ data: [n, p, f], backgroundColor: ['#00f7ff', '#ffc107', '#28a745'] }] } }); }
     function renderCaixaTable() { const t = document.querySelector('#caixa-table tbody'); if (t) { t.innerHTML = caixa.map(m => `<tr><td>${m.data}</td><td>${m.descricao}</td><td>${m.tipo==='entrada'?'R$ '+m.valor.toFixed(2):''}</td><td>${m.tipo==='saida'?'R$ '+m.valor.toFixed(2):''}</td></tr>`).join(''); } }
@@ -144,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // A função openEditModal agora usa o listener e garante o estado visual
-    function openEditModal(leadId) { 
+    async function openEditModal(leadId) { 
         currentLeadId = leadId; 
         const lead = leads.find(l => l.id === leadId); 
         const toggleBotBtn = document.getElementById('toggle-bot-btn');
@@ -158,6 +181,15 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-lead-qualification').value = lead.qualificacao; 
             document.getElementById('edit-lead-notes').value = lead.notas; 
             
+            // NOVO: ZERA O CONTADOR DE MENSAGENS NÃO LIDAS
+            if (lead.unreadCount && lead.unreadCount > 0) {
+                lead.unreadCount = 0;
+                // É essencial salvar o estado para zerar a notificação
+                await saveUserData(firebase.auth().currentUser.uid); 
+                // Atualiza a UI imediatamente (Kanban)
+                renderKanbanCards();
+            }
+
             const botActive = lead.botActive === undefined ? true : lead.botActive; 
             toggleBotBtn.classList.toggle('btn-delete', botActive); 
             toggleBotBtn.classList.toggle('btn-save', !botActive);
@@ -166,8 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // NOVO: Limpa o chat e mostra mensagem de carregamento antes de ligar o listener
             const chatContainer = document.getElementById('lead-chatbot-messages');
             if (chatContainer) {
-                chatContainer.innerHTML = ''; // Limpa mensagens antigas
-                // O listener renderiza o histórico. Esta mensagem será substituída.
+                chatContainer.innerHTML = ''; 
                 addMessageToChat("Carregando histórico...", 'bot-message bot-thinking', 'lead-chatbot-messages'); 
             }
 
