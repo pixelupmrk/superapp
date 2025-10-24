@@ -85,8 +85,10 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
     width: 85%; /* Reduzido o percentual de largura */
     max-width: 850px; /* Reduzido para um valor mais seguro */
     min-height: 80vh; 
-    max-height: 90vh; /* Adicionado max-height para evitar overflow em telas pequenas */
+    max-height: 90vh; 
     overflow-y: auto; 
+    /* CORREÇÃO PARA A BARRA HORIZONTAL: Garante que nada estoure a largura */
+    overflow-x: hidden; 
     display: flex; 
     gap: 2rem;
 }
@@ -144,7 +146,7 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
         /* CORREÇÃO: Garante que o modal caiba na tela */
         max-height: 95vh; 
     }
-    .lead-chat-column { 
+    .lead-form-column { 
         border-left: none !important; 
         padding-left: 0 !important; 
         border-top: 1px solid var(--secondary-color);
