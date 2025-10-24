@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL E COMPLETA (CORRIGIDO ERRO setupEventListeners e Coleção do Chat)
+// script.js - VERSÃO FINAL E COMPLETA (COM CHAT EM TEMPO REAL)
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
@@ -16,8 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let nextLeadId = 0, currentLeadId = null, draggedItem = null, currentProductId = null;
     let statusChart;
     let db;
-    let leadChatHistory = {}; 
-    let unsubscribeLeadChatListener = null; 
+    let unsubscribeLeadChatListener = null; // Listener de chat em tempo real
     let whatsappEventsSource = null;
     let botInstructions = ""; 
 
@@ -29,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function addMessageToChat(msg, type, containerId) { 
         const c = document.getElementById(containerId); 
         if (c) { 
+            // Remove o 'Pensando...' quando a mensagem real chega
             if(type !== 'bot-thinking' && document.querySelector(`#${containerId} .bot-thinking`)) {
                  document.querySelector(`#${containerId} .bot-thinking`).remove();
             }
@@ -44,6 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!history || history.length === 0) { 
             addMessageToChat("Olá! Como posso ajudar?", 'bot-message', containerId); 
         } else { 
+            // Garante que o histórico não tenha o 'Pensando...' no final
+            document.querySelector(`#${containerId} .bot-thinking`)?.remove(); 
             history.forEach(m => addMessageToChat(m.parts[0].text, m.role === 'user' ? 'user-message' : 'bot-message', containerId)); 
         } 
     }
@@ -105,35 +107,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // === FUNÇÃO CRÍTICA: CARREGA O HISTÓRICO REAL DO FIRESTORE (Subcoleção) ===
-    async function reloadChatHistoryFromFirestore(leadId) {
+    // === NOVO: FUNÇÃO PARA CONFIGURAR O LISTENER DE CHAT EM TEMPO REAL ===
+    function setupLeadChatListener(leadId) {
+        // Se houver um listener antigo, cancela
+        if (unsubscribeLeadChatListener) {
+            unsubscribeLeadChatListener();
+        }
+        
         const userId = firebase.auth().currentUser.uid;
-        // CORREÇÃO: Usar 'chatHistory' como no backend (functions/index.js)
         const chatRef = db.collection('userData').doc(userId).collection('leads').doc(String(leadId)).collection('chatHistory');
 
-        try {
-            const snapshot = await chatRef.orderBy('timestamp', 'asc').get();
+        // Adiciona um listener (escuta em tempo real)
+        unsubscribeLeadChatListener = chatRef.orderBy('timestamp', 'asc').onSnapshot(snapshot => {
             const history = [];
             snapshot.forEach(doc => {
                 const data = doc.data();
-                // O backend (functions/index.js) armazena no formato Gemini (role/parts), por isso a adaptação não é mais necessária aqui
                 history.push(data);
             });
-
-            // Atualiza o histórico do lead no array local (necessário para o chat interno)
+            
+            // Atualiza o histórico local e renderiza
             const lead = leads.find(l => l.id === leadId);
             if(lead) {
                  lead.chatHistory = history;
             }
             
-            renderChatHistory('lead-chatbot-messages', history); // Renderiza o histórico atualizado
-            
-        } catch (error) {
-            console.error("Erro ao carregar histórico do Firestore:", error);
-            addMessageToChat("Erro: Falha ao carregar histórico de conversas do Firestore.", 'bot-message', 'lead-chatbot-messages');
-        }
+            renderChatHistory('lead-chatbot-messages', history);
+        }, error => {
+            console.error("Erro no listener de chat do Firestore:", error);
+            addMessageToChat("Erro: Falha ao carregar histórico de conversas em tempo real.", 'bot-message', 'lead-chatbot-messages');
+        });
     }
-    
+
+    // A função openEditModal agora usa o listener
     function openEditModal(leadId) { 
         currentLeadId = leadId; 
         const lead = leads.find(l => l.id === leadId); 
@@ -149,21 +154,21 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-lead-notes').value = lead.notas; 
             
             const botActive = lead.botActive === undefined ? true : lead.botActive; 
-            // Lógica para alternar o botão: se o bot estiver ativo, mostra 'Desativar Bot' (btn-delete/vermelho)
             toggleBotBtn.classList.toggle('btn-delete', botActive); 
             toggleBotBtn.classList.toggle('btn-save', !botActive);
             toggleBotBtn.textContent = botActive ? 'Desativar Bot' : 'Ativar Bot';
 
-            // CARREGA O HISTÓRICO DO FIRESTORE QUANDO O MODAL É ABERTO
-            reloadChatHistoryFromFirestore(lead.id);
+            // ATIVA O LISTENER DE CHAT EM TEMPO REAL
+            setupLeadChatListener(lead.id);
 
             document.getElementById('edit-lead-modal').style.display = 'flex'; 
         } 
     }
-    
+
+    // A função antiga 'reloadChatHistoryFromFirestore' foi substituída pela callback do listener
+
     function openCustosModal(productId) { currentProductId = productId; const produto = estoque.find(p => p.id === productId); if (produto) { document.getElementById('custos-modal-title').textContent = `Custos de: ${produto.produto}`; renderCustosList(produto); document.getElementById('custos-modal').style.display = 'flex'; } }
     function renderCustosList(produto) { const listContainer = document.getElementById('custos-list'); if (!produto.custos || produto.custos.length === 0) { listContainer.innerHTML = '<p>Nenhum custo adicionado.</p>'; return; } listContainer.innerHTML = produto.custos.map(custo => `<div class="custo-item"><span>${custo.descricao}</span><span>R$ ${custo.valor.toFixed(2)}</span></div>`).join(''); }
-
 
     // --- LÓGICA DE CONEXÃO DO WHATSAPP BOT ---
     function setupWhatsappBotConnection() {
@@ -209,13 +214,10 @@ document.addEventListener('DOMContentLoaded', () => {
                              updateStatus('Desconectado. Pressione "Verificar Status" para obter um novo QR Code.', false);
                         }
                     } else if (data.type === 'message' && data.from) {
-                        // === PONTO CRÍTICO: RECARREGA O CHAT QUANDO O BOT ENVIA UMA RESPOSTA ===
+                        // === PONTO CRÍTICO: RECARREGA OS DADOS PRINCIPAIS NO EVENTO ===
                         // Força a recarga dos leads (para novos leads e atualização do Kanban)
                         loadAllUserData(currentUserId);
-                        // Se o modal de edição de lead estiver aberto, recarrega o histórico
-                        if (currentLeadId !== null) {
-                            reloadChatHistoryFromFirestore(currentLeadId);
-                        }
+                        // O chat em tempo real (modal) já é atualizado automaticamente pelo listener onSnapshot
                     }
                 } catch (e) {
                     console.error("Erro ao processar evento SSE:", e, event.data);
@@ -291,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // === FUNÇÃO ONDE ESTAVA O PROBLEMA DE ORDEM (AGORA NO LUGAR CORRETO) ===
+    // === FUNÇÃO DE EVENT LISTENERS (MOVIDA PARA CIMA) ===
     function setupEventListeners(userId) {
         const menuToggle = document.getElementById('menu-toggle');
         const appContainer = document.getElementById('app-container');
@@ -370,6 +372,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 lead.notas = document.getElementById('edit-lead-notes').value;
                 await saveUserData(userId);
                 updateAllUI();
+                
+                // Fecha o modal e desativa o listener de chat
+                if (unsubscribeLeadChatListener) unsubscribeLeadChatListener();
                 document.getElementById('edit-lead-modal').style.display = 'none';
             }
         });
@@ -379,6 +384,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 leads = leads.filter(l => l.id !== currentLeadId);
                 await saveUserData(userId);
                 updateAllUI();
+                
+                // Fecha o modal e desativa o listener de chat
+                if (unsubscribeLeadChatListener) unsubscribeLeadChatListener();
                 document.getElementById('edit-lead-modal').style.display = 'none';
             }
         });
@@ -455,7 +463,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const userInput = chatbotInput.value.trim();
             if (!userInput) return;
             addMessageToChat(userInput, 'user-message', 'chatbot-messages');
-            // O histórico é atualizado aqui para ser enviado na próxima requisição
             chatHistory.push({ role: "user", parts: [{ text: userInput }] });
             chatbotInput.value = '';
             addMessageToChat("Pensando...", 'bot-message bot-thinking', 'chatbot-messages');
@@ -473,7 +480,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 const data = await response.json();
                 addMessageToChat(data.text, 'bot-message', 'chatbot-messages');
-                // Adiciona a resposta do modelo ao histórico para o próximo turno
                 chatHistory.push({ role: "model", parts: [{ text: data.text }] });
             } catch (error) {
                 document.querySelector('#chatbot-messages .bot-thinking')?.remove();
@@ -489,6 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const userInput = input.value.trim();
             if (!userInput || currentLeadId === null) return;
             
+            // Adiciona o 'Pensando...' imediatamente para feedback visual
             addMessageToChat(userInput, 'user-message', 'lead-chatbot-messages');
             input.value = '';
             addMessageToChat("Pensando...", 'bot-message bot-thinking', 'lead-chatbot-messages');
@@ -498,8 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const startChat = firebase.functions().httpsCallable('startAiChat');
                 await startChat({ prompt: userInput, leadId: currentLeadId });
                 
-                // Recarrega o histórico para mostrar a mensagem enviada
-                await reloadChatHistoryFromFirestore(currentLeadId); 
+                // O listener em tempo real (setupLeadChatListener) cuidará da atualização da tela
                 
             } catch (error) {
                 document.querySelector('#lead-chatbot-messages .bot-thinking')?.remove();
@@ -508,7 +514,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        document.querySelectorAll('.close-modal').forEach(btn => { btn.addEventListener('click', () => { document.getElementById(btn.dataset.target).style.display = 'none'; }); });
+        document.querySelectorAll('.close-modal').forEach(btn => { 
+            btn.addEventListener('click', () => { 
+                // Fecha o modal
+                document.getElementById(btn.dataset.target).style.display = 'none'; 
+                // DESATIVA O LISTENER DE CHAT AO FECHAR O MODAL
+                if (unsubscribeLeadChatListener) {
+                    unsubscribeLeadChatListener();
+                    unsubscribeLeadChatListener = null;
+                }
+            }); 
+        });
     }
     
     async function loadAllUserData(userId) {
@@ -544,11 +560,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.setAttribute('data-initialized', 'true');
                 db = firebase.firestore();
                 await loadAllUserData(user.uid);
-                setupEventListeners(user.uid); // <--- Chamada agora é feita APÓS a definição da função
+                setupEventListeners(user.uid); 
                 setupWhatsappBotConnection();
             }
         });
     }
 
-    main(); // Chamada da função main
+    main(); 
 });
