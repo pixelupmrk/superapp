@@ -134,7 +134,12 @@ document.addEventListener('DOMContentLoaded', () => {
             renderChatHistory('lead-chatbot-messages', history);
         }, error => {
             console.error("Erro no listener de chat do Firestore:", error);
-            addMessageToChat("Erro: Falha ao carregar histórico de conversas em tempo real.", 'bot-message', 'lead-chatbot-messages');
+            // Verifica se o erro é de permissão (o motivo mais comum para não carregar)
+            if (error.code === 'permission-denied') {
+                 addMessageToChat("ERRO: O histórico não pôde ser carregado. Verifique e implante as Regras de Segurança do Firestore.", 'bot-message', 'lead-chatbot-messages');
+            } else {
+                 addMessageToChat("Erro: Falha ao carregar histórico de conversas em tempo real.", 'bot-message', 'lead-chatbot-messages');
+            }
         });
     }
 
@@ -236,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
         
-        // NOVO: Chamada inicial para garantir que o Bot seja ativado assim que o app carregar
+        // Chamada inicial para garantir que o Bot seja ativado assim que o app carregar
         startSSEListener(); 
 
         // 2. Função para verificar o status atual (chamada pelo botão)
@@ -518,7 +523,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
             } catch (error) {
                 document.querySelector('#lead-chatbot-messages .bot-thinking')?.remove();
-                // A linha abaixo era o que gerava o erro visto na imagem!
                 const errorMessage = error.message.includes('permission-denied') ? 'Erro de permissão do Firebase Functions.' : error.message;
                 addMessageToChat(`Erro ao iniciar chat do Lead: ${errorMessage}`, 'bot-message', 'lead-chatbot-messages');
             }
@@ -534,6 +538,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     unsubscribeLeadChatListener = null;
                 }
             }); 
+        });
+        
+        // NOVO: Funcionalidade para fechar o modal ao clicar no overlay (clicar fora)
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                // Verifica se o clique foi exatamente no overlay (e não dentro do modal-content)
+                if (e.target.classList.contains('modal-overlay')) {
+                    const modalId = e.target.id;
+                    document.getElementById(modalId).style.display = 'none';
+                    
+                    // Se for o modal de edição de lead, desativa o listener de chat
+                    if (modalId === 'edit-lead-modal' && unsubscribeLeadChatListener) {
+                        unsubscribeLeadChatListener();
+                        unsubscribeLeadChatListener = null;
+                    }
+                }
+            });
         });
     }
     
