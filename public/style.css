@@ -85,7 +85,7 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
     width: 85%; /* Reduzido o percentual de largura */
     max-width: 850px; /* Reduzido para um valor mais seguro */
     min-height: 80vh; 
-    max-height: 90vh; /* Adicionado max-height para evitar overflow */
+    max-height: 90vh; /* Adicionado max-height para evitar overflow em telas pequenas */
     overflow-y: auto; 
     display: flex; 
     gap: 2rem;
