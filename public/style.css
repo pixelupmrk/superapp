@@ -45,7 +45,7 @@ body { font-family: 'Inter', sans-serif; background-color: var(--background-colo
     margin-left: var(--sidebar-width); 
     padding: 2rem; 
     transition: margin-left 0.3s ease-in-out; 
-    /* CORREÇÃO DA PROPORÇÃO: Garante que a largura se ajuste */
+    /* CORREÇÃO DA PROPORÇÃO: Garante que a largura se ajuste à tela */
     width: calc(100% - var(--sidebar-width)); 
     overflow-x: hidden; 
 }
@@ -161,7 +161,8 @@ th, td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--secondary-color); 
 .kanban-card strong {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    /* Ajusta para que o nome e a bolinha fiquem lado a lado */
+    justify-content: space-between; 
 }
 
 
