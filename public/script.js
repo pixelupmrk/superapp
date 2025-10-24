@@ -502,29 +502,74 @@ document.addEventListener('DOMContentLoaded', () => {
             await saveUserData(userId);
         });
         
-        // CHATBOT DO LEAD (NO MODAL)
+        // CHATBOT DO LEAD (NO MODAL) - LÓGICA REESCRITA PARA BOT ATIVO/DESATIVADO
         document.getElementById('lead-chatbot-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('lead-chatbot-input');
             const userInput = input.value.trim();
             if (!userInput || currentLeadId === null) return;
             
-            // Adiciona o 'Pensando...' imediatamente para feedback visual
-            addMessageToChat(userInput, 'user-message', 'lead-chatbot-messages');
-            input.value = '';
-            addMessageToChat("Pensando...", 'bot-message bot-thinking', 'lead-chatbot-messages');
+            const lead = leads.find(l => l.id === currentLeadId);
+            if (!lead) return;
+            
+            const isBotActive = lead.botActive === undefined ? true : lead.botActive;
+            const userId = firebase.auth().currentUser.uid;
+            const chatContainerId = 'lead-chatbot-messages';
 
-            try {
-                // Chama a função do Firebase que enfileira a tarefa de IA para o lead
-                const startChat = firebase.functions().httpsCallable('startAiChat');
-                await startChat({ prompt: userInput, leadId: currentLeadId });
+            // 1. Adiciona a mensagem do operador IMEDIATAMENTE (Sua mensagem)
+            addMessageToChat(userInput, 'user-message', chatContainerId);
+            input.value = '';
+            
+            if (!isBotActive) { 
+                // --- BOT DESATIVADO: ENVIO DIRETO PARA WHATSAPP (Via /send do Render)
                 
-                // O listener em tempo real (setupLeadChatListener) cuidará da atualização da tela
+                try {
+                    // 2. SALVA A MENSAGEM NO HISTÓRICO COMO OPERADOR (role: "model")
+                    const chatRef = db.collection('userData').doc(userId).collection('leads').doc(String(currentLeadId)).collection('chatHistory');
+                    await chatRef.add({
+                        role: "model", // Mensagens do operador são salvas como "model"
+                        parts: [{text: userInput}],
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    });
+                    
+                    // 3. ENVIAR DIRETAMENTE PARA O WHATSAPP
+                    const sendResponse = await fetch(`${WHATSAPP_BOT_URL}/send`, {
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ 
+                            to: lead.whatsapp, 
+                            text: userInput, 
+                            userId: userId 
+                        }) 
+                    });
+                    
+                    if (!sendResponse.ok) {
+                        const errorData = await sendResponse.json();
+                        throw new Error(errorData.error || 'Falha no envio da mensagem via Bot API.');
+                    }
+
+                    // 4. Se o envio foi OK, não precisa de mais feedback visual além do que já apareceu
+                    
+                } catch (error) {
+                    console.error("Erro ao enviar mensagem como operador:", error);
+                    addMessageToChat(`ERRO DE ENVIO: ${error.message}.`, 'bot-message', chatContainerId);
+                }
                 
-            } catch (error) {
-                document.querySelector('#lead-chatbot-messages .bot-thinking')?.remove();
-                const errorMessage = error.message.includes('permission-denied') ? 'Erro de permissão do Firebase Functions.' : error.message;
-                addMessageToChat(`Erro ao iniciar chat do Lead: ${errorMessage}`, 'bot-message', 'lead-chatbot-messages');
+            } else { 
+                // --- BOT ATIVO: CHAMA CLOUD FUNCTION (Fluxo IA)
+                
+                addMessageToChat("Pensando...", 'bot-message bot-thinking', chatContainerId);
+
+                try {
+                    // O Cloud Function startAiChat SALVA A MENSAGEM DO OPERADOR e INICIA A RESPOSTA DA IA
+                    const startChat = firebase.functions().httpsCallable('startAiChat');
+                    await startChat({ prompt: userInput, leadId: currentLeadId });
+                    
+                } catch (error) {
+                    document.querySelector(`#${chatContainerId} .bot-thinking`)?.remove();
+                    const errorMessage = error.message.includes('permission-denied') ? 'Erro de permissão do Firebase Functions.' : error.message;
+                    addMessageToChat(`Erro ao iniciar chat do Lead: ${errorMessage}`, 'bot-message', chatContainerId);
+                }
             }
         });
 
