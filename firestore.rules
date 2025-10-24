@@ -2,7 +2,6 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Regra principal para o documento userData (onde ficam leads, caixa, estoque, etc.)
     // Permite leitura e escrita apenas para o usuário autenticado (userId)
     match /userData/{userId} {
       allow read, write: if request.auth.uid == userId;
