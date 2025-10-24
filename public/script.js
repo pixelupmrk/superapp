@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL E ESTÁVEL
+// script.js - VERSÃO FINAL COM KEEP-ALIVE (24/7) E CORREÇÕES DE NOTIFICAÇÃO
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let unsubscribeLeadChatListener = null; 
     let whatsappEventsSource = null;
     let botInstructions = ""; 
+    let keepAliveInterval = null; // Variável para armazenar o ID do intervalo
 
     // URL BASE DO SEU BOT DE WHATSAPP NO RENDER
     const WHATSAPP_BOT_URL = 'https://superapp-whatsapp-bot.onrender.com';
@@ -213,6 +214,29 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCustosList(produto) { const listContainer = document.getElementById('custos-list'); if (!produto.custos || produto.custos.length === 0) { listContainer.innerHTML = '<p>Nenhum custo adicionado.</p>'; return; } listContainer.innerHTML = produto.custos.map(custo => `<div class="custo-item"><span>${custo.descricao}</span><span>R$ ${custo.valor.toFixed(2)}</span></div>`).join(''); }
 
     // --- LÓGICA DE CONEXÃO DO WHATSAPP BOT (MANTIDA ATIVA) ---
+    // NOVO: Função Keep-Alive
+    function startKeepAlive() {
+        if (keepAliveInterval) {
+            clearInterval(keepAliveInterval);
+        }
+        const currentUserId = firebase.auth().currentUser.uid;
+        
+        // Função que cutuca o Bot no Render
+        const cutucarBot = async () => {
+             try {
+                // Requisição simples para o endpoint /status. Apenas a chamada já evita o sleep.
+                await fetch(`${WHATSAPP_BOT_URL}/status?userId=${currentUserId}`);
+                // console.log("[KeepAlive] Bot cutucado com sucesso."); // Descomente para debug
+            } catch (error) {
+                // console.error("[KeepAlive] Falha ao cutucar Bot:", error); // Descomente para debug
+            }
+        };
+
+        // Inicia a cutucada a cada 30 segundos (30000ms)
+        keepAliveInterval = setInterval(cutucarBot, 30000);
+        console.log("[KeepAlive] Serviço de prevenção de sono do Bot iniciado.");
+    }
+    
     function setupWhatsappBotConnection() {
         const statusElement = document.getElementById('bot-status');
         const qrCodeImg = document.getElementById('qr-code-img');
@@ -274,6 +298,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Chamada inicial para garantir que o Bot seja ativado assim que o app carregar
         startSSEListener(); 
+        // NOVO: Inicia o serviço de keep-alive 
+        startKeepAlive();
 
         // 2. Função para verificar o status atual (chamada pelo botão)
         checkStatusBtn?.addEventListener('click', async () => {
@@ -558,7 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 2. SALVA A MENSAGEM NO HISTÓRICO COMO OPERADOR (role: "model")
                     const chatRef = db.collection('userData').doc(userId).collection('leads').doc(String(currentLeadId)).collection('chatHistory');
                     await chatRef.add({
-                        role: "model", // Mensagens do operador são salvas como "model"
+                        role: "model", // Mensagens do operador são salvas como "model" para aparecer à esquerda
                         parts: [{text: userInput}],
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     });
@@ -661,6 +687,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // === INICIALIZAÇÃO DA APP ===
+    // NOVO: Função Keep-Alive
+    function startKeepAlive() {
+        if (keepAliveInterval) {
+            clearInterval(keepAliveInterval);
+        }
+        const currentUserId = firebase.auth().currentUser.uid;
+        
+        // Função que cutuca o Bot no Render
+        const cutucarBot = async () => {
+             try {
+                // Requisição simples para o endpoint /status. Apenas a chamada já evita o sleep.
+                await fetch(`${WHATSAPP_BOT_URL}/status?userId=${currentUserId}`);
+                // console.log("[KeepAlive] Bot cutucado com sucesso."); // Descomente para debug
+            } catch (error) {
+                // console.error("[KeepAlive] Falha ao cutucar Bot:", error); // Descomente para debug
+            }
+        };
+
+        // Inicia a cutucada a cada 30 segundos (30000ms)
+        keepAliveInterval = setInterval(cutucarBot, 30000);
+        console.log("[KeepAlive] Serviço de prevenção de sono do Bot iniciado.");
+    }
+
     async function main() {
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user && document.getElementById('app-container') && !document.body.hasAttribute('data-initialized')) {
