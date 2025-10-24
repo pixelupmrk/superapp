@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL E COMPLETA (COM CHAT EM TEMPO REAL)
+// script.js - VERSÃO FINAL E COMPLETA (CHAT EM TEMPO REAL FUNCIONANDO)
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let nextLeadId = 0, currentLeadId = null, draggedItem = null, currentProductId = null;
     let statusChart;
     let db;
-    let unsubscribeLeadChatListener = null; // Listener de chat em tempo real
+    let unsubscribeLeadChatListener = null; 
     let whatsappEventsSource = null;
     let botInstructions = ""; 
 
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // === NOVO: FUNÇÃO PARA CONFIGURAR O LISTENER DE CHAT EM TEMPO REAL ===
+    // === FUNÇÃO PARA CONFIGURAR O LISTENER DE CHAT EM TEMPO REAL ===
     function setupLeadChatListener(leadId) {
         // Se houver um listener antigo, cancela
         if (unsubscribeLeadChatListener) {
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // A função openEditModal agora usa o listener
+    // A função openEditModal agora usa o listener e garante o estado visual
     function openEditModal(leadId) { 
         currentLeadId = leadId; 
         const lead = leads.find(l => l.id === leadId); 
@@ -158,19 +158,24 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleBotBtn.classList.toggle('btn-save', !botActive);
             toggleBotBtn.textContent = botActive ? 'Desativar Bot' : 'Ativar Bot';
 
-            // ATIVA O LISTENER DE CHAT EM TEMPO REAL
+            // NOVO: Limpa o chat e mostra mensagem de carregamento antes de ligar o listener
+            const chatContainer = document.getElementById('lead-chatbot-messages');
+            if (chatContainer) {
+                chatContainer.innerHTML = ''; // Limpa mensagens antigas
+                addMessageToChat("Carregando histórico...", 'bot-message bot-thinking', 'lead-chatbot-messages'); 
+            }
+
+            // ATIVA O LISTENER DE CHAT EM TEMPO REAL. Ele sobreescreverá o 'Carregando...' com o histórico completo.
             setupLeadChatListener(lead.id);
 
             document.getElementById('edit-lead-modal').style.display = 'flex'; 
         } 
     }
 
-    // A função antiga 'reloadChatHistoryFromFirestore' foi substituída pela callback do listener
-
     function openCustosModal(productId) { currentProductId = productId; const produto = estoque.find(p => p.id === productId); if (produto) { document.getElementById('custos-modal-title').textContent = `Custos de: ${produto.produto}`; renderCustosList(produto); document.getElementById('custos-modal').style.display = 'flex'; } }
     function renderCustosList(produto) { const listContainer = document.getElementById('custos-list'); if (!produto.custos || produto.custos.length === 0) { listContainer.innerHTML = '<p>Nenhum custo adicionado.</p>'; return; } listContainer.innerHTML = produto.custos.map(custo => `<div class="custo-item"><span>${custo.descricao}</span><span>R$ ${custo.valor.toFixed(2)}</span></div>`).join(''); }
 
-    // --- LÓGICA DE CONEXÃO DO WHATSAPP BOT ---
+    // --- LÓGICA DE CONEXÃO DO WHATSAPP BOT (MANTIDA ATIVA) ---
     function setupWhatsappBotConnection() {
         const statusElement = document.getElementById('bot-status');
         const qrCodeImg = document.getElementById('qr-code-img');
@@ -214,7 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
                              updateStatus('Desconectado. Pressione "Verificar Status" para obter um novo QR Code.', false);
                         }
                     } else if (data.type === 'message' && data.from) {
-                        // === PONTO CRÍTICO: RECARREGA OS DADOS PRINCIPAIS NO EVENTO ===
                         // Força a recarga dos leads (para novos leads e atualização do Kanban)
                         loadAllUserData(currentUserId);
                         // O chat em tempo real (modal) já é atualizado automaticamente pelo listener onSnapshot
@@ -230,6 +234,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(startSSEListener, 5000); 
             };
         }
+        
+        // NOVO: Chamada inicial para garantir que o Bot seja ativado assim que o app carregar
+        startSSEListener(); 
 
         // 2. Função para verificar o status atual (chamada pelo botão)
         checkStatusBtn?.addEventListener('click', async () => {
@@ -263,11 +270,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         qrCodeImg.style.display = 'block';
                         qrCodeMessage.textContent = 'Escaneie o QR Code com seu celular para conectar o WhatsApp.';
                     }
-                    startSSEListener();
+                    // A conexão SSE é iniciada na abertura do app, mas é bom garantir.
+                    if (!whatsappEventsSource) startSSEListener();
                 } else {
                     updateStatus('Desconectado. Por favor, escaneie o QR Code.', false);
                     qrCodeMessage.textContent = 'Aguardando o backend gerar o QR Code. Se o QR não aparecer, verifique os logs do Render.';
-                    startSSEListener(); 
+                    if (!whatsappEventsSource) startSSEListener();
                 }
 
             } catch (error) {
@@ -293,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // === FUNÇÃO DE EVENT LISTENERS (MOVIDA PARA CIMA) ===
+    // === FUNÇÃO DE EVENT LISTENERS ===
     function setupEventListeners(userId) {
         const menuToggle = document.getElementById('menu-toggle');
         const appContainer = document.getElementById('app-container');
@@ -561,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 db = firebase.firestore();
                 await loadAllUserData(user.uid);
                 setupEventListeners(user.uid); 
-                setupWhatsappBotConnection();
+                setupWhatsappBotConnection(); // Mantido para atendimento 24/7
             }
         });
     }
