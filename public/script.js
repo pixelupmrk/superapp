@@ -1,4 +1,4 @@
-// script.js - VERSÃO FINAL COM KEEP-ALIVE (24/7) E CORREÇÕES DE NOTIFICAÇÃO
+// script.js - VERSÃO FINAL COM AGENDAMENTO E KEEP-ALIVE (24/7)
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let unsubscribeLeadChatListener = null; 
     let whatsappEventsSource = null;
     let botInstructions = ""; 
-    let keepAliveInterval = null; // Variável para armazenar o ID do intervalo
+    let keepAliveInterval = null; 
 
     // URL BASE DO SEU BOT DE WHATSAPP NO RENDER
     const WHATSAPP_BOT_URL = 'https://superapp-whatsapp-bot.onrender.com';
@@ -182,7 +182,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-lead-qualification').value = lead.qualificacao; 
             document.getElementById('edit-lead-notes').value = lead.notas; 
             
-            // NOVO: ZERA O CONTADOR DE MENSAGENS NÃO LIDAS
+            // NOVO: Carregar campos de Agendamento
+            document.getElementById('edit-lead-date').value = lead.scheduledDate || '';
+            document.getElementById('edit-lead-time').value = lead.scheduledTime || '';
+            document.getElementById('edit-lead-reminder-type').value = lead.reminderType || 'none';
+            
+            // ZERA O CONTADOR DE MENSAGENS NÃO LIDAS
             if (lead.unreadCount && lead.unreadCount > 0) {
                 lead.unreadCount = 0;
                 // É essencial salvar o estado para zerar a notificação
@@ -428,6 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.getElementById('leads-table')?.addEventListener('click', e => { if (e.target.tagName === 'A') { e.stopPropagation(); return; } if (e.target.closest('.btn-edit-table')) openEditModal(parseInt(e.target.closest('tr').dataset.id)); if (e.target.closest('.btn-delete-table')) { if (confirm('Tem certeza?')) { leads = leads.filter(l => l.id != parseInt(e.target.closest('tr').dataset.id)); saveUserData(userId); updateAllUI(); } } });
 
+        // NOVO: Bloco de salvar agendamento e informações do lead
         document.getElementById('edit-lead-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const lead = leads.find(l => l.id === currentLeadId);
@@ -439,10 +445,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 lead.origem = document.getElementById('edit-lead-origem').value;
                 lead.qualificacao = document.getElementById('edit-lead-qualification').value;
                 lead.notas = document.getElementById('edit-lead-notes').value;
+                
+                // NOVO: Salvar Campos de Agendamento
+                const reminderType = document.getElementById('edit-lead-reminder-type').value;
+                lead.scheduledDate = document.getElementById('edit-lead-date').value;
+                lead.scheduledTime = document.getElementById('edit-lead-time').value;
+                lead.reminderType = reminderType;
+                
+                // Limpa o agendamento se o tipo for 'none'
+                if (reminderType === 'none') {
+                    delete lead.scheduledDate;
+                    delete lead.scheduledTime;
+                    delete lead.reminderType;
+                }
+
                 await saveUserData(userId);
                 updateAllUI();
                 
-                // Fecha o modal e desativa o listener de chat
                 if (unsubscribeLeadChatListener) unsubscribeLeadChatListener();
                 document.getElementById('edit-lead-modal').style.display = 'none';
             }
