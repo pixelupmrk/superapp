@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } 
     }
     
-    // --- FUNÇÃO DE RENDERIZAÇÃO DO KANBAN COM NOTIFICAÇÃO ---
+    // --- FUNÇÃO DE RENDERIZAÇÃO DO KANBAN COM NOTIFICAÇÃO E ÍCONE DE AGENDAMENTO ---
     function renderKanbanCards() { 
         document.querySelectorAll('.kanban-cards-list').forEach(l => l.innerHTML = ''); 
         leads.forEach(lead => { 
@@ -59,16 +59,36 @@ document.addEventListener('DOMContentLoaded', () => {
             if (c) { 
                 const wa = `<a href="https://wa.me/${(lead.whatsapp || '').replace(/\D/g, '')}" target="_blank">${lead.whatsapp}</a>`; 
                 
-                // LÓGICA DA BOLINHA DE NOTIFICAÇÃO
+                // LÓGICA DA BOLINHA DE MENSAGEM NÃO LIDA
                 const unreadCount = lead.unreadCount || 0;
                 let notificationBadge = '';
                 if (unreadCount > 0) {
                     notificationBadge = `<span class="notification-badge">${unreadCount}</span>`;
                 }
 
+                // LÓGICA: ÍCONE DE AGENDAMENTO (Relógio)
+                let scheduleIcon = '';
+                let scheduleText = '';
+                if (lead.scheduledDate && lead.scheduledTime) {
+                    // Formata a hora para exibir (Ex: 15:30)
+                    const hora = lead.scheduledTime.substring(0, 5); 
+                    
+                    scheduleIcon = `
+                        <span class="schedule-badge" title="Agendado para ${lead.scheduledDate} às ${hora} (${lead.reminderType || 'Lembrete'})">
+                            <i class="ph-fill ph-clock-countdown"></i>
+                        </span>`;
+                    
+                    scheduleText = `<p class="scheduled-time">${hora} (${lead.reminderType || 'Lembrete'})</p>`;
+                }
+
+
                 c.innerHTML += `
                     <div class="kanban-card" draggable="true" data-id="${lead.id}">
-                        <strong>${lead.nome} ${notificationBadge}</strong>
+                        <strong class="card-header">
+                            <span>${lead.nome} ${notificationBadge}</span>
+                            ${scheduleIcon}
+                        </strong>
+                        ${scheduleText}
                         <p>${wa}</p>
                     </div>`; 
             } 
