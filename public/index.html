@@ -207,6 +207,20 @@
                         <select id="edit-lead-qualification"> <option value="">Qualificação</option> <option value="quente">Lead Quente</option> <option value="morno">Lead Morno</option> <option value="frio">Lead Frio</option> </select>
                     </div>
                     <textarea id="edit-lead-notes" placeholder="Notas"></textarea>
+
+                    <div class="card" style="padding: 1rem; margin-top: 1rem;">
+                        <h3>Agendamento / Lembrete</h3>
+                        <div class="input-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                            <input type="date" id="edit-lead-date" placeholder="Data">
+                            <input type="time" id="edit-lead-time" placeholder="Hora">
+                            <select id="edit-lead-reminder-type">
+                                <option value="none">Sem Lembrete</option>
+                                <option value="followup">Follow-up</option>
+                                <option value="meeting">Reunião</option>
+                            </select>
+                        </div>
+                    </div>
+                    
                     <div class="modal-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
                         <button type="button" class="btn-delete" id="delete-lead-btn">Excluir Lead</button>
                         <button type="button" class="btn-save" id="toggle-bot-btn">Ativar/Desativar Bot</button>
