@@ -8,7 +8,7 @@
     --accent-color: #00f7ff;
     --text-color: #cdd6f4;
     --text-color-muted: #8892b0;
-    --sidebar-width: 200px; /* AJUSTE CRÍTICO: Reduzido para 200px (era 250px) */
+    --sidebar-width: 200px; /* AJUSTE CRÍTICO: Reduzido para 200px para liberar espaço */
     --delete-color: #e57373;
     --shadow-color: rgba(0, 0, 0, 0.2);
     --highlight-color: rgba(255, 255, 255, 0.1);
@@ -110,13 +110,13 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
     padding: 1.2rem; 
     border-radius: 8px; 
     width: 95%; 
-    max-width: 800px; /* AJUSTE: Largura máxima reduzida novamente */
+    max-width: 800px; 
     min-height: 75vh; 
     max-height: 90vh; 
     overflow-y: auto; 
     overflow-x: hidden; 
     display: flex; 
-    gap: 1rem; /* AJUSTE: Reduzido o gap */
+    gap: 1rem; 
 }
 .close-modal { position: absolute; top: 8px; right: 12px; font-size: 1.5rem; color: var(--text-color-muted); cursor: pointer; }
 .finance-nav { display: flex; gap: 0.4rem; margin-bottom: 0.8rem; border-bottom: 1px solid var(--secondary-color); }
@@ -136,7 +136,10 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 .mentoria-module-content.active { display: block; }
 .chatbot-container { display: flex; flex-direction: column; height: 65vh; background-color: var(--primary-color); border-radius: 8px; overflow: hidden; }
 .chatbot-messages { flex-grow: 1; padding: 0.8rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.6rem; }
-/* Ajuste para que o balão de mensagem não estoure o container */
+
+/* --- MENSAGENS: Contraste para distinguir Cliente e Sistema/Operador --- */
+
+/* Estilo Base para os balões */
 .user-message, .bot-message { 
     padding: 0.6rem 1rem; 
     border-radius: 18px; 
@@ -144,8 +147,28 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
     line-height: 1.4; 
     word-wrap: break-word; 
     white-space: pre-wrap; 
-    font-size: 0.9rem; /* AJUSTE: Fonte do chat menor */
+    font-size: 0.9rem; 
 }
+
+/* 1. MENSAGEM DO OPERADOR/IA/SISTEMA (role: "model") - Fundo Escuro (Esquerda) */
+.bot-message { 
+    background-color: var(--secondary-color); /* Azul escuro do tema */
+    color: var(--text-color); 
+    align-self: flex-start; /* Fica à esquerda */
+    border: 1px solid var(--secondary-color); 
+    border-bottom-left-radius: 5px; 
+}
+
+/* 2. MENSAGEM DO CLIENTE (role: "user") - Fundo com Destaque (Direita) */
+/* Usamos um azul mais claro/saturado com a borda neon para forte contraste visual */
+.user-message { 
+    background-color: #3b5998; /* Azul escuro com saturação (Destaque) */
+    border: 2px solid var(--accent-color); /* Borda neon/ciano */
+    color: var(--text-color); 
+    align-self: flex-end; /* Fica à direita */
+    border-bottom-right-radius: 5px; 
+}
+
 .chatbot-form { flex-shrink: 0; display: flex; padding: 0.8rem; border-top: 1px solid var(--secondary-color); gap: 0.8rem; }
 .chatbot-form input { font-size: 0.9rem; }
 .chatbot-form button { background-color: var(--accent-color); color: #000; border: none; border-radius: 50%; width: 35px; height: 35px; font-size: 1rem; cursor: pointer; flex-shrink: 0; }
