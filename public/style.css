@@ -8,7 +8,7 @@
     --accent-color: #00f7ff;
     --text-color: #cdd6f4;
     --text-color-muted: #8892b0;
-    --sidebar-width: 200px; /* AJUSTE CRÍTICO: Reduzido para 200px para liberar espaço */
+    --sidebar-width: 200px; /* AJUSTE CRÍTICO: Reduzido para 200px para caber na tela */
     --delete-color: #e57373;
     --shadow-color: rgba(0, 0, 0, 0.2);
     --highlight-color: rgba(255, 255, 255, 0.1);
@@ -151,6 +151,7 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 }
 
 /* 1. MENSAGEM DO OPERADOR/IA/SISTEMA (role: "model") - Fundo Escuro (Esquerda) */
+/* BotMessage (role: model) e a mensagem do operador são iguais e ficam à esquerda */
 .bot-message { 
     background-color: var(--secondary-color); /* Azul escuro do tema */
     color: var(--text-color); 
@@ -160,7 +161,7 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 }
 
 /* 2. MENSAGEM DO CLIENTE (role: "user") - Fundo com Destaque (Direita) */
-/* Usamos um azul mais claro/saturado com a borda neon para forte contraste visual */
+/* UserMessage (role: user) fica à direita com forte contraste */
 .user-message { 
     background-color: #3b5998; /* Azul escuro com saturação (Destaque) */
     border: 2px solid var(--accent-color); /* Borda neon/ciano */
