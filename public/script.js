@@ -313,9 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const response = await fetch(`${WHATSAPP_BOT_URL}/status?userId=${currentUserId}`, { 
-                    headers: { 'Access-Control-Allow-Origin': '*' } 
-                }); 
+                const response = await fetch(`${WHATSAPP_BOT_URL}/status?userId=${currentUserId}`); 
                 
                 const contentType = response.headers.get("content-type");
                 if (contentType && contentType.indexOf("application/json") === -1) {
