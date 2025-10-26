@@ -203,8 +203,9 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 
 /* Ativo (Momento de Ação) */
 .kanban-card.scheduled-active {
-    border: 1px solid var(--accent-color); /* Neon */
-    box-shadow: 0 0 10px rgba(0, 247, 255, 0.4);
+    /* CORREÇÃO: Usa laranja/amarelo forte, como solicitado, e aumenta o brilho */
+    border: 2px solid #ffc107; 
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.8), 0 0 5px #ffc107; 
 }
 
 /* Atrasado (Urgência) */
@@ -215,19 +216,20 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 
 /* Em Breve (Aviso Prévio) */
 .kanban-card.scheduled-upcoming {
-    border: 1px solid #ffc107; /* Amarelo/Laranja */
-    box-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
+    /* Troca para o ciano/neon, que estava no "ativo" original */
+    border: 1px solid var(--accent-color); 
+    box-shadow: 0 0 8px rgba(0, 247, 255, 0.5);
 }
 
 /* Status do Badge/Texto */
 .schedule-badge.scheduled-active, .scheduled-time.scheduled-active {
-    color: var(--accent-color) !important;
+    color: #ffc107 !important; /* Laranja/Amarelo forte */
 }
 .schedule-badge.scheduled-overdue, .scheduled-time.scheduled-overdue {
     color: var(--delete-color) !important;
 }
 .schedule-badge.scheduled-upcoming, .scheduled-time.scheduled-upcoming {
-    color: #ffc107 !important;
+    color: var(--accent-color) !important; /* Neon/Ciano */
 }
 
 /* --- Ajuste da Largura do Card Header (Agendamento) --- */
