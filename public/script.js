@@ -103,15 +103,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     notificationBadge = `<span class="notification-badge">${unreadCount}</span>`;
                 }
 
-                // Renderização Final do Card - A classe de status é aplicada AQUI
+                // Renderização Final do Card
                 c.innerHTML += `
                     <div class="kanban-card ${scheduleStatusClass}" draggable="true" data-id="${lead.id}">
                         <strong class="card-header">
                             <span>${lead.nome} ${notificationBadge}</span>
-                            ${scheduleIcon}
                         </strong>
                         ${scheduleText}
                         <p>${wa}</p>
+                        ${scheduleIcon}
                     </div>`; 
             } 
         }); 
