@@ -587,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('import-csv-btn')?.addEventListener('click', () => { const input = document.createElement('input'); input.type = 'file'; input.accept = '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'; input.onchange = e => { const file = e.target.files[0]; const reader = new FileReader(); reader.onload = async (event) => { const data = new Uint8Array(event.target.result); const workbook = XLSX.read(data, {type: 'array'}); const ws = workbook.Sheets[workbook.SheetNames[0]]; const json = XLSX.utils.sheet_to_json(ws); json.forEach(item => { const pKey = Object.keys(item).find(k=>k.toLowerCase()==='produto'); const cKey = Object.keys(item).find(k=>k.toLowerCase().includes('compra')); const vKey = Object.keys(item).find(k=>k.toLowerCase().includes('venda')); if(item[pKey] && item[cKey] && item[vKey]){ estoque.push({ id: `prod_${Date.now()}_${Math.random()}`, produto: item[pKey], descricao: item['Descrição']||item['descricao']||'', compra: parseFloat(item[cKey]), venda: parseFloat(item[vKey]), custos: [] }); } }); await saveUserData(userId); renderEstoqueTable(); alert(`${json.length} produtos importados!`); }; reader.readAsArrayBuffer(file); }; input.click(); });
         
         // CHATBOT PRINCIPAL (USANDO A ROTA /api/gemini.js)
-        document.getElementById('chatbot-form')?.addEventListener('submit', async e => {
+        document.getElementById('chatbot-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const chatbotInput = document.getElementById('chatbot-input');
             const userInput = chatbotInput.value.trim();
@@ -782,4 +782,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     main(); 
+    // Garante que o status do agendamento seja atualizado a cada minuto
+    setInterval(updateAllUI, 60000);
 });
