@@ -24,7 +24,7 @@
                 <a href="#" class="nav-item" data-target="crm-list-section"> <i class="ph-fill ph-list-dashes"></i> <span>Lista de Leads</span> </a>
                 <a href="#" class="nav-item" data-target="finance-section"> <i class="ph-fill ph-chart-bar"></i> <span>Financeiro</span> </a>
                 <a href="#" class="nav-item" data-target="sales-accelerator-section"> <i class="ph-fill ph-rocket-launch"></i> <span>Acelerador de Vendas</span> </a>
-                <a href="#" class="nav-item" data-target="chatbot-section"> <i class="ph-fill ph-robot"></i> <span>Chatbot AI</span> </a>
+                <a href="#" class="nav-item" data-target="whatsapp-bot-section"> <i class="ph-fill ph-whatsapp-logo"></i> <span>WhatsApp Bot</span> </a>
                 <a href="#" class="nav-item" data-target="settings-section"> <i class="ph-fill ph-gear-six"></i> <span>Configurações</span> </a>
                 <a href="#" id="logout-btn" class="nav-item"> <i class="ph-fill ph-sign-out"></i> <span>Sair</span> </a>
             </nav>
@@ -159,13 +159,23 @@
                 </div>
             </div>
             
-            <div class="content-area" id="chatbot-section">
-                <div class="chatbot-container">
-                    <div id="chatbot-messages" class="chatbot-messages"></div>
-                    <form id="chatbot-form" class="chatbot-form">
-                        <input type="text" id="chatbot-input" placeholder="Digite sua pergunta..." autocomplete="off">
-                        <button type="submit"><i class="ph-fill ph-paper-plane-right"></i></button>
-                    </form>
+            <div class="content-area" id="whatsapp-bot-section">
+                <div class="card" id="whatsapp-status-card">
+                    <h2>Status da Conexão e Atendimento IA</h2>
+                    <p id="bot-status">Clique em Verificar Status para iniciar a conexão.</p>
+                    <button class="btn-save" id="check-bot-status-btn">Verificar Status</button>
+                    <div id="qr-code-container" style="text-align: center; margin-top: 20px;">
+                        <img id="qr-code-img" style="max-width: 300px; max-height: 300px; display: none;" alt="QR Code para Conexão">
+                    </div>
+                    <p id="qr-code-message" style="margin-top: 10px; color: var(--text-color-muted);"></p>
+                </div>
+                
+                <div class="card">
+                    <h3>Instruções de Atendimento do Chatbot</h3>
+                    <p class="guide-text" style="margin-bottom: 1rem; color: var(--text-color-muted);">Defina o tom, a função e as regras do Chatbot para o pré-atendimento no WhatsApp. Seja claro!</p>
+                    <textarea id="bot-instructions" placeholder="Ex: Você é um assistente de vendas educado. Sua função é responder dúvidas sobre produtos e agendar conversas com o vendedor. Nunca dê preços, apenas colete o nome e o interesse principal do cliente."></textarea>
+                    <button class="btn-save" id="save-bot-instructions">Salvar Instruções da IA</button>
+                    <p id="instructions-save-message" style="color: var(--accent-color); margin-top: 0.5rem;"></p>
                 </div>
             </div>
 
@@ -186,24 +196,52 @@
     </div>
 
     <div class="modal-overlay" id="edit-lead-modal">
-        <div class="modal-content">
-            <span class="close-modal" data-target="edit-lead-modal">&times;</span>
-            <h2>Editar Lead</h2>
-            <form id="edit-lead-form">
-                <div class="input-grid">
-                    <input type="text" id="edit-lead-name" placeholder="Nome">
-                    <input type="email" id="edit-lead-email" placeholder="E-mail">
-                    <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
-                    <select id="edit-lead-status"> <option value="novo">Novo</option> <option value="progresso">Em Progresso</option> <option value="fechado">Fechado</option> </select>
-                    <input type="text" id="edit-lead-origem" placeholder="Origem">
-                    <select id="edit-lead-qualification"> <option value="">Qualificação</option> <option value="quente">Lead Quente</option> <option value="morno">Lead Morno</option> <option value="frio">Lead Frio</option> </select>
+        <div class="modal-content"> 
+            <div class="lead-form-column" style="flex: 1;">
+                <span class="close-modal" data-target="edit-lead-modal">&times;</span>
+                <h2>Editar Lead</h2>
+                <form id="edit-lead-form">
+                    <div class="input-grid">
+                        <input type="text" id="edit-lead-name" placeholder="Nome">
+                        <input type="email" id="edit-lead-email" placeholder="E-mail">
+                        <input type="tel" id="edit-lead-whatsapp" placeholder="WhatsApp">
+                        <select id="edit-lead-status"> <option value="novo">Novo</option> <option value="progresso">Em Progresso</option> <option value="fechado">Fechado</option> </select>
+                        <input type="text" id="edit-lead-origem" placeholder="Origem">
+                        <select id="edit-lead-qualification"> <option value="">Qualificação</option> <option value="quente">Lead Quente</option> <option value="morno">Lead Morno</option> <option value="frio">Lead Frio</option> </select>
+                    </div>
+                    <textarea id="edit-lead-notes" placeholder="Notas"></textarea>
+
+                    <div class="card" style="padding: 1rem; margin-top: 1rem;">
+                        <h3>Agendamento / Lembrete</h3>
+                        <div class="input-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                            <input type="date" id="edit-lead-date" placeholder="Data">
+                            <input type="time" id="edit-lead-time" placeholder="Hora">
+                            <select id="edit-lead-reminder-type">
+                                <option value="none">Sem Lembrete</option>
+                                <option value="followup">Follow-up</option>
+                                <option value="meeting">Reunião</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                        <button type="button" class="btn-delete" id="delete-lead-btn">Excluir Lead</button>
+                        <button type="button" class="btn-save" id="toggle-bot-btn">Ativar/Desativar Bot</button>
+                        <button type="submit" class="btn-save">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+            <div class="lead-chat-column" style="flex: 1; display: flex; flex-direction: column; border-left: 1px solid var(--secondary-color); padding-left: 2rem;">
+                <h3>Conversa com Lead (via Bot)</h3>
+                <div class="chatbot-container" style="height: 100%;">
+                    <div id="lead-chatbot-messages" class="chatbot-messages" style="height: 400px;">
+                        </div>
+                    <form id="lead-chatbot-form" class="chatbot-form">
+                        <input type="text" id="lead-chatbot-input" placeholder="Converse com o lead ou envie mensagem manual..." autocomplete="off">
+                        <button type="submit"><i class="ph-fill ph-paper-plane-right"></i></button>
+                    </form>
                 </div>
-                <textarea id="edit-lead-notes" placeholder="Notas"></textarea>
-                <div class="modal-actions">
-                    <button type="button" class="btn-delete" id="delete-lead-btn">Excluir Lead</button>
-                    <button type="submit" class="btn-save">Salvar Alterações</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -226,6 +264,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <script src="auth.js"></script>
