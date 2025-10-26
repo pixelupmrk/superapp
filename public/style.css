@@ -216,20 +216,20 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 
 /* Em Breve (Aviso Prévio) */
 .kanban-card.scheduled-upcoming {
-    /* Troca para o ciano/neon, que estava no "ativo" original */
+    /* Usa o ciano/neon para indicar que está próximo, mas ainda não "ativo" */
     border: 1px solid var(--accent-color); 
     box-shadow: 0 0 8px rgba(0, 247, 255, 0.5);
 }
 
 /* Status do Badge/Texto */
 .schedule-badge.scheduled-active, .scheduled-time.scheduled-active {
-    color: #ffc107 !important; /* Laranja/Amarelo forte */
+    color: #ffc107 !important; /* Laranja/Amarelo forte para o ícone ativo */
 }
 .schedule-badge.scheduled-overdue, .scheduled-time.scheduled-overdue {
     color: var(--delete-color) !important;
 }
 .schedule-badge.scheduled-upcoming, .scheduled-time.scheduled-upcoming {
-    color: var(--accent-color) !important; /* Neon/Ciano */
+    color: var(--accent-color) !important; /* Neon/Ciano para o ícone próximo */
 }
 
 /* --- Ajuste da Largura do Card Header (Agendamento) --- */
@@ -243,7 +243,7 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 
 /* NOVO: Estilo para o Relógio de Agendamento */
 .schedule-badge {
-    color: var(--accent-color); /* Ciano para destaque */
+    color: var(--accent-color); /* Ciano padrão */
     font-size: 1.2rem;
     position: absolute;
     top: 5px;
