@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     scheduleText = `<p class="scheduled-time ${scheduleStatusClass}">${hora} (${lead.reminderType || 'Lembrete'})</p>`;
                 }
 
-                // LÓGICA DA BOLINHA DE MENSAGEM NÃO LIDA
+                // LÓGICA DA BOLINHA DE MENSAGEM NÃO LIDAS
                 const unreadCount = lead.unreadCount || 0;
                 let notificationBadge = '';
                 if (unreadCount > 0) {
