@@ -94,7 +94,7 @@ textarea { min-height: 70px; resize: vertical; margin-bottom: 0.7rem; }
 .kanban-column { background-color: var(--primary-color); padding: 0.7rem; border-radius: 8px; }
 .kanban-cards-list { min-height: 300px; }
 .kanban-card { 
-    position: relative; 
+    position: relative; /* CRITICAL: Define o card como ponto de referência para posicionamento do ícone */
     background-color: var(--secondary-color); 
     padding: 0.7rem; 
     border-radius: 5px; 
@@ -212,11 +212,25 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 
 /* Ativo (Momento de Ação) */
 .kanban-card.scheduled-active {
-    /* CORREÇÃO CRÍTICA: Laranja visível no background e borda */
+    /* CORREÇÃO CRÍTICA: Fundo Laranja Opaco para MÁXIMA VISIBILIDADE */
     border: 2px solid #ffc107; 
     box-shadow: 0 0 15px rgba(255, 193, 7, 0.9), 0 0 5px #ffc107; 
-    /* AUMENTADO OPACIDADE PARA FICAR VISIVELMENTE LARANJA */
-    background-color: rgba(255, 165, 0, 0.3); 
+    /* Laranja/Amarelo mais claro para se destacar sobre o dark blue */
+    background-color: rgba(255, 165, 0, 0.6); 
+    color: #16213e; /* Troca a cor do texto para escuro para manter o contraste */
+}
+/* Garante que o texto e link dentro do card laranja fiquem escuros e legíveis */
+.kanban-card.scheduled-active strong,
+.kanban-card.scheduled-active p,
+.kanban-card.scheduled-active a {
+    color: #16213e;
+}
+.kanban-card.scheduled-active a {
+    font-weight: 700;
+}
+/* Ícone e hora em laranja forte no fundo laranja para destacar */
+.schedule-badge.scheduled-active, .scheduled-time.scheduled-active {
+    color: #cc6600 !important; /* Laranja mais escuro para maior contraste no fundo laranja */
 }
 
 /* Atrasado (Urgência) */
@@ -233,9 +247,6 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 }
 
 /* Status do Badge/Texto */
-.schedule-badge.scheduled-active, .scheduled-time.scheduled-active {
-    color: #ffc107 !important; /* Laranja/Amarelo forte para o ícone ativo */
-}
 .schedule-badge.scheduled-overdue, .scheduled-time.scheduled-overdue {
     color: var(--delete-color) !important;
 }
