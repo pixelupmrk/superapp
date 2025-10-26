@@ -212,31 +212,25 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 
 /* Ativo (Momento de Ação) */
 .kanban-card.scheduled-active {
-    /* CORREÇÃO CRÍTICA: Fundo Laranja Opaco para MÁXIMA VISIBILIDADE */
-    border: 2px solid #ffc107; 
+    /* CORREÇÃO CRÍTICA: Fundo Laranja SÓLIDO (ou quase sólido) para MÁXIMA VISIBILIDADE */
+    border: 2px solid #cc6600; /* Borda Laranja Escuro */
     box-shadow: 0 0 15px rgba(255, 193, 7, 0.9), 0 0 5px #ffc107; 
-    /* Laranja/Amarelo mais claro para se destacar sobre o dark blue */
-    background-color: rgba(255, 165, 0, 0.6); 
+    /* Laranja Sólido (ou muito opaco) */
+    background-color: #ffc107; 
     color: #16213e; /* Troca a cor do texto para escuro para manter o contraste */
 }
 /* Garante que o texto e link dentro do card laranja fiquem escuros e legíveis */
 .kanban-card.scheduled-active strong,
 .kanban-card.scheduled-active p,
 .kanban-card.scheduled-active a {
-    color: #16213e;
-}
-.kanban-card.scheduled-active a {
-    font-weight: 700;
-}
-/* Ícone e hora em laranja forte no fundo laranja para destacar */
-.schedule-badge.scheduled-active, .scheduled-time.scheduled-active {
-    color: #cc6600 !important; /* Laranja mais escuro para maior contraste no fundo laranja */
+    color: #16213e !important;
 }
 
 /* Atrasado (Urgência) */
 .kanban-card.scheduled-overdue {
     border: 1px solid var(--delete-color); /* Vermelho */
     box-shadow: 0 0 10px rgba(229, 115, 115, 0.6);
+    /* Mantém o fundo escuro para distinguir do estado "ativo" */
 }
 
 /* Em Breve (Aviso Prévio) */
@@ -247,6 +241,9 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 }
 
 /* Status do Badge/Texto */
+.schedule-badge.scheduled-active, .scheduled-time.scheduled-active {
+    color: #cc6600 !important; /* Laranja Escuro forte para o ícone no fundo laranja */
+}
 .schedule-badge.scheduled-overdue, .scheduled-time.scheduled-overdue {
     color: var(--delete-color) !important;
 }
