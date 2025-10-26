@@ -94,7 +94,7 @@ textarea { min-height: 70px; resize: vertical; margin-bottom: 0.7rem; }
 .kanban-column { background-color: var(--primary-color); padding: 0.7rem; border-radius: 8px; }
 .kanban-cards-list { min-height: 300px; }
 .kanban-card { 
-    position: relative; /* CRITICAL: Define o card como ponto de referência para posicionamento do ícone */
+    position: relative; 
     background-color: var(--secondary-color); 
     padding: 0.7rem; 
     border-radius: 5px; 
@@ -212,10 +212,11 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 
 /* Ativo (Momento de Ação) */
 .kanban-card.scheduled-active {
-    /* DESTAQUE LARANJA COMPLETO NO CARD */
+    /* CORREÇÃO CRÍTICA: Laranja visível no background e borda */
     border: 2px solid #ffc107; 
-    box-shadow: 0 0 15px rgba(255, 193, 7, 0.8), 0 0 5px #ffc107; 
-    background-color: rgba(255, 193, 7, 0.1); 
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.9), 0 0 5px #ffc107; 
+    /* AUMENTADO OPACIDADE PARA FICAR VISIVELMENTE LARANJA */
+    background-color: rgba(255, 165, 0, 0.3); 
 }
 
 /* Atrasado (Urgência) */
@@ -306,4 +307,5 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
         border-top: 1px solid var(--secondary-color);
         padding-top: 0.8rem;
     }
-    .
+    .kanban-card strong { font-size: 0.9rem; }
+}
