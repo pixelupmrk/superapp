@@ -60,22 +60,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const wa = `<a href="https://wa.me/${(lead.whatsapp || '').replace(/\D/g, '')}" target="_blank">${lead.whatsapp}</a>`; 
                 
                 // LÓGICA DE STATUS DE TEMPO E CLASSES
-                let scheduleStatusClass = ''; // 'scheduled-active', 'scheduled-overdue'
+                let scheduleStatusClass = ''; // 'scheduled-active', 'scheduled-overdue', 'scheduled-upcoming'
                 let scheduleIcon = '';
                 let scheduleText = '';
 
                 if (lead.scheduledDate && lead.scheduledTime) {
                     const now = new Date();
-                    // Junta data e hora (Ex: 2025-10-25T16:01:00)
-                    const scheduledDateTime = new Date(`${lead.scheduledDate}T${lead.scheduledTime}:00`);
+                    // CRÍTICO: CONSTRUÇÃO SEGURA DA DATA COM BASE NO HORÁRIO LOCAL
+                    const [year, month, day] = lead.scheduledDate.split('-').map(Number);
+                    const [hour, minute] = lead.scheduledTime.split(':').map(Number);
+                    
+                    // Mês é base 0, então subtraímos 1
+                    const scheduledDateTime = new Date(year, month - 1, day, hour, minute, 0); 
 
                     const diffMinutes = Math.round((scheduledDateTime - now) / 60000); // Diferença em minutos
 
                     if (diffMinutes <= 0 && lead.status !== 'fechado') { 
-                        scheduleStatusClass = 'scheduled-active'; // Laranja para ATIVO (agora ou passou)
+                        scheduleStatusClass = 'scheduled-active'; // Laranja para ATIVO/AGORA
                         
-                        if (diffMinutes < -10) { 
-                            scheduleStatusClass = 'scheduled-overdue'; // Vermelho para ATRASADO (> 10 minutos)
+                        if (diffMinutes < -15) { 
+                            scheduleStatusClass = 'scheduled-overdue'; // Vermelho para ATRASADO (> 15 minutos)
                         }
                     } else if (diffMinutes > 0 && diffMinutes <= 60) {
                         scheduleStatusClass = 'scheduled-upcoming'; // Amarelo para EM BREVE (< 60 minutos)
