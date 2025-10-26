@@ -42,12 +42,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const c = document.getElementById(containerId); 
         if (!c) return; 
         c.innerHTML = ''; 
-        if (!history || history.length === 0) { 
+        
+        // FILTRO CRÍTICO: Remove o script de instrução do bot do histórico de visualização
+        const filteredHistory = history.filter(m => 
+            !(m.role === 'model' && m.parts[0]?.text?.includes('**INSTRUÇÕES GERAIS PARA O OPERADOR**'))
+        );
+
+        if (!filteredHistory || filteredHistory.length === 0) { 
             addMessageToChat("Olá! Como posso ajudar?", 'bot-message', containerId); 
         } else { 
             // Garante que o histórico não tenha o 'Pensando...' no final
             document.querySelector(`#${containerId} .bot-thinking`)?.remove(); 
-            history.forEach(m => addMessageToChat(m.parts[0].text, m.role === 'user' ? 'user-message' : 'bot-message', containerId)); 
+            filteredHistory.forEach(m => addMessageToChat(m.parts[0].text, m.role === 'user' ? 'user-message' : 'bot-message', containerId)); 
         } 
     }
     
@@ -103,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     notificationBadge = `<span class="notification-badge">${unreadCount}</span>`;
                 }
 
-                // Renderização Final do Card - Ícone do relógio fora do <strong> para melhor posicionamento
+                // Renderização Final do Card
                 c.innerHTML += `
                     <div class="kanban-card ${scheduleStatusClass}" draggable="true" data-id="${lead.id}">
                         <strong class="card-header">
@@ -224,8 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-lead-qualification').value = lead.qualificacao; 
             document.getElementById('edit-lead-notes').value = lead.notas; 
             
-            // Campos de Agendamento (AGORA EXISTEM NO HTML)
-            // Se o elemento não for encontrado, ele será null, mas o código não quebrará porque agora fazemos o check no HTML
+            // Campos de Agendamento (CORRIGIDO PARA ACESSAR ELEMENTOS VÁLIDOS)
             const editLeadDate = document.getElementById('edit-lead-date');
             if (editLeadDate) editLeadDate.value = lead.scheduledDate || '';
             
@@ -243,9 +248,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const botActive = lead.botActive === undefined ? true : lead.botActive; 
-            toggleBotBtn.classList.toggle('btn-delete', botActive); 
-            toggleBotBtn.classList.toggle('btn-save', !botActive);
-            toggleBotBtn.textContent = botActive ? 'Desativar Bot' : 'Ativar Bot';
+            // CORRIGIDO: O elemento toggleBotBtn agora é encontrado
+            if (toggleBotBtn) {
+                 toggleBotBtn.classList.toggle('btn-delete', botActive); 
+                 toggleBotBtn.classList.toggle('btn-save', !botActive);
+                 toggleBotBtn.textContent = botActive ? 'Desativar Bot' : 'Ativar Bot';
+            }
 
             const chatContainer = document.getElementById('lead-chatbot-messages');
             if (chatContainer) {
@@ -477,7 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.getElementById('leads-table')?.addEventListener('click', e => { if (e.target.tagName === 'A') { e.stopPropagation(); return; } if (e.target.closest('.btn-edit-table')) openEditModal(parseInt(e.target.closest('tr').dataset.id)); if (e.target.closest('.btn-delete-table')) { if (confirm('Tem certeza?')) { leads = leads.filter(l => l.id != parseInt(e.target.closest('tr').dataset.id)); saveUserData(userId); updateAllUI(); } } });
 
-        // NOVO: Bloco de salvar agendamento e informações do lead
+        // Bloco de salvar agendamento e informações do lead
         document.getElementById('edit-lead-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const lead = leads.find(l => l.id === currentLeadId);
@@ -490,7 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 lead.qualificacao = document.getElementById('edit-lead-qualification').value;
                 lead.notas = document.getElementById('edit-lead-notes').value;
                 
-                // NOVO: Salvar Campos de Agendamento
+                // Salvar Campos de Agendamento
                 const reminderType = document.getElementById('edit-lead-reminder-type').value;
                 lead.scheduledDate = document.getElementById('edit-lead-date').value;
                 lead.scheduledTime = document.getElementById('edit-lead-time').value;
@@ -731,7 +739,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 estoque = data.estoque || [];
                 estoque.forEach((item, index) => { if (!item.id) item.id = `prod_${Date.now()}_${index}`; });
                 chatHistory = data.chatHistory || [];
-                // CORREÇÃO: Verifica se o campo bot-instructions existe antes de tentar preencher (agora deve existir)
+                // CORREÇÃO: Verifica se o campo bot-instructions existe antes de tentar preencher
                 const instructionsElement = document.getElementById('bot-instructions');
                 botInstructions = instructionsElement?.value || data.botInstructions || instructionsElement?.placeholder || "Você é um assistente virtual prestativo.";
                 
