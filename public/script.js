@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     notificationBadge = `<span class="notification-badge">${unreadCount}</span>`;
                 }
 
-                // Renderização Final do Card
+                // Renderização Final do Card - Ícone do relógio fora do <strong> para melhor posicionamento
                 c.innerHTML += `
                     <div class="kanban-card ${scheduleStatusClass}" draggable="true" data-id="${lead.id}">
                         <strong class="card-header">
