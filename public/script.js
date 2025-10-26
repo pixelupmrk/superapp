@@ -215,6 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const toggleBotBtn = document.getElementById('toggle-bot-btn');
 
         if(lead) { 
+            // CARREGAMENTO DOS DADOS (Incluindo Agendamento)
             document.getElementById('edit-lead-name').value = lead.nome; 
             document.getElementById('edit-lead-email').value = lead.email; 
             document.getElementById('edit-lead-whatsapp').value = lead.whatsapp; 
@@ -223,17 +224,21 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-lead-qualification').value = lead.qualificacao; 
             document.getElementById('edit-lead-notes').value = lead.notas; 
             
-            // NOVO: Carregar campos de Agendamento
-            document.getElementById('edit-lead-date').value = lead.scheduledDate || '';
-            document.getElementById('edit-lead-time').value = lead.scheduledTime || '';
-            document.getElementById('edit-lead-reminder-type').value = lead.reminderType || 'none';
+            // Campos de Agendamento (AGORA EXISTEM NO HTML)
+            // Se o elemento não for encontrado, ele será null, mas o código não quebrará porque agora fazemos o check no HTML
+            const editLeadDate = document.getElementById('edit-lead-date');
+            if (editLeadDate) editLeadDate.value = lead.scheduledDate || '';
+            
+            const editLeadTime = document.getElementById('edit-lead-time');
+            if (editLeadTime) editLeadTime.value = lead.scheduledTime || '';
+            
+            const editLeadReminderType = document.getElementById('edit-lead-reminder-type');
+            if (editLeadReminderType) editLeadReminderType.value = lead.reminderType || 'none';
             
             // ZERA O CONTADOR DE MENSAGENS NÃO LIDAS
             if (lead.unreadCount && lead.unreadCount > 0) {
                 lead.unreadCount = 0;
-                // É essencial salvar o estado para zerar a notificação
                 await saveUserData(firebase.auth().currentUser.uid); 
-                // Atualiza a UI imediatamente (Kanban)
                 renderKanbanCards();
             }
 
@@ -242,14 +247,12 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleBotBtn.classList.toggle('btn-save', !botActive);
             toggleBotBtn.textContent = botActive ? 'Desativar Bot' : 'Ativar Bot';
 
-            // NOVO: Limpa o chat e mostra mensagem de carregamento antes de ligar o listener
             const chatContainer = document.getElementById('lead-chatbot-messages');
             if (chatContainer) {
                 chatContainer.innerHTML = ''; 
                 addMessageToChat("Carregando histórico...", 'bot-message bot-thinking', 'lead-chatbot-messages'); 
             }
 
-            // ATIVA O LISTENER DE CHAT EM TEMPO REAL. 
             setupLeadChatListener(lead.id);
 
             document.getElementById('edit-lead-modal').style.display = 'flex'; 
@@ -728,7 +731,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 estoque = data.estoque || [];
                 estoque.forEach((item, index) => { if (!item.id) item.id = `prod_${Date.now()}_${index}`; });
                 chatHistory = data.chatHistory || [];
-                botInstructions = document.getElementById('bot-instructions')?.value || data.botInstructions || document.getElementById('bot-instructions')?.placeholder || "Você é um assistente virtual prestativo.";
+                // CORREÇÃO: Verifica se o campo bot-instructions existe antes de tentar preencher (agora deve existir)
+                const instructionsElement = document.getElementById('bot-instructions');
+                botInstructions = instructionsElement?.value || data.botInstructions || instructionsElement?.placeholder || "Você é um assistente virtual prestativo.";
                 
                 nextLeadId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 0;
                 applySettings(data.settings);
