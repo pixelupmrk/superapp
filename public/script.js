@@ -111,8 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </strong>
                         ${scheduleText}
                         <p>${wa}</p>
-                        ${scheduleIcon}
-                    </div>`; 
+                        ${scheduleIcon} </div>`; 
             } 
         }); 
     }
