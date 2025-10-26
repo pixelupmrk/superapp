@@ -8,7 +8,7 @@
     --accent-color: #00f7ff;
     --text-color: #cdd6f4;
     --text-color-muted: #8892b0;
-    --sidebar-width: 200px; 
+    --sidebar-width: 200px; /* AJUSTE CRÍTICO: Reduzido para 200px para caber na tela */
     --delete-color: #e57373;
     --shadow-color: rgba(0, 0, 0, 0.2);
     --highlight-color: rgba(255, 255, 255, 0.1);
@@ -26,46 +26,47 @@ body { font-family: 'Inter', sans-serif; background-color: var(--background-colo
 .sidebar { 
     width: var(--sidebar-width); 
     height: 100vh; background-color: var(--primary-color); border-right: 1px solid var(--secondary-color); display: flex; flex-direction: column; 
-    padding: 0.8rem 1rem; 
+    padding: 0.8rem 1rem; /* AJUSTE: Reduzido o padding geral */
     position: fixed; transition: left 0.3s ease-in-out; z-index: 1001; 
 }
 .sidebar-header h2, .login-container h2:first-of-type {
     font-family: 'Orbitron', sans-serif;
     color: var(--accent-color);
     text-align: center;
-    margin-bottom: 1.5rem; 
-    font-size: 1.5rem; 
+    margin-bottom: 1.5rem; /* AJUSTE: Reduzido */
+    font-size: 1.5rem; /* AJUSTE: Fonte menor */
     text-shadow: 0 0 5px var(--accent-color), 0 0 10px rgba(0, 247, 255, 0.5);
 }
 .sidebar-nav { flex-grow: 1; }
 .nav-item { 
     display: flex; align-items: center; 
-    padding: 0.7rem 0.7rem; 
+    padding: 0.7rem 0.7rem; /* AJUSTE: Reduzido o padding */
     margin-bottom: 0.3rem; 
     border-radius: 6px; text-decoration: none; color: var(--text-color-muted); 
-    font-size: 0.9rem; 
+    font-size: 0.9rem; /* AJUSTE: Fonte menor */
     transition: all 0.3s ease; 
 }
 .nav-item:hover { background-color: var(--secondary-color); color: var(--text-color); }
 .nav-item.active { background-color: var(--accent-color); color: #000; font-weight: 600; box-shadow: 0 0 10px var(--accent-color); }
-.nav-item i { font-size: 1.3rem; margin-right: 0.6rem; } 
+.nav-item i { font-size: 1.3rem; margin-right: 0.6rem; } /* AJUSTE: Ícone e margem menores */
 .sidebar-footer { margin-top: auto; }
 .sac-button { background-color: #25D366; color: #ffffff; font-weight: 600; }
 .sac-button:hover { background-color: #128C7E; }
 .main-content { 
     flex-grow: 1; 
     margin-left: var(--sidebar-width); 
-    padding: 1rem; 
+    padding: 1rem; /* AJUSTE: Reduzido o padding principal */
     transition: margin-left 0.3s ease-in-out; 
+    /* Garante que a largura se ajuste perfeitamente */
     width: calc(100% - var(--sidebar-width)); 
     overflow-x: hidden; 
 }
 .main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-.main-header h1 { font-size: 1.6rem; } 
-.user-profile { font-weight: 600; font-size: 0.9rem; } 
+.main-header h1 { font-size: 1.6rem; } /* AJUSTE: Fonte menor */
+.user-profile { font-weight: 600; font-size: 0.9rem; } /* AJUSTE: Fonte menor */
 .content-area { display: none; }
 .content-area.active { display: block; }
-.btn-save, .btn-login, .btn-delete, .btn-custo { width: auto; padding: 0.6rem 1rem; border: 1px solid var(--highlight-color); border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease-in-out; box-shadow: 0px 2px 4px var(--shadow-color), inset 0px 1px 1px var(--highlight-color); } 
+.btn-save, .btn-login, .btn-delete, .btn-custo { width: auto; padding: 0.6rem 1rem; border: 1px solid var(--highlight-color); border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease-in-out; box-shadow: 0px 2px 4px var(--shadow-color), inset 0px 1px 1px var(--highlight-color); } /* AJUSTE: Botões menores */
 .btn-save, .btn-login { background: linear-gradient(145deg, #1e3a8a, var(--secondary-color)); color: var(--accent-color); text-shadow: 0 0 3px var(--accent-color); }
 .btn-save:hover, .btn-login:hover { transform: translateY(-1px); box-shadow: 0px 4px 6px var(--shadow-color), inset 0px 1px 1px var(--highlight-color); filter: brightness(1.2); }
 .btn-save:active, .btn-login:active { transform: translateY(1px); box-shadow: 0px 1px 2px var(--shadow-color), inset 0px 1px 1px var(--highlight-color); }
@@ -73,14 +74,15 @@ body { font-family: 'Inter', sans-serif; background-color: var(--background-colo
 .btn-custo { background: #6366f1; color: #fff; padding: 0.4rem 0.7rem; font-size: 0.75rem; }
 .card { 
     background-color: var(--primary-color); 
-    padding: 1.2rem; 
+    padding: 1.2rem; /* AJUSTE: Reduzido padding do card */
     border-radius: 8px; 
     margin-bottom: 1rem; 
     border: 1px solid var(--secondary-color); 
     box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
 }
-.input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.7rem; margin-bottom: 0.7rem; }
-input, select, textarea { width: 100%; padding: 0.5rem 0.7rem; background-color: var(--secondary-color); border: 1px solid var(--secondary-color); border-radius: 5px; color: var(--text-color); font-size: 0.85rem; } 
+/* Ajuste no input-grid para caber mais em telas normais */
+.input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* AJUSTE: Min-width menor */ gap: 0.7rem; margin-bottom: 0.7rem; }
+input, select, textarea { width: 100%; padding: 0.5rem 0.7rem; background-color: var(--secondary-color); border: 1px solid var(--secondary-color); border-radius: 5px; color: var(--text-color); font-size: 0.85rem; } /* AJUSTE: Inputs menores */
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-color); }
 textarea { min-height: 70px; resize: vertical; margin-bottom: 0.7rem; }
 .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.8rem; margin-bottom: 1rem; }
@@ -92,15 +94,14 @@ textarea { min-height: 70px; resize: vertical; margin-bottom: 0.7rem; }
 .kanban-column { background-color: var(--primary-color); padding: 0.7rem; border-radius: 8px; }
 .kanban-cards-list { min-height: 300px; }
 .kanban-card { 
-    /* ADICIONADO: Define o card como ponto de referência para posicionamento do ícone */
-    position: relative; 
+    position: relative; /* CRITICAL: Define o card como ponto de referência para posicionamento do ícone */
     background-color: var(--secondary-color); 
     padding: 0.7rem; 
     border-radius: 5px; 
     margin-bottom: 0.4rem; 
     cursor: grab; 
     font-size: 0.9rem; 
-    transition: all 0.2s ease; /* Adicionado para transição suave da cor */
+    transition: all 0.2s ease;
 }
 .kanban-card a, #leads-table a { color: var(--accent-color); text-decoration: none; font-weight: bold; }
 table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
@@ -111,6 +112,7 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
     background-color: rgba(0, 0, 0, 0.75); display: none; 
     justify-content: center; align-items: center; z-index: 1000; 
 }
+/* CORREÇÃO DO MODAL: Ajustado para caber na tela sem rolagem */
 .modal-content { 
     position: relative; 
     background-color: var(--primary-color); 
@@ -158,20 +160,22 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 }
 
 /* 1. MENSAGEM DO OPERADOR/IA/SISTEMA (role: "model") - Fundo Escuro (Esquerda) */
+/* BotMessage (role: model) e a mensagem do operador são iguais e ficam à esquerda */
 .bot-message { 
-    background-color: var(--secondary-color); 
+    background-color: var(--secondary-color); /* Azul escuro do tema */
     color: var(--text-color); 
-    align-self: flex-start; 
+    align-self: flex-start; /* Fica à esquerda */
     border: 1px solid var(--secondary-color); 
     border-bottom-left-radius: 5px; 
 }
 
 /* 2. MENSAGEM DO CLIENTE (role: "user") - Fundo com Destaque (Direita) */
+/* UserMessage (role: user) fica à direita com forte contraste */
 .user-message { 
-    background-color: #3b5998; 
-    border: 2px solid var(--accent-color); 
+    background-color: #3b5998; /* Azul escuro com saturação (Destaque) */
+    border: 2px solid var(--accent-color); /* Borda neon/ciano */
     color: var(--text-color); 
-    align-self: flex-end; 
+    align-self: flex-end; /* Fica à direita */
     border-bottom-right-radius: 5px; 
 }
 
@@ -211,37 +215,37 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
     /* DESTAQUE LARANJA COMPLETO NO CARD */
     border: 2px solid #ffc107; 
     box-shadow: 0 0 15px rgba(255, 193, 7, 0.8), 0 0 5px #ffc107; 
-    /* Pode-se adicionar uma cor de fundo sutil para mais destaque: */
     background-color: rgba(255, 193, 7, 0.1); 
 }
 
 /* Atrasado (Urgência) */
 .kanban-card.scheduled-overdue {
-    border: 1px solid var(--delete-color); 
+    border: 1px solid var(--delete-color); /* Vermelho */
     box-shadow: 0 0 10px rgba(229, 115, 115, 0.6);
 }
 
 /* Em Breve (Aviso Prévio) */
 .kanban-card.scheduled-upcoming {
+    /* Usa o ciano/neon para indicar que está próximo */
     border: 1px solid var(--accent-color); 
     box-shadow: 0 0 8px rgba(0, 247, 255, 0.5);
 }
 
 /* Status do Badge/Texto */
 .schedule-badge.scheduled-active, .scheduled-time.scheduled-active {
-    color: #ffc107 !important; /* Ícone e texto laranja */
+    color: #ffc107 !important; /* Laranja/Amarelo forte para o ícone ativo */
 }
 .schedule-badge.scheduled-overdue, .scheduled-time.scheduled-overdue {
     color: var(--delete-color) !important;
 }
 .schedule-badge.scheduled-upcoming, .scheduled-time.scheduled-upcoming {
-    color: var(--accent-color) !important; 
+    color: var(--accent-color) !important; /* Neon/Ciano para o ícone próximo */
 }
 
 /* --- Ajuste da Largura do Card Header (Agendamento) --- */
 .kanban-card .card-header {
     display: flex;
-    justify-content: flex-start; /* Alinha o nome e notificação à esquerda */
+    justify-content: flex-start;
     align-items: center;
     font-weight: bold;
     margin-bottom: 5px;
@@ -249,16 +253,16 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
 
 /* NOVO: Estilo para o Relógio de Agendamento */
 .schedule-badge {
-    /* POSICIONAMENTO ABSOLUTO DENTRO DO CARD (que agora é relative) */
+    /* POSICIONAMENTO ABSOLUTO CORRETO EM RELAÇÃO AO CARD PAI */
     position: absolute;
-    top: 0.7rem; /* Ajustado para dentro do padding do card */
-    right: 0.7rem; /* Ajustado para dentro do padding do card */
+    top: 0.7rem; 
+    right: 0.7rem; 
     color: var(--accent-color); 
     font-size: 1.2rem;
-    background: transparent; /* Remove o fundo */
-    padding: 0; /* Remove o padding extra */
-    border-radius: 0; /* Remove a borda arredondada */
-    box-shadow: none; /* Remove a sombra */
+    background: transparent; 
+    padding: 0; 
+    border-radius: 0; 
+    box-shadow: none; 
     line-height: 1;
 }
 
@@ -266,7 +270,7 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 8px; 
+    gap: 8px; /* Espaço entre nome e bolinha */
 }
 
 .kanban-card p.scheduled-time {
@@ -302,5 +306,4 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
         border-top: 1px solid var(--secondary-color);
         padding-top: 0.8rem;
     }
-    .kanban-card strong { font-size: 0.9rem; }
-}
+    .
