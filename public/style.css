@@ -199,6 +199,74 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--secondary-color)
     font-size: 1rem;
 }
 
+/* --- Estilos para o Status de Agendamento (Cores Vivas) --- */
+
+/* Ativo (Momento de Ação) */
+.kanban-card.scheduled-active {
+    border: 1px solid var(--accent-color); /* Neon */
+    box-shadow: 0 0 10px rgba(0, 247, 255, 0.4);
+}
+
+/* Atrasado (Urgência) */
+.kanban-card.scheduled-overdue {
+    border: 1px solid var(--delete-color); /* Vermelho */
+    box-shadow: 0 0 10px rgba(229, 115, 115, 0.6);
+}
+
+/* Em Breve (Aviso Prévio) */
+.kanban-card.scheduled-upcoming {
+    border: 1px solid #ffc107; /* Amarelo/Laranja */
+    box-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
+}
+
+/* Status do Badge/Texto */
+.schedule-badge.scheduled-active, .scheduled-time.scheduled-active {
+    color: var(--accent-color) !important;
+}
+.schedule-badge.scheduled-overdue, .scheduled-time.scheduled-overdue {
+    color: var(--delete-color) !important;
+}
+.schedule-badge.scheduled-upcoming, .scheduled-time.scheduled-upcoming {
+    color: #ffc107 !important;
+}
+
+/* --- Ajuste da Largura do Card Header (Agendamento) --- */
+.kanban-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* NOVO: Estilo para o Relógio de Agendamento */
+.schedule-badge {
+    color: var(--accent-color); /* Ciano para destaque */
+    font-size: 1.2rem;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: var(--primary-color);
+    padding: 2px 5px;
+    border-radius: 3px;
+    box-shadow: 0 0 5px rgba(0, 247, 255, 0.5);
+    line-height: 1;
+}
+
+.kanban-card strong {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px; /* Espaço entre nome e bolinha */
+}
+
+.kanban-card p.scheduled-time {
+    color: var(--text-color-muted);
+    font-size: 0.8rem;
+    margin-top: -5px; /* Puxa para cima para ficar junto do nome */
+}
+/* Fim dos Estilos de Agendamento */
+
 
 @media (max-width: 768px) {
     .sidebar { left: -100%; }
