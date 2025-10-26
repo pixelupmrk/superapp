@@ -493,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 lead.scheduledTime = document.getElementById('edit-lead-time').value;
                 lead.reminderType = reminderType;
                 
-                // Limpa o agendamento se o tipo for 'none'
+                // Lógica de desativação do agendamento
                 if (reminderType === 'none') {
                     delete lead.scheduledDate;
                     delete lead.scheduledTime;
