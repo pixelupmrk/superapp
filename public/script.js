@@ -1,8 +1,9 @@
-// script.js - VERSÃO FINAL COM AGENDAMENTO E KEEP-ALIVE (24/7)
+// script.js - VERSÃO FINAL COM AGENDAMENTO, KEEP-ALIVE E CORREÇÃO leadId
 document.addEventListener('DOMContentLoaded', () => {
     // --- DADOS COMPLETOS DA MENTORIA ---
     const mentoriaData = [
-        { "moduleId": "MD01", "title": "Módulo 1: Conectando com o Cliente Ideal", "exercisePrompt": "Exercício Módulo 1:\n\n1. Descreva sua persona (cliente ideal).\n2. Qual é a principal dor que seu serviço resolve?\n3. Escreva sua Proposta de Valor.", "lessons": [ { "lessonId": "L01.01", "title": "Questionário para Definição de Persona", "content": "Antes de qualquer estratégia, é essencial saber com quem você está falando. O questionário irá ajudar a identificar o perfil do seu cliente ideal. Use o CRM para registrar as respostas e começar a segmentar seus leads.\n\nPerguntas do Questionário:\n1. Nome fictício da persona:\n2. Idade aproximada:\n3. Profissão ou ocupação:\n4. Quais são suas dores e dificuldades?\n5. Quais são seus desejos ou objetivos?\n6. Onde essa pessoa busca informação?\n7. Quais redes sociais essa pessoa usa com frequência?\n8. Que tipo de conteúdo ela consome?" }, { "lessonId": "L01.02", "title": "Proposta de Valor e Posicionamento", "content": "Com base na persona, vamos definir a proposta de valor do seu serviço. A proposta responde: 'Eu ajudo [persona] a [solução] através de [diferencial do seu serviço].'\n\nExemplo: Ajudo [vendedores autônomos] a [acelerar vendas] usando [o super app com CRM e automação]." } ] },
+        // ... (Dados da mentoria - mantidos iguais ao original) ...
+         { "moduleId": "MD01", "title": "Módulo 1: Conectando com o Cliente Ideal", "exercisePrompt": "Exercício Módulo 1:\n\n1. Descreva sua persona (cliente ideal).\n2. Qual é a principal dor que seu serviço resolve?\n3. Escreva sua Proposta de Valor.", "lessons": [ { "lessonId": "L01.01", "title": "Questionário para Definição de Persona", "content": "Antes de qualquer estratégia, é essencial saber com quem você está falando. O questionário irá ajudar a identificar o perfil do seu cliente ideal. Use o CRM para registrar as respostas e começar a segmentar seus leads.\n\nPerguntas do Questionário:\n1. Nome fictício da persona:\n2. Idade aproximada:\n3. Profissão ou ocupação:\n4. Quais são suas dores e dificuldades?\n5. Quais são seus desejos ou objetivos?\n6. Onde essa pessoa busca informação?\n7. Quais redes sociais essa pessoa usa com frequência?\n8. Que tipo de conteúdo ela consome?" }, { "lessonId": "L01.02", "title": "Proposta de Valor e Posicionamento", "content": "Com base na persona, vamos definir a proposta de valor do seu serviço. A proposta responde: 'Eu ajudo [persona] a [solução] através de [diferencial do seu serviço].'\n\nExemplo: Ajudo [vendedores autônomos] a [acelerar vendas] usando [o super app com CRM e automação]." } ] },
         { "moduleId": "MD02", "title": "Módulo 2: O Algoritmo da Meta", "exercisePrompt": "Exercício Módulo 2:\n\n1. Crie 3 ganchos para um vídeo sobre seu serviço.\n2. Liste 2 tipos de conteúdo que geram mais salvamentos.", "lessons": [ { "lessonId": "L02.01", "title": "Como o Algoritmo Funciona", "content": "O algoritmo da Meta analisa o comportamento dos usuários para decidir o que mostrar. Ele prioriza conteúdos que geram interação rápida. Quanto mais relevante for o seu conteúdo para o público, mais ele será entregue." }, { "lessonId": "L02.03", "title": "Comece com um Gancho Forte", "content": "O primeiro segundo do seu conteúdo precisa chamar a atenção imediatamente. Depois do gancho, entregue valor real e finalize com uma chamada para ação (CTA). Exemplo de ganchos: 'Você está postando, mas ninguém engaja? Isso aqui é pra você.'" } ] },
         { "moduleId": "MD03", "title": "Módulo 3: Cronograma de Postagens", "exercisePrompt": "Exercício Módulo 3:\n\n1. Defina a frequência ideal de postagens para você.\n2. Monte um cronograma de conteúdo para a próxima semana.", "lessons": [ { "lessonId": "L03.01", "title": "Melhores Horários e Dias para Postagem", "content": "O ideal é postar quando seu público está mais ativo (geralmente entre 11h e 13h ou 18h e 20h, de terça a quinta). Use as métricas do Instagram para ver quando seus seguidores estão online." }, { "lessonId": "L03.03", "title": "Exemplo de Cronograma Semanal", "content": "Utilize um calendário para organizar o conteúdo por dia da semana:\nSegunda-feira: Conteúdo Educativo\nTerça-feira: Prova Social (depoimento)\nQuarta-feira: Vídeo Reels\nQuinta-feira: Dica + Engajamento\nSexta-feira: Chamada para Ação/Oferta\nSábado: Conteúdo leve/Bastidor\nDomingo: (Opcional) Inspiração" } ] },
         { "moduleId": "MD04", "title": "Módulo 4: Conteúdo que Conecta", "exercisePrompt": "Exercício Módulo 4:\n\n1. Escreva um roteiro curto para um vídeo.\n2. Quais são as 2 cores principais da sua marca?", "lessons": [ { "lessonId": "L04.01", "title": "Estrutura de Vídeos que Engajam", "content": "Um vídeo precisa seguir uma estrutura estratégica: Gancho (1º segundo), Valor (dica ou solução) e CTA (chamada para ação). Exemplo: 'Você quer mais clientes? Então evite esse erro aqui...'" } ] },
@@ -16,55 +17,55 @@ document.addEventListener('DOMContentLoaded', () => {
     let nextLeadId = 0, currentLeadId = null, draggedItem = null, currentProductId = null;
     let statusChart;
     let db;
-    let unsubscribeLeadChatListener = null; 
+    let unsubscribeLeadChatListener = null;
     let whatsappEventsSource = null;
-    let botInstructions = ""; 
-    let keepAliveInterval = null; 
+    let botInstructions = "";
+    let keepAliveInterval = null;
 
     // URL BASE DO SEU BOT DE WHATSAPP NO RENDER
     const WHATSAPP_BOT_URL = 'https://superapp-whatsapp-bot.onrender.com';
 
     // === FUNÇÕES DE UTILIDADE E RENDERIZAÇÃO ===
-    
-    function addMessageToChat(msg, type, containerId) { 
-        const c = document.getElementById(containerId); 
-        if (c) { 
+
+    function addMessageToChat(msg, type, containerId) {
+        const c = document.getElementById(containerId);
+        if (c) {
             // Remove o 'Pensando...' quando a mensagem real chega
             if(type !== 'bot-thinking' && document.querySelector(`#${containerId} .bot-thinking`)) {
                  document.querySelector(`#${containerId} .bot-thinking`).remove();
             }
-            c.innerHTML += `<div class="${type}">${msg}</div>`; 
-            c.scrollTop = c.scrollHeight; 
-        } 
+            c.innerHTML += `<div class="${type}">${msg}</div>`;
+            c.scrollTop = c.scrollHeight;
+        }
     }
-    
-    function renderChatHistory(containerId, history) { 
-        const c = document.getElementById(containerId); 
-        if (!c) return; 
-        c.innerHTML = ''; 
-        
+
+    function renderChatHistory(containerId, history) {
+        const c = document.getElementById(containerId);
+        if (!c) return;
+        c.innerHTML = '';
+
         // FILTRO CRÍTICO: Remove o script de instrução do bot do histórico de visualização
-        const filteredHistory = history.filter(m => 
+        const filteredHistory = history.filter(m =>
             !(m.role === 'model' && m.parts[0]?.text?.includes('**INSTRUÇÕES GERAIS PARA O OPERADOR**'))
         );
 
-        if (!filteredHistory || filteredHistory.length === 0) { 
-            addMessageToChat("Olá! Como posso ajudar?", 'bot-message', containerId); 
-        } else { 
+        if (!filteredHistory || filteredHistory.length === 0) {
+            addMessageToChat("Olá! Como posso ajudar?", 'bot-message', containerId);
+        } else {
             // Garante que o histórico não tenha o 'Pensando...' no final
-            document.querySelector(`#${containerId} .bot-thinking`)?.remove(); 
-            filteredHistory.forEach(m => addMessageToChat(m.parts[0].text, m.role === 'user' ? 'user-message' : 'bot-message', containerId)); 
-        } 
+            document.querySelector(`#${containerId} .bot-thinking`)?.remove();
+            filteredHistory.forEach(m => addMessageToChat(m.parts[0].text, m.role === 'user' ? 'user-message' : 'bot-message', containerId));
+        }
     }
-    
+
     // --- FUNÇÃO DE RENDERIZAÇÃO DO KANBAN COM NOTIFICAÇÃO E ÍCONE DE AGENDAMENTO ---
-    function renderKanbanCards() { 
-        document.querySelectorAll('.kanban-cards-list').forEach(l => l.innerHTML = ''); 
-        leads.forEach(lead => { 
-            const c = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`); 
-            if (c) { 
-                const wa = `<a href="https://wa.me/${(lead.whatsapp || '').replace(/\D/g, '')}" target="_blank">${lead.whatsapp}</a>`; 
-                
+    function renderKanbanCards() {
+        document.querySelectorAll('.kanban-cards-list').forEach(l => l.innerHTML = '');
+        leads.forEach(lead => {
+            const c = document.querySelector(`.kanban-column[data-status="${lead.status}"] .kanban-cards-list`);
+            if (c) {
+                const wa = `<a href="https://wa.me/${(lead.whatsapp || '').replace(/\D/g, '')}" target="_blank">${lead.whatsapp}</a>`;
+
                 // LÓGICA DE STATUS DE TEMPO E CLASSES
                 let scheduleStatusClass = ''; // 'scheduled-active', 'scheduled-overdue', 'scheduled-upcoming'
                 let scheduleIcon = '';
@@ -75,16 +76,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     // CRÍTICO: CONSTRUÇÃO SEGURA DA DATA COM BASE NO HORÁRIO LOCAL
                     const [year, month, day] = lead.scheduledDate.split('-').map(Number);
                     const [hour, minute] = lead.scheduledTime.split(':').map(Number);
-                    
+
                     // Mês é base 0, então subtraímos 1
-                    const scheduledDateTime = new Date(year, month - 1, day, hour, minute, 0); 
+                    const scheduledDateTime = new Date(year, month - 1, day, hour, minute, 0);
 
                     const diffMinutes = Math.round((scheduledDateTime - now) / 60000); // Diferença em minutos
 
-                    if (diffMinutes <= 0 && lead.status !== 'fechado') { 
+                    if (diffMinutes <= 0 && lead.status !== 'fechado') {
                         scheduleStatusClass = 'scheduled-active'; // Laranja para ATIVO/AGORA
-                        
-                        if (diffMinutes < -15) { 
+
+                        if (diffMinutes < -15) {
                             scheduleStatusClass = 'scheduled-overdue'; // Vermelho para ATRASADO (> 15 minutos)
                         }
                     } else if (diffMinutes > 0 && diffMinutes <= 60) {
@@ -92,13 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     // Renderização do Ícone de Agendamento
-                    const hora = lead.scheduledTime.substring(0, 5); 
-                    
+                    const hora = lead.scheduledTime.substring(0, 5);
+
                     scheduleIcon = `
                         <span class="schedule-badge ${scheduleStatusClass}" title="Agendado para ${lead.scheduledDate} às ${hora} (${lead.reminderType || 'Lembrete'})">
                             <i class="ph-fill ph-clock-countdown"></i>
                         </span>`;
-                    
+
                     scheduleText = `<p class="scheduled-time ${scheduleStatusClass}">${hora} (${lead.reminderType || 'Lembrete'})</p>`;
                 }
 
@@ -117,11 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         </strong>
                         ${scheduleText}
                         <p>${wa}</p>
-                        ${scheduleIcon} </div>`; 
-            } 
-        }); 
+                        ${scheduleIcon} </div>`;
+            }
+        });
     }
-    
+
     function renderLeadsTable() { const t = document.querySelector('#leads-table tbody'); if (t) { t.innerHTML = leads.map(l => { const wa = `<a href="https://wa.me/${(l.whatsapp || '').replace(/\D/g, '')}" target="_blank">${l.whatsapp}</a>`; return `<tr data-id="${l.id}"><td>${l.nome}</td><td>${wa}</td><td>${l.origem}</td><td>${l.qualificacao}</td><td>${l.status}</td><td><button class="btn-edit-table"><i class="ph-fill ph-note-pencil"></i></button><button class="btn-delete-table"><i class="ph-fill ph-trash"></i></button></td></tr>`; }).join(''); } }
     function updateDashboard() { const n = leads.filter(l=>l.status==='novo').length, p=leads.filter(l=>l.status==='progresso').length, f=leads.filter(l=>l.status==='fechado').length; document.getElementById('total-leads').textContent = leads.length; document.getElementById('leads-novo').textContent = n; document.getElementById('leads-progresso').textContent = p; document.getElementById('leads-fechado').textContent = f; const ctx = document.getElementById('statusChart')?.getContext('2d'); if (!ctx) return; if (statusChart) statusChart.destroy(); statusChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Novo', 'Progresso', 'Fechado'], datasets: [{ data: [n, p, f], backgroundColor: ['#00f7ff', '#ffc107', '#28a745'] }] } }); }
     function renderCaixaTable() { const t = document.querySelector('#caixa-table tbody'); if (t) { t.innerHTML = caixa.map(m => `<tr><td>${m.data}</td><td>${m.descricao}</td><td>${m.tipo==='entrada'?'R$ '+m.valor.toFixed(2):''}</td><td>${m.tipo==='saida'?'R$ '+m.valor.toFixed(2):''}</td></tr>`).join(''); } }
@@ -144,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCaixa();
         renderEstoqueTable();
     }
-    
+
     function applySettings(settings = {}) {
         const theme = settings.theme || 'dark';
         const userName = settings.userName || 'Usuário';
@@ -165,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const dataToSave = {
                 leads, caixa, estoque, chatHistory,
                 mentoriaNotes: getMentoriaNotes(),
-                botInstructions: document.getElementById('bot-instructions')?.value || botInstructions, 
+                botInstructions: document.getElementById('bot-instructions')?.value || botInstructions,
                 settings: {
                     theme: document.body.classList.contains('light-theme') ? 'light' : 'dark',
                     userName: document.getElementById('setting-user-name').value || 'Usuário',
@@ -184,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (unsubscribeLeadChatListener) {
             unsubscribeLeadChatListener();
         }
-        
+
         const userId = firebase.auth().currentUser.uid;
         const chatRef = db.collection('userData').doc(userId).collection('leads').doc(String(leadId)).collection('chatHistory');
 
@@ -195,13 +196,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = doc.data();
                 history.push(data);
             });
-            
+
             // Atualiza o histórico local e renderiza
             const lead = leads.find(l => l.id === leadId);
             if(lead) {
                  lead.chatHistory = history;
             }
-            
+
             renderChatHistory('lead-chatbot-messages', history);
         }, error => {
             console.error("Erro no listener de chat do Firestore:", error);
@@ -215,56 +216,56 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // A função openEditModal agora usa o listener e garante o estado visual
-    async function openEditModal(leadId) { 
-        currentLeadId = leadId; 
-        const lead = leads.find(l => l.id === leadId); 
+    async function openEditModal(leadId) {
+        currentLeadId = leadId;
+        const lead = leads.find(l => l.id === leadId);
         const toggleBotBtn = document.getElementById('toggle-bot-btn');
 
-        if(lead) { 
+        if(lead) {
             // CARREGAMENTO DOS DADOS (Incluindo Agendamento)
-            document.getElementById('edit-lead-name').value = lead.nome; 
-            document.getElementById('edit-lead-email').value = lead.email; 
-            document.getElementById('edit-lead-whatsapp').value = lead.whatsapp; 
-            document.getElementById('edit-lead-status').value = lead.status; 
-            document.getElementById('edit-lead-origem').value = lead.origem; 
-            document.getElementById('edit-lead-qualification').value = lead.qualificacao; 
-            document.getElementById('edit-lead-notes').value = lead.notas; 
-            
+            document.getElementById('edit-lead-name').value = lead.nome;
+            document.getElementById('edit-lead-email').value = lead.email;
+            document.getElementById('edit-lead-whatsapp').value = lead.whatsapp;
+            document.getElementById('edit-lead-status').value = lead.status;
+            document.getElementById('edit-lead-origem').value = lead.origem;
+            document.getElementById('edit-lead-qualification').value = lead.qualificacao;
+            document.getElementById('edit-lead-notes').value = lead.notas;
+
             // Campos de Agendamento (CORRIGIDO PARA ACESSAR ELEMENTOS VÁLIDOS)
             const editLeadDate = document.getElementById('edit-lead-date');
             if (editLeadDate) editLeadDate.value = lead.scheduledDate || '';
-            
+
             const editLeadTime = document.getElementById('edit-lead-time');
             if (editLeadTime) editLeadTime.value = lead.scheduledTime || '';
-            
+
             const editLeadReminderType = document.getElementById('edit-lead-reminder-type');
             if (editLeadReminderType) editLeadReminderType.value = lead.reminderType || 'none';
-            
+
             // ZERA O CONTADOR DE MENSAGENS NÃO LIDAS
             if (lead.unreadCount && lead.unreadCount > 0) {
                 lead.unreadCount = 0;
-                await saveUserData(firebase.auth().currentUser.uid); 
+                await saveUserData(firebase.auth().currentUser.uid);
                 renderKanbanCards();
             }
 
-            const botActive = lead.botActive === undefined ? true : lead.botActive; 
+            const botActive = lead.botActive === undefined ? true : lead.botActive;
             // CORRIGIDO: O elemento toggleBotBtn agora é encontrado
             if (toggleBotBtn) {
-                 toggleBotBtn.classList.toggle('btn-delete', botActive); 
+                 toggleBotBtn.classList.toggle('btn-delete', botActive);
                  toggleBotBtn.classList.toggle('btn-save', !botActive);
                  toggleBotBtn.textContent = botActive ? 'Desativar Bot' : 'Ativar Bot';
             }
 
             const chatContainer = document.getElementById('lead-chatbot-messages');
             if (chatContainer) {
-                chatContainer.innerHTML = ''; 
-                addMessageToChat("Carregando histórico...", 'bot-message bot-thinking', 'lead-chatbot-messages'); 
+                chatContainer.innerHTML = '';
+                addMessageToChat("Carregando histórico...", 'bot-message bot-thinking', 'lead-chatbot-messages');
             }
 
             setupLeadChatListener(lead.id);
 
-            document.getElementById('edit-lead-modal').style.display = 'flex'; 
-        } 
+            document.getElementById('edit-lead-modal').style.display = 'flex';
+        }
     }
 
     function openCustosModal(productId) { currentProductId = productId; const produto = estoque.find(p => p.id === productId); if (produto) { document.getElementById('custos-modal-title').textContent = `Custos de: ${produto.produto}`; renderCustosList(produto); document.getElementById('custos-modal').style.display = 'flex'; } }
@@ -277,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(keepAliveInterval);
         }
         const currentUserId = firebase.auth().currentUser.uid;
-        
+
         // Função que cutuca o Bot no Render
         const cutucarBot = async () => {
              try {
@@ -293,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
         keepAliveInterval = setInterval(cutucarBot, 30000);
         console.log("[KeepAlive] Serviço de prevenção de sono do Bot iniciado.");
     }
-    
+
     function setupWhatsappBotConnection() {
         const statusElement = document.getElementById('bot-status');
         const qrCodeImg = document.getElementById('qr-code-img');
@@ -306,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Função para atualizar o status na tela
         function updateStatus(message, isConnected) {
             statusElement.textContent = message;
-            statusElement.style.color = isConnected ? '#25D366' : '#e57373'; 
+            statusElement.style.color = isConnected ? '#25D366' : '#e57373';
             qrCodeImg.style.display = 'none';
             qrCodeMessage.textContent = '';
         }
@@ -317,12 +318,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 whatsappEventsSource.close();
             }
             const currentUserId = firebase.auth().currentUser.uid;
-            whatsappEventsSource = new EventSource(`${WHATSAPP_BOT_URL}/events?userId=${currentUserId}`); 
-            
+            whatsappEventsSource = new EventSource(`${WHATSAPP_BOT_URL}/events?userId=${currentUserId}`);
+
             whatsappEventsSource.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
-                    
+
                     if (data.type === 'qr' && data.data) {
                         qrCodeImg.src = data.data;
                         qrCodeImg.style.display = 'block';
@@ -349,13 +350,13 @@ document.addEventListener('DOMContentLoaded', () => {
             whatsappEventsSource.onerror = (error) => {
                 console.error("Erro na conexão SSE com o WhatsApp Bot:", error);
                 updateStatus('Erro na Conexão em Tempo Real. Tentando reconectar...', false);
-                setTimeout(startSSEListener, 5000); 
+                setTimeout(startSSEListener, 5000);
             };
         }
-        
+
         // Chamada inicial para garantir que o Bot seja ativado assim que o app carregar
-        startSSEListener(); 
-        // NOVO: Inicia o serviço de keep-alive 
+        startSSEListener();
+        // NOVO: Inicia o serviço de keep-alive
         startKeepAlive();
 
         // 2. Função para verificar o status atual (chamada pelo botão)
@@ -370,8 +371,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const response = await fetch(`${WHATSAPP_BOT_URL}/status?userId=${currentUserId}`); 
-                
+                const response = await fetch(`${WHATSAPP_BOT_URL}/status?userId=${currentUserId}`);
+
                 const contentType = response.headers.get("content-type");
                 if (contentType && contentType.indexOf("application/json") === -1) {
                     const textResponse = await response.text();
@@ -380,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const data = await response.json();
-                
+
                 if (data.connected || data.status === 'QR_AVAILABLE') {
                     updateStatus(`Conectado como: ${data.user || 'Dispositivo'}`, true);
                     if (data.qrCodeUrl) {
@@ -401,12 +402,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateStatus(`Erro de Conexão: ${error.message}. Verifique a hospedagem do Bot.`, false);
             }
         });
-        
+
         // 3. Salvar instruções da IA
         saveInstructionsBtn?.addEventListener('click', async () => {
             const newInstructions = instructionsTextarea.value;
             try {
-                await saveUserData(firebase.auth().currentUser.uid); 
+                await saveUserData(firebase.auth().currentUser.uid);
                 botInstructions = newInstructions;
                 saveMessage.textContent = 'Instruções salvas com sucesso!';
                 saveMessage.style.color = '#25D366';
@@ -429,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 appContainer.classList.toggle('sidebar-visible');
             });
         }
-        
+
         document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
             item.addEventListener('click', e => {
                 if (window.innerWidth <= 768) {
@@ -448,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.getElementById('theme-toggle-btn')?.addEventListener('click', () => { document.body.classList.toggle('light-theme'); const isLight = document.body.classList.contains('light-theme'); document.getElementById('theme-toggle-btn').textContent = isLight ? 'Mudar para Tema Escuro' : 'Mudar para Tema Claro'; saveUserData(userId); });
-        
+
         document.getElementById('save-settings-btn')?.addEventListener('click', async () => {
             await saveUserData(userId);
             alert('Configurações salvas!');
@@ -482,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             kanbanBoard.addEventListener('click', e => { if (e.target.tagName === 'A') { e.stopPropagation(); return; } const card = e.target.closest('.kanban-card'); if (card) openEditModal(parseInt(card.dataset.id)); });
         }
-        
+
         document.getElementById('leads-table')?.addEventListener('click', e => { if (e.target.tagName === 'A') { e.stopPropagation(); return; } if (e.target.closest('.btn-edit-table')) openEditModal(parseInt(e.target.closest('tr').dataset.id)); if (e.target.closest('.btn-delete-table')) { if (confirm('Tem certeza?')) { leads = leads.filter(l => l.id != parseInt(e.target.closest('tr').dataset.id)); saveUserData(userId); updateAllUI(); } } });
 
         // Bloco de salvar agendamento e informações do lead
@@ -497,13 +498,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 lead.origem = document.getElementById('edit-lead-origem').value;
                 lead.qualificacao = document.getElementById('edit-lead-qualification').value;
                 lead.notas = document.getElementById('edit-lead-notes').value;
-                
+
                 // Salvar Campos de Agendamento
                 const reminderType = document.getElementById('edit-lead-reminder-type').value;
                 lead.scheduledDate = document.getElementById('edit-lead-date').value;
                 lead.scheduledTime = document.getElementById('edit-lead-time').value;
                 lead.reminderType = reminderType;
-                
+
                 // Lógica de desativação do agendamento
                 if (reminderType === 'none') {
                     delete lead.scheduledDate;
@@ -513,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 await saveUserData(userId);
                 updateAllUI();
-                
+
                 if (unsubscribeLeadChatListener) unsubscribeLeadChatListener();
                 document.getElementById('edit-lead-modal').style.display = 'none';
             }
@@ -524,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 leads = leads.filter(l => l.id !== currentLeadId);
                 await saveUserData(userId);
                 updateAllUI();
-                
+
                 // Fecha o modal e desativa o listener de chat
                 if (unsubscribeLeadChatListener) unsubscribeLeadChatListener();
                 document.getElementById('edit-lead-modal').style.display = 'none';
@@ -550,7 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.querySelectorAll('.finance-tab').forEach(tab => { tab.addEventListener('click', e => { e.preventDefault(); document.querySelectorAll('.finance-tab, .finance-content').forEach(el => el.classList.remove('active')); e.target.classList.add('active'); document.getElementById(e.target.dataset.tab + '-tab-content').classList.add('active'); }); });
-        
+
         document.getElementById('estoque-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const newProduct = { id: `prod_${Date.now()}`, produto: document.getElementById('estoque-produto').value, descricao: document.getElementById('estoque-descricao').value, compra: parseFloat(document.getElementById('estoque-compra').value), venda: parseFloat(document.getElementById('estoque-venda').value), custos: [] };
@@ -559,9 +560,9 @@ document.addEventListener('DOMContentLoaded', () => {
             renderEstoqueTable();
             e.target.reset();
         });
-        
+
         document.getElementById('estoque-search')?.addEventListener('input', renderEstoqueTable);
-        
+
         document.getElementById('estoque-table')?.addEventListener('click', async (e) => {
             if (e.target.closest('.btn-custo')) {
                 const productId = e.target.closest('tr').dataset.id;
@@ -576,7 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        
+
         document.getElementById('add-custo-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const produto = estoque.find(p => p.id === currentProductId);
@@ -595,7 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('export-leads-btn')?.addEventListener('click', () => { if (leads.length === 0) { alert("Não há leads para exportar."); return; } const header = ["Nome", "Email", "WhatsApp", "Origem", "Qualificação", "Status", "Notas"]; const rows = leads.map(l => [l.nome, l.email, l.whatsapp, l.origem, l.qualificacao, l.status, `"${(l.notas || '').replace(/"/g, '""')}"`]); const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Leads"); XLSX.writeFile(workbook, "leads.xlsx"); });
         document.getElementById('export-csv-btn')?.addEventListener('click', () => { if (estoque.length === 0) { alert("Não há produtos para exportar."); return; } const header = ["Produto", "Descrição", "Valor de Compra", "Valor de Venda"]; const rows = estoque.map(p => [p.produto, p.descricao, p.compra, p.venda]); const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Estoque"); XLSX.writeFile(workbook, "estoque.xlsx"); });
         document.getElementById('import-csv-btn')?.addEventListener('click', () => { const input = document.createElement('input'); input.type = 'file'; input.accept = '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'; input.onchange = e => { const file = e.target.files[0]; const reader = new FileReader(); reader.onload = async (event) => { const data = new Uint8Array(event.target.result); const workbook = XLSX.read(data, {type: 'array'}); const ws = workbook.Sheets[workbook.SheetNames[0]]; const json = XLSX.utils.sheet_to_json(ws); json.forEach(item => { const pKey = Object.keys(item).find(k=>k.toLowerCase()==='produto'); const cKey = Object.keys(item).find(k=>k.toLowerCase().includes('compra')); const vKey = Object.keys(item).find(k=>k.toLowerCase().includes('venda')); if(item[pKey] && item[cKey] && item[vKey]){ estoque.push({ id: `prod_${Date.now()}_${Math.random()}`, produto: item[pKey], descricao: item['Descrição']||item['descricao']||'', compra: parseFloat(item[cKey]), venda: parseFloat(item[vKey]), custos: [] }); } }); await saveUserData(userId); renderEstoqueTable(); alert(`${json.length} produtos importados!`); }; reader.readAsArrayBuffer(file); }; input.click(); });
-        
+
         // CHATBOT PRINCIPAL (USANDO A ROTA /api/gemini.js)
         document.getElementById('chatbot-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -607,12 +608,12 @@ document.addEventListener('DOMContentLoaded', () => {
             chatbotInput.value = '';
             addMessageToChat("Pensando...", 'bot-message bot-thinking', 'chatbot-messages');
             try {
-                const response = await fetch('/api/gemini', { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ prompt: userInput, history: chatHistory }) 
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: userInput, history: chatHistory })
                 });
-                
+
                 document.querySelector('#chatbot-messages .bot-thinking')?.remove();
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -627,17 +628,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             await saveUserData(userId);
         });
-        
+
         // CHATBOT DO LEAD (NO MODAL) - LÓGICA REESCRITA PARA BOT ATIVO/DESATIVADO
         document.getElementById('lead-chatbot-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('lead-chatbot-input');
             const userInput = input.value.trim();
             if (!userInput || currentLeadId === null) return;
-            
+
             const lead = leads.find(l => l.id === currentLeadId);
             if (!lead) return;
-            
+
             const isBotActive = lead.botActive === undefined ? true : lead.botActive;
             const userId = firebase.auth().currentUser.uid;
             const chatContainerId = 'lead-chatbot-messages';
@@ -645,52 +646,48 @@ document.addEventListener('DOMContentLoaded', () => {
             // 1. Adiciona a mensagem do operador IMEDIATAMENTE (Sua mensagem)
             addMessageToChat(userInput, 'user-message', chatContainerId);
             input.value = '';
-            
-            if (!isBotActive) { 
+
+            if (!isBotActive) {
                 // --- BOT DESATIVADO: ENVIO DIRETO PARA WHATSAPP (Via /send do Render)
-                
+
                 try {
                     // 2. SALVA A MENSAGEM NO HISTÓRICO COMO OPERADOR (role: "model")
-                    const chatRef = db.collection('userData').doc(userId).collection('leads').doc(String(currentLeadId)).collection('chatHistory');
-                    await chatRef.add({
-                        role: "model", // Mensagens do operador são salvas como "model" para aparecer à esquerda
-                        parts: [{text: userInput}],
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    });
-                    
+                    //    -> O listener do Firestore já fará isso aparecer na tela.
+
                     // 3. ENVIAR DIRETAMENTE PARA O WHATSAPP
                     const sendResponse = await fetch(`${WHATSAPP_BOT_URL}/send`, {
-                        method: 'POST', 
-                        headers: { 'Content-Type': 'application/json' }, 
-                        body: JSON.stringify({ 
-                            to: lead.whatsapp, 
-                            text: userInput, 
-                            userId: userId 
-                        }) 
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            to: lead.whatsapp,
+                            text: userInput,
+                            userId: userId,
+                            leadId: currentLeadId // <<< CORREÇÃO APLICADA AQUI
+                        })
                     });
-                    
+
                     if (!sendResponse.ok) {
                         const errorData = await sendResponse.json();
                         throw new Error(errorData.error || 'Falha no envio da mensagem via Bot API.');
                     }
+                    // 4. O listener já atualizou o chat com a mensagem salva pelo backend do bot.
 
-                    // 4. Se o envio foi OK, não precisa de mais feedback visual além do que já apareceu
-                    
                 } catch (error) {
                     console.error("Erro ao enviar mensagem como operador:", error);
-                    addMessageToChat(`ERRO DE ENVIO: ${error.message}.`, 'bot-message', chatContainerId);
+                    addMessageToChat(`ERRO DE ENVIO: ${error.message}. Verifique o console do Bot.`, 'bot-message', chatContainerId);
                 }
-                
-            } else { 
+
+            } else {
                 // --- BOT ATIVO: CHAMA CLOUD FUNCTION (Fluxo IA)
-                
+
                 addMessageToChat("Pensando...", 'bot-message bot-thinking', chatContainerId);
 
                 try {
                     // O Cloud Function startAiChat SALVA A MENSAGEM DO OPERADOR e INICIA A RESPOSTA DA IA
                     const startChat = firebase.functions().httpsCallable('startAiChat');
                     await startChat({ prompt: userInput, leadId: currentLeadId });
-                    
+                    // O listener (setupLeadChatListener) cuidará de mostrar a resposta da IA
+
                 } catch (error) {
                     document.querySelector(`#${chatContainerId} .bot-thinking`)?.remove();
                     const errorMessage = error.message.includes('permission-denied') ? 'Erro de permissão do Firebase Functions.' : error.message;
@@ -699,18 +696,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        document.querySelectorAll('.close-modal').forEach(btn => { 
-            btn.addEventListener('click', () => { 
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', () => {
                 // Fecha o modal
-                document.getElementById(btn.dataset.target).style.display = 'none'; 
+                document.getElementById(btn.dataset.target).style.display = 'none';
                 // DESATIVA O LISTENER DE CHAT AO FECHAR O MODAL
                 if (unsubscribeLeadChatListener) {
                     unsubscribeLeadChatListener();
                     unsubscribeLeadChatListener = null;
                 }
-            }); 
+            });
         });
-        
+
         // NOVO: Funcionalidade para fechar o modal ao clicar no overlay (clicar fora)
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', (e) => {
@@ -718,7 +715,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (e.target.classList.contains('modal-overlay')) {
                     const modalId = e.target.id;
                     document.getElementById(modalId).style.display = 'none';
-                    
+
                     // Se for o modal de edição de lead, desativa o listener de chat
                     if (modalId === 'edit-lead-modal' && unsubscribeLeadChatListener) {
                         unsubscribeLeadChatListener();
@@ -728,7 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-    
+
     async function loadAllUserData(userId) {
         try {
             const doc = await db.collection('userData').doc(userId).get();
@@ -742,7 +739,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // CORREÇÃO: Verifica se o campo bot-instructions existe antes de tentar preencher
                 const instructionsElement = document.getElementById('bot-instructions');
                 botInstructions = instructionsElement?.value || data.botInstructions || instructionsElement?.placeholder || "Você é um assistente virtual prestativo.";
-                
+
                 nextLeadId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 0;
                 applySettings(data.settings);
                 loadMentoriaNotes(data.mentoriaNotes);
@@ -764,7 +761,7 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(keepAliveInterval);
         }
         const currentUserId = firebase.auth().currentUser.uid;
-        
+
         // Função que cutuca o Bot no Render
         const cutucarBot = async () => {
              try {
@@ -787,13 +784,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.setAttribute('data-initialized', 'true');
                 db = firebase.firestore();
                 await loadAllUserData(user.uid);
-                setupEventListeners(user.uid); 
-                setupWhatsappBotConnection(); 
+                setupEventListeners(user.uid);
+                setupWhatsappBotConnection();
             }
         });
     }
 
-    main(); 
+    main();
     // Garante que o status do agendamento seja atualizado a cada minuto
     setInterval(updateAllUI, 60000);
 });
