@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Permite leitura e escrita apenas para o usuário autenticado (userId)
+    match /userData/{userId} {
+      allow read, write: if request.auth.uid == userId;
+      
+      // Regra para a subcoleção 'leads'
+      match /leads/{leadId} {
+        allow read, write: if request.auth.uid == userId;
+        
+        // CORREÇÃO CRÍTICA: Regra para a subcoleção 'chatHistory' dentro do lead.
+        // Permite que o usuário autenticado (userId) leia e escreva.
+        match /chatHistory/{chatMessage} {
+          allow read, write: if request.auth.uid == userId;
+        }
+      }
+    }
+  }
+}
