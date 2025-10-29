@@ -1,4 +1,4 @@
-// Arquivo: auth.js (Simplificado)
+// Arquivo: auth.js (Versão Definitiva)
 // SUAS CREDENCIAIS DO FIREBASE JÁ ESTÃO AQUI DENTRO
 const firebaseConfig = {
   apiKey: "AIzaSyA5H7sBUCdgNueLXvdv_sxPTUHT6n38Z9k",
@@ -10,7 +10,7 @@ const firebaseConfig = {
   measurementId: "G-ZZTHW2QHR4"
 };
 
-// Inicializa o Firebase
-if (!firebase.apps.length) {
+// Inicializa o Firebase (apenas se não estiver inicializado)
+if (typeof firebase !== 'undefined' && !firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
