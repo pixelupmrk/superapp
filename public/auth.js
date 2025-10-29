@@ -1,4 +1,4 @@
-// Arquivo: auth.js (Versão Definitiva)
+// Arquivo: public/auth.js (Versão Definitiva)
 // SUAS CREDENCIAIS DO FIREBASE JÁ ESTÃO AQUI DENTRO
 const firebaseConfig = {
   apiKey: "AIzaSyA5H7sBUCdgNueLXvdv_sxPTUHT6n38Z9k",
